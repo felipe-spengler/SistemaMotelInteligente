@@ -58,6 +58,7 @@ import java.util.List;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
+
 /**
  *
  */
@@ -114,12 +115,10 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             configuracao.setCaixa(idCaixaAtual);
         }
 
-
         new Thread(() -> {
             MotelInteligenteApplication.main(new String[]{});
         }).start();
     }
-
 
     public void setLabel(String ini_user, String ini_cargo) {
         cargo = ini_cargo;
@@ -1597,7 +1596,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             if (status.equals("limpeza") || status.equals("manutencao") || status.equals("reservado")) {
                 menuLimpeza.show(botaoStatus, 20, 20);
 
-
             } else if (status.contains("ocupado")) {
                 menuOcupado.show(botaoStatus, 20, 20);
                 String[] partes = status.split("-");
@@ -1679,8 +1677,23 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     }//GEN-LAST:event_btFuncionarioActionPerformed
 
     private void botaoEncerrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoEncerrarActionPerformed
-        // TODO add your handling code here:
+        if (isClickable) {
+            isClickable = false;
 
+            executarFinalizar();
+            // Iniciar uma thread para desbloquear o botão após um segundo
+            new Thread(() -> {
+                try {
+                    Thread.sleep(1000); // Esperar um segundo
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                } finally {
+                    isClickable = true; // Desbloquear o botão
+                }
+            }).start();
+        }
+    }//GEN-LAST:event_botaoEncerrarActionPerformed
+    public void executarFinalizar() {
         configGlobal config = configGlobal.getInstance();
         int idCaixa = config.getCaixa();
         if (idCaixa == 0) {
@@ -1696,9 +1709,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 new EncerraQuarto(quartoEmFoco);
             }
         }
-
-
-    }//GEN-LAST:event_botaoEncerrarActionPerformed
+    }
     public boolean mudaStatusNaCache(int quartoMudar, String statusColocar) {
         CacheDados dados = CacheDados.getInstancia();
         // Obtém o quarto da cache
@@ -2210,9 +2221,10 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             cache.getCacheOcupado().put(quartoEmFoco, quartoOcupado);
 
         }
+
         List<Negociados> negociacoes = null;
         if (cache.cacheNegociado.containsKey(idLocacao)) {
-             negociacoes = cache.cacheNegociado.get(idLocacao);
+            negociacoes = cache.cacheNegociado.get(idLocacao);
         }
         Negociados negociado = new Negociados(tipo, valor);
         negociacoes.add(negociado);

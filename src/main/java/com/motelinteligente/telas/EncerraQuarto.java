@@ -260,8 +260,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
         // ve se tem itens no prevenda
         int idLocacao = quartodao.getIdLocacao(numeroQuarto);
         if (idLocacao == 0) {
-             int novoID = new fquartos().getIdLocacao(numeroQuarto);
-             idLocacao = novoID;
+            int novoID = new fquartos().getIdLocacao(numeroQuarto);
+            idLocacao = novoID;
         }
         adicionaPreVendidos(idLocacao);
         verAntecipado(idLocacao);
@@ -1235,34 +1235,36 @@ public class EncerraQuarto extends javax.swing.JFrame {
     }//GEN-LAST:event_txtPessoasActionPerformed
 
     private void btSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btSalvarActionPerformed
+
         if (motivo != null) {
             // foi dado desistencia
             salvaDesistencia();
-        }
-        KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(yourKeyEventDispatcher);
+        } else {
+            String descontar = txtDesconto.getText();
+            String acrescentar = txtAcrescimo.getText();
+            if ((!descontar.equals("0") && !descontar.isEmpty()) || (!acrescentar.equals("0") && !acrescentar.isEmpty())) {
+                // precisa de justificativa
+                if (txtJustifica.getText().isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Precisa Justificativa!");
+                } else {
+                    if (chamaJOP()) {
+                        salvaVendidos(numeroDoQuarto);
+                        salvaJustifica();
+                        System.out.println("justificativa salva");
+                    }
+                }
 
-        String descontar = txtDesconto.getText();
-        String acrescentar = txtAcrescimo.getText();
-        if ((!descontar.equals("0") && !descontar.isEmpty()) || (!acrescentar.equals("0") && !acrescentar.isEmpty())) {
-            // precisa de justificativa
-            if (txtJustifica.getText().isEmpty()) {
-                JOptionPane.showMessageDialog(null, "Precisa Justificativa!");
             } else {
+                // nao precisa justificativa
                 if (chamaJOP()) {
                     salvaVendidos(numeroDoQuarto);
-                    salvaJustifica();
-                    System.out.println("justificativa salva");
+                    System.out.println("não precisou justificar");
+
                 }
             }
-
-        } else {
-            // nao precisa justificativa
-            if (chamaJOP()) {
-                salvaVendidos(numeroDoQuarto);
-                System.out.println("não precisou justificar");
-
-            }
         }
+
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(yourKeyEventDispatcher);
 
     }//GEN-LAST:event_btSalvarActionPerformed
     public void salvaJustifica() {
@@ -1343,17 +1345,23 @@ public class EncerraQuarto extends javax.swing.JFrame {
     }
 
     public void salvaDesistencia() {
-
-        int idLocacao = new fquartos().getIdLocacao(numeroDoQuarto);
-
+        configGlobal config = configGlobal.getInstance();
+        int idCaixa = config.getCaixa();
+        fquartos quartodao = new fquartos();
+        CacheDados cache = CacheDados.getInstancia();
+        int idLocacao = cache.getCacheOcupado().get(numeroDoQuarto).getIdLoca();
+        String horaFim = lblFimLocacao.getText();
+        String horaInicio = lblInicioLocacao.getText();
         Connection link = null;
         try {
             link = new fazconexao().conectar();
-            String consultaSQL = "INSERT INTO desistencia (idlocacao, motivo) VALUES (?, ?)";
+            String consultaSQL = "INSERT INTO desistencia (numquarto, horainicio, horafim, motivo, idcaixaatual) VALUES (?, ?, ? , ? , ?)";
             PreparedStatement statement = link.prepareStatement(consultaSQL);
-            //statement.setInt(1, dados.getIdquartos());
-            statement.setInt(1, idLocacao);
-            statement.setString(2, motivo);
+            statement.setInt(1, numeroDoQuarto);
+            statement.setTimestamp(2, Timestamp.valueOf(horaInicio));
+            statement.setTimestamp(3, Timestamp.valueOf(horaFim));
+            statement.setString(4, motivo);
+            statement.setInt(5, idCaixa);
 
             int n = statement.executeUpdate();
 
@@ -1361,7 +1369,24 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 link.close();
                 statement.close();
                 JOptionPane.showMessageDialog(null, "Desistencia Salva! ");
+                excluiDaRegistraLocado(idLocacao);
+                // altera o status do quarto para limpeza
+                mudaStatusNaCache(numeroDoQuarto, "limpeza");
+                //retira da cache ocupados
+                cache.getCacheOcupado().remove(numeroDoQuarto);
 
+                //se tiver prevendidos ou negociados retira tambem
+                if (cache.cacheNegociado.containsKey(idLocacao)) {
+                    cache.cacheNegociado.remove(idLocacao);
+                }
+                if (cache.cacheProdutosVendidos.containsKey(idLocacao)) {
+                    cache.cacheProdutosVendidos.remove(idLocacao);
+                }
+                quartodao.setStatus(numeroDoQuarto, "limpeza");
+                quartodao.adicionaRegistro(numeroDoQuarto, "limpeza");
+                config.setMudanca(true);
+                outraTela.dispose();
+                this.dispose();
             } else {
                 link.close();
                 statement.close();
@@ -1370,6 +1395,35 @@ public class EncerraQuarto extends javax.swing.JFrame {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "SEVERAL ERROR: Desistencia! Infome ao Suporte do Sistema!");
 
+        } finally {
+            try {
+                // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
+                if (link != null && !link.isClosed()) {
+                    link.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void excluiDaRegistraLocado(int idLocacao) {
+        Connection link = null;
+        try {
+            link = new fazconexao().conectar();
+            String consultaSQL = "DELETE FROM registralocado WHERE idlocacao = ?";
+            PreparedStatement statement = link.prepareStatement(consultaSQL);
+            statement.setInt(1, idLocacao);
+            int n = statement.executeUpdate();
+
+            if (n != 0) {
+                JOptionPane.showMessageDialog(null, "Registro excluído da tabela registralocado!");
+            } else {
+                JOptionPane.showMessageDialog(null, "Nenhum registro encontrado para exclusão na tabela registralocado!");
+            }
+            statement.close();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao excluir registro de locação na tabela registralocado! Informe ao Suporte do Sistema!");
         } finally {
             try {
                 // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
@@ -1518,10 +1572,10 @@ public class EncerraQuarto extends javax.swing.JFrame {
 
         //se tiver prevendidos ou negociados retira tambem
         if (cache.cacheNegociado.containsKey(idLocacao)) {
-            cache.cacheNegociado.remove(numeroDoQuarto);
+            cache.cacheNegociado.remove(idLocacao);
         }
         if (cache.cacheProdutosVendidos.containsKey(idLocacao)) {
-            cache.cacheNegociado.remove(numeroDoQuarto);
+            cache.cacheProdutosVendidos.remove(idLocacao);
         }
         quartodao.setStatus(numeroDoQuarto, "limpeza");
         quartodao.adicionaRegistro(numeroDoQuarto, "limpeza");
