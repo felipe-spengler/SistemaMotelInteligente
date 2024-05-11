@@ -1494,6 +1494,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
                     valD = valDinheiro;
                     valC = valCartao;
                     valP = valPix;
+                    panel.setVisible(false); // Fechar o painel quando os valores forem aceitos
+
                     return true;
                 } else {
                     System.out.println("");
