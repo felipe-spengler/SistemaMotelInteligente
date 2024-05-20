@@ -6,6 +6,7 @@ package com.motelinteligente.telas;
 
 
 
+import com.motelinteligente.dados.configGlobal;
 import com.motelinteligente.dados.fprodutos;
 import com.motelinteligente.dados.vprodutos;
 import javax.swing.JOptionPane;
@@ -34,7 +35,7 @@ public class Produto extends javax.swing.JFrame {
     private void initComponents() {
 
         bt_voltar = new javax.swing.JButton();
-        bt_salvar = new javax.swing.JButton();
+        bt_novo = new javax.swing.JButton();
         btEditar = new javax.swing.JButton();
         bt_apagar = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
@@ -56,11 +57,11 @@ public class Produto extends javax.swing.JFrame {
             }
         });
 
-        bt_salvar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_bot_salvar.png"))); // NOI18N
-        bt_salvar.setText("Cadastrar Novo Produto");
-        bt_salvar.addActionListener(new java.awt.event.ActionListener() {
+        bt_novo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_bot_salvar.png"))); // NOI18N
+        bt_novo.setText("Cadastrar Novo Produto");
+        bt_novo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bt_salvarActionPerformed(evt);
+                bt_novoActionPerformed(evt);
             }
         });
 
@@ -126,7 +127,7 @@ public class Produto extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(btEditar)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(bt_salvar)
+                .addComponent(bt_novo)
                 .addGap(102, 102, 102))
         );
         layout.setVerticalGroup(
@@ -138,7 +139,7 @@ public class Produto extends javax.swing.JFrame {
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 436, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(bt_salvar)
+                    .addComponent(bt_novo)
                     .addComponent(bt_voltar)
                     .addComponent(btEditar)
                     .addComponent(bt_apagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -153,10 +154,10 @@ public class Produto extends javax.swing.JFrame {
         dispose();
     }//GEN-LAST:event_bt_voltarActionPerformed
 
-    private void bt_salvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_salvarActionPerformed
+    private void bt_novoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_novoActionPerformed
         // TODO add your handling code here:
         new CadastraProduto().setVisible(true);
-    }//GEN-LAST:event_bt_salvarActionPerformed
+    }//GEN-LAST:event_bt_novoActionPerformed
 
     private void btEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btEditarActionPerformed
         int linhaSelecionada = tabela.getSelectedRow();
@@ -187,6 +188,12 @@ public class Produto extends javax.swing.JFrame {
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
         // TODO add your handling code here:
         mostraJTableProduto();
+        configGlobal config = configGlobal.getInstance();
+        if(config.getCargoUsuario().equals("comum")){
+            btEditar.setEnabled(false);
+            bt_apagar.setEnabled(false);
+            bt_novo.setEnabled(false);
+        }
     }//GEN-LAST:event_formWindowOpened
 
     /**
@@ -227,7 +234,7 @@ public class Produto extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btEditar;
     private javax.swing.JButton bt_apagar;
-    private javax.swing.JButton bt_salvar;
+    private javax.swing.JButton bt_novo;
     private javax.swing.JButton bt_voltar;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JScrollPane jScrollPane1;

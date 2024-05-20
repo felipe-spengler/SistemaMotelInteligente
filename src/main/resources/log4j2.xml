@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Properties>
+        <!-- Definir propriedades globais -->
+        <Property name="log.path">logs</Property>
+    </Properties>
+    <Appenders>
+        <!-- Console appender para todos os logs -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </Console>
+        
+        <!-- Rolling file appender para todos os logs -->
+        <RollingFile name="RollingFileAll" fileName="${log.path}/app.log"
+                     filePattern="${log.path}/app-%d{MM-dd-yyyy}-%i.log">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+        
+        <!-- Rolling file appender apenas para logs de erro -->
+        <RollingFile name="RollingFileError" fileName="${log.path}/error.log"
+                     filePattern="${log.path}/error-%d{MM-dd-yyyy}-%i.log">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <Filters>
+                <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <!-- Root logger -->
+        <Root level="INFO">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="RollingFileAll"/>
+        </Root>
+        
+        <!-- Logger específico para logs de erro -->
+        <Logger name="com.example.myapp" level="ERROR" additivity="false">
+            <AppenderRef ref="RollingFileError"/>
+        </Logger>
+    </Loggers>
+</Configuration>
+
+
+

@@ -626,7 +626,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
                             .addGap(16, 16, 16)))))
         );
 
-        painelProdutos.setBackground(new java.awt.Color(102, 255, 255));
+        painelProdutos.setBackground(new java.awt.Color(204, 204, 204));
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel2.setText("Adicionar Consumo");
@@ -1144,7 +1144,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
             fprodutos produtodao = new fprodutos();
             String texto = produtodao.getDescicao(txtIdProduto.getText());
             if (texto != null) {
-                if (txtQuantidade.getText() != null) {
+                if (isInteger(txtQuantidade.getText())) {
                     float valor = produtodao.getValorProduto(Integer.parseInt(txtIdProduto.getText()));
                     float valorSoma = valor * Integer.parseInt(txtQuantidade.getText());
                     modelo.addRow(new Object[]{
@@ -1469,9 +1469,9 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 JOptionPane.OK_CANCEL_OPTION);
 
         if (result == JOptionPane.OK_OPTION) {
-            String valorPix = pixField.getText();
-            String valorCartao = cartaoField.getText();
-            String valorDinheiro = dinheiroField.getText();
+            String valorPix = pixField.getText().replace(",", ".");;
+            String valorCartao = cartaoField.getText().replace(",", ".");;
+            String valorDinheiro = dinheiroField.getText().replace(",", ".");;
 
             try {
                 float valPix = 0, valCartao = 0, valDinheiro = 0;
@@ -1494,7 +1494,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
                     valD = valDinheiro;
                     valC = valCartao;
                     valP = valPix;
-                    panel.setVisible(false); // Fechar o painel quando os valores forem aceitos
+                    JOptionPane.getRootFrame().dispose();
 
                     return true;
                 } else {
@@ -1705,7 +1705,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         String textoSemPercentagem = textoPrimeiro.replace("%", "");
         textoSemPercentagem = textoSemPercentagem.replace(",", ".");
 
-        String textoSegundo = txtDesconto.getText();
+        String textoSegundo = txtDesconto.getText().replace(",", ".");;
         float descontoPorcento = -1;
         float desconto = -1;
         try {
@@ -1714,15 +1714,36 @@ public class EncerraQuarto extends javax.swing.JFrame {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e);
         }
+        configGlobal config = configGlobal.getInstance();
+        int limiteDesconto = config.getLimiteDesconto();
         if (numero == 1) {
             if (descontoPorcento >= 0) {
-                realizaDescontoPorCento();
+                if (config.getCargoUsuario().equals("comum")) {
+                    if (descontoPorcento < limiteDesconto) {
+                        realizaDescontoPorCento();
+                    }else{
+                        JOptionPane.showMessageDialog(null, "Desconto Excede o Permitido");
+                    }
+                } else {
+                    realizaDescontoPorCento();
+                }
             }
+
         }
         if (numero == 2) {
             if (desconto >= 0) {
-                realizaDesconto();
+                float porcentoDesconto = (desconto * 100) / valorTotalFinal;
+                if (config.getCargoUsuario().equals("comum")) {
+                    if (porcentoDesconto < limiteDesconto) {
+                        realizaDesconto();
+                    }else{
+                        JOptionPane.showMessageDialog(null, "Desconto Excede o Permitido");
+                    }
+                } else {
+                    realizaDesconto();
+                }
             }
+
         }
 
     }
@@ -1748,7 +1769,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
             outraTela.setValorTotal(valorTotal);
             lblAReceber.setText(mostrar);
         } catch (NumberFormatException e) {
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "RealizaDesconto(): "+ e);
         }
     }
 

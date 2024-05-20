@@ -23,6 +23,15 @@ public class vendaProdutos {
     public float valorUnd;
     public float valorTotal;
 
+    public vendaProdutos(int idProduto, int quantidade, float valorUnd, float valorTotal) {
+        this.idProduto = idProduto;
+        this.quantidade = quantidade;
+        this.valorUnd = valorUnd;
+        this.valorTotal = valorTotal;
+    }
+    public vendaProdutos() {
+    }
+
     public class gerenciaVenda {
 
         public List<vendaProdutos> listaDeProdutos;

@@ -521,12 +521,14 @@ public class CadastraQuarto extends javax.swing.JFrame {
                 val_quarto.setText(valor_vai);
                 this.pernoite.setText(pernoite_vai);
                 String periodo = new fquartos().getPeriodo(Integer.parseInt(num_vai));
+                float valorHoraAdd = new fquartos().getAdicional(Integer.parseInt(num_vai));
                 String[] partesDividir = periodo.split(":");
                 String horasDiv = partesDividir[0];
                 String minutosDiv = partesDividir[1];
                 periodoHoras.setText(horasDiv);
                 periodoMin.setText(minutosDiv);
                 num_quarto.setEditable(false);
+                horaAdicional.setText(String.valueOf(valorHoraAdd));
 
                 //new fquartos().exclusao(Integer.parseInt(num_vai));
             }

@@ -1,6 +1,5 @@
 package com.motelinteligente.telas;
 
-import com.motelinteligente.dados.MotelInteligenteApplication;
 import com.motelinteligente.arduino.ConectaArduino;
 import com.motelinteligente.dados.CacheDados;
 import com.motelinteligente.dados.CacheDados.DadosVendidos;
@@ -39,7 +38,6 @@ import java.awt.Insets;
 import java.awt.MouseInfo;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import javax.swing.JLabel;
@@ -114,10 +112,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             configGlobal configuracao = configGlobal.getInstance();
             configuracao.setCaixa(idCaixaAtual);
         }
-
-        new Thread(() -> {
-            MotelInteligenteApplication.main(new String[]{});
-        }).start();
     }
 
     public void setLabel(String ini_user, String ini_cargo) {
@@ -196,11 +190,12 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             String[] partes = status.split("-");
             int idLoca = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
             if (idLoca == 0) {
+                System.out.println("tinha dado idlocacao = 0 na cache");
                 DadosOcupados quartoOcupado = cache.getCacheOcupado().get(quartoEmFoco);
                 int novoID = new fquartos().getIdLocacao(quartoEmFoco);
                 quartoOcupado.setIdLoca(novoID);
                 cache.getCacheOcupado().put(quartoEmFoco, quartoOcupado);
-
+                System.out.println("resolvido novo id é " + novoID);
                 cache.carregaProdutosNegociadosCache(novoID);
             }
             //insere prevendidos tabela
@@ -245,13 +240,14 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
             }
         } else {
-            System.out.println("Não há produtos vendidos para a locação " + idLocacao + " na cache.");
+            System.out.println("Não há antecipados para a locação " + idLocacao + " na cache.");
         }
 
     }
 
     public void populaPrevendidos(int locacao, DefaultTableModel modelo) {
         CacheDados cache = CacheDados.getInstancia();
+        float totalVendido = 0;
         // Verifica se a cache contém produtos vendidos para essa locação
         if (cache.cacheProdutosVendidos.containsKey(locacao)) {
             // Obtém a lista de produtos vendidos associada a essa locação
@@ -265,7 +261,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 String desc = produtoDao.getDescicao(String.valueOf(idProduto));
                 float valor = produtoDao.getValorProduto(idProduto);
                 float total = valor * quantidade;
-
+                totalVendido +=total;
                 // Adiciona uma nova linha ao modelo da tabela
                 modelo.addRow(new Object[]{
                     quantidade,
@@ -277,6 +273,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         } else {
             System.out.println("Não há produtos vendidos para a locação " + locacao + " na cache.");
         }
+        lblValorConsumo.setText("R$ "+ totalVendido);
     }
 
     public static String formatarData(String dataOriginal) {
@@ -430,7 +427,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         jSeparator3 = new javax.swing.JSeparator();
         jSeparator5 = new javax.swing.JSeparator();
         jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
+        lblPermissao = new javax.swing.JLabel();
         lblUsuario = new javax.swing.JLabel();
         lblCargo = new javax.swing.JLabel();
         painelSecundario2 = new javax.swing.JDesktopPane();
@@ -470,7 +467,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         tabela = new javax.swing.JPanel();
         srPane = new javax.swing.JDesktopPane();
         jMenuBar1 = new javax.swing.JMenuBar();
-        jMenu1 = new javax.swing.JMenu();
+        btCadastros = new javax.swing.JMenu();
         btQuartos = new javax.swing.JMenu();
         btFuncionario = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
@@ -483,11 +480,10 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         btConfereLocacao = new javax.swing.JMenuItem();
         jMenu18 = new javax.swing.JMenu();
         menuRelaVenProdutos = new javax.swing.JMenuItem();
-        menuRelaVenServicos = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         menuFazBackup = new javax.swing.JMenuItem();
         menuResBackup = new javax.swing.JMenuItem();
-        btAdicionais = new javax.swing.JMenu();
+        btFerramentas = new javax.swing.JMenu();
         menuConfigAd = new javax.swing.JMenu();
         menuSobSistema = new javax.swing.JMenuItem();
         menuSair = new javax.swing.JMenu();
@@ -635,8 +631,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         jLabel5.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         jLabel5.setText("Usuário:");
 
-        jLabel6.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
-        jLabel6.setText("Cargo:");
+        lblPermissao.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        lblPermissao.setText("Permissão:");
 
         lblUsuario.setFont(new java.awt.Font("Lucida Grande", 3, 14)); // NOI18N
         lblUsuario.setForeground(new java.awt.Color(51, 51, 51));
@@ -1043,7 +1039,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                                         .addGap(132, 132, 132)
                                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                             .addComponent(jLabel5)
-                                            .addComponent(jLabel6))
+                                            .addComponent(lblPermissao))
                                         .addGap(32, 32, 32)
                                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                             .addComponent(lblCargo)
@@ -1073,7 +1069,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                     .addComponent(lblUsuario))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel6)
+                    .addComponent(lblPermissao)
                     .addComponent(lblCargo))
                 .addGap(0, 0, 0)
                 .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1107,9 +1103,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             .addGap(0, 588, Short.MAX_VALUE)
         );
 
-        jMenu1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/cadastro.png"))); // NOI18N
-        jMenu1.setText("Cadastros    |");
-        jMenu1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btCadastros.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/cadastro.png"))); // NOI18N
+        btCadastros.setText("Cadastros    |");
+        btCadastros.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
         btQuartos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_quarto.png"))); // NOI18N
         btQuartos.setText("Quartos");
@@ -1124,7 +1120,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 btQuartosActionPerformed(evt);
             }
         });
-        jMenu1.add(btQuartos);
+        btCadastros.add(btQuartos);
 
         btFuncionario.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_funcionario.png"))); // NOI18N
         btFuncionario.setText("Funcionários");
@@ -1139,9 +1135,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 btFuncionarioActionPerformed(evt);
             }
         });
-        jMenu1.add(btFuncionario);
+        btCadastros.add(btFuncionario);
 
-        jMenuBar1.add(jMenu1);
+        jMenuBar1.add(btCadastros);
 
         jMenu2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/businesspackage_additionalpackage_box_add_insert_negoci_2335.png"))); // NOI18N
         jMenu2.setText("Produtos");
@@ -1233,11 +1229,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         });
         jMenu18.add(menuRelaVenProdutos);
 
-        menuRelaVenServicos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_rela_produto.png"))); // NOI18N
-        menuRelaVenServicos.setText("Serviços");
-        menuRelaVenServicos.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jMenu18.add(menuRelaVenServicos);
-
         jMenu5.add(jMenu18);
 
         jMenuBar1.add(jMenu5);
@@ -1273,9 +1264,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         jMenuBar1.add(jMenu6);
 
-        btAdicionais.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/ferramentas.png"))); // NOI18N
-        btAdicionais.setText("Ferramentas   |");
-        btAdicionais.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btFerramentas.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/ferramentas.png"))); // NOI18N
+        btFerramentas.setText("Ferramentas   |");
+        btFerramentas.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
         menuConfigAd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_editar.png"))); // NOI18N
         menuConfigAd.setText("Configurações Adicionais");
@@ -1290,7 +1281,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 menuConfigAdActionPerformed(evt);
             }
         });
-        btAdicionais.add(menuConfigAd);
+        btFerramentas.add(menuConfigAd);
 
         menuSobSistema.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_entrar.png"))); // NOI18N
         menuSobSistema.setText("Auto Atendimento");
@@ -1305,9 +1296,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 menuSobSistemaActionPerformed(evt);
             }
         });
-        btAdicionais.add(menuSobSistema);
+        btFerramentas.add(menuSobSistema);
 
-        jMenuBar1.add(btAdicionais);
+        jMenuBar1.add(btFerramentas);
 
         menuSair.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/sair.png"))); // NOI18N
         menuSair.setText("Sair");
@@ -1384,6 +1375,11 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             JOptionPane.showMessageDialog(null, "Precisa abrir o caixa");
             new CaixaFrame().setVisible(true);
         }
+        if(config.getCargoUsuario().equals("comum")){
+            btFerramentas.setEnabled(false);
+            btCadastros.setEnabled(false);
+            menuCadastraProduto.setEnabled(false);
+        }
         Date dataSistema = new Date();
         SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
         labelData.setText(formato.format(dataSistema));
@@ -1393,8 +1389,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         timer.start();
         mostraQuartos();
         outroTimer.start();
-        CacheDados cache = CacheDados.getInstancia();
-        cache.carregaArduino();
+        
 
     }
 
@@ -1575,7 +1570,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     }
     private void menuSairActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSairActionPerformed
         try {
-            // TODO add your handling code here:
+            CacheDados cacheDados = CacheDados.getInstancia();
+            cacheDados.limparCaches();
             fecharTela();
         } catch (IOException ex) {
             Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
@@ -1697,19 +1693,18 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         configGlobal config = configGlobal.getInstance();
         int idCaixa = config.getCaixa();
         if (idCaixa == 0) {
-            JOptionPane.showMessageDialog(null, "Precisa abrir o caixa!");
             new CaixaFrame().setVisible(true);
+            JOptionPane.showMessageDialog(null, "Precisa abrir o caixa!");
+            
         } else {
             // Abre uma caixa de diálogo de confirmação
             int confirmacao = JOptionPane.showConfirmDialog(null, "Deseja encerrar o quarto " + quartoEmFoco + "?", "Confirmação", JOptionPane.YES_NO_OPTION);
-
-            // Verifica se o usuário clicou em "Sim" (YES_OPTION)
             if (confirmacao == JOptionPane.YES_OPTION) {
-                // Se o usuário confirmou, então procedemos com o encerramento do quarto
                 new EncerraQuarto(quartoEmFoco);
             }
         }
     }
+
     public boolean mudaStatusNaCache(int quartoMudar, String statusColocar) {
         CacheDados dados = CacheDados.getInstancia();
         // Obtém o quarto da cache
@@ -2017,10 +2012,46 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         int linhaSelecionada = tabela1.getSelectedRow();
         if (linhaSelecionada != -1) {
             String desc = modelo.getValueAt(linhaSelecionada, 1).toString();
+            int qntVendida = Integer.valueOf(modelo.getValueAt(linhaSelecionada, 0).toString());
             modelo.removeRow(linhaSelecionada);
             new fprodutos().removePreVendido(quartoEmFoco, desc);
             JOptionPane.showMessageDialog(null, "Excluido com sucesso");
 
+            //remove da cache tbm
+            CacheDados cache = CacheDados.getInstancia();
+            int idLoca = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
+            int idProduto = new fprodutos().getIdProduto(desc);
+            if (idLoca == 0) {
+                DadosOcupados quartoOcupado = cache.getCacheOcupado().get(quartoEmFoco);
+                int novoID = new fquartos().getIdLocacao(quartoEmFoco);
+                quartoOcupado.setIdLoca(novoID);
+                cache.getCacheOcupado().put(quartoEmFoco, quartoOcupado);
+
+                cache.carregaProdutosNegociadosCache(novoID);
+            }
+            List<DadosVendidos> produtosVendidos = new ArrayList<>();
+            int limitador = 0;
+            if (cache.cacheProdutosVendidos.containsKey(idLoca)) {
+                // Itera sobre a lista usando um índice para poder remover um item
+                for (int i = 0; i < produtosVendidos.size(); i++) {
+                    DadosVendidos dados = produtosVendidos.get(i);
+                    if (dados.idProduto == idProduto && dados.quantidadeVendida == qntVendida) {
+                        produtosVendidos.remove(i); // Remove o item da lista
+                        limitador++;
+                        break; // Sai do loop após remover o item desejado
+                    }
+                }
+
+                // Verifica se a lista ficou vazia
+                if (produtosVendidos.isEmpty()) {
+                    // Remove a entrada correspondente da cache
+                    cache.cacheProdutosVendidos.remove(idLoca);
+                } else {
+                    // Atualiza a lista na cache
+                    cache.cacheProdutosVendidos.put(idLoca, produtosVendidos);
+                }
+
+            }
         } else {
             JOptionPane.showMessageDialog(null, "Nenhum produto selecionado");
         }
@@ -2135,6 +2166,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         // Exibe um JOptionPane com o painel contendo os componentes
         int result = JOptionPane.showConfirmDialog(null, panel, "Obter Produto", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        txtIdProduto.grabFocus();
         if (result == JOptionPane.OK_OPTION) {
             // Aqui você pode usar os valores inseridos pelo usuário, por exemplo:
             String idProdutoStr = txtIdProduto.getText();
@@ -2167,7 +2199,10 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                             cache.carregaProdutosNegociadosCache(novoID);
                         }
                         List<DadosVendidos> produtosVendidos = new ArrayList<>();
-                        produtosVendidos = cache.cacheProdutosVendidos.get(idLoca);
+                        if (cache.cacheProdutosVendidos.containsKey(idLoca)) {
+                            produtosVendidos = cache.cacheProdutosVendidos.get(idLoca);
+
+                        }
                         produtosVendidos.add(new DadosVendidos(Integer.valueOf(idProdutoStr), Integer.valueOf(quantidadeStr)));
                         cache.cacheProdutosVendidos.put(idLoca, produtosVendidos);
 
@@ -2185,19 +2220,30 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         }
     }
     private void txtDescontoNegociadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDescontoNegociadoActionPerformed
-        float valorRecebido = Float.parseFloat(txtDescontoNegociado.getText().replace(',', '.'));
-        CacheDados cache = CacheDados.getInstancia();
-        int idLocacao = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
+        float valorRecebido = 0;
+        try {
+            valorRecebido = Float.parseFloat(txtDescontoNegociado.getText().replace(',', '.'));
+            CacheDados cache = CacheDados.getInstancia();
+            int idLocacao = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
 
-        salvaAntecipado(idLocacao, "negociado", valorRecebido);
+            salvaAntecipado(idLocacao, "negociado", valorRecebido);
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Valor digitado não é monetário");
+        }
     }//GEN-LAST:event_txtDescontoNegociadoActionPerformed
 
     private void txtAntecipadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtAntecipadoActionPerformed
-        float valorRecebido = Float.parseFloat(txtAntecipado.getText().replace(',', '.'));
-        CacheDados cache = CacheDados.getInstancia();
-        int idLocacao = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
+        float valorRecebido = 0;
+        try {
+            valorRecebido = Float.parseFloat(txtAntecipado.getText().replace(',', '.'));
+            CacheDados cache = CacheDados.getInstancia();
+            int idLocacao = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
 
-        salvaAntecipado(idLocacao, "recebido", valorRecebido);
+            salvaAntecipado(idLocacao, "recebido", valorRecebido);
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Valor digitado não é monetário");
+        }
+
 
     }//GEN-LAST:event_txtAntecipadoActionPerformed
 
@@ -2219,20 +2265,28 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             int novoID = new fquartos().getIdLocacao(quartoEmFoco);
             quartoOcupado.setIdLoca(novoID);
             cache.getCacheOcupado().put(quartoEmFoco, quartoOcupado);
-
         }
 
-        List<Negociados> negociacoes = null;
+        List<Negociados> negociacoes = new ArrayList<>();
         if (cache.cacheNegociado.containsKey(idLocacao)) {
             negociacoes = cache.cacheNegociado.get(idLocacao);
+
+            //preciso iterar em negociações ver se tem algum negociado onde tipo = tipoNegociado
+            for (Negociados negociado : negociacoes) {
+                if (negociado.tipo.equals(tipo)) {
+                    negociado.valor = valor;
+                }
+            }
+
+        } else {
+            Negociados negociado = new Negociados(tipo, valor);
+            negociacoes.add(negociado);
+            cache.cacheNegociado.put(idLocacao, negociacoes);
         }
-        Negociados negociado = new Negociados(tipo, valor);
-        negociacoes.add(negociado);
-        cache.cacheNegociado.put(idLocacao, negociacoes);
+
         Connection link = null;
         try {
             link = new fazconexao().conectar();
-
             // Primeiro, tenta atualizar um registro existente
             String updateSQL = "UPDATE antecipado SET valor = ? WHERE idlocacao = ? AND tipo = ?";
             PreparedStatement updateStatement = link.prepareStatement(updateSQL);
@@ -2315,9 +2369,10 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private javax.swing.JButton botaoEncerrar;
     private javax.swing.JButton botaoIniciar;
     private javax.swing.JButton botaoStatus;
-    private javax.swing.JMenu btAdicionais;
+    private javax.swing.JMenu btCadastros;
     private javax.swing.JMenuItem btConfereCaixa;
     private javax.swing.JMenuItem btConfereLocacao;
+    private javax.swing.JMenu btFerramentas;
     private javax.swing.JMenu btFuncionario;
     private javax.swing.JMenu btQuartos;
     private javax.swing.JButton bt_apagarProduto;
@@ -2339,11 +2394,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
-    private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu16;
     private javax.swing.JMenu jMenu18;
     private javax.swing.JMenu jMenu2;
@@ -2370,6 +2423,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private javax.swing.JLabel lblEntrada;
     private javax.swing.JLabel lblHoraAdicional;
     private javax.swing.JLabel lblNumero;
+    private javax.swing.JLabel lblPermissao;
     private javax.swing.JLabel lblUsuario;
     private javax.swing.JLabel lblValorConsumo;
     private javax.swing.JLabel lblValorQuarto;
@@ -2381,7 +2435,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private javax.swing.JPopupMenu menuLimpeza;
     private javax.swing.JPopupMenu menuOcupado;
     private javax.swing.JMenuItem menuRelaVenProdutos;
-    private javax.swing.JMenuItem menuRelaVenServicos;
     private javax.swing.JMenuItem menuResBackup;
     private javax.swing.JMenu menuSair;
     private javax.swing.JMenuItem menuSobSistema;

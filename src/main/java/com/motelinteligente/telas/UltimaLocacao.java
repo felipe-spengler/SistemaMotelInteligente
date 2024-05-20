@@ -4,7 +4,6 @@
  */
 package com.motelinteligente.telas;
 
-
 import com.motelinteligente.dados.fazconexao;
 import com.motelinteligente.dados.fprodutos;
 import com.motelinteligente.dados.fquartos;
@@ -42,14 +41,17 @@ public class UltimaLocacao extends javax.swing.JFrame {
      */
     public UltimaLocacao(boolean editable, int numeroQuarto) {
         initComponents();
+
+        // Inicialização de variáveis
         int numPessoas = 2;
-        float valorQuarto = 0, valorConsumo = 0, valorTotal = 0, horaAdd = 0, desconto = 0, acrescimo = 0;
+        float valorQuarto = 0, valorConsumo = 0, valorTotal = 0, acrescimo = 0, desconto = 0;
         float recebeuD = 0, recebeuP = 0, recebeuC = 0;
         Timestamp horaInicio = null, horaFim = null;
         String justificativa = null, tipoQuarto = null;
-        String consultaSQL = "SELECT * FROM registralocado WHERE idlocacao = (SELECT MAX(idlocacao) FROM registralocado WHERE numquarto = ? and horafim is not null)";
+        String consultaSQL = "SELECT * FROM registralocado WHERE idlocacao = (SELECT MAX(idlocacao) FROM registralocado WHERE numquarto = ? AND horafim IS NOT NULL)";
         Connection link = null;
 
+        // Configuração da tabela
         DefaultTableModel modelo = (DefaultTableModel) tabela.getModel();
         modelo.setNumRows(0);
         tabela.getColumn(tabela.getColumnName(0)).setPreferredWidth(55);
@@ -58,7 +60,7 @@ public class UltimaLocacao extends javax.swing.JFrame {
         tabela.getColumn(tabela.getColumnName(3)).setPreferredWidth(120);
         tabela.getColumn(tabela.getColumnName(4)).setPreferredWidth(120);
 
-        //nuncamudam
+        // Campos que nunca mudam
         txtValorQuarto.setEditable(false);
         txtConsumo.setEditable(false);
         txtTipo.setEditable(false);
@@ -68,7 +70,7 @@ public class UltimaLocacao extends javax.swing.JFrame {
         txtFim.setEditable(false);
         txtNumPessoas.setEditable(false);
 
-        //variam conforme editable
+        // Campos que variam conforme editable
         txtAcrescimo.setEditable(editable);
         txtJustificativa.setEditable(editable);
         txtDesconto.setEditable(editable);
@@ -80,12 +82,18 @@ public class UltimaLocacao extends javax.swing.JFrame {
         bt_inserirProduto.setEnabled(editable);
         bt_salvar.setEnabled(editable);
 
+        PreparedStatement statement = null;
+        ResultSet resultado = null;
+        PreparedStatement statementJustificativa = null;
+        ResultSet resultSetJustificativa = null;
+
         try {
             link = new fazconexao().conectar();
             fquartos quartodao = new fquartos();
-            PreparedStatement statement = link.prepareStatement(consultaSQL);
-            statement.setInt(1, numeroQuarto); // Atribuindo o valor para o parâmetro
-            ResultSet resultado = statement.executeQuery();
+            statement = link.prepareStatement(consultaSQL);
+            statement.setInt(1, numeroQuarto);
+            resultado = statement.executeQuery();
+
             if (resultado.next()) {
                 idLocacao = resultado.getInt("idlocacao");
                 horaInicio = resultado.getTimestamp("horainicio");
@@ -99,43 +107,41 @@ public class UltimaLocacao extends javax.swing.JFrame {
                 recebeuC = resultado.getFloat("pagocartao");
                 idCaixa = resultado.getInt("idcaixaatual");
 
-                // verifica a tabela justificativa
-                String sql = "SELECT * FROM justificativa WHERE idlocacao = ?";
+                // Verifica a tabela justificativa
+                String sqlJustificativa = "SELECT * FROM justificativa WHERE idlocacao = ?";
+                statementJustificativa = link.prepareStatement(sqlJustificativa);
+                statementJustificativa.setInt(1, idLocacao);
+                resultSetJustificativa = statementJustificativa.executeQuery();
 
-                try {
-                    // Preparação da declaração SQL corrigida
-                    PreparedStatement statementJustificativa = link.prepareStatement(sql);
-                    statementJustificativa.setInt(1, idLocacao); // Atribuindo o valor para o parâmetro
-                    ResultSet resultSet = statementJustificativa.executeQuery();
-
-                    if (resultSet.next()) {
-                        // Extrair os valores do resultado
-
-                        String tipo = resultSet.getString("tipo");
-                        if (tipo.equals("desconto")) {
-                            desconto = resultSet.getFloat("valor");
-                            acrescimo = 0;
-                        } else {
-                            acrescimo = resultSet.getFloat("valor");
-                            desconto = 0;
-                        }
-
-                        justificativa = resultSet.getString("justificativa");
+                if (resultSetJustificativa.next()) {
+                    String tipo = resultSetJustificativa.getString("tipo");
+                    if ("desconto".equals(tipo)) {
+                        desconto = resultSetJustificativa.getFloat("valor");
+                        acrescimo = 0;
+                    } else {
+                        acrescimo = resultSetJustificativa.getFloat("valor");
+                        desconto = 0;
                     }
-                    resultSet.close();
-                    statementJustificativa.close();
-                } catch (SQLException e) {
-                    JOptionPane.showMessageDialog(null, e);
+                    justificativa = resultSetJustificativa.getString("justificativa");
                 }
-                resultado.close();
-                statement.close();
-            } else {
             }
+
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e);
         } finally {
             try {
-                // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
+                if (resultSetJustificativa != null) {
+                    resultSetJustificativa.close();
+                }
+                if (statementJustificativa != null) {
+                    statementJustificativa.close();
+                }
+                if (resultado != null) {
+                    resultado.close();
+                }
+                if (statement != null) {
+                    statement.close();
+                }
                 if (link != null && !link.isClosed()) {
                     link.close();
                 }
@@ -144,31 +150,27 @@ public class UltimaLocacao extends javax.swing.JFrame {
             }
         }
 
-        //seta os valores
+        // Seta os valores nos campos
         txtDinheiro.setText(String.valueOf(recebeuD));
         txtCartao.setText(String.valueOf(recebeuC));
         txtPix.setText(String.valueOf(recebeuP));
-
         txtAcrescimo.setText(String.valueOf(acrescimo));
         txtDesconto.setText(String.valueOf(desconto));
         txtJustificativa.setText(justificativa);
-
         txtNumero.setText(String.valueOf(numeroQuarto));
         txtNumPessoas.setText(String.valueOf(numPessoas));
         txtInicio.setText(String.valueOf(horaInicio));
         txtFim.setText(String.valueOf(horaFim));
-
         txtValorQuarto.setText(String.valueOf(valorQuarto));
         txtConsumo.setText(String.valueOf(valorConsumo));
         txtValorTotal.setText(String.valueOf(valorQuarto + valorConsumo));
 
-        //carregar a tabela com os produtos vendidos
+        // Carregar a tabela com os produtos vendidos
         vendaProdutos venda = new vendaProdutos();
         vendaProdutos.gerenciaVenda gerenciaVenda = venda.new gerenciaVenda();
         produtos = gerenciaVenda.vendidoLocacao(idLocacao);
         float valorVendido = 0;
         modelo.setNumRows(0);
-        //JScrollPane scrollPane = new JScrollPane(tabelaProdutos);
         for (vendaProdutos v : produtos) {
             String desc = new fprodutos().getDescicao(String.valueOf(v.idProduto));
             modelo.addRow(new Object[]{
@@ -293,29 +295,29 @@ public class UltimaLocacao extends javax.swing.JFrame {
 
         tabela.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         tabela.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null}
-            },
-            new String [] {
-                "id", "Quantidade", "Descrição", "Valor und", "Valor Total"
-            }
+                new Object[][]{
+                    {null, null, null, null, null},
+                    {null, null, null, null, null},
+                    {null, null, null, null, null},
+                    {null, null, null, null, null}
+                },
+                new String[]{
+                    "id", "Quantidade", "Descrição", "Valor und", "Valor Total"
+                }
         ) {
-            Class[] types = new Class [] {
+            Class[] types = new Class[]{
                 java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.Float.class, java.lang.Float.class
             };
-            boolean[] canEdit = new boolean [] {
+            boolean[] canEdit = new boolean[]{
                 false, true, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
+                return types[columnIndex];
             }
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
+                return canEdit[columnIndex];
             }
         });
         tabela.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
@@ -381,157 +383,158 @@ public class UltimaLocacao extends javax.swing.JFrame {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(86, 86, 86)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
-                            .addComponent(jLabel4))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(txtInicio, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(91, 91, 91)
-                                .addComponent(jLabel5)
-                                .addGap(12, 12, 12)
-                                .addComponent(txtFim, javax.swing.GroupLayout.PREFERRED_SIZE, 255, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(txtNumero, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(41, 41, 41)
-                                .addComponent(jLabel2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtTipo, javax.swing.GroupLayout.PREFERRED_SIZE, 370, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(366, 366, 366)
-                        .addComponent(jLabel22))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(93, 93, 93)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 652, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(jLabel19)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(txtDinheiro, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jLabel20)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(txtPix, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(jLabel21)
-                                .addGap(18, 18, 18)
-                                .addComponent(txtCartao, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(bt_voltar, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(bt_salvar, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(bt_inserirProduto)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(bt_apagarProduto))))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(78, 78, 78)
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel10)
-                                    .addComponent(jLabel16)
-                                    .addComponent(jLabel14, javax.swing.GroupLayout.Alignment.TRAILING))
-                                .addGap(20, 20, 20))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jLabel9)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(txtNumPessoas, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(46, 46, 46)
-                                .addComponent(jLabel15)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(txtValorTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 251, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(txtValorQuarto)
-                                    .addComponent(txtAcrescimo, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel8)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jLabel11)
-                                        .addGap(15, 15, 15)))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(txtConsumo)
-                                    .addComponent(txtDesconto, javax.swing.GroupLayout.PREFERRED_SIZE, 239, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addComponent(txtJustificativa, javax.swing.GroupLayout.PREFERRED_SIZE, 579, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(78, Short.MAX_VALUE))
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGap(86, 86, 86)
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(jLabel1)
+                                                        .addComponent(jLabel4))
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(txtInicio, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addGap(91, 91, 91)
+                                                                .addComponent(jLabel5)
+                                                                .addGap(12, 12, 12)
+                                                                .addComponent(txtFim, javax.swing.GroupLayout.PREFERRED_SIZE, 255, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(txtNumero, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addGap(41, 41, 41)
+                                                                .addComponent(jLabel2)
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addComponent(txtTipo, javax.swing.GroupLayout.PREFERRED_SIZE, 370, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGap(366, 366, 366)
+                                                .addComponent(jLabel22))
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGap(93, 93, 93)
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 652, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                                                .addComponent(jLabel19)
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                                .addComponent(txtDinheiro, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                .addComponent(jLabel20)
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                                .addComponent(txtPix, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addGap(18, 18, 18)
+                                                                .addComponent(jLabel21)
+                                                                .addGap(18, 18, 18)
+                                                                .addComponent(txtCartao, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(bt_voltar, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addGap(18, 18, 18)
+                                                                .addComponent(bt_salvar, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                .addComponent(bt_inserirProduto)
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addComponent(bt_apagarProduto))))
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addGap(78, 78, 78)
+                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                        .addComponent(jLabel10)
+                                                                        .addComponent(jLabel16)
+                                                                        .addComponent(jLabel14, javax.swing.GroupLayout.Alignment.TRAILING))
+                                                                .addGap(20, 20, 20))
+                                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                                                .addContainerGap()
+                                                                .addComponent(jLabel9)
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addComponent(txtNumPessoas, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addGap(46, 46, 46)
+                                                                .addComponent(jLabel15)
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                .addComponent(txtValorTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 251, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                        .addGroup(layout.createSequentialGroup()
+                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                                        .addComponent(txtValorQuarto)
+                                                                        .addComponent(txtAcrescimo, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                                .addGap(18, 18, 18)
+                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                                        .addComponent(jLabel8)
+                                                                        .addGroup(layout.createSequentialGroup()
+                                                                                .addComponent(jLabel11)
+                                                                                .addGap(15, 15, 15)))
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                                        .addComponent(txtConsumo)
+                                                                        .addComponent(txtDesconto, javax.swing.GroupLayout.PREFERRED_SIZE, 239, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                                        .addComponent(txtJustificativa, javax.swing.GroupLayout.PREFERRED_SIZE, 579, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addContainerGap(78, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(26, 26, 26)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(txtNumero, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2)
-                    .addComponent(txtTipo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel4)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(txtInicio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel5)
-                        .addComponent(txtFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 47, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtValorQuarto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel8)
-                    .addComponent(txtConsumo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel9))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(txtDesconto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(txtAcrescimo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jLabel11))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(txtJustificativa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel14))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel15)
-                            .addComponent(txtValorTotal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtNumPessoas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel16)))
-                    .addComponent(jLabel10))
-                .addGap(46, 46, 46)
-                .addComponent(jLabel22)
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel19)
-                    .addComponent(txtDinheiro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel20)
-                    .addComponent(txtPix, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel21)
-                    .addComponent(txtCartao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(26, 26, 26)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(bt_salvar, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(bt_inserirProduto, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(bt_apagarProduto, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(bt_voltar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGap(26, 26, 26)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel1)
+                                        .addComponent(txtNumero, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel2)
+                                        .addComponent(txtTipo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jLabel4)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                .addComponent(txtInicio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(jLabel5)
+                                                .addComponent(txtFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 47, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(txtValorQuarto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel8)
+                                        .addComponent(txtConsumo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel9))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                                .addComponent(txtDesconto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addComponent(txtAcrescimo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                        .addComponent(jLabel11))
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                        .addComponent(txtJustificativa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addComponent(jLabel14))
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                        .addComponent(jLabel15)
+                                                        .addComponent(txtValorTotal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addComponent(txtNumPessoas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addComponent(jLabel16)))
+                                        .addComponent(jLabel10))
+                                .addGap(46, 46, 46)
+                                .addComponent(jLabel22)
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel19)
+                                        .addComponent(txtDinheiro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel20)
+                                        .addComponent(txtPix, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel21)
+                                        .addComponent(txtCartao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(26, 26, 26)
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                .addComponent(bt_salvar, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(bt_inserirProduto, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(bt_apagarProduto, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addComponent(bt_voltar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
     private boolean isNumeroFloat(String texto) {
         // Substituir vírgulas por pontos
         texto = texto.replace(',', '.');
@@ -542,6 +545,7 @@ public class UltimaLocacao extends javax.swing.JFrame {
         // Verificar se a string corresponde ao padrão
         return texto.matches(regex);
     }
+
     private void bt_salvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_salvarActionPerformed
         // Primeiro ver se os valores fecham!
         boolean valores = false, recebido = false, positivos = false;
@@ -609,13 +613,11 @@ public class UltimaLocacao extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, e);
         }
     }//GEN-LAST:event_bt_salvarActionPerformed
+
     private void salvaDados() {
         Connection link = null;
         try {
-            // Estabelecer conexão com o banco de dados
             link = new fazconexao().conectar();
-
-            // Atualizar os valores no banco de dados na tabela 'registralocado'
             String updateRegistralocadoSQL = "UPDATE registralocado SET pagodinheiro = ?, pagopix = ?, pagocartao = ?, horainicio = ?, horafim = ?, valorquarto = ?, valorconsumo = ? WHERE idlocacao = ?";
             PreparedStatement statementRegistralocado = link.prepareStatement(updateRegistralocadoSQL);
             statementRegistralocado.setFloat(1, Float.parseFloat(txtDinheiro.getText().replace(',', '.')));
@@ -627,50 +629,69 @@ public class UltimaLocacao extends javax.swing.JFrame {
             statementRegistralocado.setFloat(7, Float.parseFloat(txtConsumo.getText().replace(',', '.')));
             statementRegistralocado.setInt(8, idLocacao); // Substitua idLocacao pelo valor correto da sua lógica
             statementRegistralocado.executeUpdate();
-
-            // Atualizar a tabela justificativa (ou inserir se não existir)
+            System.out.println("id da locacao é " + idLocacao);
             String tipo = "";
             float valorSetar = 0;
             if (Float.parseFloat(txtDesconto.getText().replace(',', '.')) > 0) {
                 tipo = "desconto";
                 System.out.println("caiu desconto");
-                valorSetar= Float.parseFloat(txtDesconto.getText().replace(',', '.'));
+                valorSetar = Float.parseFloat(txtDesconto.getText().replace(',', '.'));
             } else if (Float.parseFloat(txtAcrescimo.getText().replace(',', '.')) > 0) {
                 tipo = "acrescimo";
                 System.out.println("caiu acrescimo");
-                valorSetar= Float.parseFloat(txtAcrescimo.getText().replace(',', '.'));
+                valorSetar = Float.parseFloat(txtAcrescimo.getText().replace(',', '.'));
             }
-            String updateJustificativaSQL = "UPDATE justificativa SET tipo = ?, valor = ?,  justificativa = ? WHERE idlocacao = ?";
-            PreparedStatement statementJustificativa = link.prepareStatement(updateJustificativaSQL);
-            statementJustificativa.setString(1, tipo);
-            statementJustificativa.setFloat(2, valorSetar);
-            statementJustificativa.setString(3, txtJustificativa.getText());
-            statementJustificativa.setInt(4, idLocacao); 
-
-            int rowsUpdated = statementJustificativa.executeUpdate();
-
-            if (rowsUpdated == 0) {
-                // Nenhuma linha foi atualizada, então a justificativa não existia, devemos inseri-la
-                String insertJustificativaSQL = "INSERT INTO justificativa (idlocacao, tipo, valor, justificativa) VALUES (?, ?, ?, ?)";
-                PreparedStatement statementInsertJustificativa = link.prepareStatement(insertJustificativaSQL);
-                statementInsertJustificativa.setInt(1, idLocacao); // Substitua idLocacao pelo valor correto da sua lógica
-                statementInsertJustificativa.setString(2, tipo);
-                statementInsertJustificativa.setFloat(3, Float.parseFloat(txtDesconto.getText().replace(',', '.')));
-                statementInsertJustificativa.setFloat(4, Float.parseFloat(txtAcrescimo.getText().replace(',', '.')));
-                statementInsertJustificativa.setString(5, txtJustificativa.getText());
-                statementInsertJustificativa.executeUpdate();
+            if (valorSetar > 0) {
+                String updateJustificativaSQL = "UPDATE justificativa SET tipo = ?, valor = ?,  justificativa = ? WHERE idlocacao = ?";
+                PreparedStatement statementJustificativa = link.prepareStatement(updateJustificativaSQL);
+                statementJustificativa.setString(1, tipo);
+                statementJustificativa.setFloat(2, valorSetar);
+                statementJustificativa.setString(3, txtJustificativa.getText());
+                statementJustificativa.setInt(4, idLocacao);
+                int rowsUpdated = statementJustificativa.executeUpdate();
+                if (rowsUpdated == 0) {
+                    // Nenhuma linha foi atualizada, então a justificativa não existia, devemos inseri-la
+                    String insertJustificativaSQL = "INSERT INTO justificativa (idlocacao, tipo, valor, justificativa) VALUES (?, ?, ?, ?)";
+                    PreparedStatement statementInsertJustificativa = link.prepareStatement(insertJustificativaSQL);
+                    statementInsertJustificativa.setInt(1, idLocacao); // Substitua idLocacao pelo valor correto da sua lógica
+                    statementInsertJustificativa.setString(2, tipo);
+                    statementInsertJustificativa.setFloat(3, Float.parseFloat(txtDesconto.getText().replace(',', '.')));
+                    statementInsertJustificativa.setFloat(4, Float.parseFloat(txtAcrescimo.getText().replace(',', '.')));
+                    statementInsertJustificativa.setString(5, txtJustificativa.getText());
+                    statementInsertJustificativa.executeUpdate();
+                }
             }
-
         } catch (SQLException e) {
-            // Se ocorrer uma exceção, faça o rollback da transação
+            JOptionPane.showMessageDialog(null, "SalvaDados: " + e);
+        } finally {
             if (link != null) {
                 try {
-                    link.rollback();
+                    link.close();
                 } catch (SQLException ex) {
                     JOptionPane.showMessageDialog(null, ex);
                 }
             }
-            JOptionPane.showMessageDialog(null, e);
+        }
+
+        salvaVendidos();
+    }
+
+    private void salvaVendidos() {
+        Connection link = null;
+        try {
+            link = new fazconexao().conectar();
+            String deleteSQL = "DELETE FROM registravendido WHERE idlocacao = ?";
+            PreparedStatement deleteStatement = link.prepareStatement(deleteSQL);
+            deleteStatement.setInt(1, idLocacao); // Substitua idLocacao pelo valor correto da sua lógica
+            int rowsAffected = deleteStatement.executeUpdate();
+            link.close();
+            deleteStatement.close();
+
+            reinsereProdutos();
+            JOptionPane.showMessageDialog(null, " Registro Alterado Com Sucesso");
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "SalvaVendidos:" + e);
+            e.printStackTrace();
         } finally {
             // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
             if (link != null) {
@@ -681,26 +702,18 @@ public class UltimaLocacao extends javax.swing.JFrame {
                 }
             }
         }
-
-        // agora vamos tratar os produtos vendidos
-        salvaVendidos();
     }
 
-    private void salvaVendidos() {
+    private void reinsereProdutos() {
+        PreparedStatement insertStatement = null;
         Connection link = null;
         try {
-            // Estabelecer conexão com o banco de dados
             link = new fazconexao().conectar();
-
-            // Excluir os registros de vendas associados à locação atual
-            String deleteSQL = "DELETE FROM registravendido WHERE idlocacao = ?";
-            PreparedStatement deleteStatement = link.prepareStatement(deleteSQL);
-            deleteStatement.setInt(1, idLocacao); // Substitua idLocacao pelo valor correto da sua lógica
-            deleteStatement.executeUpdate();
-
-            // Adicionar os novos registros de produtos à tabela 'registravendido'
             String insertSQL = "INSERT INTO registravendido (idlocacao, idproduto, quantidade, valorunidade, valortotal, idcaixaatual) VALUES (?, ?, ?, ?, ?, ?)";
-            PreparedStatement insertStatement = link.prepareStatement(insertSQL);
+            insertStatement = link.prepareStatement(insertSQL);
+
+            int totalInserted = 0; // Contador para o número de registros inseridos
+
             for (vendaProdutos produto : produtos) {
                 insertStatement.setInt(1, idLocacao);
                 insertStatement.setInt(2, produto.idProduto);
@@ -708,26 +721,37 @@ public class UltimaLocacao extends javax.swing.JFrame {
                 insertStatement.setFloat(4, produto.valorUnd);
                 insertStatement.setFloat(5, produto.valorTotal);
                 insertStatement.setInt(6, idCaixa);
-                insertStatement.executeUpdate();
+                int rowsAffected = insertStatement.executeUpdate();
+                totalInserted += rowsAffected;
             }
 
+            
 
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, e);
+            JOptionPane.showMessageDialog(null, "Erro ao inserir registros: " + e.getMessage());
+            e.printStackTrace();
         } finally {
-            // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
+            if (insertStatement != null) {
+                try {
+                    insertStatement.close();
+                } catch (SQLException e) {
+                    JOptionPane.showMessageDialog(null, "Erro ao fechar statement: " + e.getMessage());
+                }
+            }
             if (link != null) {
                 try {
                     link.close();
-                } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(null, ex);
+                } catch (SQLException e) {
+                    JOptionPane.showMessageDialog(null, "Erro ao fechar conexão: " + e.getMessage());
                 }
             }
         }
     }
+
     private void bt_inserirProdutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_inserirProdutoActionPerformed
         obterProduto();
     }//GEN-LAST:event_bt_inserirProdutoActionPerformed
+
     private void obterProduto() {
         // Criação do campo de texto para o ID do produto
         JTextField txtIdProduto = new JTextField();
@@ -775,8 +799,8 @@ public class UltimaLocacao extends javax.swing.JFrame {
         panel.add(new JLabel("Descrição do Produto:"));
         panel.add(lblDescricaoProduto);
 
-        // Exibe um JOptionPane com o painel contendo os componentes
         int result = JOptionPane.showConfirmDialog(null, panel, "Obter Produto", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        txtIdProduto.grabFocus();
         if (result == JOptionPane.OK_OPTION) {
             // Aqui você pode usar os valores inseridos pelo usuário, por exemplo:
             String idProdutoStr = txtIdProduto.getText();
@@ -797,6 +821,8 @@ public class UltimaLocacao extends javax.swing.JFrame {
                             valor,
                             valorSoma
                         });
+                        vendaProdutos vendido = new vendaProdutos(Integer.valueOf(idProdutoStr),Integer.valueOf(quantidadeStr),valor, valorSoma );
+                        produtos.add(vendido);
                         float valorConsumo = 0;
                         //atualiza valor consumo
                         if (!(txtConsumo.getText().isEmpty()) && isNumeroFloat(txtConsumo.getText())) {
@@ -843,31 +869,41 @@ public class UltimaLocacao extends javax.swing.JFrame {
         dispose();
     }//GEN-LAST:event_bt_voltarActionPerformed
 
-    private void bt_apagarProdutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_apagarProdutoActionPerformed
+    private void bt_apagarProdutoActionPerformed(java.awt.event.ActionEvent evt) {
         DefaultTableModel modelo = (DefaultTableModel) tabela.getModel();
 
         int selectedRow;
         selectedRow = tabela.getSelectedRow();
         if (selectedRow != -1) {
+            int quantidade = (int) modelo.getValueAt(selectedRow, 1);
+            int idProduto = (int) modelo.getValueAt(selectedRow, 0);
             float valorProduto = (float) modelo.getValueAt(selectedRow, 4);
             modelo.removeRow(selectedRow);
 
-            
             float valorConsumo = 0;
-                        //atualiza valor consumo
-                        if (!(txtConsumo.getText().isEmpty()) && isNumeroFloat(txtConsumo.getText())) {
-                            valorConsumo = Float.parseFloat(txtConsumo.getText().replace(',', '.'));
-                        }
-                        valorConsumo -= valorProduto;
-                        txtConsumo.setText(String.valueOf(valorConsumo));
-
-                        //atualiza valor total
-                        atualizaTotal();
+            //atualiza valor consumo
+            if (!(txtConsumo.getText().isEmpty()) && isNumeroFloat(txtConsumo.getText().replace(',', '.'))) {
+                valorConsumo = Float.parseFloat(txtConsumo.getText().replace(',', '.'));
+            }
+            valorConsumo -= valorProduto;
+            txtConsumo.setText(String.valueOf(valorConsumo));
+            Iterator<vendaProdutos> iterator = produtos.iterator();
+            while (iterator.hasNext()) {
+                vendaProdutos produto = iterator.next();
+                if (produto.idProduto == idProduto && produto.quantidade == quantidade && produto.valorTotal == valorProduto) {
+                    iterator.remove();
+                    System.out.println("retirou da lista");
+                    break; // Assume que estamos removendo apenas uma ocorrência do produto
+                }
+            }
+            //atualiza valor total
+            atualizaTotal();
 
         } else {
             JOptionPane.showMessageDialog(null, "Nenhum produto selecionado!");
         }
-    }//GEN-LAST:event_bt_apagarProdutoActionPerformed
+    }
+
     public void realizaDesconto() {
         float valorQuarto = 0, valorConsumo = 0;
         float desconto = 0;
@@ -887,12 +923,13 @@ public class UltimaLocacao extends javax.swing.JFrame {
             txtValorTotal.setText(String.valueOf(valorTotal));
         }
     }
+
     private void txtDescontoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDescontoActionPerformed
         //dar desconto
         realizaDesconto();
 
-
     }//GEN-LAST:event_txtDescontoActionPerformed
+
     public void realizaAcrescimo() {
         float valorQuarto = 0, valorConsumo = 0;
         float acrescimo = 0, desconto = 0;
@@ -917,6 +954,7 @@ public class UltimaLocacao extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Somente Desconto ou Acréscimo! Arrume essa bagunça.");
         }
     }
+
     private void txtNumPessoasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNumPessoasActionPerformed
 
     }//GEN-LAST:event_txtNumPessoasActionPerformed
@@ -924,7 +962,6 @@ public class UltimaLocacao extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bt_apagarProduto;
     private javax.swing.JButton bt_inserirProduto;

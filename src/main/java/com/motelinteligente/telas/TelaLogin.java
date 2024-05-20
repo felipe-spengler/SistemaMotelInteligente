@@ -1,6 +1,8 @@
 package com.motelinteligente.telas;
 
 import com.motelinteligente.dados.BarraCarregar;
+import com.motelinteligente.dados.CacheDados;
+import com.motelinteligente.dados.MotelInteligenteApplication;
 import com.motelinteligente.dados.configGlobal;
 import com.motelinteligente.dados.ffuncionario;
 import java.awt.event.KeyAdapter;
@@ -153,7 +155,6 @@ public class TelaLogin extends javax.swing.JFrame {
     public void insereIcone(JFrame frame) {
         try {
             frame.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/imagens/iconeMotel.png")));
-            System.out.println("setouicone");
         } catch (Exception e) {
             System.out.println(e.toString());
         }
@@ -213,6 +214,17 @@ public class TelaLogin extends javax.swing.JFrame {
 
             configGlobal configuracoes = configGlobal.getInstance();
             configuracoes.carregarInformacoes(cargo, texto_login);
+            CacheDados cache = CacheDados.getInstancia();
+            if (!configuracoes.isFlagArduino()) {
+                cache.carregaArduino();
+                configuracoes.setFlagArduino(true);
+            }
+            if (!configuracoes.isFlagSistemaSpring()) {
+                new Thread(() -> {
+                    MotelInteligenteApplication.main(new String[]{});
+                }).start();
+                configuracoes.setFlagSistemaSpring(true);
+            }
 
             dispose();
         } else {

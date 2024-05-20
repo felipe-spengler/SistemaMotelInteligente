@@ -43,6 +43,13 @@ public class CacheDados {
         return arduinoPort;
     }
 
+    public void limparCaches() {
+        cacheQuarto.clear();
+        cacheOcupado.clear();
+        cacheProdutosVendidos.clear();
+        cacheNegociado.clear();
+    }
+
     public void carregaArduino() {
         arduinoPort = SerialPort.getCommPort("COM4");
         if (!arduinoPort.openPort()) {
@@ -58,79 +65,77 @@ public class CacheDados {
     }
 
     public void carregarOcupado(int numeroQuarto) {
-    float valPeriodo = 0, valPernoite = 0, valAdicional = 0;
-    int pessoas = 0;
-    fquartos quartodao = new fquartos();
-    valPernoite = quartodao.getValorQuarto(numeroQuarto, "pernoite");
-    valPeriodo = quartodao.getValorQuarto(numeroQuarto, "periodo");
-    valAdicional = quartodao.getAdicional(numeroQuarto);
-    pessoas = quartodao.getPessoas(numeroQuarto);
-    String tempo = quartodao.getPeriodo(numeroQuarto);
-    System.out.println("Nos ocupados");
-    int idLoca = new fquartos().getIdLocacao(numeroQuarto);
-    DadosOcupados ocupado = new DadosOcupados(idLoca, valPeriodo, valPernoite, pessoas, valAdicional, tempo);
-    cacheOcupado.put(numeroQuarto, ocupado);
-    carregaProdutosNegociadosCache(idLoca);
-}
-
-    public void carregaProdutosNegociadosCache(int idLoca){
-        
-    // Consulta produtos prevendidos no banco de dados e adiciona à cache
-    String consultaProdutosSQL = "SELECT idproduto, quantidade FROM prevendidos WHERE idlocacao = ?";
-    try (Connection link = new fazconexao().conectar();
-         PreparedStatement statementProdutos = link.prepareStatement(consultaProdutosSQL, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
-        statementProdutos.setInt(1, idLoca);
-        try (ResultSet resultadoProdutos = statementProdutos.executeQuery()) {
-            // Verifica se há produtos prevendidos para essa locação no banco de dados
-            if (resultadoProdutos.next()) {
-                // Cria uma lista para armazenar os produtos prevendidos
-                List<DadosVendidos> produtosVendidos = new ArrayList<>();
-
-                // Adiciona os produtos prevendidos do banco de dados à lista
-                do {
-                    int idProdutoBD = resultadoProdutos.getInt("idproduto");
-                    int quantidadeBD = resultadoProdutos.getInt("quantidade");
-                    produtosVendidos.add(new DadosVendidos(idProdutoBD, quantidadeBD));
-                } while (resultadoProdutos.next());
-
-                // Adiciona a lista de produtos prevendidos à cache
-                cacheProdutosVendidos.put(idLoca, produtosVendidos);
-
-            } 
-        }
-    } catch (SQLException e) {
-        // Tratamento de erro
-        e.printStackTrace();
+        float valPeriodo = 0, valPernoite = 0, valAdicional = 0;
+        int pessoas = 0;
+        fquartos quartodao = new fquartos();
+        valPernoite = quartodao.getValorQuarto(numeroQuarto, "pernoite");
+        valPeriodo = quartodao.getValorQuarto(numeroQuarto, "periodo");
+        valAdicional = quartodao.getAdicional(numeroQuarto);
+        pessoas = quartodao.getPessoas(numeroQuarto);
+        String tempo = quartodao.getPeriodo(numeroQuarto);
+        int idLoca = new fquartos().getIdLocacao(numeroQuarto);
+        DadosOcupados ocupado = new DadosOcupados(idLoca, valPeriodo, valPernoite, pessoas, valAdicional, tempo);
+        cacheOcupado.put(numeroQuarto, ocupado);
+        carregaProdutosNegociadosCache(idLoca);
     }
 
-    // Consulta negociações antecipadas no banco de dados e adiciona à cacheNegociados
-    String consultaNegociacoesSQL = "SELECT * FROM antecipado WHERE idlocacao = ?";
-    try (Connection link = new fazconexao().conectar();
-         PreparedStatement statementNegociacoes = link.prepareStatement(consultaNegociacoesSQL, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
-        statementNegociacoes.setInt(1, idLoca);
-        try (ResultSet resultadoNegociacoes = statementNegociacoes.executeQuery()) {
-            if (resultadoNegociacoes.next()) {
-                // Reinicia o cursor do ResultSet
-                resultadoNegociacoes.beforeFirst();
-                List<Negociados> negociacoes = new ArrayList<>();
-                while (resultadoNegociacoes.next()) {
-                    String tipo = resultadoNegociacoes.getString("tipo");
-                    float valor = resultadoNegociacoes.getFloat("valor");
-                    System.out.println("Negociado add - locacao " + idLoca + " tipo " + tipo + " valor "+ valor);
-                    // Cria um objeto Negociado com os valores do ResultSet
-                    Negociados negociado = new Negociados(tipo, valor);
-                    // Adiciona o objeto Negociado à cacheNegociados
-                    negociacoes.add(negociado);
+    public void carregaProdutosNegociadosCache(int idLoca) {
+
+        // Consulta produtos prevendidos no banco de dados e adiciona à cache
+        String consultaProdutosSQL = "SELECT idproduto, quantidade FROM prevendidos WHERE idlocacao = ?";
+        try ( Connection link = new fazconexao().conectar();  PreparedStatement statementProdutos = link.prepareStatement(consultaProdutosSQL, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
+            statementProdutos.setInt(1, idLoca);
+            try ( ResultSet resultadoProdutos = statementProdutos.executeQuery()) {
+                // Verifica se há produtos prevendidos para essa locação no banco de dados
+                if (resultadoProdutos.next()) {
+                    // Cria uma lista para armazenar os produtos prevendidos
+                    List<DadosVendidos> produtosVendidos = new ArrayList<>();
+
+                    // Adiciona os produtos prevendidos do banco de dados à lista
+                    do {
+                        int idProdutoBD = resultadoProdutos.getInt("idproduto");
+                        int quantidadeBD = resultadoProdutos.getInt("quantidade");
+                        produtosVendidos.add(new DadosVendidos(idProdutoBD, quantidadeBD));
+                    } while (resultadoProdutos.next());
+
+                    // Adiciona a lista de produtos prevendidos à cache
+                    cacheProdutosVendidos.put(idLoca, produtosVendidos);
+
                 }
-                
-                cacheNegociado.put(idLoca, negociacoes);
             }
+        } catch (SQLException e) {
+            // Tratamento de erro
+            e.printStackTrace();
         }
-    } catch (SQLException e) {
-        // Tratamento de erro
-        e.printStackTrace();
+
+        // Consulta negociações antecipadas no banco de dados e adiciona à cacheNegociados
+        String consultaNegociacoesSQL = "SELECT * FROM antecipado WHERE idlocacao = ?";
+        try ( Connection link = new fazconexao().conectar();  PreparedStatement statementNegociacoes = link.prepareStatement(consultaNegociacoesSQL, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
+            statementNegociacoes.setInt(1, idLoca);
+            try ( ResultSet resultadoNegociacoes = statementNegociacoes.executeQuery()) {
+                if (resultadoNegociacoes.next()) {
+                    // Reinicia o cursor do ResultSet
+                    resultadoNegociacoes.beforeFirst();
+                    List<Negociados> negociacoes = new ArrayList<>();
+                    while (resultadoNegociacoes.next()) {
+                        String tipo = resultadoNegociacoes.getString("tipo");
+                        float valor = resultadoNegociacoes.getFloat("valor");
+                        System.out.println("Negociado add - locacao " + idLoca + " tipo " + tipo + " valor " + valor);
+                        // Cria um objeto Negociado com os valores do ResultSet
+                        Negociados negociado = new Negociados(tipo, valor);
+                        // Adiciona o objeto Negociado à cacheNegociados
+                        negociacoes.add(negociado);
+                    }
+
+                    cacheNegociado.put(idLoca, negociacoes);
+                }
+            }
+        } catch (SQLException e) {
+            // Tratamento de erro
+            e.printStackTrace();
+        }
     }
-    }
+
     public CarregaQuarto carregarDadosQuarto() {
         int numeroQuarto = 0;
         String data;

@@ -87,6 +87,7 @@ public class CaixaFrame extends javax.swing.JFrame {
         jLabel16 = new javax.swing.JLabel();
         lbltQuarto = new javax.swing.JLabel();
         lbltConsumo = new javax.swing.JLabel();
+        lblContador = new javax.swing.JLabel();
 
         txtCodigoCaixa3.setBackground(new java.awt.Color(218, 218, 216));
         txtCodigoCaixa3.setForeground(new java.awt.Color(0, 0, 255));
@@ -510,6 +511,9 @@ public class CaixaFrame extends javax.swing.JFrame {
         lbltConsumo.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         lbltConsumo.setText("jLabel17");
 
+        lblContador.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblContador.setText("jLabel17");
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -519,7 +523,9 @@ public class CaixaFrame extends javax.swing.JFrame {
                 .addComponent(jScrollPane1)
                 .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(278, Short.MAX_VALUE)
+                .addGap(15, 15, 15)
+                .addComponent(lblContador)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 207, Short.MAX_VALUE)
                 .addComponent(jLabel15)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(lbltQuarto)
@@ -538,7 +544,8 @@ public class CaixaFrame extends javax.swing.JFrame {
                     .addComponent(jLabel15)
                     .addComponent(jLabel16)
                     .addComponent(lbltQuarto)
-                    .addComponent(lbltConsumo))
+                    .addComponent(lbltConsumo)
+                    .addComponent(lblContador))
                 .addGap(0, 32, Short.MAX_VALUE))
         );
 
@@ -756,6 +763,7 @@ public class CaixaFrame extends javax.swing.JFrame {
     public void carregaTabelaQuartosLocados() {
         configGlobal config = configGlobal.getInstance();
         int idCaixa = config.getCaixa();
+        int count = 0;
         String consultaSQL = "SELECT * FROM registralocado WHERE idcaixaatual = " + idCaixa;
         Connection link = null;
         DefaultTableModel modelo = (DefaultTableModel) tabelaLocacoes.getModel();
@@ -776,6 +784,7 @@ public class CaixaFrame extends javax.swing.JFrame {
                     resultado.getFloat("valorquarto"),
                     resultado.getFloat("valorconsumo")
                 });
+                count++;
             }
         } catch (Exception e) {
             JOptionPane.showConfirmDialog(null, e);
@@ -788,6 +797,7 @@ public class CaixaFrame extends javax.swing.JFrame {
                 e.printStackTrace();
             }
         }
+        lblContador.setText(count + " locações");
         lbltConsumo.setText("R$" + String.valueOf(valC));
         lbltQuarto.setText("R$" + String.valueOf(valQ));
     }
@@ -919,6 +929,7 @@ public class CaixaFrame extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JLabel lblContador;
     private javax.swing.JLabel lblquantidadevendida;
     private javax.swing.JLabel lbltConsumo;
     private javax.swing.JLabel lbltQuarto;

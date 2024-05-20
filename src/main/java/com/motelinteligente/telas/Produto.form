@@ -44,7 +44,7 @@
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Component id="btEditar" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="bt_salvar" min="-2" max="-2" attributes="0"/>
+              <Component id="bt_novo" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="102" max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -58,7 +58,7 @@
               <Component id="jScrollPane1" min="-2" pref="436" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="bt_salvar" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="bt_novo" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="bt_voltar" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="btEditar" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="bt_apagar" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -80,7 +80,7 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bt_voltarActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JButton" name="bt_salvar">
+    <Component class="javax.swing.JButton" name="bt_novo">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/imagens/icon_bot_salvar.png"/>
@@ -88,7 +88,7 @@
         <Property name="text" type="java.lang.String" value="Cadastrar Novo Produto"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bt_salvarActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bt_novoActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JButton" name="btEditar">

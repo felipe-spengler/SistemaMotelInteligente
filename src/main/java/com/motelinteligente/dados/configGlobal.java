@@ -17,6 +17,12 @@ public class configGlobal {
     private boolean controlaEstoque;
     private boolean flagFechar;
     public float addPessoa = 30;
+    private boolean flagSistemaSpring;
+    private boolean flagArduino;
+    private boolean flagMesmoUserCaixa;
+    private int limiteDesconto;
+
+    
 
     // Construtor privado para evitar a criação de múltiplas instâncias
     public configGlobal() {
@@ -24,11 +30,40 @@ public class configGlobal {
         cargoUsuario = "Visitante";
         caixaAberto = 0;
         mudanca = false;
-        
-        
         logoffecharcaixa = false;
         controlaEstoque = false;
+        flagSistemaSpring = flagArduino = false;
 
+    }
+    public int getLimiteDesconto() {
+        return limiteDesconto;
+    }
+
+    public void setLimiteDesconto(int limiteDesconto) {
+        this.limiteDesconto = limiteDesconto;
+    }
+    public boolean isFlagMesmoUserCaixa() {
+        return flagMesmoUserCaixa;
+    }
+
+    public void setFlagMesmoUserCaixa(boolean flagMesmoUserCaixa) {
+        this.flagMesmoUserCaixa = flagMesmoUserCaixa;
+    }
+
+    public boolean isFlagSistemaSpring() {
+        return flagSistemaSpring;
+    }
+
+    public void setFlagSistemaSpring(boolean flagSistemaSpring) {
+        this.flagSistemaSpring = flagSistemaSpring;
+    }
+
+    public boolean isFlagArduino() {
+        return flagArduino;
+    }
+
+    public void setFlagArduino(boolean flagArduino) {
+        this.flagArduino = flagArduino;
     }
 
     public void carregarInformacoes(String cargo, String login) {
@@ -51,7 +86,8 @@ public class configGlobal {
                 //carrega as configurações do banco de dados
                 this.logoffecharcaixa = resultado.getBoolean("logoffcaixa");
                 this.controlaEstoque = resultado.getBoolean("estoque");
-                
+                this.flagMesmoUserCaixa = resultado.getBoolean("flagMesmoUserCaixa");
+                this.limiteDesconto = resultado.getInt("limitadesconto");
             } else {
                 JOptionPane.showMessageDialog(null, "Erro ao carregar Informações Adicionais.");
                 link.close();

@@ -14,12 +14,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.swing.JOptionPane;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author MOTEL
  */
 public class fprodutos {
+
+    private static final Logger logger = LogManager.getLogger(fprodutos.class);
 
     public List<vprodutos> mostrarProduto() {
         List<vprodutos> produtos = new ArrayList<>();
@@ -31,7 +35,7 @@ public class fprodutos {
             link = new fazconexao().conectar();
             String consultaSQL = "select * from produtos order by idproduto";
             PreparedStatement statement = link.prepareStatement(consultaSQL);
-
+            logger.debug("Executando consulta SQL: {}", consultaSQL);
             ResultSet resultado = statement.executeQuery();
 
             // Processar o resultado
@@ -52,6 +56,8 @@ public class fprodutos {
             link.close();
 
         } catch (Exception e) {
+            logger.error("Erro ao obter produto: mostrarProduto(): ", e);
+
             JOptionPane.showConfirmDialog(null, e);
         } finally {
             try {
@@ -61,6 +67,8 @@ public class fprodutos {
                 }
             } catch (SQLException e) {
                 JOptionPane.showMessageDialog(null, e);
+                logger.error("Erro : motraProduto() finally: ", e);
+
             }
         }
         return produtos;
@@ -76,13 +84,14 @@ public class fprodutos {
             PreparedStatement statement = link.prepareStatement(estoqueQuery);
             statement.setInt(1, idProduto);
             ResultSet resultado = statement.executeQuery();
-
+            logger.debug("Executando consulta SQL: {}", estoqueQuery);
             if (resultado.next()) {
                 String estoque = resultado.getString("estoque");
                 try {
                     int estoqueAtual = Integer.parseInt(estoque);
                     int novoEstoque = estoqueAtual - quantidade;
                     if (novoEstoque >= 0) {
+                        logger.debug("Executando consulta SQL: {}", updateQuery);
                         statement = link.prepareStatement(updateQuery);
                         statement.setInt(1, novoEstoque);
                         statement.setInt(2, idProduto);
@@ -101,6 +110,7 @@ public class fprodutos {
                 return false;
             }
         } catch (SQLException e) {
+            logger.error("Erro : diminuiEstoque(): ", e);
             JOptionPane.showMessageDialog(null, e.getMessage());
             return false;
         } finally {
@@ -110,6 +120,8 @@ public class fprodutos {
                 }
             } catch (SQLException e) {
                 JOptionPane.showMessageDialog(null, e);
+                logger.error("Erro : diminuiEstoque() finally: ", e);
+
             }
         }
     }
@@ -121,6 +133,7 @@ public class fprodutos {
         try {
             link = new fazconexao().conectar();
             PreparedStatement statement = link.prepareStatement(consultaSQL);
+            logger.debug("Executando consulta SQL: {}", consultaSQL);
 
             statement.setInt(1, numero);
             ResultSet resultado = statement.executeQuery();
@@ -139,6 +152,7 @@ public class fprodutos {
                 }
             }
         } catch (Exception e) {
+            logger.error("Erro : verExiste(): ", e);
             JOptionPane.showConfirmDialog(null, e);
             return false;
         } finally {
@@ -149,6 +163,8 @@ public class fprodutos {
                 }
             } catch (SQLException e) {
                 JOptionPane.showMessageDialog(null, e);
+                logger.error("Erro : verExiste() finally: ", e);
+
             }
         }
 
@@ -161,6 +177,7 @@ public class fprodutos {
 
         try {
             link = new fazconexao().conectar();
+            logger.debug("Executando consulta SQL: {}", consultaSQL);
             PreparedStatement statement = link.prepareStatement(consultaSQL);
             statement.setInt(1, dados.getIdProduto());
             statement.setString(2, dados.getDescricao());
@@ -178,6 +195,7 @@ public class fprodutos {
                 return false;
             }
         } catch (Exception e) {
+            logger.error("Erro : insercao(): ", e);
             JOptionPane.showConfirmDialog(null, e);
             return false;
         } finally {
@@ -188,6 +206,8 @@ public class fprodutos {
                 }
             } catch (SQLException e) {
                 JOptionPane.showMessageDialog(null, e);
+                logger.error("Erro : insercao() finally: ", e);
+
             }
         }
 
@@ -199,6 +219,7 @@ public class fprodutos {
         Connection link = null;
 
         try {
+            logger.debug("Executando consulta SQL: {}", consultaSQL);
             link = new fazconexao().conectar();
             PreparedStatement statement = link.prepareStatement(consultaSQL);
             int n = statement.executeUpdate();
@@ -212,6 +233,7 @@ public class fprodutos {
                 return false;
             }
         } catch (Exception e) {
+            logger.error("Erro : exclusao(): ", e);
             JOptionPane.showConfirmDialog(null, e);
             return false;
         } finally {
@@ -222,6 +244,8 @@ public class fprodutos {
                 }
             } catch (SQLException e) {
                 JOptionPane.showMessageDialog(null, e);
+                logger.error("Erro : exclusao() finally: ", e);
+
             }
         }
     }
@@ -234,6 +258,7 @@ public class fprodutos {
         try {
             link = new fazconexao().conectar();
             Statement statement = link.createStatement();
+            logger.debug("Executando consulta SQL: {}", consultaSQL);
 
             ResultSet resultado = statement.executeQuery(consultaSQL);
             if (resultado.next()) {
@@ -250,6 +275,7 @@ public class fprodutos {
                 statement.close();
             }
         } catch (Exception e) {
+            logger.error("Erro : getProduto(): ", e);
             JOptionPane.showConfirmDialog(null, e);
         } finally {
             try {
@@ -258,6 +284,7 @@ public class fprodutos {
                     link.close();
                 }
             } catch (SQLException e) {
+                logger.error("Erro : getproduto() finally: ", e);
                 JOptionPane.showMessageDialog(null, e);
             }
         }
@@ -270,6 +297,7 @@ public class fprodutos {
         Connection link = null;
 
         try {
+            logger.debug("Executando consulta SQL: {}", consultaSQL);
             link = new fazconexao().conectar();
             PreparedStatement statement = link.prepareStatement(consultaSQL);
             int n = statement.executeUpdate();
@@ -283,6 +311,7 @@ public class fprodutos {
                 return false;
             }
         } catch (Exception e) {
+            logger.error("Erro : exclui(): ", e);
             JOptionPane.showConfirmDialog(null, e);
             return false;
         } finally {
@@ -292,6 +321,7 @@ public class fprodutos {
                     link.close();
                 }
             } catch (SQLException e) {
+                logger.error("Erro : exclui() finally: ", e);
                 JOptionPane.showMessageDialog(null, e);
             }
         }
@@ -304,7 +334,7 @@ public class fprodutos {
         try {
             link = new fazconexao().conectar();
             Statement statement = link.createStatement();
-
+            logger.debug("Executando consulta SQL: {}", consultaSQL);
             ResultSet resultado = statement.executeQuery(consultaSQL);
             if (resultado.next()) {
                 return (String) resultado.getString("descricao");
@@ -313,6 +343,7 @@ public class fprodutos {
                 statement.close();
             }
         } catch (Exception e) {
+            logger.error("Erro : getDescicao(): ", e);
             JOptionPane.showConfirmDialog(null, e);
         } finally {
             try {
@@ -321,6 +352,7 @@ public class fprodutos {
                     link.close();
                 }
             } catch (SQLException e) {
+                logger.error("Erro : getDescicao() finally: ", e);
                 JOptionPane.showMessageDialog(null, e);
             }
         }
@@ -336,7 +368,7 @@ public class fprodutos {
             link = new fazconexao().conectar();
             PreparedStatement statement = link.prepareStatement(consultaSQL);
             statement.setString(1, desc);
-
+            logger.debug("Executando consulta SQL: {}", consultaSQL);
             ResultSet resultado = statement.executeQuery();
             if (resultado.next()) {
                 idProduto = resultado.getInt("idproduto");
@@ -346,16 +378,16 @@ public class fprodutos {
             resultado.close();
             statement.close();
         } catch (SQLException e) {
+            logger.error("Erro : getIdProduto() : ", e);
             JOptionPane.showMessageDialog(null, "Erro ao buscar o ID do produto: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
         } finally {
             try {
                 if (link != null && !link.isClosed()) {
                     link.close();
                 }
             } catch (SQLException e) {
+                logger.error("Erro : getIdProduto() finally: ", e);
                 JOptionPane.showMessageDialog(null, "Erro ao fechar a conexão: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
-                e.printStackTrace();
             }
         }
 
@@ -380,17 +412,15 @@ public class fprodutos {
             PreparedStatement statement = link.prepareStatement(consultaSQL);
             statement.setInt(1, idLocacao);
             statement.setInt(2, idProduto);
-
-            // Executar a consulta
+            logger.debug("Executando consulta SQL: {}", consultaSQL);
             statement.executeUpdate();
-
-            // Fechar os recursos
             statement.close();
             link.close();
         } catch (SQLException e) {
             // Tratamento de erro
             JOptionPane.showMessageDialog(null, "Erro ao deletar prevendidos: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
+            logger.error("Erro : removePreVendido(): ", e);
+
         } finally {
             try {
                 // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
@@ -398,7 +428,8 @@ public class fprodutos {
                     link.close();
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                logger.error("Erro : removePreVendido() finally: ", e);
+
             }
         }
     }
@@ -410,6 +441,7 @@ public class fprodutos {
         try {
             link = new fazconexao().conectar();
             Statement statement = link.createStatement();
+            logger.debug("Executando consulta SQL: {}", consultaSQL);
 
             ResultSet resultado = statement.executeQuery(consultaSQL);
             if (resultado.next()) {
@@ -419,6 +451,8 @@ public class fprodutos {
                 statement.close();
             }
         } catch (Exception e) {
+            logger.error("Erro : getValorProduto(): ", e);
+
             JOptionPane.showConfirmDialog(null, e);
         } finally {
             try {
@@ -427,6 +461,7 @@ public class fprodutos {
                     link.close();
                 }
             } catch (SQLException e) {
+                logger.error("Erro : getValorProduto() finally: ", e);
                 JOptionPane.showMessageDialog(null, e);
             }
         }
@@ -441,7 +476,7 @@ public class fprodutos {
             // Consulta SQL para inserção de dados na tabela prevendidos
             String consultaSQL = "INSERT INTO prevendidos (idlocacao, idproduto, quantidade) VALUES (?, ?, ?)";
             PreparedStatement statement = link.prepareStatement(consultaSQL);
-
+            logger.debug("Executando consulta SQL: {}", consultaSQL);
             // Define os parâmetros da consulta
             statement.setInt(1, idLocacao);
             statement.setInt(2, idProduto);
@@ -454,7 +489,7 @@ public class fprodutos {
             statement.close();
             link.close();
         } catch (SQLException e) {
-            // Tratamento de erro
+            logger.error("Erro : inserirPrevendido(): ", e);
             JOptionPane.showMessageDialog(null, "Erro ao inserir prevendido: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
         } finally {
             try {
@@ -463,7 +498,7 @@ public class fprodutos {
                     link.close();
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                logger.error("Erro : inserirPrevendido() finally: ", e);
             }
         }
     }
