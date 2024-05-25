@@ -41,6 +41,11 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.28</version> <!-- ou a versão mais recente -->
         </dependency>
+        <dependency>
+            <groupId>com.formdev</groupId>
+            <artifactId>flatlaf</artifactId>
+            <version>1.6</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -57,7 +62,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>com.example.MainClass</mainClass>
+                            <mainClass>com.motelinteligente.telas.TelaLogin</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

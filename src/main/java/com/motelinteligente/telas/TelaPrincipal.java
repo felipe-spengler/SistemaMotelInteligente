@@ -36,6 +36,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.MouseInfo;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -112,6 +114,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             configGlobal configuracao = configGlobal.getInstance();
             configuracao.setCaixa(idCaixaAtual);
         }
+        
+
     }
 
     public void setLabel(String ini_user, String ini_cargo) {
@@ -461,6 +465,11 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         jLabel3 = new javax.swing.JLabel();
         txtAntecipado = new javax.swing.JTextField();
         txtDescontoNegociado = new javax.swing.JTextField();
+        jPanel4 = new javax.swing.JPanel();
+        jPanel7 = new javax.swing.JPanel();
+        lblAdicionarAlarme = new javax.swing.JLabel();
+        jButton2 = new javax.swing.JButton();
+        jButton5 = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         painelQuartos = new javax.swing.JPanel();
@@ -585,6 +594,12 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Motel Intensy - Principal");
         addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
             public void windowOpened(java.awt.event.WindowEvent evt) {
                 formWindowOpened(evt);
             }
@@ -648,6 +663,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         lblCargo.setText("texto");
 
         painelSecundario2.setBackground(new java.awt.Color(204, 204, 204));
+
+        jTabbedPane1.setFont(new java.awt.Font("Sitka Small", 0, 14)); // NOI18N
 
         jLabel11.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel11.setText("Horas Adicionais");
@@ -838,7 +855,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 .addComponent(botaoEncerrar)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(botaoIniciar)
-                .addContainerGap(61, Short.MAX_VALUE))
+                .addContainerGap(72, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Principal", painelSecundario);
@@ -928,7 +945,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtAntecipado, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(70, Short.MAX_VALUE))
+                .addContainerGap(76, Short.MAX_VALUE))
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -975,6 +992,67 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         );
 
         jTabbedPane1.addTab("Antecipado", jPanel5);
+
+        jPanel7.setBackground(new java.awt.Color(204, 204, 204));
+
+        lblAdicionarAlarme.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        lblAdicionarAlarme.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblAdicionarAlarme.setText("Clique Para Adicionar Alarme");
+        lblAdicionarAlarme.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblAdicionarAlarmeMouseClicked(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
+        jPanel7.setLayout(jPanel7Layout);
+        jPanel7Layout.setHorizontalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
+                .addContainerGap(96, Short.MAX_VALUE)
+                .addComponent(lblAdicionarAlarme, javax.swing.GroupLayout.PREFERRED_SIZE, 207, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(91, 91, 91))
+        );
+        jPanel7Layout.setVerticalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel7Layout.createSequentialGroup()
+                .addGap(26, 26, 26)
+                .addComponent(lblAdicionarAlarme, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(26, Short.MAX_VALUE))
+        );
+
+        jButton2.setText("Excluir Alarme");
+
+        jButton5.setText("Modificar Alarme");
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                .addGap(79, 79, 79)
+                .addComponent(jButton5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(43, 43, 43))
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGap(12, 12, 12)
+                .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(12, Short.MAX_VALUE))
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGap(35, 35, 35)
+                .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 136, Short.MAX_VALUE)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(94, 94, 94))
+        );
+
+        jTabbedPane1.addTab("Alarme", jPanel4);
 
         painelSecundario2.setLayer(jTabbedPane1, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
@@ -2227,6 +2305,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             int idLocacao = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
 
             salvaAntecipado(idLocacao, "negociado", valorRecebido);
+            JOptionPane.showMessageDialog(null, "Desconto Antecipado adicionado com Sucesso!");
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(null, "Valor digitado não é monetário");
         }
@@ -2240,9 +2319,11 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             int idLocacao = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
 
             salvaAntecipado(idLocacao, "recebido", valorRecebido);
+            JOptionPane.showMessageDialog(null, "Recebimento Antecipado adicionado com Sucesso!");
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(null, "Valor digitado não é monetário");
         }
+        
 
 
     }//GEN-LAST:event_txtAntecipadoActionPerformed
@@ -2258,6 +2339,27 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         cache.mostrarCacheProdutosVendidos();
     }//GEN-LAST:event_menuFazBackupActionPerformed
 
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_formWindowClosed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+         int confirmed = JOptionPane.showConfirmDialog(this,
+                "Você tem certeza que deseja encerrar a aplicação?", "Confirmação de Encerramento",
+                JOptionPane.YES_NO_OPTION);
+
+        if (confirmed == JOptionPane.YES_OPTION) {
+            CacheDados cache = CacheDados.getInstancia();
+            cache.alteraRunning(false);
+            dispose();  // Fecha a janela e chama windowClosed
+        }
+    }//GEN-LAST:event_formWindowClosing
+
+    private void lblAdicionarAlarmeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblAdicionarAlarmeMouseClicked
+        //EventroAbrirAlarme
+        
+    }//GEN-LAST:event_lblAdicionarAlarmeMouseClicked
+    
     public void salvaAntecipado(int idLocacao, String tipo, float valor) {
         CacheDados cache = CacheDados.getInstancia();
         if (idLocacao == 0) {
@@ -2380,8 +2482,10 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private javax.swing.JMenuItem itemManutencao;
     private javax.swing.JMenuItem itemReserva;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
     private javax.swing.JFrame jFrame1;
     private javax.swing.JFrame jFrame2;
     private javax.swing.JFrame jFrame3;
@@ -2407,8 +2511,10 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSeparator jSeparator1;
@@ -2419,6 +2525,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private javax.swing.JTextField jTextField2;
     private javax.swing.JLabel labelData;
     private javax.swing.JLabel labelHora;
+    private javax.swing.JLabel lblAdicionarAlarme;
     private javax.swing.JLabel lblCargo;
     private javax.swing.JLabel lblEntrada;
     private javax.swing.JLabel lblHoraAdicional;

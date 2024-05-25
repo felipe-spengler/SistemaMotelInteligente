@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +27,7 @@ public class CacheDados {
     private Map<Integer, DadosOcupados> cacheOcupado = new HashMap<>();
     public Map<Integer, List<DadosVendidos>> cacheProdutosVendidos = new HashMap<>();
     public Map<Integer, List<Negociados>> cacheNegociado = new HashMap<>();
+    public Map<Integer, Timestamp> despertador = new HashMap<>();
     SerialPort arduinoPort;
 
     private CacheDados() {
@@ -48,6 +50,7 @@ public class CacheDados {
         cacheOcupado.clear();
         cacheProdutosVendidos.clear();
         cacheNegociado.clear();
+        despertador.clear();
     }
 
     public void carregaArduino() {
@@ -78,7 +81,13 @@ public class CacheDados {
         cacheOcupado.put(numeroQuarto, ocupado);
         carregaProdutosNegociadosCache(idLoca);
     }
-
+    public void alteraRunning(boolean setar){
+        /*Connection link = null;
+        try{
+            link = new fazconexao().conectar();
+            String sql = 
+        }*/
+    }
     public void carregaProdutosNegociadosCache(int idLoca) {
 
         // Consulta produtos prevendidos no banco de dados e adiciona à cache
