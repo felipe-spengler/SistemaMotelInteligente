@@ -22,17 +22,18 @@ public class fazconexao {
 
     public  Connection conectar(){
         try{
-            //CONEXAO COM O BANCO PLANETSCALE
             Connection conn = DriverManager.getConnection(
                     "jdbc:mysql://srv1196.hstgr.io/u876938716_motel",
   "u876938716_contato",
   "Felipe0110@");
-            
-            
+            configGlobal config = configGlobal.getInstance();
+            config.aumentaContador();
+            System.out.print("-"+ config.getContador() +"-");
             return conn;
         }catch(Exception e){
             JOptionPane.showConfirmDialog(null, e);
         }
+        
         return null;
     }
     public int verificaCaixa(){

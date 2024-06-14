@@ -21,7 +21,7 @@ public class configGlobal {
     private boolean flagArduino;
     private boolean flagMesmoUserCaixa;
     private int limiteDesconto;
-
+    public int contador;
     
 
     // Construtor privado para evitar a criação de múltiplas instâncias
@@ -33,7 +33,7 @@ public class configGlobal {
         logoffecharcaixa = false;
         controlaEstoque = false;
         flagSistemaSpring = flagArduino = false;
-
+        contador =0;
     }
     public int getLimiteDesconto() {
         return limiteDesconto;
@@ -107,7 +107,12 @@ public class configGlobal {
     
     }
 
-
+    public int getContador(){
+        return contador;
+    }
+    public void aumentaContador(){
+        contador++;
+    }
 
     public String getUsuario() {
         return usuario;

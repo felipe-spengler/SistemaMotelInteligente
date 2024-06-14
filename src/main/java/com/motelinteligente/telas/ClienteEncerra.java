@@ -136,6 +136,12 @@ public class ClienteEncerra extends javax.swing.JFrame {
 
         });
     }
+    public void setTitulo(int numero) {
+        SwingUtilities.invokeLater(() -> {
+            lblTitulo.setText("Encerramento do Quarto " + numero);
+
+        });
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -171,7 +177,7 @@ public class ClienteEncerra extends javax.swing.JFrame {
         tabela = new javax.swing.JTable();
         jLabel11 = new javax.swing.JLabel();
         lblValorConsumo = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
+        lblTitulo = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -419,8 +425,8 @@ public class ClienteEncerra extends javax.swing.JFrame {
                 .addContainerGap(163, Short.MAX_VALUE))
         );
 
-        jLabel7.setFont(new java.awt.Font("Sitka Small", 1, 48)); // NOI18N
-        jLabel7.setText("Encerramento - Quarto x");
+        lblTitulo.setFont(new java.awt.Font("Sitka Small", 1, 48)); // NOI18N
+        lblTitulo.setText("Encerramento - Quarto x");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -434,14 +440,14 @@ public class ClienteEncerra extends javax.swing.JFrame {
                 .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 788, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblTitulo, javax.swing.GroupLayout.PREFERRED_SIZE, 788, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(205, 205, 205))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(14, 14, 14)
-                .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblTitulo, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(painelInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 613, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -498,7 +504,6 @@ public class ClienteEncerra extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
@@ -507,6 +512,7 @@ public class ClienteEncerra extends javax.swing.JFrame {
     private javax.swing.JLabel lblInicioLocacao;
     private javax.swing.JLabel lblPessoasQuarto;
     private javax.swing.JLabel lblTempoLocado;
+    private javax.swing.JLabel lblTitulo;
     private javax.swing.JLabel lblValorConsumo;
     private javax.swing.JLabel lblValorConsumo2;
     private javax.swing.JLabel lblValorQuarto;

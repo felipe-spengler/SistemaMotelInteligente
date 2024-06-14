@@ -269,6 +269,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
 
         //setar as datas da tela do cliente
         outraTela.setaDatas(dataInicio, dataFim, tempoTotalLocado);
+        outraTela.setTitulo(numeroQuarto);
 
     }
 

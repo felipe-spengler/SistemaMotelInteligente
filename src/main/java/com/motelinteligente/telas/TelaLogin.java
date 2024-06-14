@@ -4,6 +4,7 @@ import com.motelinteligente.dados.BarraCarregar;
 import com.motelinteligente.dados.CacheDados;
 import com.motelinteligente.dados.MotelInteligenteApplication;
 import com.motelinteligente.dados.configGlobal;
+import com.motelinteligente.dados.fazconexao;
 import com.motelinteligente.dados.ffuncionario;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -15,6 +16,10 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.JOptionPane;
 import java.awt.Toolkit;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import javax.swing.JFrame;
 import javax.swing.JProgressBar;
 
@@ -266,18 +271,53 @@ public class TelaLogin extends javax.swing.JFrame {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(TelaLogin.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
 
-        /* Create and display the form */
-        //java.awt.EventQueue.invokeLater(new Runnable() {
-        //public void run() {
-        // TelaLogin telalogin = new TelaLogin();
-        //telalogin.setVisible(true);
-        //}
-        new TelaLogin().setVisible(true);
-        //}
-        //});
-    }
+
+        //conferir isRunning
+        Connection link = null;
+        String query = "SELECT isRunning FROM configuracoes";
+        boolean resultado = false;
+
+        try {
+            // Estabelecendo a conexão
+            link = new fazconexao().conectar();
+            // Preparando e executando a consulta
+            try ( PreparedStatement pstmt = link.prepareStatement(query);  ResultSet rst = pstmt.executeQuery()) {
+
+                if (rst.next()) {
+                    resultado = rst.getBoolean("isRunning");
+                    System.out.println(rst.getBoolean("isRunning"));
+                    System.out.println(resultado);
+                }
+
+                if (resultado) {
+                    JOptionPane.showMessageDialog(null, "Já está em uso");
+                    System.exit(0);
+                    
+                } else {
+                    CacheDados cache = CacheDados.getInstancia();
+                    cache.alteraRunning(true);
+                    new TelaLogin().setVisible(true);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            // Fechando a conexão
+            if (link != null) {
+                try {
+                    link.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    
+
+    //}
+    //});
+}
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bt_entrar;

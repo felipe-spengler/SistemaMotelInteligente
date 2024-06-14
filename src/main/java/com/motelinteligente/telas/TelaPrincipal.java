@@ -95,7 +95,14 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     public TelaPrincipal() {
         initComponents();
         inicializarPopupMenu();
-
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                CacheDados cache = CacheDados.getInstancia();
+                cache.alteraRunning(false);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }));
         setExtendedState(MAXIMIZED_BOTH);
         iniciar();
         insereIcone(this);
@@ -114,7 +121,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             configGlobal configuracao = configGlobal.getInstance();
             configuracao.setCaixa(idCaixaAtual);
         }
-        
 
     }
 
@@ -265,7 +271,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 String desc = produtoDao.getDescicao(String.valueOf(idProduto));
                 float valor = produtoDao.getValorProduto(idProduto);
                 float total = valor * quantidade;
-                totalVendido +=total;
+                totalVendido += total;
                 // Adiciona uma nova linha ao modelo da tabela
                 modelo.addRow(new Object[]{
                     quantidade,
@@ -277,7 +283,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         } else {
             System.out.println("Não há produtos vendidos para a locação " + locacao + " na cache.");
         }
-        lblValorConsumo.setText("R$ "+ totalVendido);
+        lblValorConsumo.setText("R$ " + totalVendido);
     }
 
     public static String formatarData(String dataOriginal) {
@@ -1453,7 +1459,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             JOptionPane.showMessageDialog(null, "Precisa abrir o caixa");
             new CaixaFrame().setVisible(true);
         }
-        if(config.getCargoUsuario().equals("comum")){
+        if (config.getCargoUsuario().equals("comum")) {
             btFerramentas.setEnabled(false);
             btCadastros.setEnabled(false);
             menuCadastraProduto.setEnabled(false);
@@ -1467,7 +1473,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         timer.start();
         mostraQuartos();
         outroTimer.start();
-        
 
     }
 
@@ -1635,9 +1640,13 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             configGlobal config = configGlobal.getInstance();
 
             if (config.getMudanca()) {
-                mostraQuartos();
-                focoQuarto();
-                config.setMudanca(false);
+                SwingUtilities.invokeLater(() -> {
+                    mostraQuartos();
+                    focoQuarto();
+                    config.setMudanca(false);
+                    painelSecundario.repaint();
+                });
+
             }
 
         }
@@ -1773,7 +1782,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         if (idCaixa == 0) {
             new CaixaFrame().setVisible(true);
             JOptionPane.showMessageDialog(null, "Precisa abrir o caixa!");
-            
+
         } else {
             // Abre uma caixa de diálogo de confirmação
             int confirmacao = JOptionPane.showConfirmDialog(null, "Deseja encerrar o quarto " + quartoEmFoco + "?", "Confirmação", JOptionPane.YES_NO_OPTION);
@@ -2323,7 +2332,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(null, "Valor digitado não é monetário");
         }
-        
 
 
     }//GEN-LAST:event_txtAntecipadoActionPerformed
@@ -2344,7 +2352,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     }//GEN-LAST:event_formWindowClosed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-         int confirmed = JOptionPane.showConfirmDialog(this,
+        int confirmed = JOptionPane.showConfirmDialog(this,
                 "Você tem certeza que deseja encerrar a aplicação?", "Confirmação de Encerramento",
                 JOptionPane.YES_NO_OPTION);
 
@@ -2357,9 +2365,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
     private void lblAdicionarAlarmeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblAdicionarAlarmeMouseClicked
         //EventroAbrirAlarme
-        
+
     }//GEN-LAST:event_lblAdicionarAlarmeMouseClicked
-    
+
     public void salvaAntecipado(int idLocacao, String tipo, float valor) {
         CacheDados cache = CacheDados.getInstancia();
         if (idLocacao == 0) {
