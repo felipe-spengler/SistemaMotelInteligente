@@ -196,7 +196,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             jTabbedPane1.setEnabledAt(1, true);
             botaoStatus.setEnabled(true);
             txtPessoas.setEnabled(true);
-            txtPessoas.setText(String.valueOf(quartodao.getPessoas(quartoEmFoco)));
+            txtPessoas.setText(String.valueOf(cache.getCacheOcupado().get(quartoEmFoco).getNumeroPessoas()));
             String[] partes = status.split("-");
             int idLoca = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
             if (idLoca == 0) {
@@ -431,6 +431,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         jSeparator1 = new javax.swing.JSeparator();
         labelData = new javax.swing.JLabel();
         labelHora = new javax.swing.JLabel();
+        lblAlarmeAtivo = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jPanel2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
@@ -472,7 +473,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         txtAntecipado = new javax.swing.JTextField();
         txtDescontoNegociado = new javax.swing.JTextField();
         jPanel4 = new javax.swing.JPanel();
-        jPanel7 = new javax.swing.JPanel();
+        pnAdicionarAlarme = new javax.swing.JPanel();
         lblAdicionarAlarme = new javax.swing.JLabel();
         jButton2 = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
@@ -615,6 +616,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         labelHora.setText("hora hora hora");
 
+        lblAlarmeAtivo.setText("jLabel4");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -624,6 +627,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 .addComponent(labelData)
                 .addGap(40, 40, 40)
                 .addComponent(labelHora)
+                .addGap(374, 374, 374)
+                .addComponent(lblAlarmeAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, 322, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
@@ -638,7 +643,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 .addGap(29, 29, 29)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(labelData)
-                    .addComponent(labelHora))
+                    .addComponent(labelHora)
+                    .addComponent(lblAlarmeAtivo))
                 .addContainerGap(16, Short.MAX_VALUE))
         );
 
@@ -999,7 +1005,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         jTabbedPane1.addTab("Antecipado", jPanel5);
 
-        jPanel7.setBackground(new java.awt.Color(204, 204, 204));
+        pnAdicionarAlarme.setBackground(new java.awt.Color(204, 204, 204));
 
         lblAdicionarAlarme.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
         lblAdicionarAlarme.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -1010,18 +1016,18 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             }
         });
 
-        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
-        jPanel7.setLayout(jPanel7Layout);
-        jPanel7Layout.setHorizontalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
+        javax.swing.GroupLayout pnAdicionarAlarmeLayout = new javax.swing.GroupLayout(pnAdicionarAlarme);
+        pnAdicionarAlarme.setLayout(pnAdicionarAlarmeLayout);
+        pnAdicionarAlarmeLayout.setHorizontalGroup(
+            pnAdicionarAlarmeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnAdicionarAlarmeLayout.createSequentialGroup()
                 .addContainerGap(96, Short.MAX_VALUE)
                 .addComponent(lblAdicionarAlarme, javax.swing.GroupLayout.PREFERRED_SIZE, 207, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(91, 91, 91))
         );
-        jPanel7Layout.setVerticalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel7Layout.createSequentialGroup()
+        pnAdicionarAlarmeLayout.setVerticalGroup(
+            pnAdicionarAlarmeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnAdicionarAlarmeLayout.createSequentialGroup()
                 .addGap(26, 26, 26)
                 .addComponent(lblAdicionarAlarme, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(26, Short.MAX_VALUE))
@@ -1043,14 +1049,14 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 .addGap(43, 43, 43))
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addGap(12, 12, 12)
-                .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(pnAdicionarAlarme, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(12, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addGap(35, 35, 35)
-                .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(pnAdicionarAlarme, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 136, Short.MAX_VALUE)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1469,7 +1475,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         labelData.setText(formato.format(dataSistema));
 
         Timer timer = new Timer(1000, new hora());
-        Timer outroTimer = new Timer(60000, new horaQuarto());
+        Timer outroTimer = new Timer(30000, new horaQuarto());
         timer.start();
         mostraQuartos();
         outroTimer.start();
@@ -1641,6 +1647,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
             if (config.getMudanca()) {
                 SwingUtilities.invokeLater(() -> {
+                    System.out.println("algo mudou");
                     mostraQuartos();
                     focoQuarto();
                     config.setMudanca(false);
@@ -2522,7 +2529,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSeparator jSeparator1;
@@ -2534,6 +2540,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private javax.swing.JLabel labelData;
     private javax.swing.JLabel labelHora;
     private javax.swing.JLabel lblAdicionarAlarme;
+    private javax.swing.JLabel lblAlarmeAtivo;
     private javax.swing.JLabel lblCargo;
     private javax.swing.JLabel lblEntrada;
     private javax.swing.JLabel lblHoraAdicional;
@@ -2558,6 +2565,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private javax.swing.JPanel painelQuartos;
     private javax.swing.JPanel painelSecundario;
     private javax.swing.JDesktopPane painelSecundario2;
+    private javax.swing.JPanel pnAdicionarAlarme;
     private javax.swing.JRadioButtonMenuItem radioPeriodo;
     private javax.swing.JRadioButtonMenuItem radioPernoite;
     private javax.swing.JDesktopPane srPane;

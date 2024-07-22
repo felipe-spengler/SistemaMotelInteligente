@@ -2,6 +2,7 @@ package com.motelinteligente.telas;
 
 import com.motelinteligente.dados.BarraCarregar;
 import com.motelinteligente.dados.CacheDados;
+import com.motelinteligente.dados.ExternalMonitor;
 import com.motelinteligente.dados.MotelInteligenteApplication;
 import com.motelinteligente.dados.configGlobal;
 import com.motelinteligente.dados.fazconexao;
@@ -272,7 +273,6 @@ public class TelaLogin extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(TelaLogin.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
 
-
         //conferir isRunning
         Connection link = null;
         String query = "SELECT isRunning FROM configuracoes";
@@ -292,13 +292,19 @@ public class TelaLogin extends javax.swing.JFrame {
 
                 if (resultado) {
                     JOptionPane.showMessageDialog(null, "Já está em uso");
-                    System.exit(0);
-                    
+                    //System.exit(0);
+
                 } else {
                     CacheDados cache = CacheDados.getInstancia();
                     cache.alteraRunning(true);
-                    new TelaLogin().setVisible(true);
+
+                    // Inicia o monitoramento externo em uma nova daemon thread
+                    Thread monitorThread = new Thread(new ExternalMonitor());
+                    //monitorThread.setDaemon(true);
+                    monitorThread.start();
+                    
                 }
+                new TelaLogin().setVisible(true);
             }
 
         } catch (SQLException e) {
@@ -313,11 +319,10 @@ public class TelaLogin extends javax.swing.JFrame {
                 }
             }
         }
-    
 
-    //}
-    //});
-}
+        //}
+        //});
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bt_entrar;

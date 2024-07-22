@@ -26,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import com.motelinteligente.dados.SSLUtil;
 
 @SpringBootApplication
 public class MotelInteligenteApplication {
@@ -33,6 +34,8 @@ public class MotelInteligenteApplication {
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger(fprodutos.class);
 
     public static void main(String[] args) {
+        
+        SSLUtil.disableSSLCertificateChecking();
         // Inicializa a aplicação Spring Boot normalmente
         SpringApplication.run(MotelInteligenteApplication.class, args);
         try {
@@ -95,6 +98,7 @@ public class MotelInteligenteApplication {
 
         @PostMapping(value = "/receberNumeroQuarto", consumes = "text/plain", produces = "text/plain")
         public ResponseEntity<String> receberNumeroQuarto(@RequestBody String numeroQuarto) {
+            logger.debug("Recebeu do sistema Spring Boot: " + numeroQuarto);
             String[] partes = numeroQuarto.split(" ");
 
             if (partes.length != 2) {
@@ -103,7 +107,7 @@ public class MotelInteligenteApplication {
             String acao = partes[0];
             String numero = partes[1];
             System.out.println(acao + numero);
-            logger.debug("Recebeu do sistema Spring Boot: " + numeroQuarto);
+            
             if (acao.equals("abrir")) {
                 switch (numero) {
                     case "entrada" ->
