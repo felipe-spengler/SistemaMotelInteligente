@@ -32,6 +32,8 @@ import com.motelinteligente.dados.SSLUtil;
 public class MotelInteligenteApplication {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger(fprodutos.class);
+    private BackupQueueManager backupQueueManager;
+
 
     public static void main(String[] args) {
         

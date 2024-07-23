@@ -1,5 +1,8 @@
 package com.motelinteligente.telas;
 
+import com.motelinteligente.dados.AppConfig;
+import com.motelinteligente.dados.BackupExecutor;
+import com.motelinteligente.dados.BackupQueueManager;
 import com.motelinteligente.dados.BarraCarregar;
 import com.motelinteligente.dados.CacheDados;
 import com.motelinteligente.dados.ExternalMonitor;
@@ -23,6 +26,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.swing.JFrame;
 import javax.swing.JProgressBar;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**
  *
@@ -36,6 +41,17 @@ public class TelaLogin extends javax.swing.JFrame {
     JProgressBar barraProgesso = new javax.swing.JProgressBar();
 
     public TelaLogin() throws IOException {
+        // Inicializa o contexto do Spring
+        ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+        BackupQueueManager backupQueueManager = context.getBean(BackupQueueManager.class);
+
+        // Armazena o BackupQueueManager no ConfigGlobal
+        configGlobal.getInstance().initializeBackupQueueManager(backupQueueManager);
+
+        // Inicializa o BackupExecutor
+        BackupExecutor backupExecutor = new BackupExecutor(backupQueueManager);
+        backupExecutor.start();
+        
         setVisible(true);
         initComponents();
         insereIcone(this);
@@ -272,53 +288,8 @@ public class TelaLogin extends javax.swing.JFrame {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(TelaLogin.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-
-        //conferir isRunning
-        Connection link = null;
-        String query = "SELECT isRunning FROM configuracoes";
-        boolean resultado = false;
-
-        try {
-            // Estabelecendo a conexão
-            link = new fazconexao().conectar();
-            // Preparando e executando a consulta
-            try ( PreparedStatement pstmt = link.prepareStatement(query);  ResultSet rst = pstmt.executeQuery()) {
-
-                if (rst.next()) {
-                    resultado = rst.getBoolean("isRunning");
-                    System.out.println(rst.getBoolean("isRunning"));
-                    System.out.println(resultado);
-                }
-
-                if (resultado) {
-                    JOptionPane.showMessageDialog(null, "Já está em uso");
-                    //System.exit(0);
-
-                } else {
-                    CacheDados cache = CacheDados.getInstancia();
-                    cache.alteraRunning(true);
-
-                    // Inicia o monitoramento externo em uma nova daemon thread
-                    Thread monitorThread = new Thread(new ExternalMonitor());
-                    //monitorThread.setDaemon(true);
-                    monitorThread.start();
-                    
-                }
-                new TelaLogin().setVisible(true);
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            // Fechando a conexão
-            if (link != null) {
-                try {
-                    link.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+        new TelaLogin().setVisible(true);
+        
 
         //}
         //});

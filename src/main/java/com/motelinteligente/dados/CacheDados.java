@@ -89,7 +89,6 @@ public class CacheDados {
         try {
             // Estabelecendo a conexão
             link = new fazconexao().conectar();
-
             // Preparando e executando a consulta
             try ( PreparedStatement stmt = link.prepareStatement(query)) {
                 stmt.setBoolean(1, setar);

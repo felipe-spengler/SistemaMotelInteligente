@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.motelinteligente.dados;
+import java.lang.reflect.Proxy;
 import java.sql.DriverManager;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,23 +14,55 @@ import java.sql.SQLException;
  *
  * @author MOTEL
  */
-public class fazconexao {
-    //private static final String URL = "jdbc:mysql://0.tcp.sa.ngrok.io.:18233/motel";
-    /*private static final String URL = "jdbc:mysql://localhost:3306/motel";
-    private static final String USER = "root";
-    private static final String PASS = "";
-*/
 
+public class fazconexao {
+    
+    private final BackupQueueManager queueManager;
+
+     public fazconexao(BackupQueueManager queueManager) {
+        this.queueManager = queueManager;
+    }
+
+    public fazconexao() {
+        this(new BackupQueueManager());
+    }
+    // conexao online
     public  Connection conectar(){
         try{
             Connection conn = DriverManager.getConnection(
                     "jdbc:mysql://srv1196.hstgr.io/u876938716_motel",
   "u876938716_contato",
   "Felipe0110@");
-            configGlobal config = configGlobal.getInstance();
-            config.aumentaContador();
-            System.out.print("-"+ config.getContador() +"-");
             return conn;
+        }catch(Exception e){
+            JOptionPane.showConfirmDialog(null, e);
+        }
+        
+        return null;
+    }
+    private Connection createConnectionProxy(Connection connection) {
+        return (Connection) Proxy.newProxyInstance(
+                connection.getClass().getClassLoader(),
+                new Class[]{Connection.class},
+                (proxy, method, args) -> {
+                    if ("prepareStatement".equals(method.getName()) && args[0] instanceof String) {
+                        String sql = (String) args[0];
+                        // Adiciona o comando SQL à fila de backup
+                        queueManager.addTask(new BackupTask(sql));
+                    }
+                    return method.invoke(connection, args);
+                }
+        );
+    }
+    //conexao local
+    public  Connection conectarLocal(){
+        try{
+            Connection conn = DriverManager.getConnection(
+                    "jdbc:mysql://localhost:3306/u876938716_motel",
+                    "u876938716_contato",
+                    "Felipe0110@");
+
+            return createConnectionProxy(conn);
         }catch(Exception e){
             JOptionPane.showConfirmDialog(null, e);
         }

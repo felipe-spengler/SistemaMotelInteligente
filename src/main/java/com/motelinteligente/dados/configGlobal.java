@@ -21,8 +21,7 @@ public class configGlobal {
     private boolean flagArduino;
     private boolean flagMesmoUserCaixa;
     private int limiteDesconto;
-    public int contador;
-    
+    private BackupQueueManager backupQueueManager;    
 
     // Construtor privado para evitar a criação de múltiplas instâncias
     public configGlobal() {
@@ -33,7 +32,13 @@ public class configGlobal {
         logoffecharcaixa = false;
         controlaEstoque = false;
         flagSistemaSpring = flagArduino = false;
-        contador =0;
+    }
+     public BackupQueueManager getBackupQueueManager() {
+        return backupQueueManager;
+    }
+
+    public void initializeBackupQueueManager(BackupQueueManager backupQueueManager) {
+        this.backupQueueManager = backupQueueManager;
     }
     public int getLimiteDesconto() {
         return limiteDesconto;
@@ -107,12 +112,7 @@ public class configGlobal {
     
     }
 
-    public int getContador(){
-        return contador;
-    }
-    public void aumentaContador(){
-        contador++;
-    }
+
 
     public String getUsuario() {
         return usuario;
