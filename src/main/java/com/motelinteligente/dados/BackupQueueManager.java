@@ -20,12 +20,15 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class BackupQueueManager {
     private final BlockingQueue<BackupTask> taskQueue = new LinkedBlockingQueue<>();
 
-    public void addTask(BackupTask task) {
+   public void addTask(BackupTask task) {
         taskQueue.offer(task);
+        System.out.println("Tarefa adicionada à fila: " + task.getSql());
     }
 
     public BackupTask getTask() throws InterruptedException {
-        return taskQueue.take();
+        BackupTask task = taskQueue.take();
+        System.out.println("Tarefa retirada da fila: " + task.getSql());
+        return task;
     }
 
     public void startProcessing() {
@@ -33,7 +36,7 @@ public class BackupQueueManager {
             while (true) {
                 try {
                     BackupTask task = getTask();
-                    // Aqui você pode executar a tarefa em um banco de dados secundário ou backup
+                    System.out.println("Processando tarefa: " + task.getSql());
                     // Execute a tarefa usando a conexão de backup
                     try (Connection backupConn = DriverManager.getConnection(
                             "jdbc:mysql://localhost:3306/u876938716_motel",

@@ -44,14 +44,7 @@ public class fazconexao {
         return (Connection) Proxy.newProxyInstance(
                 connection.getClass().getClassLoader(),
                 new Class[]{Connection.class},
-                (proxy, method, args) -> {
-                    if ("prepareStatement".equals(method.getName()) && args[0] instanceof String) {
-                        String sql = (String) args[0];
-                        // Adiciona o comando SQL à fila de backup
-                        queueManager.addTask(new BackupTask(sql));
-                    }
-                    return method.invoke(connection, args);
-                }
+                new BackupProxyHandler(connection, queueManager)
         );
     }
     //conexao local
