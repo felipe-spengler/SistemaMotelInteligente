@@ -4,28 +4,27 @@
  */
 package com.motelinteligente.dados;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 /**
  *
  * @author MOTEL
  */
 public class BackupTask {
-    private final String sql;
+    private String sql;
+    private PreparedStatement preparedStatement;
 
-    public BackupTask(String sql) {
+    public BackupTask(String sql, PreparedStatement preparedStatement) {
         this.sql = sql;
+        this.preparedStatement = preparedStatement;
     }
 
-    public String getSql() {
+    public String getSqlCommand() {
         return sql;
     }
 
-    public void execute(Connection connection) throws SQLException {
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.execute();
-        }
+    public PreparedStatement getPreparedStatement() {
+        return preparedStatement;
     }
+
 }

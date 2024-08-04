@@ -8,47 +8,46 @@ package com.motelinteligente.dados;
  *
  * @author MOTEL
  */
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class BackupQueueManager {
-    private final BlockingQueue<BackupTask> taskQueue = new LinkedBlockingQueue<>();
 
-   public void addTask(BackupTask task) {
-        taskQueue.offer(task);
-        System.out.println("Tarefa adicionada à fila: " + task.getSql());
+    private static BackupQueueManager instance;
+    private BlockingQueue<BackupTask> queue;
+    private boolean isProcessing = false;
+
+    private BackupQueueManager() {
+        queue = new LinkedBlockingQueue<>();
     }
 
-    public BackupTask getTask() throws InterruptedException {
-        BackupTask task = taskQueue.take();
-        System.out.println("Tarefa retirada da fila: " + task.getSql());
+    public static synchronized BackupQueueManager getInstance() {
+        if (instance == null) {
+            instance = new BackupQueueManager();
+        }
+        return instance;
+    }
+
+    ;
+
+    public void addTask(BackupTask task) {
+        try {
+            queue.put(task); // Usa put() para comportamento bloqueante
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.err.println("Falha ao adicionar tarefa à fila: " + e.getMessage());
+        }
+    }
+
+    public BackupTask takeTask() throws InterruptedException {
+        BackupTask task = queue.take();
         return task;
     }
 
-    public void startProcessing() {
-        new Thread(() -> {
-            while (true) {
-                try {
-                    BackupTask task = getTask();
-                    System.out.println("Processando tarefa: " + task.getSql());
-                    // Execute a tarefa usando a conexão de backup
-                    try (Connection backupConn = DriverManager.getConnection(
-                            "jdbc:mysql://localhost:3306/u876938716_motel",
-                    "u876938716_contato",
-                    "Felipe0110@"
-                    )) {
-                        task.execute(backupConn);
-                    }
-                } catch (InterruptedException | SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
+    public boolean isEmpty() {
+        return queue.isEmpty();
     }
+
 }

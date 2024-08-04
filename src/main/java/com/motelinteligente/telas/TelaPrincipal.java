@@ -1,10 +1,12 @@
 package com.motelinteligente.telas;
 
 import com.motelinteligente.arduino.ConectaArduino;
+import com.motelinteligente.dados.BackupExecutor;
 import com.motelinteligente.dados.CacheDados;
 import com.motelinteligente.dados.CacheDados.DadosVendidos;
 import com.motelinteligente.dados.CacheDados.Negociados;
 import com.motelinteligente.dados.CarregaQuarto;
+import com.motelinteligente.dados.CheckSincronia;
 import com.motelinteligente.dados.DadosOcupados;
 import com.motelinteligente.dados.configGlobal;
 import com.motelinteligente.dados.fazconexao;
@@ -36,8 +38,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.MouseInfo;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -103,6 +103,11 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 e.printStackTrace();
             }
         }));
+        // Inicializa o BackupExecutor
+        new BackupExecutor().start();
+        CheckSincronia checkSincronia = new CheckSincronia();
+        checkSincronia.start();
+        
         setExtendedState(MAXIMIZED_BOTH);
         iniciar();
         insereIcone(this);
@@ -2366,7 +2371,11 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         if (confirmed == JOptionPane.YES_OPTION) {
             CacheDados cache = CacheDados.getInstancia();
             cache.alteraRunning(false);
+            setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             dispose();  // Fecha a janela e chama windowClosed
+            System.exit(0);
+        } else {
+            setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         }
     }//GEN-LAST:event_formWindowClosing
 

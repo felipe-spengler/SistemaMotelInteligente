@@ -1,11 +1,8 @@
 package com.motelinteligente.telas;
 
-import com.motelinteligente.dados.AppConfig;
-import com.motelinteligente.dados.BackupExecutor;
-import com.motelinteligente.dados.BackupQueueManager;
+
 import com.motelinteligente.dados.BarraCarregar;
 import com.motelinteligente.dados.CacheDados;
-import com.motelinteligente.dados.ExternalMonitor;
 import com.motelinteligente.dados.MotelInteligenteApplication;
 import com.motelinteligente.dados.configGlobal;
 import com.motelinteligente.dados.fazconexao;
@@ -26,8 +23,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.swing.JFrame;
 import javax.swing.JProgressBar;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**
  *
@@ -42,16 +37,7 @@ public class TelaLogin extends javax.swing.JFrame {
 
     public TelaLogin() throws IOException {
         // Inicializa o contexto do Spring
-        ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
-        BackupQueueManager backupQueueManager = context.getBean(BackupQueueManager.class);
-
-        // Armazena o BackupQueueManager no ConfigGlobal
-        configGlobal.getInstance().initializeBackupQueueManager(backupQueueManager);
-
-        // Inicializa o BackupExecutor
-        BackupExecutor backupExecutor = new BackupExecutor(backupQueueManager);
-        backupExecutor.start();
-        
+                
         setVisible(true);
         initComponents();
         insereIcone(this);

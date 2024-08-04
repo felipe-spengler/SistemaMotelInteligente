@@ -27,16 +27,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.motelinteligente.dados.SSLUtil;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 
-@SpringBootApplication
+
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 public class MotelInteligenteApplication {
-
+    
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger(fprodutos.class);
     private BackupQueueManager backupQueueManager;
 
-
     public static void main(String[] args) {
-        
+
         SSLUtil.disableSSLCertificateChecking();
         // Inicializa a aplicação Spring Boot normalmente
         SpringApplication.run(MotelInteligenteApplication.class, args);
@@ -109,7 +110,7 @@ public class MotelInteligenteApplication {
             String acao = partes[0];
             String numero = partes[1];
             System.out.println(acao + numero);
-            
+
             if (acao.equals("abrir")) {
                 switch (numero) {
                     case "entrada" ->

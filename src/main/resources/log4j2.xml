@@ -2,7 +2,7 @@
 <Configuration status="WARN">
     <Properties>
         <!-- Definir propriedades globais -->
-        <Property name="log.path">logs</Property>
+        <Property name="log.path">${sys:project.basedir}/logs</Property>
     </Properties>
     <Appenders>
         <!-- Console appender para todos os logs -->
@@ -48,6 +48,3 @@
         </Logger>
     </Loggers>
 </Configuration>
-
-
-
