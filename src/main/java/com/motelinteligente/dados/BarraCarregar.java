@@ -4,7 +4,6 @@ import com.motelinteligente.telas.TelaPrincipal;
 import javax.swing.JFrame;
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
 
 public class BarraCarregar {
 

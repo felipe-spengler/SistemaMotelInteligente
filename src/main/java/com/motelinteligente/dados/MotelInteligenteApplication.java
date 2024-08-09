@@ -1,7 +1,9 @@
 package com.motelinteligente.dados;
 
 import com.motelinteligente.arduino.ConectaArduino;
-import com.motelinteligente.telas.TelaPrincipal;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -12,29 +14,18 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Collections;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
-import org.apache.logging.log4j.LogManager;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import com.motelinteligente.dados.SSLUtil;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 
 
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 public class MotelInteligenteApplication {
-    
-    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger(fprodutos.class);
-    private BackupQueueManager backupQueueManager;
 
     public static void main(String[] args) {
 
@@ -46,11 +37,12 @@ public class MotelInteligenteApplication {
             URLConnection con = url.openConnection();
             BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
             String externalIP = reader.readLine();
-            System.out.println("ServidorIniciado: " + externalIP);
-            logger.debug("Servidor Iniciado: " + externalIP);
+            System.out.println("Servidor Iniciado: " + externalIP);
+            //logger.debug("Servidor Iniciado: " + externalIP);
             reader.close();
 
-            //verifica o ip no banco de dados
+
+            // Verifica o IP no banco de dados
             try {
                 // Estabelecer a conexão com o banco de dados
                 Connection link = new fazconexao().conectar();
@@ -95,13 +87,12 @@ public class MotelInteligenteApplication {
             e.printStackTrace();
         }
     }
-
     @RestController
     class ReceberNumeroQuartoController {
 
         @PostMapping(value = "/receberNumeroQuarto", consumes = "text/plain", produces = "text/plain")
         public ResponseEntity<String> receberNumeroQuarto(@RequestBody String numeroQuarto) {
-            logger.debug("Recebeu do sistema Spring Boot: " + numeroQuarto);
+            //logger.debug("Recebeu do sistema Spring Boot: " + numeroQuarto);
             String[] partes = numeroQuarto.split(" ");
 
             if (partes.length != 2) {
@@ -164,7 +155,7 @@ public class MotelInteligenteApplication {
                                 String statusAntes = quarto.getStatus(quartoEmFoco);
 
                                 quarto.setStatus(quartoEmFoco, "manutencao");
-                                logger.info("o status era " + statusAntes);
+                                //logger.info("o status era " + statusAntes);
                                 if (!(statusAntes.equals("livre"))) {
                                     quarto.alteraRegistro(quartoEmFoco, statusAntes);
                                 }
@@ -181,7 +172,7 @@ public class MotelInteligenteApplication {
                         mudaStatusNaCache(quartoEmFoco, "livre");
                         configGlobal config = configGlobal.getInstance();
                         config.setMudanca(true);
-                        logger.info("Spring boot - disponibilizar " + quartoEmFoco);
+                        //logger.info("Spring boot - disponibilizar " + quartoEmFoco);
                         // a seguir acontece em background
                         SwingWorker<Void, Void> worker;
                         worker = new SwingWorker<Void, Void>() {
@@ -212,26 +203,31 @@ public class MotelInteligenteApplication {
                                 } else {
                                     configGlobal config = configGlobal.getInstance();
                                     config.setMudanca(true);
+                                    try {
+                                        Thread.sleep(500); // Pausa por 0,5 segundo
+                                    } catch (InterruptedException ex) {
+                                        ex.printStackTrace();
+                                    }
                                     //abreportao
                                     new ConectaArduino(quartoEmFoco);
-                                    logger.info("Alugou - Arduino abrir " + quartoEmFoco);
+                                    //logger.info("Alugou - Arduino abrir " + quartoEmFoco);
                                     try {
                                         Thread.sleep(1000); // Pausa por 1 segundo
                                     } catch (InterruptedException ex) {
-                                        Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+                                        ex.printStackTrace();
                                     }
                                     new ConectaArduino(888);
-                                    logger.info("Alugou - Arduino abrir entrada");
+                                    //logger.info("Alugou - Arduino abrir entrada");
 
                                 }
                             } else {
-                                logger.error("Erro ao tentar locar - recebido SpringBoot - return false ");
+                                //logger.error("Erro ao tentar locar - recebido SpringBoot - return false ");
                                 JOptionPane.showMessageDialog(null, "Falha ao iniciar locação!");
 
                             }
                         } else {
                             JOptionPane.showMessageDialog(null, "Tentando alugar quarto não disponível");
-                            logger.error("Tentou Inicializar quarto com status ", statusAtual);
+                            //logger.error("Tentou Inicializar quarto com status ", statusAtual);
                         }
 
                     }

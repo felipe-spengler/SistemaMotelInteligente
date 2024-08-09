@@ -8,6 +8,7 @@ package com.motelinteligente.dados;
  *
  * @author MOTEL
  */
+import java.io.FileWriter;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -16,15 +17,11 @@ import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class CheckSincronia {
 
-    private static final String REMOTE_DB_URL = "jdbc:mysql://localhost:3306/u876938716_motel";
-    private static final String LOCAL_DB_URL = "jdbc:mysql://srv1196.hstgr.io/u876938716_motel";
-    //private static final String LOCAL_DB_URL = "jdbc:mysql://localhost:3306/u876938716_motel";
-    //private static final String REMOTE_DB_URL = "jdbc:mysql://srv1196.hstgr.io/u876938716_motel";
+    private static final String LOCAL_DB_URL = "jdbc:mysql://localhost:3306/u876938716_motel";
+    private static final String REMOTE_DB_URL = "jdbc:mysql://srv1196.hstgr.io/u876938716_motel";
     private static final String USER = "u876938716_contato";
     private static final String PASSWORD = "Felipe0110@";
 
@@ -33,11 +30,14 @@ public class CheckSincronia {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                try {
-                    checkDatabaseSync();
-                } catch (UnsupportedEncodingException ex) {
-                    Logger.getLogger(CheckSincronia.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                // Executa a sincronização em uma nova thread
+                new Thread(() -> {
+                    try {
+                        checkDatabaseSync();
+                    } catch (UnsupportedEncodingException ex) {
+                        ex.printStackTrace();
+                    }
+                }).start();
             }
         }, 0, 60 * 60 * 1000); // Executa a cada 1 hora
     }
@@ -45,11 +45,11 @@ public class CheckSincronia {
     private void checkDatabaseSync() throws UnsupportedEncodingException {
         String[] tables = {
             "antecipado", "caixa", "configuracoes", "desistencia", "funcionario", "imagens",
-            "justificativa", "login_acesso", "login_registros", "prevendidos", "produtos", "quartos",
+            "justificativa", "prevendidos", "produtos", "quartos",
             "registralimpeza", "registralocado", "registramanutencao", "registrareserva", "registravendido",
             "status"
         };
-
+        String[] onlineParaLocal = {"login_acesso", "login_registros"};
         boolean isSynced = true;
 
         try ( Connection localConn = DriverManager.getConnection(LOCAL_DB_URL, USER, PASSWORD);  Connection remoteConn = DriverManager.getConnection(REMOTE_DB_URL, USER, PASSWORD)) {
@@ -60,7 +60,22 @@ public class CheckSincronia {
                 if (!localChecksum.equals(remoteChecksum)) {
                     isSynced = false;
                     System.out.printf("Discrepância na tabela %s: Local (%s) vs Remoto (%s)%n", table, localChecksum, remoteChecksum);
+                    // Exportar os dados para arquivos .txt antes de corrigir
+                    exportTableData(localConn, table, table + "_home.txt");
+                    exportTableData(remoteConn, table, table + "_online.txt");
                     copyDataToRemote(localConn, remoteConn, table);
+                }
+            }
+            for (String tabela : onlineParaLocal) {
+                String localChecksum = getTableChecksum(localConn, tabela);
+                String remoteChecksum = getTableChecksum(remoteConn, tabela);
+                if (!localChecksum.equals(remoteChecksum)) {
+                    isSynced = false;
+                    System.out.printf("Discrepância na tabela %s: Remota (%s) vs Local (%s)%n", tabela, localChecksum, remoteChecksum);
+                    // Exportar os dados para arquivos .txt antes de corrigir
+                    exportTableData(localConn, tabela, tabela + "_home.txt");
+                    exportTableData(remoteConn, tabela, tabela + "_online.txt");
+                    copyDataToRemote(remoteConn, localConn, tabela);
                 }
             }
 
@@ -70,6 +85,36 @@ public class CheckSincronia {
                 System.out.println("Os bancos de dados não estão sincronizados e foram corrigidos.");
             }
 
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void exportTableData(Connection conn, String table, String fileName) {
+        String selectSql = String.format("SELECT * FROM %s", table);
+
+        try ( Statement stmt = conn.createStatement();  ResultSet rs = stmt.executeQuery(selectSql)) {
+            ResultSetMetaData metaData = rs.getMetaData();
+            int columnCount = metaData.getColumnCount();
+
+            try ( FileWriter writer = new FileWriter(fileName)) {
+                while (rs.next()) {
+                    StringBuilder row = new StringBuilder();
+                    for (int i = 1; i <= columnCount; i++) {
+                        Object value = rs.getObject(i);
+                        if (value instanceof byte[]) {
+                            // Codifica dados BLOB em Base64
+                            value = Base64.getEncoder().encodeToString((byte[]) value);
+                        }
+                        row.append(value).append("\t");
+                    }
+                    row.setLength(row.length() - 1); // Remove a última tabulação
+                    writer.write(row.toString());
+                    writer.write(System.lineSeparator());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -101,65 +146,67 @@ public class CheckSincronia {
     }
 
     private void copyDataToRemote(Connection localConn, Connection remoteConn, String table) {
-        String deleteSql = String.format("DELETE FROM %s", table);
+    String deleteSql = String.format("DELETE FROM %s", table);
 
-        try (Statement remoteStmt = remoteConn.createStatement()) {
-            // Log delete SQL
-            System.out.println("Executing: " + deleteSql);
-            remoteStmt.execute(deleteSql);
+    try (Statement remoteStmt = remoteConn.createStatement()) {
+        // Log delete SQL
+        System.out.println("Executing: " + deleteSql);
+        remoteStmt.execute(deleteSql);
 
-            String selectSql = String.format("SELECT * FROM %s", table);
-            try (Statement localStmt = localConn.createStatement(); ResultSet rs = localStmt.executeQuery(selectSql)) {
+        String selectSql = String.format("SELECT * FROM %s", table);
+        try (Statement localStmt = localConn.createStatement(); ResultSet rs = localStmt.executeQuery(selectSql)) {
 
-                ResultSetMetaData metaData = rs.getMetaData();
-                int columnCount = metaData.getColumnCount();
-                StringBuilder columns = new StringBuilder();
-                for (int i = 1; i <= columnCount; i++) {
-                    columns.append(metaData.getColumnName(i)).append(",");
-                }
-                columns.setLength(columns.length() - 1); // Remove a última vírgula
+            ResultSetMetaData metaData = rs.getMetaData();
+            int columnCount = metaData.getColumnCount();
+            StringBuilder columns = new StringBuilder();
+            for (int i = 1; i <= columnCount; i++) {
+                columns.append(metaData.getColumnName(i)).append(",");
+            }
+            columns.setLength(columns.length() - 1); // Remove a última vírgula
 
-                StringBuilder insertSql = new StringBuilder();
-                insertSql.append(String.format("INSERT INTO %s (%s) VALUES ", table, columns.toString()));
+            StringBuilder placeholders = new StringBuilder();
+            for (int i = 1; i <= columnCount; i++) {
+                placeholders.append("?,");
+            }
+            placeholders.setLength(placeholders.length() - 1); // Remove a última vírgula
 
+            String insertSql = String.format("INSERT INTO %s (%s) VALUES (%s)", table, columns.toString(), placeholders.toString());
+
+            try (PreparedStatement pstmt = remoteConn.prepareStatement(insertSql)) {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
                 while (rs.next()) {
-                    StringBuilder values = new StringBuilder();
-                    values.append("(");
                     for (int i = 1; i <= columnCount; i++) {
                         Object value = rs.getObject(i);
-                        if (metaData.getColumnType(i) == java.sql.Types.TIMESTAMP || 
-                            metaData.getColumnType(i) == java.sql.Types.DATE || 
-                            metaData.getColumnType(i) == java.sql.Types.TIME) {
-                            Timestamp tsValue = rs.getTimestamp(i);
-                            values.append("'").append(dateFormat.format(tsValue)).append("',");
-                        } else if (value instanceof String) {
-                            values.append("'").append(value).append("',");
-                        } else if (value == null) {
-                            values.append("NULL,");
+                        if (metaData.getColumnType(i) == java.sql.Types.TIMESTAMP
+                                || metaData.getColumnType(i) == java.sql.Types.DATE
+                                || metaData.getColumnType(i) == java.sql.Types.TIME) {
+                            if (value != null) {
+                                Timestamp tsValue = rs.getTimestamp(i);
+                                pstmt.setString(i, dateFormat.format(tsValue));
+                            } else {
+                                pstmt.setNull(i, java.sql.Types.TIMESTAMP);
+                            }
                         } else if (metaData.getColumnType(i) == java.sql.Types.BLOB) {
-                            // Tratar colunas BLOB
                             byte[] blobData = rs.getBytes(i);
-                            String encodedBlob = Base64.getEncoder().encodeToString(blobData);
-                            values.append("'").append(encodedBlob).append("',");
+                            pstmt.setBytes(i, blobData);
+                        } else if (value instanceof String) {
+                            pstmt.setString(i, (String) value);
+                        } else if (value == null) {
+                            pstmt.setNull(i, metaData.getColumnType(i));
                         } else {
-                            values.append(value).append(",");
+                            pstmt.setObject(i, value);
                         }
                     }
-                    values.setLength(values.length() - 1); // Remove a última vírgula
-                    values.append("),");
-                    insertSql.append(values.toString());
+                    pstmt.addBatch();
                 }
-                insertSql.setLength(insertSql.length() - 1); // Remove a última vírgula
-
-                // Log insert SQL
-                System.out.println("Executing: " + insertSql.toString());
-                remoteStmt.execute(insertSql.toString());
-
+                pstmt.executeBatch();
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+}
+
+
 }
