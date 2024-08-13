@@ -22,10 +22,8 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.List;
 import javax.sound.sampled.AudioInputStream;
@@ -55,21 +53,21 @@ import javax.swing.text.PlainDocument;
  * @author MOTEL
  */
 public class EncerraQuarto extends javax.swing.JFrame {
-
+    
     String dataInicio, dataFim, tempoTotalLocado;
-    float valorAcrescimo = 0;
+    float valorAcrescimo = 0, valorDesconto = 0;
+    float valoreRecebido = 0,  valorDivida = 0;
     float valorConsumo = 0, valorQuarto = 0, valorAdicionalPeriodo = 0, valorAdicionalPessoa = 0;
-    float valD = 0, valP = 0, valC = 0, valorTotalFinal = 0;
+    float valD = 0, valP = 0, valC = 0;
     ClienteEncerra outraTela = new ClienteEncerra();
-    float valorTotalRecebido = 0;
     int numeroDoQuarto;
-    int finalizar = 0, numeroDePessoas = 2;
+    int numeroDePessoas = 2;
     String motivo = null;
     private KeyEventDispatcher yourKeyEventDispatcher;
     private Timer timer;
-
+    
     class numOnly extends PlainDocument {
-
+        
         public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
             if (str != null) {
                 // Verifique se a string inserida contém apenas números (0 a 9)
@@ -96,11 +94,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
         txtPessoas.setDocument(new numOnly());
         this.setVisible(true);
         setaLabelGeral(numeroQuarto);
-        // fim setar valor quarto e adicional
 
-        //setar valor total 
-        setValorTotal();
-
+        
         tabela.getModel().addTableModelListener(new TableModelListener() {
             @Override
             public void tableChanged(TableModelEvent e) {
@@ -111,24 +106,26 @@ public class EncerraQuarto extends javax.swing.JFrame {
                     float novoTotal = novaQuantidade * valorUnd;
                     tabela.setValueAt(novoTotal, row, 4); // Atualize a coluna "Total"
 
-                    atualizaLabel();
+                    atualizaConsumo();
                 }
             }
-
+            
         });
+        
+        setValorDivida();
         // Inicialize yourKeyEventDispatcher
         yourKeyEventDispatcher = new KeyEventDispatcher() {
             boolean eventConsumed = false;
-
+            
             @Override
             public boolean dispatchKeyEvent(KeyEvent e) {
                 if (eventConsumed) {
                     // Se o evento já foi consumido, retorne false para indicar que não foi tratado novamente
                     return false;
                 }
-
+                
                 int keyCode = e.getKeyCode();
-
+                
                 switch (keyCode) {
                     case KeyEvent.VK_ESCAPE:
                         btVoltar.doClick();
@@ -166,7 +163,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
                     }
                 });
                 timer.start();
-
+                
                 return false; // Indica se o evento foi consumido ou não
             }
         };
@@ -174,19 +171,19 @@ public class EncerraQuarto extends javax.swing.JFrame {
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(yourKeyEventDispatcher);
         txtIdProduto.grabFocus();
     }
-
+    
     public void setaLabelGeral(int numeroQuarto) {
         DefaultTableModel modelo = (DefaultTableModel) tabela.getModel();
-
+        
         modelo.setNumRows(0);
         txtIdProduto.getDocument().addDocumentListener(new DocumentListener() {
-
+            
             @Override
             public void insertUpdate(DocumentEvent e) {
                 String texto = new fprodutos().getDescicao(txtIdProduto.getText());
                 lblNomeProduto.setText(texto);
             }
-
+            
             @Override
             public void removeUpdate(DocumentEvent e) {
                 if (isInteger(txtIdProduto.getText())) {
@@ -194,7 +191,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
                     lblNomeProduto.setText(texto);
                 }
             }
-
+            
             @Override
             public void changedUpdate(DocumentEvent e) {
             }
@@ -214,23 +211,18 @@ public class EncerraQuarto extends javax.swing.JFrame {
         //setar a data final
         Date dataAtual = new Date();
         Timestamp horaAtual = new Timestamp(dataAtual.getTime());
-
+        
         dataFim = String.valueOf(horaAtual);
         lblFimLocacao.setText(dataFim);
-
+        
         tempoTotalLocado = quartodao.getData(numeroQuarto);
-
+        
         labelEncerramento.setText("Encerramento Quarto " + numeroDoQuarto);
         //setar tempo locado
         lblTempoLocado.setText(tempoTotalLocado);
 
-        //setar numero pessoas
-        numeroDePessoas = quartodao.getPessoas(numeroQuarto);
-        if (numeroDePessoas == 2) {
-            txtPessoas.setText(String.valueOf(numeroDePessoas));
-        } else {
-            txtPessoas.setText(String.valueOf(numeroDePessoas));
-        }
+
+        
         //setar valor quarto e adicionalPeriodo começa agora
         CacheDados cache = CacheDados.getInstancia();
         DadosOcupados ocupado = cache.getCacheOcupado().get(numeroQuarto);
@@ -238,45 +230,43 @@ public class EncerraQuarto extends javax.swing.JFrame {
         String status = quarto.getStatusQuarto();
         String horarioQuarto = quarto.getHoraStatus();
         String[] partes = status.split("-");
+        
+        
+        txtPessoas.setText(String.valueOf(ocupado.getNumeroPessoas()));
+        valorAdicionalPessoa = calculaAdicionalPessoa(ocupado.getNumeroPessoas());
         if (partes[1].equals("pernoite")) {
-            float valor = ocupado.getValorPernoite();
-            //adiciona o valor do adicional de pessoas
-            valor += calculaAdicionalPessoa(ocupado.getNumeroPessoas());
-            lblValorQuarto.setText("R$" + String.valueOf(valor));
-            valorQuarto = (valor);
+            valorQuarto = ocupado.getValorPernoite();
             int numeroAdicionais = subtrairHora(numeroQuarto, horarioQuarto, "pernoite");
             valorAdicionalPeriodo = Float.valueOf(numeroAdicionais) * ocupado.getValorAdicional();
             lblHoraAdicional.setText("R$" + String.valueOf(valorAdicionalPeriodo));
         } else if (partes[1].equals("periodo")) {
-            float valor = ocupado.getValorPeriodo();
-            //adiciona o valor do adicional de pessoas
-            valor += calculaAdicionalPessoa(ocupado.getNumeroPessoas());
-            lblValorQuarto.setText("R$" + String.valueOf(valor));
+            valorQuarto = ocupado.getValorPeriodo();
             int numeroAdicionais = subtrairHora(numeroQuarto, horarioQuarto, ocupado.getTempoPeriodo());
             valorAdicionalPeriodo = Float.valueOf(numeroAdicionais) * ocupado.getValorAdicional();
             lblHoraAdicional.setText("R$" + String.valueOf(valorAdicionalPeriodo));
         }
-
-        // ve se tem itens no prevenda
-        int idLocacao = quartodao.getIdLocacao(numeroQuarto);
+        
+        int idLocacao = cache.getCacheOcupado().get(numeroQuarto).getIdLoca();
         if (idLocacao == 0) {
+            DadosOcupados quartoOcupado = cache.getCacheOcupado().get(numeroQuarto);
             int novoID = new fquartos().getIdLocacao(numeroQuarto);
-            idLocacao = novoID;
+            quartoOcupado.setIdLoca(novoID);
+            cache.getCacheOcupado().put(numeroQuarto, quartoOcupado);
         }
         adicionaPreVendidos(idLocacao);
         verAntecipado(idLocacao);
-        setValorTotal();
+        setValorDivida();
 
         //setar as datas da tela do cliente
         outraTela.setaDatas(dataInicio, dataFim, tempoTotalLocado);
         outraTela.setTitulo(numeroQuarto);
-
+        
     }
-
+    
     public void adicionaPreVendidos(int locacao) {
         // Verifica se a cache de produtos vendidos contém a locação
         CacheDados cache = CacheDados.getInstancia();
-
+        
         if (cache.cacheProdutosVendidos.containsKey(locacao)) {
             // Obtém a lista de produtos vendidos para esta locação da cache
             List<DadosVendidos> produtosVendidos = cache.cacheProdutosVendidos.get(locacao);
@@ -294,10 +284,10 @@ public class EncerraQuarto extends javax.swing.JFrame {
             }
 
             // Atualiza o label (se necessário)
-            atualizaLabel();
+            atualizaConsumo();
         }
     }
-
+    
     public void verAntecipado(int locacao) {
         // Verifica se a cache de negociações antecipadas contém a locação
         CacheDados cache = CacheDados.getInstancia();
@@ -311,20 +301,21 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 float valor = negociado.valor;
                 if (valor > 0) {
                     if (tipo.equals("recebido")) {
+                        valoreRecebido += valor;
                         JOptionPane.showMessageDialog(null, valor + " recebidos antecipadamente!", "Aviso", JOptionPane.WARNING_MESSAGE);
                     }
                     if (tipo.equals("negociado")) {
                         JOptionPane.showMessageDialog(null, valor + " desconto negociado!", "Aviso", JOptionPane.WARNING_MESSAGE);
                     }
                 }
-
+                
             }
         } else {
             // Se a cache não contiver a locação, exibe uma mensagem informando que não há dados antecipados para essa locação
             System.out.println("Não há dados antecipados para a locação " + locacao + " na cache.");
         }
     }
-
+     
     public float calculaAdicionalPessoa(int numeroPessoas) {
         float adicionalPessoas = (numeroPessoas - 2) * 30;
         if (adicionalPessoas <= 0) {
@@ -333,58 +324,20 @@ public class EncerraQuarto extends javax.swing.JFrame {
         valorAdicionalPessoa = adicionalPessoas;
         return adicionalPessoas;
     }
-
+    
     @Override
     public void dispose() {
         KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(yourKeyEventDispatcher);
-
+        
         outraTela.dispose();
         super.dispose();
     }
-
-    public void setValorTotal() {
-        try {
-            int indiceQuarto = lblValorQuarto.getText().indexOf("R$");
-            int indiceConsumo = lblValorConsumo2.getText().indexOf("R$");
-            int indiceAdicional = lblHoraAdicional.getText().indexOf("R$");
-            float valQuarto = 0;
-            float valConsumo = 0;
-            float valAdicional = 0;
-
-            if (indiceQuarto != -1) {
-                String valorAtual = lblValorQuarto.getText().substring(indiceQuarto + 2);
-                valQuarto = Float.valueOf(valorAtual);
-            }
-
-            if (indiceConsumo != -1) {
-                String valorAtual = lblValorConsumo2.getText().substring(indiceConsumo + 2);
-                valConsumo = Float.valueOf(valorAtual);
-            }
-            if (indiceAdicional != -1) {
-                String valorAtual = lblHoraAdicional.getText().substring(indiceAdicional + 2);
-                valAdicional = Float.valueOf(valorAtual);
-            }
-
-            float valorTotal = valQuarto + valConsumo + valAdicional;
-            valorTotalFinal = valorTotal;
-            SwingUtilities.invokeLater(() -> {
-                lblValorTotal.setText("R$" + String.valueOf(valorTotal));
-                outraTela.setPessoas(numeroDePessoas);
-                outraTela.setarValores(lblValorQuarto.getText(), lblHoraAdicional.getText());
-                outraTela.setValorTotal(valorTotal);
-                lblAReceber.setText("R$" + String.valueOf(valorTotalFinal - valorTotalRecebido));
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
+    
     public String calculaData(String dataBanco) {
         Timestamp horaBanco = Timestamp.valueOf(dataBanco);
         Long datetime = System.currentTimeMillis();
         Timestamp horaAtual = new Timestamp(datetime);
-
+        
         long diferencaMillis = horaAtual.getTime() - horaBanco.getTime();
 
         // Calcula a diferença em horas, minutos e segundos
@@ -395,7 +348,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         String diferencaFormatada = String.format("%02d:%02d", horas, minutos);
         return diferencaFormatada;
     }
-
+    
     public int subtrairHora(int numeroQuarto, String horarioQuarto, String ondeEncaixa) {
         String diferenca = calculaData(horarioQuarto);
         String[] partes = diferenca.split(":");
@@ -403,7 +356,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         int minutos = Integer.parseInt(partes[1]);
         int totalMinutos = (horas * 60) + minutos;
         int add = 0, minPernoite = 729;
-
+        
         if (ondeEncaixa.equals("pernoite")) {
             // Verifica se a diferença é maior que 12 horas e 9 minutos
             if (totalMinutos <= minPernoite) {
@@ -438,7 +391,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
             }
         }
     }
-
+    
     public static boolean isInteger(String str) {
         if (str == null || str.isEmpty()) {
             return false;
@@ -468,7 +421,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         lblNomeProduto = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabela = new javax.swing.JTable();
-        jButton4 = new javax.swing.JButton();
+        btApagar = new javax.swing.JButton();
         btInserir = new javax.swing.JButton();
         txtQuantidade = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
@@ -489,7 +442,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         txtPessoas = new javax.swing.JTextField();
         lblValorConsumo2 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        lblValorTotal = new javax.swing.JLabel();
+        txtValorDivida = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         painelRecebimento = new javax.swing.JPanel();
@@ -675,12 +628,12 @@ public class EncerraQuarto extends javax.swing.JFrame {
         tabela.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
         jScrollPane1.setViewportView(tabela);
 
-        jButton4.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jButton4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_bot_excluir.png"))); // NOI18N
-        jButton4.setText("Apagar");
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
+        btApagar.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        btApagar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_bot_excluir.png"))); // NOI18N
+        btApagar.setText("Apagar");
+        btApagar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
+                btApagarActionPerformed(evt);
             }
         });
 
@@ -715,7 +668,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
             painelProdutosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelProdutosLayout.createSequentialGroup()
                 .addGap(18, 18, 18)
-                .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btApagar, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel11)
                 .addGap(28, 28, 28)
@@ -764,7 +717,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
                     .addGroup(painelProdutosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel11)
                         .addComponent(lblValorConsumo))
-                    .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btApagar, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -823,9 +776,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
         jLabel4.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jLabel4.setText("Valor do Consumo:");
 
-        lblValorTotal.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        lblValorTotal.setForeground(new java.awt.Color(255, 51, 51));
-        lblValorTotal.setText("0,00");
+        txtValorDivida.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        txtValorDivida.setText("0,00");
 
         jLabel12.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel12.setText("Valor Total:");
@@ -847,6 +799,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         jLabel16.setText("Justificativa:");
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel2.setForeground(new java.awt.Color(204, 204, 204));
 
         jLabel13.setBackground(new java.awt.Color(255, 51, 51));
         jLabel13.setFont(new java.awt.Font("Segoe UI", 3, 18)); // NOI18N
@@ -854,14 +807,14 @@ public class EncerraQuarto extends javax.swing.JFrame {
         jLabel13.setText("        RECEBIMENTO");
         jLabel13.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
-        jLabel18.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel18.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
         jLabel18.setText("Valor Pendente a Receber:");
 
         lblAReceber.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         lblAReceber.setForeground(new java.awt.Color(255, 51, 51));
         lblAReceber.setText("jLabel17");
 
-        jLabel19.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel19.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jLabel19.setText("Valor Recebido:");
 
         txtValorRecebido.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
@@ -887,13 +840,13 @@ public class EncerraQuarto extends javax.swing.JFrame {
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addGap(101, 101, 101)
                                 .addComponent(lblAReceber)))
-                        .addGap(0, 134, Short.MAX_VALUE))
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jLabel13, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
+                .addGap(0, 17, Short.MAX_VALUE)
                 .addComponent(jLabel19)
                 .addGap(18, 18, 18)
                 .addComponent(txtValorRecebido, javax.swing.GroupLayout.PREFERRED_SIZE, 161, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -920,13 +873,13 @@ public class EncerraQuarto extends javax.swing.JFrame {
         painelRecebimentoLayout.setHorizontalGroup(
             painelRecebimentoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(painelRecebimentoLayout.createSequentialGroup()
-                .addComponent(jLabel16)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtJustifica, javax.swing.GroupLayout.PREFERRED_SIZE, 278, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(painelRecebimentoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(painelRecebimentoLayout.createSequentialGroup()
+                        .addComponent(jLabel16)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtJustifica, javax.swing.GroupLayout.PREFERRED_SIZE, 278, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(0, 0, Short.MAX_VALUE))
-            .addGroup(painelRecebimentoLayout.createSequentialGroup()
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
         );
         painelRecebimentoLayout.setVerticalGroup(
             painelRecebimentoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -989,7 +942,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtDescontoPorcento, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtDesconto, javax.swing.GroupLayout.DEFAULT_SIZE, 90, Short.MAX_VALUE)
+                        .addComponent(txtDesconto, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(30, 30, 30)
                         .addComponent(jLabel15)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1015,40 +968,42 @@ public class EncerraQuarto extends javax.swing.JFrame {
         painelInfo.setLayout(painelInfoLayout);
         painelInfoLayout.setHorizontalGroup(
             painelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(painelInfoLayout.createSequentialGroup()
-                .addGap(15, 15, 15)
                 .addGroup(painelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(painelInfoLayout.createSequentialGroup()
+                        .addGap(15, 15, 15)
                         .addGroup(painelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel1))
-                        .addGap(46, 46, 46)
-                        .addGroup(painelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblInicioLocacao)
-                            .addComponent(lblFimLocacao)))
+                            .addGroup(painelInfoLayout.createSequentialGroup()
+                                .addGroup(painelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel3)
+                                    .addComponent(jLabel1))
+                                .addGap(46, 46, 46)
+                                .addGroup(painelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(lblInicioLocacao)
+                                    .addComponent(lblFimLocacao)))
+                            .addGroup(painelInfoLayout.createSequentialGroup()
+                                .addComponent(jLabel9)
+                                .addGap(63, 63, 63)
+                                .addComponent(lblTempoLocado))
+                            .addGroup(painelInfoLayout.createSequentialGroup()
+                                .addGroup(painelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel5)
+                                    .addComponent(jLabel6)
+                                    .addComponent(jLabel10)
+                                    .addComponent(jLabel4))
+                                .addGap(32, 32, 32)
+                                .addGroup(painelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(lblValorQuarto)
+                                    .addComponent(txtPessoas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblHoraAdicional)
+                                    .addComponent(lblValorConsumo2)))))
                     .addGroup(painelInfoLayout.createSequentialGroup()
-                        .addComponent(jLabel9)
-                        .addGap(63, 63, 63)
-                        .addComponent(lblTempoLocado))
-                    .addGroup(painelInfoLayout.createSequentialGroup()
-                        .addGroup(painelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel5)
-                            .addComponent(jLabel6)
-                            .addComponent(jLabel10)
-                            .addComponent(jLabel4))
-                        .addGap(32, 32, 32)
-                        .addGroup(painelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblValorQuarto)
-                            .addComponent(txtPessoas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblHoraAdicional)
-                            .addComponent(lblValorConsumo2)))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelInfoLayout.createSequentialGroup()
+                        .addGap(59, 59, 59)
                         .addComponent(jLabel12)
                         .addGap(18, 18, 18)
-                        .addComponent(lblValorTotal)
-                        .addGap(23, 23, 23)))
+                        .addComponent(txtValorDivida)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         painelInfoLayout.setVerticalGroup(
             painelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1086,7 +1041,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(painelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel12)
-                    .addComponent(lblValorTotal))
+                    .addComponent(txtValorDivida))
                 .addGap(28, 28, 28)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
@@ -1099,14 +1054,14 @@ public class EncerraQuarto extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(barraCima, javax.swing.GroupLayout.DEFAULT_SIZE, 1140, Short.MAX_VALUE)
+            .addComponent(barraCima, javax.swing.GroupLayout.DEFAULT_SIZE, 1137, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(painelInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(26, 26, 26)
+                        .addGap(67, 67, 67)
                         .addComponent(labelEncerramento, javax.swing.GroupLayout.PREFERRED_SIZE, 606, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(116, Short.MAX_VALUE))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(painelProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1140,7 +1095,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
 
     private void btInserirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btInserirActionPerformed
         DefaultTableModel modelo = (DefaultTableModel) tabela.getModel();
-
+        
         if (isInteger(txtIdProduto.getText())) {
             fprodutos produtodao = new fprodutos();
             String texto = produtodao.getDescicao(txtIdProduto.getText());
@@ -1156,24 +1111,14 @@ public class EncerraQuarto extends javax.swing.JFrame {
                         valorSoma
                     });
                     outraTela.adicionaTabela(txtIdProduto.getText(), txtQuantidade.getText(), texto, valor, valorSoma);
-                    String valorAtual = "0";
-                    try {
-                        int indiceDoR = lblValorQuarto.getText().indexOf("R$");
-                        if (indiceDoR != -1) {
-                            valorAtual = lblValorConsumo.getText().substring(indiceDoR + 2);
-                        }
-                    } catch (Exception e) {
-                        JOptionPane.showMessageDialog(null, e);
-                    }
 
-                    float novoVal = Float.parseFloat(valorAtual) + valorSoma;
-                    atualizaLabel();
-                    valorConsumo = novoVal;
-                    setValorTotal();
-
+                    //inseriu o produto
+                    //agora atualiza os valores
+                    atualizaConsumo();
+                    
                 } else {
                     JOptionPane.showMessageDialog(rootPane, "Quantidade inválida!");
-
+                    
                 }
             } else {
                 JOptionPane.showMessageDialog(rootPane, "Código inserido invalido!");
@@ -1181,35 +1126,28 @@ public class EncerraQuarto extends javax.swing.JFrame {
         } else {
             JOptionPane.showMessageDialog(rootPane, "Digite um valor válido!");
         }
-
-        if (!(txtDesconto.getText().isEmpty())) {
-            verificaDesconto(2);
-            System.out.println("realizar ");
-        }
-        if (!(txtDesconto.getText().isEmpty())) {
-            realizaAcrescimo();
-        }
-
+        
+        setValorDivida();
         txtQuantidade.setText("");
         txtIdProduto.setText("");
 
     }//GEN-LAST:event_btInserirActionPerformed
-    public void atualizaLabel() {
+    public void atualizaConsumo() {
         valorConsumo = 0;
         DefaultTableModel model = (DefaultTableModel) tabela.getModel();
         int rowCount = model.getRowCount();
         for (int i = 0; i < rowCount; i++) {
-
+            
             valorConsumo += (float) model.getValueAt(i, 4);
-
+            
         }
-
+        
         SwingUtilities.invokeLater(() -> {
             lblValorConsumo.setText(String.valueOf("R$" + valorConsumo));
             lblValorConsumo2.setText(String.valueOf("R$" + valorConsumo));
             outraTela.setConsumo(valorConsumo);
-            setValorTotal();
-
+            setValorDivida();
+            
         });
     }
     private void txtPessoasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPessoasActionPerformed
@@ -1220,30 +1158,35 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 if (qnt < 2) {
                     qnt = 2;
                 }
-
+                
                 float novoVal = calculaAdicionalPessoa(qnt);
-                lblValorQuarto.setText("R$" + String.valueOf(novoVal + valorQuarto));
-                System.out.println("aqui o valor do quarto é " + (novoVal + valorQuarto));
-                outraTela.setValorQuarto("R$" + String.valueOf(novoVal + valorQuarto));
-
+                valorAdicionalPessoa = novoVal;
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            setValorTotal();
-
+            setValorDivida();
+            
         }
 
     }//GEN-LAST:event_txtPessoasActionPerformed
-
+    private void setValorDivida() {
+        float valorSomar = valorAcrescimo + valorQuarto + valorConsumo + valorAdicionalPeriodo + valorAdicionalPessoa ;       
+        valorDivida = valorSomar - valorDesconto;
+        txtValorDivida.setText(String.valueOf(valorDivida));
+        txtValorRecebido.setText(String.valueOf(valoreRecebido));
+        lblValorQuarto.setText(String.valueOf(valorAdicionalPessoa + valorQuarto));
+        lblValorConsumo.setText(String.valueOf(valorConsumo));
+        lblAReceber.setText(String.valueOf(valorDivida - valoreRecebido));
+    }
     private void btSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btSalvarActionPerformed
-
+        
         if (motivo != null) {
             // foi dado desistencia
             salvaDesistencia();
         } else {
             String descontar = txtDesconto.getText();
             String acrescentar = txtAcrescimo.getText();
-            if ((!descontar.equals("0") && !descontar.isEmpty()) || (!acrescentar.equals("0") && !acrescentar.isEmpty())) {
+            if (valorDesconto > 0 || valorAcrescimo > 0) {
                 // precisa de justificativa
                 if (txtJustifica.getText().isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Precisa Justificativa!");
@@ -1254,49 +1197,25 @@ public class EncerraQuarto extends javax.swing.JFrame {
                         System.out.println("justificativa salva");
                     }
                 }
-
+                
             } else {
                 // nao precisa justificativa
                 if (chamaJOP()) {
                     salvaVendidos(numeroDoQuarto);
                     System.out.println("não precisou justificar");
-
+                    
                 }
             }
         }
-
+        
         KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(yourKeyEventDispatcher);
 
     }//GEN-LAST:event_btSalvarActionPerformed
     public void salvaJustifica() {
-        System.out.println("está executando aqui");
-        int idLocacao = 0;
         Connection link = null;
-        String consultaSQL = "SELECT MAX(idlocacao) as max_id FROM registralocado WHERE numquarto = ?";
-        try {
-            link = new fazconexao().conectar();
-            PreparedStatement statement = link.prepareStatement(consultaSQL);
-            statement.setInt(1, numeroDoQuarto);
-            ResultSet resultado = statement.executeQuery();
-            if (resultado.next()) {
-                idLocacao = resultado.getInt("max_id");
-                System.out.println("id é " + idLocacao);
-            } else {
-                link.close();
-                statement.close();
-            }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "error salvajustifica:" + e);
-        } finally {
-            try {
-                // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
-                if (link != null && !link.isClosed()) {
-                    link.close();
-                }
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(null, "error salvajustifica:" + e);
-            }
-        }
+        CacheDados cache = CacheDados.getInstancia();
+        int idLocacao = cache.getCacheOcupado().get(numeroDoQuarto).getIdLoca();
+        
         float valorSalvar = 0;
         String tipoValor = null;
         if (txtDesconto.getText() != null && txtDesconto.getText() != "0") {
@@ -1310,21 +1229,21 @@ public class EncerraQuarto extends javax.swing.JFrame {
         }
         try {
             link = new fazconexao().conectar();
-            consultaSQL = "INSERT INTO justificativa (idlocacao, valor, tipo, justificativa) VALUES (?, ?, ?, ?)";
+            String consultaSQL = "INSERT INTO justificativa (idlocacao, valor, tipo, justificativa) VALUES (?, ?, ?, ?)";
             PreparedStatement statement = link.prepareStatement(consultaSQL);
             System.out.println("");
             statement.setInt(1, idLocacao);
             statement.setFloat(2, valorSalvar);
             statement.setString(3, tipoValor);
             statement.setString(4, txtJustifica.getText());
-
+            
             int n = statement.executeUpdate();
-
+            
             if (n != 0) {
                 link.close();
                 statement.close();
                 JOptionPane.showMessageDialog(null, "Desconto/Acrescimo salvo! ");
-
+                
             } else {
                 link.close();
                 statement.close();
@@ -1332,7 +1251,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "SEVERAL ERROR: Justificativa! Infome ao Suporte do Sistema!");
-
+            
         } finally {
             try {
                 // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
@@ -1344,7 +1263,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
             }
         }
     }
-
+    
     public void salvaDesistencia() {
         configGlobal config = configGlobal.getInstance();
         int idCaixa = config.getCaixa();
@@ -1363,9 +1282,9 @@ public class EncerraQuarto extends javax.swing.JFrame {
             statement.setTimestamp(3, Timestamp.valueOf(horaFim));
             statement.setString(4, motivo);
             statement.setInt(5, idCaixa);
-
+            
             int n = statement.executeUpdate();
-
+            
             if (n != 0) {
                 link.close();
                 statement.close();
@@ -1395,7 +1314,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "SEVERAL ERROR: Desistencia! Infome ao Suporte do Sistema!");
-
+            
         } finally {
             try {
                 // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
@@ -1407,7 +1326,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
             }
         }
     }
-
+    
     public void excluiDaRegistraLocado(int idLocacao) {
         Connection link = null;
         try {
@@ -1416,9 +1335,9 @@ public class EncerraQuarto extends javax.swing.JFrame {
             PreparedStatement statement = link.prepareStatement(consultaSQL);
             statement.setInt(1, idLocacao);
             int n = statement.executeUpdate();
-
+            
             if (n != 0) {
-                JOptionPane.showMessageDialog(null, "Registro excluído da tabela registralocado!");
+                JOptionPane.showMessageDialog(null, "Locação Excluida!");
             } else {
                 JOptionPane.showMessageDialog(null, "Nenhum registro encontrado para exclusão na tabela registralocado!");
             }
@@ -1436,7 +1355,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
             }
         }
     }
-
+    
     public boolean chamaJOP() {
         JTextField pixField = new JTextField(10);
         JTextField cartaoField = new JTextField(10);
@@ -1445,11 +1364,11 @@ public class EncerraQuarto extends javax.swing.JFrame {
         pixField.setFont(biggerFont);
         cartaoField.setFont(biggerFont);
         dinheiroField.setFont(biggerFont);
-
+        
         float valorTotal = 0;
-        int indiceDoR = lblValorTotal.getText().indexOf("R$");
+        int indiceDoR = txtValorDivida.getText().indexOf("R$");
         if (indiceDoR != -1) {
-            String valorPegar = lblValorTotal.getText().substring(indiceDoR + 2);
+            String valorPegar = txtValorDivida.getText().substring(indiceDoR + 2);
             valorPegar = valorPegar.replace(",", ".");
             valorTotal = Float.parseFloat(valorPegar);
         }
@@ -1468,26 +1387,26 @@ public class EncerraQuarto extends javax.swing.JFrame {
         // Exiba o JOptionPane personalizado
         int result = JOptionPane.showConfirmDialog(null, panel, "Digite os valores recebidos",
                 JOptionPane.OK_CANCEL_OPTION);
-
+        
         if (result == JOptionPane.OK_OPTION) {
             String valorPix = pixField.getText().replace(",", ".");;
             String valorCartao = cartaoField.getText().replace(",", ".");;
             String valorDinheiro = dinheiroField.getText().replace(",", ".");;
-
+            
             try {
                 float valPix = 0, valCartao = 0, valDinheiro = 0;
                 if (valorPix != null) {
                     valPix = Float.parseFloat(valorPix);
                 }
-
+                
                 if (valorCartao != null) {
                     valCartao = Float.parseFloat(valorCartao);
                 }
-
+                
                 if (valorDinheiro != null) {
                     valDinheiro = Float.parseFloat(valorDinheiro);
                 }
-
+                
                 float soma = valPix + valCartao + valDinheiro;
                 // vê se fecha com o valor da conta
 
@@ -1496,7 +1415,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
                     valC = valCartao;
                     valP = valPix;
                     JOptionPane.getRootFrame().dispose();
-
+                    
                     return true;
                 } else {
                     System.out.println("");
@@ -1509,12 +1428,12 @@ public class EncerraQuarto extends javax.swing.JFrame {
         }
         return false;
     }
-
+    
     public int objectToInt(int x, int y) {
         DefaultTableModel model = (DefaultTableModel) tabela.getModel();
-
+        
         Object value = model.getValueAt(x, y);
-
+        
         if (value instanceof Integer) {
             int numero = (Integer) value;
             return numero;
@@ -1529,7 +1448,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         System.out.println("deu ruim");
         return -1;
     }
-
+    
     public void salvaVendidos(int numero) {
         fquartos quartodao = new fquartos();
         CacheDados cache = CacheDados.getInstancia();
@@ -1541,7 +1460,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
             int quantidade = objectToInt(i, 1);
             float valUnd = (Float) model.getValueAt(i, 3);
             float valtotal = (Float) model.getValueAt(i, 4);
-
+            
             quartodao.salvaProduto(idLocacao, idProduto, quantidade, valUnd, valtotal);
             new com.motelinteligente.dados.fprodutos().diminuiEstoque(idProduto, quantidade);
         }
@@ -1553,16 +1472,16 @@ public class EncerraQuarto extends javax.swing.JFrame {
             consumoPegar = consumoPegar.replace(",", ".");
             valorPegouConsumo = Float.parseFloat(consumoPegar);
         }
-        int indiceT = lblValorTotal.getText().indexOf("R$");
+        int indiceT = txtValorDivida.getText().indexOf("R$");
         if (indiceT != -1) {
-            totalPegar = lblValorTotal.getText().substring(indiceT + 2);
+            totalPegar = txtValorDivida.getText().substring(indiceT + 2);
             totalPegar = totalPegar.replace(",", ".");
             valorPegouTotal = Float.parseFloat(totalPegar);
         }
         float valorDoQuarto = valorPegouTotal - valorPegouConsumo;
         String horaFim = lblFimLocacao.getText();
         String horaInicio = lblInicioLocacao.getText();
-        String valorQuartoPassar = lblValorTotal.getText();
+        String valorQuartoPassar = txtValorDivida.getText();
         quartodao.salvaLocacao(idLocacao, Timestamp.valueOf(horaInicio), Timestamp.valueOf(horaFim), valorDoQuarto, valorConsumo, valD, valP, valC);
         new playSound().playSound("som/agradecemosPreferencia.wav");
         new ConectaArduino(999);
@@ -1587,7 +1506,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         outraTela.dispose();
         this.dispose();
     }
-
+    
     public boolean mudaStatusNaCache(int quartoMudar, String statusColocar) {
         CacheDados dados = CacheDados.getInstancia();
         // Obtém o quarto da cache
@@ -1600,36 +1519,32 @@ public class EncerraQuarto extends javax.swing.JFrame {
         // Atualiza o quarto na cache
         dados.getCacheQuarto().put(quartoMudar, quarto);
         return true;
-
+        
     }
     private void btVoltarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btVoltarActionPerformed
         // TODO add your handling code here:
         KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(yourKeyEventDispatcher);
-
+        
         outraTela.dispose();
         this.dispose();
     }//GEN-LAST:event_btVoltarActionPerformed
 
     private void btDebitoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btDebitoActionPerformed
         // clicou falar débito
-        String valorDebito = "0";
-        int indice = lblValorQuarto.getText().indexOf("R$");
-        if (indice != -1) {
-            valorDebito = lblValorTotal.getText().substring(indice + 2);
-            float valor = Float.parseFloat(valorDebito);
-            String falar = "SuaConta " + NumeroPorExtenso.NumeroPorExtenso(valor) + " reais";
-            String[] palavras = falar.split(" ");
+        String valorDebito;
+        float valor = (valorDivida - valoreRecebido);
+        String falar = "SuaConta " + NumeroPorExtenso.NumeroPorExtenso(valor) + " reais";
+        String[] palavras = falar.split(" ");
 
-            // Itere pelo array de palavras e imprima cada uma
-            reproduzirSonsEmSequencia(palavras, 0);
-        }
+        // Itere pelo array de palavras e imprima cada uma
+        reproduzirSonsEmSequencia(palavras, 0);
 
     }//GEN-LAST:event_btDebitoActionPerformed
     public static void reproduzirSonsEmSequencia(String[] palavras, int indice) {
         if (indice < palavras.length) {
             String palavraAtual = palavras[indice];
             String caminhoSom = "som/" + palavraAtual + ".wav";
-
+            
             try {
                 AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(caminhoSom));
                 Clip clip = AudioSystem.getClip();
@@ -1650,7 +1565,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
             }
         }
     }
-
+    
 
     private void btConferenciaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btConferenciaActionPerformed
         // TODO add your handling code here:
@@ -1665,7 +1580,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         int minutos = Integer.parseInt(partes[1]);
         configGlobal config = configGlobal.getInstance();
         String cargo = config.getCargoUsuario();
-
+        
         if (horas == 0 && minutos <= 10) {
             //da tempo de fazer desistencia
             fazDesistencia();
@@ -1682,10 +1597,10 @@ public class EncerraQuarto extends javax.swing.JFrame {
     public void fazDesistencia() {
         motivo = JOptionPane.showInputDialog(null, "Digite o motivo da Desistencia:");
         if (motivo != null) {
-            lblValorTotal.setText("R$0.00");
+            txtValorDivida.setText("R$0.00");
             lblValorQuarto.setText("R$0.00");
             lblAReceber.setText("R$0.00");
-            valorQuarto = valorTotalFinal = 0;
+            valorDivida = 0;
         } else {
             JOptionPane.showMessageDialog(null, "Precisa digitar o motivo!!");
         }
@@ -1699,126 +1614,53 @@ public class EncerraQuarto extends javax.swing.JFrame {
 
     }//GEN-LAST:event_txtDescontoPorcentoActionPerformed
     public void verificaDesconto(int numero) {
-        String textoPrimeiro = txtDescontoPorcento.getText();
-        if (textoPrimeiro == null) {
-            textoPrimeiro = "0";
-        }
-        String textoSemPercentagem = textoPrimeiro.replace("%", "");
-        textoSemPercentagem = textoSemPercentagem.replace(",", ".");
-
-        String textoSegundo = txtDesconto.getText().replace(",", ".");;
-        float descontoPorcento = -1;
-        float desconto = -1;
-        try {
-            descontoPorcento = Float.valueOf(textoSemPercentagem);
-            desconto = Float.valueOf(textoSegundo);
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, e);
-        }
+        float valorDesconto = 0, valorPorcento = 0;
+        
         configGlobal config = configGlobal.getInstance();
         int limiteDesconto = config.getLimiteDesconto();
         if (numero == 1) {
-            if (descontoPorcento >= 0) {
-                if (config.getCargoUsuario().equals("comum")) {
-                    if (descontoPorcento < limiteDesconto) {
-                        realizaDescontoPorCento();
-                    }else{
-                        JOptionPane.showMessageDialog(null, "Desconto Excede o Permitido");
-                    }
-                } else {
-                    realizaDescontoPorCento();
-                }
+            try {
+                String semPorcentagem = txtDescontoPorcento.getText().replace("%", "");
+                valorPorcento = Float.valueOf(semPorcentagem);
+                valorDesconto = (valorPorcento / 100) * valorDivida;
+                txtDesconto.setText("" + valorDesconto);
+            } catch (Exception e) {
+                System.out.println(e);
+                JOptionPane.showMessageDialog(null, "Digite um valor válido");
             }
-
+            
+        } else {
+            valorDesconto = Float.valueOf(txtDesconto.getText());
+            valorPorcento = (valorDesconto / valorDivida) * 100;
+            txtDescontoPorcento.setText(valorPorcento + "%");
         }
-        if (numero == 2) {
-            if (desconto >= 0) {
-                float porcentoDesconto = (desconto * 100) / valorTotalFinal;
-                if (config.getCargoUsuario().equals("comum")) {
-                    if (porcentoDesconto < limiteDesconto) {
-                        realizaDesconto();
-                    }else{
-                        JOptionPane.showMessageDialog(null, "Desconto Excede o Permitido");
-                    }
+        
+        if (valorDesconto >= 0) {
+            if (config.getCargoUsuario().equals("comum")) {
+                if (valorPorcento < limiteDesconto) {
+                    this.valorDesconto = valorDesconto;
                 } else {
-                    realizaDesconto();
+                    JOptionPane.showMessageDialog(null, "Desconto Excede o Permitido");
                 }
+            } else {
+                this.valorDesconto = valorDesconto;
             }
-
         }
-
+        setValorDivida();
     }
-
-    public void realizaDesconto() {
-        float valorTotal = 0;
-        try {
-            float valorDesconto = Float.parseFloat(txtDesconto.getText());
-            float porcentoDesconto = (valorDesconto * 100) / valorTotalFinal;
-
-            DecimalFormat formato = new DecimalFormat("#.##");
-            String numeroFormatado = formato.format(porcentoDesconto);
-            System.out.println("val tt era " + valorTotalFinal);
-            System.out.println("val desc  " + valorDesconto);
-            txtDescontoPorcento.setText(numeroFormatado + "%");
-            valorTotal = valorTotalFinal - valorDesconto;
-
-            final String mostrar = String.valueOf(valorTotal);
-            SwingUtilities.invokeLater(() -> {
-                lblValorTotal.setText("R$" + String.valueOf(mostrar));
-
-            });
-            outraTela.setValorTotal(valorTotal);
-            lblAReceber.setText(mostrar);
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "RealizaDesconto(): "+ e);
-        }
-    }
-
-    public void realizaDescontoPorCento() {
-        float valorTotal = 0;
-        try {
-            String textoPrimeiro = txtDescontoPorcento.getText();
-            String textoSemPercentagem = textoPrimeiro.replace("%", "");
-            textoSemPercentagem = textoSemPercentagem.replace(",", ".");
-            float porcentoDesconto = Float.valueOf(textoSemPercentagem);
-            float valorDesconto = (porcentoDesconto / 100) * valorTotalFinal;
-            txtDesconto.setText(String.valueOf(valorDesconto));
-            valorTotal = valorTotalFinal - valorDesconto;
-            final String mostrar = String.valueOf(valorTotal);
-            SwingUtilities.invokeLater(() -> {
-                lblValorTotal.setText("R$" + String.valueOf(mostrar));
-            });
-            outraTela.setValorTotal(valorTotal);
-            lblAReceber.setText(mostrar);
-
-            //outraTela.setDesconto(porcentoDesconto, valorDesconto);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void realizaAcrescimo() {
-        float valorTotal = 0;
-        try {
-            float acrescimo = Float.valueOf(txtAcrescimo.getText());
-
-            valorTotal = valorTotalFinal + acrescimo;
-            final String mostrar = String.valueOf(valorTotal);
-            SwingUtilities.invokeLater(() -> {
-                lblValorTotal.setText("R$" + String.valueOf(mostrar));
-
-            });
-            outraTela.setValorTotal(valorTotal);
-            lblAReceber.setText(mostrar);
-            //outraTela.setAcrescimo(acrescimo);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+    
+   
     private void txtAcrescimoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtAcrescimoActionPerformed
         if (txtAcrescimo.getText() != null) {
-            realizaAcrescimo();
-
+            try {
+                float valorAcrescimo = Float.valueOf(txtAcrescimo.getText() );
+                this.valorAcrescimo = valorAcrescimo;
+                setValorDivida();
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "Valor de acréscimo incorreto");
+                e.printStackTrace();
+            }
+            
         }
 
     }//GEN-LAST:event_txtAcrescimoActionPerformed
@@ -1834,38 +1676,32 @@ public class EncerraQuarto extends javax.swing.JFrame {
             recebido = recebido.replace(",", ".");
             if (recebido != null) {
                 float valorRecebido = Float.valueOf(recebido);
-                valorTotalRecebido += valorRecebido;
+                valoreRecebido = valorRecebido;
+                setValorDivida();
             }
-            String valorDebito;
-            int indice = lblAReceber.getText().indexOf("R$");
-            if (indice != -1) {
-                valorDebito = lblAReceber.getText().substring(indice + 2);
-                float valor = Float.valueOf(valorDebito);
-
-                lblAReceber.setText("R$" + String.valueOf(valor - valorTotalRecebido));
-            }
-
+            
+            
         } catch (Exception e) {
             e.printStackTrace();
         }
     }//GEN-LAST:event_txtValorRecebidoActionPerformed
 
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+    private void btApagarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btApagarActionPerformed
         DefaultTableModel modelo = (DefaultTableModel) tabela.getModel();
-
+        
         int selectedRow;
         selectedRow = tabela.getSelectedRow();
         if (selectedRow != -1) {
             float coluna5 = (float) modelo.getValueAt(selectedRow, 4);
             modelo.removeRow(selectedRow);
-
-            atualizaLabel();
-            setValorTotal();
-
+            
+            atualizaConsumo();
+            setValorDivida();
+            
         } else {
             JOptionPane.showMessageDialog(null, "Nenhum produto selecionado!");
         }
-    }//GEN-LAST:event_jButton4ActionPerformed
+    }//GEN-LAST:event_btApagarActionPerformed
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
         // TODO add your handling code here:
@@ -1876,13 +1712,13 @@ public class EncerraQuarto extends javax.swing.JFrame {
      */
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel barraCima;
+    private javax.swing.JButton btApagar;
     private javax.swing.JButton btConferencia;
     private javax.swing.JButton btDebito;
     private javax.swing.JButton btDesistencia;
     private javax.swing.JButton btInserir;
     private javax.swing.JButton btSalvar;
     private javax.swing.JButton btVoltar;
-    private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -1914,7 +1750,6 @@ public class EncerraQuarto extends javax.swing.JFrame {
     private javax.swing.JLabel lblValorConsumo;
     private javax.swing.JLabel lblValorConsumo2;
     private javax.swing.JLabel lblValorQuarto;
-    private javax.swing.JLabel lblValorTotal;
     private javax.swing.JPanel painelInfo;
     private javax.swing.JPanel painelProdutos;
     private javax.swing.JPanel painelRecebimento;
@@ -1926,6 +1761,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
     private javax.swing.JTextField txtJustifica;
     private javax.swing.JTextField txtPessoas;
     private javax.swing.JTextField txtQuantidade;
+    private javax.swing.JLabel txtValorDivida;
     private javax.swing.JTextField txtValorRecebido;
     // End of variables declaration//GEN-END:variables
 }
