@@ -1,0 +1,189 @@
+4	0	10.0	desconto	desconto fidelidade
+5	0	30.0	desconto	desconto nem usou quarto
+6	77	10.0	desconto	desconto fidelidade
+7	0	10.0	desconto	fedelidade
+8	0	10.0	desconto	desconto fidelidade
+9	0	10.0	desconto	cartao de fidelidade
+10	0	10.0	desconto	cartao de fidelidade
+11	0	0.0	desconto	por ter infeitado quarto
+12	0	8.0	desconto	foi dado desconto
+13	0	10.0	desconto	cartao de fidelidade
+14	0	38.0	desconto	feito valor de apartamento
+15	0	10.0	desconto	desconto cliente
+16	0	5.0	desconto	desconto cliente pediu
+17	0	10.0	desconto	cartao fedelidade
+18	0	7.0	desconto	desconto cliente 
+19	0	38.0	desconto	hggjghjggh
+20	0	1.0	desconto	hjgjkhgjkgjg
+21	0	10.0	desconto	cartao de fidelidade
+22	0	10.0	desconto	desconto fidelidade
+23	0	10.0	desconto	cartao fedelidade 
+24	0	10.0	desconto	desconto fidelidade
+25	0	10.0	desconto	cartao fedelidade
+26	0	8.0	desconto	cartao fedelidae
+27	0	10.0	desconto	cartao fidelidade
+28	0	10.0	desconto	CARTAO FEDELIDADE
+29	0	30.0	desconto	vbhfgyhtfuyht
+30	0	10.0	desconto	hghjgjhghjg
+31	0	6.0	desconto	hghjgjhtgjyhtgj
+32	0	10.0	desconto	cartao fedelidade
+33	0	5.0	desconto	desconto fidelidade
+34	0	10.0	desconto	cartao fede
+35	0	5.0	desconto	desconto teste
+38	0	5.0	desconto	teste just
+39	448	10.0	desconto	desc fidel
+40	451	2.0	desconto	DESCONTO
+41	460	10.0	desconto	cartão fidelidade
+42	468	58.0	desconto	alugado como apartamento
+43	479	10.0	desconto	jhgujhgjkh
+44	490	10.0	desconto	cartao fidelidade
+45	498	10.0	desconto	fidelidade
+46	506	10.0	desconto	fidelidade
+47	514	78.0	desconto	alugado como ap
+48	515	20.0	desconto	desconto negociado na entrada
+49	504	0.0	desconto	locação vibrador
+50	522	10.0	desconto	fideli
+51	549	10.0	desconto	fidelidade
+52	561	58.0	desconto	ggghhghghgh
+53	563	10.0	desconto	fidelidade
+54	578	10.0	desconto	cartao de fidelidade
+55	628	10.0	desconto	fidelidade
+56	642	10.0	desconto	fidelidade
+57	665	10.0	desconto	desconto fidelidade
+58	674	10.0	desconto	fidelidade
+59	707	10.0	desconto	cartao fedelidade 
+60	715	10.0	desconto	jhgujhuyjhgujgjuhgjh
+61	753	10.0	desconto	desconto fidelidade
+62	756	30.0	desconto	gtfhhjjk
+63	772	3.0	desconto	hyujgtygy
+64	786	10.0	desconto	desconto fidel
+65	785	16.0	desconto	wswswswwswsww
+66	794	10.0	desconto	ghjghjgyuh
+67	795	10.0	desconto	cartao fidelidade
+68	799	10.0	desconto	trtyrytrty
+69	805	10.0	desconto	cartao de fidelidade
+70	808	10.0	desconto	rdrtdtfyg
+71	800	32.0	desconto	fdggfhgfjhguj
+72	801	20.0	desconto	desconto
+73	828	20.0	desconto	jhjkhjkhj
+74	835	10.0	desconto	cartao fedelidade
+75	829	1.0	desconto	pediram se por 130 fazia 
+76	846	10.0	desconto	cartao f edelidade 
+77	847	10.0	desconto	fggg
+78	842	85.0	desconto	jlkjkljlkjkljlçjlçk
+79	860	10.0	desconto	hgjhgjkhgjk
+80	859	20.0	desconto	esquecimo de recomecar
+81	873	38.0	desconto	dgrth
+82	879	10.0	desconto	fidelidade
+83	883	10.0	desconto	fidelidade
+84	894	10.0	desconto	cartao fedelidade 
+85	895	1.0	desconto	desconoto 
+86	903	14.0	desconto	gytytgyutggt7yu
+87	905	10.0	desconto	cartao fidelidade
+88	922	10.0	desconto	fidelidade
+89	917	60.0	desconto	foram embora 
+90	938	58.0	desconto	desconto 
+91	942	10.0	desconto	cartao fidelidasde
+92	951	10.0	desconto	fidelidade
+93	957	10.0	desconto	fidelidade
+94	958	50.0	desconto	feito por esse valor por que que riam a 8 se nao iam embora dai foi feito
+95	960	10.0	desconto	desconto fidelidade
+96	950	1.0	desconto	feito por 70 consumo 
+97	961	11.0	desconto	GFDFHJGJKGJKHJ
+98	978	10.0	desconto	cartao fedelidade
+99	979	30.0	desconto	ooutro pernoite
+100	995	10.0	desconto	cartao fidelidade
+101	999	10.0	desconto	cartao fedelidade 
+102	1004	14.0	desconto	jhgtjhfghj
+103	1000	60.0	desconto	bdgshdhsgjh
+104	1026	10.0	desconto	desconto fidelidade
+105	1036	58.0	desconto	rtuy5e6ut6r
+106	1071	10.0	desconto	desconto fidelidade
+107	1112	10.0	desconto	fidelidade
+108	1136	10.0	desconto	desconto fidelidade
+109	1144	28.0	desconto	hgjhgjhguyjghyujhtguh
+110	1139	1.0	desconto	uiytuityuituy
+111	1153	20.0	desconto	travou sistema esqueci de finalizar
+112	1158	10.0	desconto	fidelidade
+113	1165	10.0	desconto	hyujhyjkhu
+114	1168	10.0	desconto	cartao fedelidade 
+115	1211	58.0	desconto	jyfujik
+116	1198	20.0	desconto	desconto
+117	1230	10.0	desconto	HDZSFEWBIRTFH
+118	1252	10.0	desconto	cartao fedelidade 
+119	1259	10.0	desconto	jhjhjhd
+120	1272	10.0	desconto	cartao  fidelidae
+121	1291	20.0	desconto	passou horario pq outro cliente ficou saida
+122	1299	8.0	desconto	desconto
+123	1295	1.0	desconto	hjgtghjgjkghj
+124	1301	10.0	desconto	desconto fidelidade
+125	1303	10.0	desconto	cartao fedelidade 
+126	1318	38.0	desconto	desconto
+127	1320	10.0	desconto	desconto fidel
+128	1339	10.0	desconto	desconto fidelidade
+129	1336	48.0	desconto	hgfhjhhhhhhfgfgfgfgjh
+130	1356	10.0	desconto	jkkjkljkljçlkljkd
+131	1361	58.0	desconto	desconto 
+132	1371	10.0	desconto	cartao fedelidade 
+133	1382	38.0	desconto	hjghjghgj
+134	1407	3.0	desconto	JKHLIJKLHUJ
+135	1429	10.0	desconto	htfytfrdf
+136	1437	10.0	desconto	fidelidade
+137	1453	38.0	desconto	yhgfyujhfgyhjugjyh
+138	1460	10.0	desconto	CARTAO FEDELIDADE 
+139	1470	98.0	desconto	JHUIYHIOUYIOUIOUIO
+140	1476	10.0	desconto	GYUGYU
+141	1477	10.0	desconto	CARTAO FIDELIDADE
+142	1491	10.0	desconto	cartao fidelidade
+143	1498	10.0	desconto	jhgtuytgyutu7y
+144	1517	58.0	desconto	alugado como ap
+145	1523	10.0	desconto	CARTAO FEDELIDADE 
+146	1549	10.0	desconto	fidelidaed
+147	1542	40.0	desconto	fgjhgfjhgfhjfgjhfgh
+148	1565	58.0	desconto	valor de ap
+149	1573	10.0	desconto	fytuyyuhiyi
+150	1576	10.0	desconto	desc
+151	1608	30.0	desconto	n gosto do quarto e nao quiuz ficar
+152	1626	10.0	desconto	cartao fedelidade
+153	1643	10.0	desconto	fidelidade
+154	1644	88.0	desconto	nao tinha apartamento
+155	1647	58.0	desconto	alugado como ap  
+156	1648	10.0	desconto	cartao fedelidade
+157	1658	10.0	desconto	fidelidade
+158	1671	10.0	desconto	FIDELK
+159	1673	10.0	desconto	CARTAO FEDELIDADE
+160	1691	10.0	desconto	cartao fedelidade 
+161	1696	88.0	desconto	FEITO CM AP 
+162	1698	10.0	desconto	FIDEL
+163	1692	84.0	desconto	HGFJHGJHGKJ
+164	1711	0.0	desconto	HGJHGHJGHJGJH
+165	1725	10.0	desconto	FDYFGFGF
+166	1738	10.0	desconto	jkghkjhkjklkl
+167	1748	10.0	desconto	hjghghjghhj
+168	1761	58.0	desconto	gtfdddddty
+169	1765	10.0	desconto	yui7tu
+170	1770	10.0	desconto	fidelidade
+171	1771	10.0	desconto	desconto fidel
+172	1796	10.0	desconto	fidelidade
+173	1803	10.0	desconto	fidelidade
+174	1815	8.0	desconto	dei desconto 
+175	1820	10.0	desconto	FIDELIDADE
+176	1821	10.0	desconto	FIDELIDADE
+177	1837	10.0	desconto	cartao de fidelidade
+178	1845	20.0	desconto	hytgytgyt
+179	1868	10.0	desconto	iyiyhiuyhiyhi
+180	1884	10.0	desconto	Cartao Fedelidade 
+181	1892	10.0	desconto	car fedelidadew
+182	1889	38.0	desconto	hijhkhjkjk
+183	1926	10.0	desconto	cartao fedlidade 
+184	1954	10.0	desconto	hghhhhhh
+185	1968	10.0	desconto	yhtguitgugt
+186	1979	10.0	desconto	fidelidade
+187	1996	10.0	desconto	fidelidade
+188	2003	10.0	desconto	tyr6uyruy
+189	2019	10.0	desconto	hguigjkhuj
+190	2029	10.0	desconto	hyikjyhuikjhuikji
+191	2027	81.0	desconto	jhkhhu
+192	2039	10.0	desconto	cartao fedelidade 
+193	2055	38.0	desconto	uthj
+194	2067	10.0	desconto	GHFGHVG

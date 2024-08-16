@@ -1179,22 +1179,20 @@ public class EncerraQuarto extends javax.swing.JFrame {
         lblAReceber.setText(String.valueOf(valorDivida - valoreRecebido));
     }
     private void btSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btSalvarActionPerformed
-        
         if (motivo != null) {
             // foi dado desistencia
             salvaDesistencia();
         } else {
-            String descontar = txtDesconto.getText();
-            String acrescentar = txtAcrescimo.getText();
             if (valorDesconto > 0 || valorAcrescimo > 0) {
                 // precisa de justificativa
                 if (txtJustifica.getText().isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Precisa Justificativa!");
                 } else {
                     if (chamaJOP()) {
+                        if(valorDesconto > 0) salvaJustifica("desconto", valorDesconto);
+                        if(valorAcrescimo > 0) salvaJustifica("acrescimo", valorAcrescimo);
                         salvaVendidos(numeroDoQuarto);
-                        salvaJustifica();
-                        System.out.println("justificativa salva");
+                        System.out.println("Justificativa salva");
                     }
                 }
                 
@@ -1211,22 +1209,12 @@ public class EncerraQuarto extends javax.swing.JFrame {
         KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(yourKeyEventDispatcher);
 
     }//GEN-LAST:event_btSalvarActionPerformed
-    public void salvaJustifica() {
+    public void salvaJustifica( String tipoValor, float valorSalvar) {
         Connection link = null;
         CacheDados cache = CacheDados.getInstancia();
         int idLocacao = cache.getCacheOcupado().get(numeroDoQuarto).getIdLoca();
         
-        float valorSalvar = 0;
-        String tipoValor = null;
-        if (txtDesconto.getText() != null && txtDesconto.getText() != "0") {
-            tipoValor = "desconto";
-            valorSalvar = Float.valueOf(txtDesconto.getText());
-        } else {
-            if (txtAcrescimo.getText() != null) {
-                tipoValor = "acrescimo";
-                valorSalvar = Float.valueOf(txtAcrescimo.getText());
-            }
-        }
+        
         try {
             link = new fazconexao().conectar();
             String consultaSQL = "INSERT INTO justificativa (idlocacao, valor, tipo, justificativa) VALUES (?, ?, ?, ?)";
@@ -1365,14 +1353,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
         cartaoField.setFont(biggerFont);
         dinheiroField.setFont(biggerFont);
         
-        float valorTotal = 0;
-        int indiceDoR = txtValorDivida.getText().indexOf("R$");
-        if (indiceDoR != -1) {
-            String valorPegar = txtValorDivida.getText().substring(indiceDoR + 2);
-            valorPegar = valorPegar.replace(",", ".");
-            valorTotal = Float.parseFloat(valorPegar);
-        }
-        dinheiroField.setText(String.valueOf(valorTotal));
+        
+        dinheiroField.setText(String.valueOf(valorDivida));
         cartaoField.setText(String.valueOf("0"));
         pixField.setText(String.valueOf("0"));
         JPanel panel = new JPanel();
@@ -1410,7 +1392,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 float soma = valPix + valCartao + valDinheiro;
                 // vê se fecha com o valor da conta
 
-                if (soma == valorTotal) {
+                if (soma == valorDivida) {
                     valD = valDinheiro;
                     valC = valCartao;
                     valP = valPix;
@@ -1464,24 +1446,10 @@ public class EncerraQuarto extends javax.swing.JFrame {
             quartodao.salvaProduto(idLocacao, idProduto, quantidade, valUnd, valtotal);
             new com.motelinteligente.dados.fprodutos().diminuiEstoque(idProduto, quantidade);
         }
-        String consumoPegar, totalPegar;
-        float valorPegouConsumo = 0, valorPegouTotal = 0;
-        int indiceC = lblValorConsumo.getText().indexOf("R$");
-        if (indiceC != -1) {
-            consumoPegar = lblValorConsumo.getText().substring(indiceC + 2);
-            consumoPegar = consumoPegar.replace(",", ".");
-            valorPegouConsumo = Float.parseFloat(consumoPegar);
-        }
-        int indiceT = txtValorDivida.getText().indexOf("R$");
-        if (indiceT != -1) {
-            totalPegar = txtValorDivida.getText().substring(indiceT + 2);
-            totalPegar = totalPegar.replace(",", ".");
-            valorPegouTotal = Float.parseFloat(totalPegar);
-        }
-        float valorDoQuarto = valorPegouTotal - valorPegouConsumo;
+       //salvalocacao
+        float valorDoQuarto = valorQuarto + valorAdicionalPeriodo + valorAdicionalPessoa;
         String horaFim = lblFimLocacao.getText();
         String horaInicio = lblInicioLocacao.getText();
-        String valorQuartoPassar = txtValorDivida.getText();
         quartodao.salvaLocacao(idLocacao, Timestamp.valueOf(horaInicio), Timestamp.valueOf(horaFim), valorDoQuarto, valorConsumo, valD, valP, valC);
         new playSound().playSound("som/agradecemosPreferencia.wav");
         new ConectaArduino(999);

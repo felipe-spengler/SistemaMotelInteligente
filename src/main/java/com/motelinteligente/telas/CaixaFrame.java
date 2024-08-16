@@ -765,6 +765,7 @@ public class CaixaFrame extends javax.swing.JFrame {
         int idCaixa = config.getCaixa();
         int count = 0;
         String consultaSQL = "SELECT * FROM registralocado WHERE idcaixaatual = " + idCaixa;
+        System.out.println(consultaSQL);
         Connection link = null;
         DefaultTableModel modelo = (DefaultTableModel) tabelaLocacoes.getModel();
         modelo.setNumRows(0);
