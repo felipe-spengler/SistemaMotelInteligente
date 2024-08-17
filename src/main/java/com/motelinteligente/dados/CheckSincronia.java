@@ -131,7 +131,23 @@ public class CheckSincronia {
 
             while (rs.next()) {
                 for (int i = 1; i <= columnCount; i++) {
-                    String value = rs.getString(i);
+                    String columnType = metaData.getColumnTypeName(i);
+                    String value;
+
+                    // Verifica se o tipo da coluna é datetime ou timestamp
+                    if ("DATETIME".equalsIgnoreCase(columnType) || "TIMESTAMP".equalsIgnoreCase(columnType)) {
+                        // Trunca o valor da data para ignorar os milissegundos
+                        Timestamp timestamp = rs.getTimestamp(i);
+                        if (timestamp != null) {
+                            // Remove os milissegundos da data
+                            value = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(timestamp);
+                        } else {
+                            value = null;
+                        }
+                    } else {
+                        value = rs.getString(i);
+                    }
+
                     if (value != null) {
                         digest.update(value.getBytes("UTF-8"));
                     }
@@ -146,67 +162,66 @@ public class CheckSincronia {
     }
 
     private void copyDataToRemote(Connection localConn, Connection remoteConn, String table) {
-    String deleteSql = String.format("DELETE FROM %s", table);
+        String deleteSql = String.format("DELETE FROM %s", table);
 
-    try (Statement remoteStmt = remoteConn.createStatement()) {
-        // Log delete SQL
-        System.out.println("Executing: " + deleteSql);
-        remoteStmt.execute(deleteSql);
+        try ( Statement remoteStmt = remoteConn.createStatement()) {
+            // Log delete SQL
+            System.out.println("Executing: " + deleteSql);
+            remoteStmt.execute(deleteSql);
 
-        String selectSql = String.format("SELECT * FROM %s", table);
-        try (Statement localStmt = localConn.createStatement(); ResultSet rs = localStmt.executeQuery(selectSql)) {
+            String selectSql = String.format("SELECT * FROM %s", table);
+            try ( Statement localStmt = localConn.createStatement();  ResultSet rs = localStmt.executeQuery(selectSql)) {
 
-            ResultSetMetaData metaData = rs.getMetaData();
-            int columnCount = metaData.getColumnCount();
-            StringBuilder columns = new StringBuilder();
-            for (int i = 1; i <= columnCount; i++) {
-                columns.append(metaData.getColumnName(i)).append(",");
-            }
-            columns.setLength(columns.length() - 1); // Remove a última vírgula
-
-            StringBuilder placeholders = new StringBuilder();
-            for (int i = 1; i <= columnCount; i++) {
-                placeholders.append("?,");
-            }
-            placeholders.setLength(placeholders.length() - 1); // Remove a última vírgula
-
-            String insertSql = String.format("INSERT INTO %s (%s) VALUES (%s)", table, columns.toString(), placeholders.toString());
-
-            try (PreparedStatement pstmt = remoteConn.prepareStatement(insertSql)) {
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-                while (rs.next()) {
-                    for (int i = 1; i <= columnCount; i++) {
-                        Object value = rs.getObject(i);
-                        if (metaData.getColumnType(i) == java.sql.Types.TIMESTAMP
-                                || metaData.getColumnType(i) == java.sql.Types.DATE
-                                || metaData.getColumnType(i) == java.sql.Types.TIME) {
-                            if (value != null) {
-                                Timestamp tsValue = rs.getTimestamp(i);
-                                pstmt.setString(i, dateFormat.format(tsValue));
-                            } else {
-                                pstmt.setNull(i, java.sql.Types.TIMESTAMP);
-                            }
-                        } else if (metaData.getColumnType(i) == java.sql.Types.BLOB) {
-                            byte[] blobData = rs.getBytes(i);
-                            pstmt.setBytes(i, blobData);
-                        } else if (value instanceof String) {
-                            pstmt.setString(i, (String) value);
-                        } else if (value == null) {
-                            pstmt.setNull(i, metaData.getColumnType(i));
-                        } else {
-                            pstmt.setObject(i, value);
-                        }
-                    }
-                    pstmt.addBatch();
+                ResultSetMetaData metaData = rs.getMetaData();
+                int columnCount = metaData.getColumnCount();
+                StringBuilder columns = new StringBuilder();
+                for (int i = 1; i <= columnCount; i++) {
+                    columns.append(metaData.getColumnName(i)).append(",");
                 }
-                pstmt.executeBatch();
-            }
-        }
-    } catch (SQLException e) {
-        e.printStackTrace();
-    }
-}
+                columns.setLength(columns.length() - 1); // Remove a última vírgula
 
+                StringBuilder placeholders = new StringBuilder();
+                for (int i = 1; i <= columnCount; i++) {
+                    placeholders.append("?,");
+                }
+                placeholders.setLength(placeholders.length() - 1); // Remove a última vírgula
+
+                String insertSql = String.format("INSERT INTO %s (%s) VALUES (%s)", table, columns.toString(), placeholders.toString());
+
+                try ( PreparedStatement pstmt = remoteConn.prepareStatement(insertSql)) {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+                    while (rs.next()) {
+                        for (int i = 1; i <= columnCount; i++) {
+                            Object value = rs.getObject(i);
+                            if (metaData.getColumnType(i) == java.sql.Types.TIMESTAMP
+                                    || metaData.getColumnType(i) == java.sql.Types.DATE
+                                    || metaData.getColumnType(i) == java.sql.Types.TIME) {
+                                if (value != null) {
+                                    Timestamp tsValue = rs.getTimestamp(i);
+                                    pstmt.setString(i, dateFormat.format(tsValue));
+                                } else {
+                                    pstmt.setNull(i, java.sql.Types.TIMESTAMP);
+                                }
+                            } else if (metaData.getColumnType(i) == java.sql.Types.BLOB) {
+                                byte[] blobData = rs.getBytes(i);
+                                pstmt.setBytes(i, blobData);
+                            } else if (value instanceof String) {
+                                pstmt.setString(i, (String) value);
+                            } else if (value == null) {
+                                pstmt.setNull(i, metaData.getColumnType(i));
+                            } else {
+                                pstmt.setObject(i, value);
+                            }
+                        }
+                        pstmt.addBatch();
+                    }
+                    pstmt.executeBatch();
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
 }
