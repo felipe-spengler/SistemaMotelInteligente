@@ -22,8 +22,8 @@ public class BackupExecutor {
     private boolean isProcessing = false;
 
     public void start() {
-        scheduler.scheduleAtFixedRate(this::processQueue, 0, 5, TimeUnit.SECONDS);
-        System.out.println("BackupExecutor iniciado e agendado para rodar a cada 5 segundos.");
+        scheduler.scheduleAtFixedRate(this::processQueue, 0, 30, TimeUnit.SECONDS);
+        System.out.println("BackupExecutor iniciado e agendado para rodar a cada 30 segundos.");
     }
 
     private void processQueue() {
@@ -46,7 +46,7 @@ public class BackupExecutor {
             new Thread(() -> {
                 try {
                     Connection linkOnline = DriverManager.getConnection(
-                            "jdbc:mysql://localhost:3306/u876938716_motel",
+                            "jdbc:mysql://srv1196.hstgr.io/u876938716_motel",
                             "u876938716_contato",
                             "Felipe0110@"
                     );

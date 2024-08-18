@@ -22,7 +22,8 @@ public class fazconexao {
     public Connection conectar() {
         try {
             Connection conn = DriverManager.getConnection(
-                "jdbc:mysql://srv1196.hstgr.io/u876938716_motel",
+                //"jdbc:mysql://srv1196.hstgr.io/u876938716_motel",
+                    "jdbc:mysql://localhost:3306/u876938716_motel",
                 "u876938716_contato",
                 "Felipe0110@"
             );

@@ -1,0 +1,106 @@
+2024-08-16 00:07:48 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 1
+2024-08-16 00:07:48 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 22
+2024-08-16 00:07:49 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 23
+2024-08-16 00:07:49 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 24
+2024-08-16 00:51:01 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 2
+2024-08-16 00:51:01 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 24
+2024-08-16 00:51:02 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 24
+2024-08-16 00:51:03 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT valorproduto FROM produtos WHERE idproduto = 24
+2024-08-16 00:51:08 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 2
+2024-08-16 00:51:08 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 21
+2024-08-16 00:51:10 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 21
+2024-08-16 00:51:10 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT valorproduto FROM produtos WHERE idproduto = 21
+2024-08-16 00:51:17 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 2
+2024-08-16 00:51:18 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 26
+2024-08-16 00:51:20 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 26
+2024-08-16 00:51:20 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT valorproduto FROM produtos WHERE idproduto = 26
+2024-08-16 00:53:49 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT estoque FROM produtos WHERE idproduto = ?
+2024-08-16 00:53:49 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT estoque FROM produtos WHERE idproduto = ?
+2024-08-16 00:53:50 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT estoque FROM produtos WHERE idproduto = ?
+2024-08-16 01:09:51 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 2
+2024-08-16 01:09:51 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 22
+2024-08-16 01:09:54 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 22
+2024-08-16 01:09:54 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT valorproduto FROM produtos WHERE idproduto = 22
+2024-08-16 01:09:55 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 1
+2024-08-16 01:09:57 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 1
+2024-08-16 01:09:57 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT valorproduto FROM produtos WHERE idproduto = 1
+2024-08-16 01:11:18 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT estoque FROM produtos WHERE idproduto = ?
+2024-08-16 01:11:19 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT estoque FROM produtos WHERE idproduto = ?
+2024-08-16 01:14:56 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 22
+2024-08-16 01:14:56 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 1
+2024-08-16 09:12:15 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 1
+2024-08-16 09:12:16 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 1
+2024-08-16 09:12:16 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT valorproduto FROM produtos WHERE idproduto = 1
+2024-08-16 09:12:53 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT estoque FROM produtos WHERE idproduto = ?
+2024-08-16 10:40:04 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 2
+2024-08-16 10:40:05 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 22
+2024-08-16 10:40:06 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 22
+2024-08-16 10:40:06 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT valorproduto FROM produtos WHERE idproduto = 22
+2024-08-16 10:41:35 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT estoque FROM produtos WHERE idproduto = ?
+2024-08-16 11:24:34 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 24
+2024-08-16 11:24:34 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 21
+2024-08-16 11:24:34 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 26
+2024-08-16 14:51:26 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 1
+2024-08-16 14:51:26 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 1
+2024-08-16 14:51:26 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT valorproduto FROM produtos WHERE idproduto = 1
+2024-08-16 14:51:27 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 2
+2024-08-16 14:51:27 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 23
+2024-08-16 14:51:27 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 23
+2024-08-16 14:51:28 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT valorproduto FROM produtos WHERE idproduto = 23
+2024-08-16 14:51:47 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT estoque FROM produtos WHERE idproduto = ?
+2024-08-16 14:51:47 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT estoque FROM produtos WHERE idproduto = ?
+2024-08-16 14:52:10 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 1
+2024-08-16 14:52:10 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 22
+2024-08-16 14:52:10 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 23
+2024-08-16 14:52:10 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 24
+2024-08-16 14:52:10 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 21
+2024-08-16 14:52:10 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 26
+2024-08-16 15:09:26 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 2
+2024-08-16 15:09:26 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 23
+2024-08-16 15:09:26 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 23
+2024-08-16 15:09:26 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT valorproduto FROM produtos WHERE idproduto = 23
+2024-08-16 15:10:45 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT estoque FROM produtos WHERE idproduto = ?
+2024-08-16 15:11:47 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 23
+2024-08-16 17:46:52 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 2
+2024-08-16 17:46:52 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 22
+2024-08-16 17:46:54 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 22
+2024-08-16 17:46:55 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT valorproduto FROM produtos WHERE idproduto = 22
+2024-08-16 17:47:31 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT estoque FROM produtos WHERE idproduto = ?
+2024-08-16 19:16:14 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 23
+2024-08-16 19:16:14 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 22
+2024-08-16 20:06:36 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 23
+2024-08-16 20:06:36 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 22
+2024-08-16 20:15:42 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - Starting MotelInteligenteApplication using Java 20.0.2 with PID 7268 (C:\Users\MOTEL\Desktop\MotelInteligente\target\classes started by MOTEL in C:\Users\MOTEL\Desktop\MotelInteligente)
+2024-08-16 20:15:42 DEBUG [Thread-1] c.m.d.MotelInteligenteApplication - Running with Spring Boot v3.3.1, Spring v6.1.10
+2024-08-16 20:15:42 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - No active profile set, falling back to 1 default profile: "default"
+2024-08-16 20:15:45 INFO  [Thread-1] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 1521 (http)
+2024-08-16 20:15:45 INFO  [Thread-1] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-0.0.0.0-1521"]
+2024-08-16 20:15:45 INFO  [Thread-1] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2024-08-16 20:15:45 INFO  [Thread-1] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.25]
+2024-08-16 20:15:45 INFO  [Thread-1] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-08-16 20:15:45 INFO  [Thread-1] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 3514 ms
+2024-08-16 20:15:46 INFO  [Thread-1] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-0.0.0.0-1521"]
+2024-08-16 20:15:46 INFO  [Thread-1] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 1521 (http) with context path '/'
+2024-08-16 20:15:46 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - Started MotelInteligenteApplication in 5.27 seconds (process running for 12.428)
+2024-08-16 21:00:41 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 23
+2024-08-16 21:00:42 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 22
+2024-08-16 21:11:40 INFO  [http-nio-0.0.0.0-1521-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-08-16 21:11:40 INFO  [http-nio-0.0.0.0-1521-exec-1] o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2024-08-16 21:11:40 INFO  [http-nio-0.0.0.0-1521-exec-1] o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2024-08-16 21:12:08 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 23
+2024-08-16 21:12:09 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 22
+2024-08-16 22:09:06 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 23
+2024-08-16 22:09:06 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 22
+2024-08-16 22:31:43 INFO  [http-nio-0.0.0.0-1521-exec-3] o.a.coyote.http11.Http11Processor - Error parsing HTTP request header
+ Note: further occurrences of HTTP request parsing errors will be logged at DEBUG level.
+java.lang.IllegalArgumentException: Invalid character found in method name [0x00m0x000x000x010x000x000x000x0180x01,0x0cA ]. HTTP method names must be tokens
+	at org.apache.coyote.http11.Http11InputBuffer.parseRequestLine(Http11InputBuffer.java:407)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:262)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:904)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1741)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1190)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+	at java.base/java.lang.Thread.run(Thread.java:1623)
