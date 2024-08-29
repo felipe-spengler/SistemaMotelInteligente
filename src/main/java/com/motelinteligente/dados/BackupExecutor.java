@@ -1,13 +1,5 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.motelinteligente.dados;
 
-/**
- *
- * @author MOTEL
- */
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -27,54 +19,56 @@ public class BackupExecutor {
     }
 
     private void processQueue() {
-
         if (BackupQueueManager.getInstance().isEmpty()) {
             return;
         }
 
+        Connection linkOnline = null;
+        Statement stmt = null;
         try {
-            BackupTask task = BackupQueueManager.getInstance().takeTask();
-            performBackup(task);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            System.err.println("Thread interrompida: " + e.getMessage());
-        }
-    }
+            linkOnline = DriverManager.getConnection(
+                    "jdbc:mysql://srv1196.hstgr.io/u876938716_motel",
+                    "u876938716_contato",
+                    "Felipe0110@"
+            );
+            System.out.println("Conexão aberta com o banco de dados.");
 
-    private void performBackup(BackupTask task) {
-        if (!isProcessing) {
-            new Thread(() -> {
-                try {
-                    Connection linkOnline = DriverManager.getConnection(
-                            "jdbc:mysql://srv1196.hstgr.io/u876938716_motel",
-                            "u876938716_contato",
-                            "Felipe0110@"
-                    );
-                    if (linkOnline != null) {
-
-                        try ( Statement stmt = linkOnline.createStatement()) {
-                            stmt.execute(task.getSqlCommand());
-                            System.out.println("Backup executado para o comando SQL: " + task.getSqlCommand());
-                        } catch (SQLException e) {
-                            e.printStackTrace();
-                            // Recoloca a tarefa na fila para tentar novamente mais tarde
-                            BackupQueueManager.getInstance().addTask(task);
-                            System.out.println("Tarefa recolocada na fila devido a erro: " + task.getSqlCommand());
-                        }
-                    } else {
-                        System.err.println("Falha na conexão com o banco de dados local.");
+            if (linkOnline != null) {
+                stmt = linkOnline.createStatement();
+                BackupTask task;
+                while ((task = BackupQueueManager.getInstance().peekTask()) != null) {
+                    try {
+                        // Remove a tarefa da fila antes de tentar executar
+                        task = BackupQueueManager.getInstance().takeTask();
+                        stmt.execute(task.getSqlCommand());
+                        System.out.println("Backup executado para o comando SQL: " + task.getSqlCommand());
+                    } catch (SQLException e) {
+                        e.printStackTrace();
                         // Recoloca a tarefa na fila para tentar novamente mais tarde
                         BackupQueueManager.getInstance().addTask(task);
-                        System.out.println("Tarefa recolocada na fila devido a falha na conexão: " + task.getSqlCommand());
+                        System.out.println("Tarefa recolocada na fila devido a erro: " + task.getSqlCommand());
+                        // Interrompe a execução e mantém a tarefa na fila
+                        break;
                     }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Conexão falhou, manter as tarefas na fila
+            System.err.println("Falha na conexão com o banco de dados. As tarefas serão mantidas na fila.");
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt(); // Restaura o status de interrupção
+            System.err.println("Thread interrompida: " + e.getMessage());
+            // Tarefas serão mantidas na fila, a execução será parada
+        } finally {
+            if (linkOnline != null) {
+                try {
+                    linkOnline.close();
+                    System.out.println("Conexão fechada com o banco de dados.");
                 } catch (SQLException e) {
                     e.printStackTrace();
-                    // Recoloca a tarefa na fila para tentar novamente mais tarde
-                    BackupQueueManager.getInstance().addTask(task);
-                    System.out.println("Tarefa recolocada na fila devido a exceção: " + task.getSqlCommand());
                 }
-            }).start();
-            isProcessing = false;
+            }
         }
     }
 }
