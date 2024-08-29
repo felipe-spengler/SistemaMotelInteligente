@@ -22,7 +22,6 @@ public class fazconexao {
     public Connection conectar() {
         try {
             Connection conn = DriverManager.getConnection(
-                //"jdbc:mysql://srv1196.hstgr.io/u876938716_motel",
                     "jdbc:mysql://localhost:3306/u876938716_motel",
                 "u876938716_contato",
                 "Felipe0110@"
@@ -33,22 +32,6 @@ public class fazconexao {
         }
         return null;
     }
-    /*
-    // Conexão local
-    public Connection conectarLocal() {
-        try {
-            Connection conn = DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/u876938716_motel",
-                "u876938716_contato",
-                "Felipe0110@"
-            );
-            return conn;
-        } catch (Exception e) {
-            JOptionPane.showConfirmDialog(null, e);
-        }
-        return null;
-    }
-    */
     private Connection createConnectionProxy(Connection connection) {
         return (Connection) Proxy.newProxyInstance(
             connection.getClass().getClassLoader(),
