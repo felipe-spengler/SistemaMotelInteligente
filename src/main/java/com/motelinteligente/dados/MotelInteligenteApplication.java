@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 public class MotelInteligenteApplication {
 
@@ -40,7 +39,6 @@ public class MotelInteligenteApplication {
             System.out.println("Servidor Iniciado: " + externalIP);
             //logger.debug("Servidor Iniciado: " + externalIP);
             reader.close();
-
 
             // Verifica o IP no banco de dados
             try {
@@ -87,6 +85,7 @@ public class MotelInteligenteApplication {
             e.printStackTrace();
         }
     }
+
     @RestController
     class ReceberNumeroQuartoController {
 
@@ -127,7 +126,6 @@ public class MotelInteligenteApplication {
                             protected Void doInBackground() throws Exception {
                                 fquartos quarto = new fquartos();
                                 String statusAntes = quarto.getStatus(quartoEmFoco);
-                                System.out.println("o status era " + statusAntes);
                                 quarto.setStatus(quartoEmFoco, "reservado");
                                 if (!(statusAntes.equals("livre"))) {
                                     quarto.alteraRegistro(quartoEmFoco, statusAntes);
@@ -203,22 +201,16 @@ public class MotelInteligenteApplication {
                                 } else {
                                     configGlobal config = configGlobal.getInstance();
                                     config.setMudanca(true);
-                                    try {
-                                        Thread.sleep(500); // Pausa por 0,5 segundo
-                                    } catch (InterruptedException ex) {
-                                        ex.printStackTrace();
-                                    }
-                                    //abreportao
-                                    new ConectaArduino(quartoEmFoco);
-                                    //logger.info("Alugou - Arduino abrir " + quartoEmFoco);
-                                    try {
-                                        Thread.sleep(1000); // Pausa por 1 segundo
-                                    } catch (InterruptedException ex) {
-                                        ex.printStackTrace();
-                                    }
-                                    new ConectaArduino(888);
-                                    //logger.info("Alugou - Arduino abrir entrada");
-
+                                    new Thread(() -> {
+                                        try {
+                                            Thread.sleep(1000); // Pausa por 1s
+                                            new ConectaArduino(quartoEmFoco);
+                                            Thread.sleep(1000); // Pausa por 1s
+                                        } catch (InterruptedException ex) {
+                                            ex.printStackTrace();
+                                        }
+                                        new ConectaArduino(888);
+                                    }).start(); // Inicia a thread
                                 }
                             } else {
                                 //logger.error("Erro ao tentar locar - recebido SpringBoot - return false ");

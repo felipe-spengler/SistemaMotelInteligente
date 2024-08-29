@@ -1,0 +1,143 @@
+2024-08-27 03:40:48 INFO  [http-nio-0.0.0.0-1521-exec-4] o.a.coyote.http11.Http11Processor - Error parsing HTTP request header
+ Note: further occurrences of HTTP request parsing errors will be logged at DEBUG level.
+java.lang.IllegalArgumentException: Invalid character found in method name [0x00m0x000x000x010x000x000x000x0180x01,0x0cA ]. HTTP method names must be tokens
+	at org.apache.coyote.http11.Http11InputBuffer.parseRequestLine(Http11InputBuffer.java:407)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:262)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:904)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1741)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1190)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+	at java.base/java.lang.Thread.run(Thread.java:1623)
+2024-08-27 07:20:38 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 9
+2024-08-27 07:20:38 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 1
+2024-08-27 13:57:38 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 3
+2024-08-27 13:57:39 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 3
+2024-08-27 13:57:39 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT valorproduto FROM produtos WHERE idproduto = 3
+2024-08-27 13:58:07 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT estoque FROM produtos WHERE idproduto = ?
+2024-08-27 16:09:28 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 2
+2024-08-27 16:09:29 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 26
+2024-08-27 16:09:32 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 26
+2024-08-27 16:09:32 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT valorproduto FROM produtos WHERE idproduto = 26
+2024-08-27 16:10:38 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT estoque FROM produtos WHERE idproduto = ?
+2024-08-27 16:59:07 INFO  [http-nio-0.0.0.0-1521-exec-6] o.a.coyote.http11.Http11Processor - Error parsing HTTP request header
+ Note: further occurrences of HTTP request parsing errors will be logged at DEBUG level.
+java.lang.IllegalArgumentException: Invalid character found in method name [0x160x030x010x000xee0x010x000x000xea0x030x03:0xcf0xcd0x0e60xd70xa950xa30x1a0xf60x800xb36/0xfcl/0xb3#K0xefX0x090xb40xb9o90x020x040xa5N ]. HTTP method names must be tokens
+	at org.apache.coyote.http11.Http11InputBuffer.parseRequestLine(Http11InputBuffer.java:407)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:262)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:904)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1741)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1190)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+	at java.base/java.lang.Thread.run(Thread.java:1623)
+2024-08-27 16:59:07 INFO  [http-nio-0.0.0.0-1521-exec-1] o.a.coyote.http11.Http11Processor - Error parsing HTTP request header
+ Note: further occurrences of HTTP request parsing errors will be logged at DEBUG level.
+java.lang.IllegalArgumentException: Invalid character found in method name [0x160x030x010x01$0x010x000x01 ]. HTTP method names must be tokens
+	at org.apache.coyote.http11.Http11InputBuffer.parseRequestLine(Http11InputBuffer.java:407)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:262)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:904)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1741)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1190)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+	at java.base/java.lang.Thread.run(Thread.java:1623)
+2024-08-27 16:59:07 INFO  [http-nio-0.0.0.0-1521-exec-9] o.a.coyote.http11.Http11Processor - Error parsing HTTP request header
+ Note: further occurrences of HTTP request parsing errors will be logged at DEBUG level.
+java.lang.IllegalArgumentException: Invalid character found in method name [0x00m0x000x000x010x000x000x000x0180x01,0x0cA ]. HTTP method names must be tokens
+	at org.apache.coyote.http11.Http11InputBuffer.parseRequestLine(Http11InputBuffer.java:407)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:262)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:904)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1741)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1190)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+	at java.base/java.lang.Thread.run(Thread.java:1623)
+2024-08-27 16:59:07 INFO  [http-nio-0.0.0.0-1521-exec-8] o.a.coyote.http11.Http11Processor - Error parsing HTTP request header
+ Note: further occurrences of HTTP request parsing errors will be logged at DEBUG level.
+java.lang.IllegalArgumentException: Invalid character found in method name [0x160x030x010x000xee0x010x000x000xea0x030x030xf2;0xce0x050xeb0xcc0xea0xbf0x950x160xf30xa20xf80xadd*0xebW=0x9a~^0xd9h0x9c0x82v0xef0x900xfa0xcd` ]. HTTP method names must be tokens
+	at org.apache.coyote.http11.Http11InputBuffer.parseRequestLine(Http11InputBuffer.java:407)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:262)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:904)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1741)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1190)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+	at java.base/java.lang.Thread.run(Thread.java:1623)
+2024-08-27 16:59:07 INFO  [http-nio-0.0.0.0-1521-exec-6] o.a.coyote.http11.Http11Processor - Error parsing HTTP request header
+ Note: further occurrences of HTTP request parsing errors will be logged at DEBUG level.
+java.lang.IllegalArgumentException: Invalid character found in method name [0x160x030x010x000xee0x010x000x000xea0x030x030x9c0x9a0xce00xbe:0xad0x92e0x160xa90xcc0xc5@%0x1e0x820xa90xfb00x0e0xab4Hv0x940xc4qZ0x89u0xff ]. HTTP method names must be tokens
+	at org.apache.coyote.http11.Http11InputBuffer.parseRequestLine(Http11InputBuffer.java:407)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:262)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:904)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1741)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1190)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+	at java.base/java.lang.Thread.run(Thread.java:1623)
+2024-08-27 17:27:57 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 9
+2024-08-27 17:27:57 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 1
+2024-08-27 17:27:57 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 3
+2024-08-27 17:27:57 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 26
+2024-08-27 21:14:50 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 1
+2024-08-27 21:14:52 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 1
+2024-08-27 21:14:52 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT valorproduto FROM produtos WHERE idproduto = 1
+2024-08-27 21:14:53 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 2
+2024-08-27 21:14:53 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 23
+2024-08-27 21:14:56 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 23
+2024-08-27 21:14:56 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT valorproduto FROM produtos WHERE idproduto = 23
+2024-08-27 21:15:04 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 3
+2024-08-27 21:15:08 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 3
+2024-08-27 21:15:08 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT valorproduto FROM produtos WHERE idproduto = 3
+2024-08-27 21:15:09 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 9
+2024-08-27 21:15:12 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 7
+2024-08-27 21:15:15 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 7
+2024-08-27 21:15:15 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT valorproduto FROM produtos WHERE idproduto = 7
+2024-08-27 21:16:12 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 1
+2024-08-27 21:16:16 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 1
+2024-08-27 21:16:16 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT valorproduto FROM produtos WHERE idproduto = 1
+2024-08-27 21:16:17 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 2
+2024-08-27 21:16:17 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 23
+2024-08-27 21:16:19 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 23
+2024-08-27 21:16:19 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT valorproduto FROM produtos WHERE idproduto = 23
+2024-08-27 21:16:20 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 7
+2024-08-27 21:16:22 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 7
+2024-08-27 21:16:22 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT valorproduto FROM produtos WHERE idproduto = 7
+2024-08-27 21:16:23 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 3
+2024-08-27 21:16:24 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 3
+2024-08-27 21:16:24 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT valorproduto FROM produtos WHERE idproduto = 3
+2024-08-27 21:17:25 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT estoque FROM produtos WHERE idproduto = ?
+2024-08-27 21:17:25 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT estoque FROM produtos WHERE idproduto = ?
+2024-08-27 21:17:25 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT estoque FROM produtos WHERE idproduto = ?
+2024-08-27 21:46:58 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 9
+2024-08-27 21:46:58 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 1
+2024-08-27 21:46:58 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 3
+2024-08-27 21:46:58 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 26
+2024-08-27 21:46:58 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 23
+2024-08-27 21:46:58 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 7
+2024-08-27 22:13:26 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 7
+2024-08-27 22:13:26 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 77
+2024-08-27 22:13:28 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 77
+2024-08-27 22:13:28 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT valorproduto FROM produtos WHERE idproduto = 77
+2024-08-27 22:13:58 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT estoque FROM produtos WHERE idproduto = ?
+2024-08-27 22:34:27 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 2
+2024-08-27 22:34:28 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 24
+2024-08-27 22:34:29 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 24
+2024-08-27 22:34:29 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT valorproduto FROM produtos WHERE idproduto = 24
+2024-08-27 22:35:10 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT estoque FROM produtos WHERE idproduto = ?
+2024-08-27 23:24:50 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 9
+2024-08-27 23:24:53 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 9
+2024-08-27 23:24:53 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT valorproduto FROM produtos WHERE idproduto = 9
+2024-08-27 23:25:37 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT estoque FROM produtos WHERE idproduto = ?

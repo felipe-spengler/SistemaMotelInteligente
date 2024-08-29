@@ -1177,6 +1177,9 @@ public class EncerraQuarto extends javax.swing.JFrame {
         lblValorQuarto.setText(String.valueOf(valorAdicionalPessoa + valorQuarto));
         lblValorConsumo.setText(String.valueOf(valorConsumo));
         lblAReceber.setText(String.valueOf(valorDivida - valoreRecebido));
+        outraTela.setValorQuarto(valorAdicionalPessoa + valorQuarto);
+        outraTela.setValorTotal(valorDivida);
+        outraTela.setConsumo(valorConsumo);
     }
     private void btSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btSalvarActionPerformed
         if (motivo != null) {

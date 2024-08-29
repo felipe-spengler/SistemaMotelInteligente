@@ -22,8 +22,8 @@ public class BackupExecutor {
     private boolean isProcessing = false;
 
     public void start() {
-        scheduler.scheduleAtFixedRate(this::processQueue, 0, 30, TimeUnit.SECONDS);
-        System.out.println("BackupExecutor iniciado e agendado para rodar a cada 30 segundos.");
+        scheduler.scheduleAtFixedRate(this::processQueue, 0, 2, TimeUnit.SECONDS);
+        System.out.println("BackupExecutor iniciado e agendado para rodar a cada 5 segundos.");
     }
 
     private void processQueue() {
@@ -44,14 +44,15 @@ public class BackupExecutor {
     private void performBackup(BackupTask task) {
         if (!isProcessing) {
             new Thread(() -> {
+                Connection linkOnline = null;
                 try {
-                    Connection linkOnline = DriverManager.getConnection(
+                    linkOnline = DriverManager.getConnection(
                             "jdbc:mysql://srv1196.hstgr.io/u876938716_motel",
                             "u876938716_contato",
                             "Felipe0110@"
                     );
                     if (linkOnline != null) {
-
+                        configGlobal config = configGlobal.getInstance();
                         try ( Statement stmt = linkOnline.createStatement()) {
                             stmt.execute(task.getSqlCommand());
                             System.out.println("Backup executado para o comando SQL: " + task.getSqlCommand());
@@ -62,7 +63,7 @@ public class BackupExecutor {
                             System.out.println("Tarefa recolocada na fila devido a erro: " + task.getSqlCommand());
                         }
                     } else {
-                        System.err.println("Falha na conexão com o banco de dados local.");
+                        System.err.println("Falha na conexão com o banco de dados.");
                         // Recoloca a tarefa na fila para tentar novamente mais tarde
                         BackupQueueManager.getInstance().addTask(task);
                         System.out.println("Tarefa recolocada na fila devido a falha na conexão: " + task.getSqlCommand());
@@ -72,6 +73,15 @@ public class BackupExecutor {
                     // Recoloca a tarefa na fila para tentar novamente mais tarde
                     BackupQueueManager.getInstance().addTask(task);
                     System.out.println("Tarefa recolocada na fila devido a exceção: " + task.getSqlCommand());
+                } finally {
+                    if (linkOnline != null) {
+                        try {
+                            linkOnline.close();
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                            System.err.println("Erro ao fechar a conexão: " + e.getMessage());
+                        }
+                    }
                 }
             }).start();
             isProcessing = false;

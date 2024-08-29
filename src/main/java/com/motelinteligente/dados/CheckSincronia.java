@@ -15,6 +15,7 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Base64;
+import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -52,7 +53,12 @@ public class CheckSincronia {
         String[] onlineParaLocal = {"login_acesso", "login_registros"};
         boolean isSynced = true;
 
-        try ( Connection localConn = DriverManager.getConnection(LOCAL_DB_URL, USER, PASSWORD);  Connection remoteConn = DriverManager.getConnection(REMOTE_DB_URL, USER, PASSWORD)) {
+        Connection localConn = null;
+        Connection remoteConn = null;
+
+        try {
+            localConn = DriverManager.getConnection(LOCAL_DB_URL, USER, PASSWORD);
+            remoteConn = DriverManager.getConnection(REMOTE_DB_URL, USER, PASSWORD);
 
             for (String table : tables) {
                 String localChecksum = getTableChecksum(localConn, table);
@@ -66,6 +72,7 @@ public class CheckSincronia {
                     copyDataToRemote(localConn, remoteConn, table);
                 }
             }
+
             for (String tabela : onlineParaLocal) {
                 String localChecksum = getTableChecksum(localConn, tabela);
                 String remoteChecksum = getTableChecksum(remoteConn, tabela);
@@ -87,6 +94,23 @@ public class CheckSincronia {
 
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            if (localConn != null) {
+                try {
+                    localConn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    System.err.println("Erro ao fechar a conexão local: " + e.getMessage());
+                }
+            }
+            if (remoteConn != null) {
+                try {
+                    remoteConn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    System.err.println("Erro ao fechar a conexão remota: " + e.getMessage());
+                }
+            }
         }
     }
 
@@ -132,17 +156,16 @@ public class CheckSincronia {
             while (rs.next()) {
                 for (int i = 1; i <= columnCount; i++) {
                     String columnType = metaData.getColumnTypeName(i);
-                    String value;
+                    String value = null;
 
-                    // Verifica se o tipo da coluna é datetime ou timestamp
                     if ("DATETIME".equalsIgnoreCase(columnType) || "TIMESTAMP".equalsIgnoreCase(columnType)) {
-                        // Trunca o valor da data para ignorar os milissegundos
                         Timestamp timestamp = rs.getTimestamp(i);
                         if (timestamp != null) {
-                            // Remove os milissegundos da data
-                            value = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(timestamp);
-                        } else {
-                            value = null;
+                            // Zera os segundos para evitar diferenças mínimas de 1 segundo
+                            Calendar calendar = Calendar.getInstance();
+                            calendar.setTimeInMillis(timestamp.getTime());
+                            calendar.set(Calendar.SECOND, 0); // Zera os segundos
+                            value = new SimpleDateFormat("yyyy-MM-dd HH:mm:00").format(calendar.getTime()); // Formata para garantir 00 nos segundos
                         }
                     } else {
                         value = rs.getString(i);
@@ -153,6 +176,7 @@ public class CheckSincronia {
                     }
                 }
             }
+
             byte[] checksumBytes = digest.digest();
             return Base64.getEncoder().encodeToString(checksumBytes);
 

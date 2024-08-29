@@ -14,6 +14,8 @@ import com.motelinteligente.dados.fprodutos;
 import com.motelinteligente.dados.fquartos;
 import static com.motelinteligente.telas.EncerraQuarto.isInteger;
 import com.motelinteligente.telas.Quadrado.QuartoClickListener;
+import java.awt.BorderLayout;
+import javax.swing.table.JTableHeader;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -33,11 +35,15 @@ import javax.swing.JFrame;
 import javax.swing.SwingWorker;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.MouseInfo;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -55,6 +61,10 @@ import javax.swing.table.DefaultTableModel;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
@@ -107,7 +117,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         new BackupExecutor().start();
         CheckSincronia checkSincronia = new CheckSincronia();
         checkSincronia.start();
-        
+
         setExtendedState(MAXIMIZED_BOTH);
         iniciar();
         insereIcone(this);
@@ -173,6 +183,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         fquartos quartodao = new fquartos();
         if (!status.equals("ocupado")) {
             setaLabel();
+            botaoTroca.setVisible(false);
         }
 
         txtPessoas.setEnabled(false);
@@ -198,6 +209,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         }
         if (status.contains("ocupado")) {
             finalizar();
+            botaoTroca.setVisible(true);
+
             jTabbedPane1.setEnabledAt(1, true);
             botaoStatus.setEnabled(true);
             txtPessoas.setEnabled(true);
@@ -467,6 +480,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         lblValorConsumo = new javax.swing.JLabel();
         jButton4 = new javax.swing.JButton();
         lblHoraAdicional = new javax.swing.JLabel();
+        botaoTroca = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         tabela1 = new javax.swing.JTable();
@@ -786,13 +800,19 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         lblHoraAdicional.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         lblHoraAdicional.setText("0,00");
 
+        botaoTroca.setFont(new java.awt.Font("Segoe UI", 3, 18)); // NOI18N
+        botaoTroca.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_quarto.png"))); // NOI18N
+        botaoTroca.setText("Trocar Quarto");
+        botaoTroca.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botaoTrocaActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout painelSecundarioLayout = new javax.swing.GroupLayout(painelSecundario);
         painelSecundario.setLayout(painelSecundarioLayout);
         painelSecundarioLayout.setHorizontalGroup(
             painelSecundarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(painelSecundarioLayout.createSequentialGroup()
-                .addComponent(botaoIniciar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
             .addComponent(botaoEncerrar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(painelSecundarioLayout.createSequentialGroup()
                 .addGap(13, 13, 13)
@@ -832,6 +852,11 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             .addGroup(painelSecundarioLayout.createSequentialGroup()
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(painelSecundarioLayout.createSequentialGroup()
+                .addGroup(painelSecundarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(botaoIniciar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(botaoTroca, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         painelSecundarioLayout.setVerticalGroup(
             painelSecundarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -872,7 +897,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 .addComponent(botaoEncerrar)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(botaoIniciar)
-                .addContainerGap(72, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(botaoTroca)
+                .addContainerGap(34, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Principal", painelSecundario);
@@ -1856,14 +1883,16 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 } else {
                     focoQuarto();
                     //abreportao
-                    new ConectaArduino(quartoEmFoco);
-                    try {
-                        Thread.sleep(1000); // Pausa por 1 segundo
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-
-                    new ConectaArduino(888);
+                    new Thread(() -> {
+                        try {
+                            Thread.sleep(350); // Pausa por 0,3s
+                            new ConectaArduino(quartoEmFoco);
+                            Thread.sleep(600); // Pausa por 0,6s
+                        } catch (InterruptedException ex) {
+                            JOptionPane.showMessageDialog(null, ex);
+                        }
+                        new ConectaArduino(888);
+                    }).start(); // Inicia a thread
                 }
             } else {
                 JOptionPane.showMessageDialog(null, "Falha ao iniciar locação!");
@@ -2317,6 +2346,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 JOptionPane.showMessageDialog(rootPane, "Digite um valor válido!");
             }
         }
+        focoQuarto();
     }
     private void txtDescontoNegociadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDescontoNegociadoActionPerformed
         float valorRecebido = 0;
@@ -2383,6 +2413,147 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         //EventroAbrirAlarme
 
     }//GEN-LAST:event_lblAdicionarAlarmeMouseClicked
+
+    private void botaoTrocaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoTrocaActionPerformed
+        // Obtém a instância da cache de dados
+        CacheDados cache = CacheDados.getInstancia();
+        int idLocacao = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
+        if (idLocacao == 0) {
+            DadosOcupados quartoOcupado = cache.getCacheOcupado().get(quartoEmFoco);
+            int novoID = new fquartos().getIdLocacao(quartoEmFoco);
+            quartoOcupado.setIdLoca(novoID);
+            cache.getCacheOcupado().put(quartoEmFoco, quartoOcupado);
+        }
+        // Cria o modelo da tabela
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("Número do Quarto");
+        model.addColumn("Tipo do Quarto");
+
+        // Itera sobre os quartos livres e adiciona ao modelo da tabela
+        for (Map.Entry<Integer, CarregaQuarto> entry : cache.getCacheQuarto().entrySet()) {
+            CarregaQuarto quarto = entry.getValue();
+            if (quarto.getStatusQuarto().equals("livre")) {
+                model.addRow(new Object[]{quarto.getNumeroQuarto(), quarto.getTipoQuarto()});
+
+            }
+        }
+
+        // Cria a tabela
+        JTable table = new JTable(model);
+
+        // Configura a fonte da tabela
+        table.setFont(new Font("Arial", Font.PLAIN, 14));
+        table.setRowHeight(20);
+
+        // Configura o cabeçalho da tabela
+        JTableHeader header = table.getTableHeader();
+        header.setFont(new Font("Arial", Font.BOLD, 14));
+
+        // Configura o renderizador para o cabeçalho
+        DefaultTableCellRenderer headerRenderer = (DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer();
+        headerRenderer.setHorizontalAlignment(JLabel.CENTER);
+
+        // Selecionar linha inteira ao clicar
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.setRowSelectionAllowed(true);
+        table.setColumnSelectionAllowed(false);
+
+        // Adiciona o listener de clique na tabela para selecionar a linha inteira
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int row = table.getSelectedRow();  // Obtém a linha selecionada
+                // Apenas seleciona a linha, sem ação adicional ao clicar
+            }
+        });
+
+        JScrollPane scrollPane = new JScrollPane(table);
+
+        // Cria os botões "Voltar" e "Trocar"
+        JButton botaoVoltar = new JButton("Voltar");
+        JButton botaoTrocar = new JButton("Trocar");
+
+        // Cria um painel para os botões
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        buttonPanel.add(botaoVoltar);
+        buttonPanel.add(botaoTrocar);
+
+        // Configura o JDialog
+        JDialog dialog = new JDialog((Frame) null, "Quartos Livres", true);
+        dialog.getContentPane().add(scrollPane, BorderLayout.CENTER);
+        dialog.getContentPane().add(buttonPanel, BorderLayout.SOUTH);
+        dialog.setSize(400, 300);
+        dialog.setLocationRelativeTo(null);  // Centraliza na tela
+        // Configura o botão "Voltar" para fechar o JDialog
+        botaoVoltar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dialog.dispose();  // Fecha o JDialog
+            }
+        });
+
+        // Configura o botão "Trocar" para trocar o quarto selecionado
+        botaoTrocar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int row = table.getSelectedRow();  // Obtém a linha selecionada
+                if (row != -1) {
+                    int numeroQuarto = (int) table.getValueAt(row, 0);  // Obtém o número do quarto da linha selecionada
+
+                    // Abre o JOptionPane de confirmação
+                    int resposta = JOptionPane.showConfirmDialog(
+                            dialog,
+                            "Deseja prosseguir a troca de quarto?",
+                            "Confirmação",
+                            JOptionPane.YES_NO_OPTION
+                    );
+
+                    if (resposta == JOptionPane.YES_OPTION) {
+                        trocaQuarto(idLocacao, numeroQuarto);  // Chama o método de troca de quarto
+                        dialog.dispose();  // Fecha o JDialog após a troca
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(dialog, "Por favor, selecione um quarto.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                }
+            }
+        });
+        // Exibe o JDialog
+        dialog.setVisible(true);
+
+    }//GEN-LAST:event_botaoTrocaActionPerformed
+    private void trocaQuarto(int idLocacao, int numeroNovoQuarto) {
+        mudaStatusNaCache(quartoEmFoco, "limpeza");
+        mudaStatusNaCache(numeroNovoQuarto, "ocupado-periodo");
+        fquartos quarto = new fquartos();
+        quarto.adicionaRegistro(quartoEmFoco, "limpeza");
+        quarto.setStatus(quartoEmFoco, "limpeza");
+        quarto.setStatus(numeroNovoQuarto, "ocupado-periodo");
+        String SQL = "UPDATE table registralocado set numquarto=" + numeroNovoQuarto + " where idlocacao = " + idLocacao;
+        Connection link = null;
+        try {
+            link = new fazconexao().conectar();
+            PreparedStatement statement = link.prepareStatement(SQL);
+            int linhasAfetadas = statement.executeUpdate();
+            if (linhasAfetadas == 1) {
+                JOptionPane.showMessageDialog(null, "Troca de quarto realizada com sucesso!");
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao trocar o quarto: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            if (link != null) {
+                try {
+                    link.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        focoQuarto();
+        mostraQuartos();
+
+    }
 
     public void salvaAntecipado(int idLocacao, String tipo, float valor) {
         CacheDados cache = CacheDados.getInstancia();
@@ -2495,6 +2666,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private javax.swing.JButton botaoEncerrar;
     private javax.swing.JButton botaoIniciar;
     private javax.swing.JButton botaoStatus;
+    private javax.swing.JButton botaoTroca;
     private javax.swing.JMenu btCadastros;
     private javax.swing.JMenuItem btConfereCaixa;
     private javax.swing.JMenuItem btConfereLocacao;

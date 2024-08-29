@@ -32,6 +32,7 @@ public class configGlobal {
         logoffecharcaixa = false;
         controlaEstoque = false;
         flagSistemaSpring = flagArduino = false;
+        
     }
      public BackupQueueManager getBackupQueueManager() {
         return backupQueueManager;

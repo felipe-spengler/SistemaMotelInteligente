@@ -1,0 +1,258 @@
+2024-08-22 00:05:15 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 2
+2024-08-22 00:05:15 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 26
+2024-08-22 00:05:20 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 26
+2024-08-22 00:05:20 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT valorproduto FROM produtos WHERE idproduto = 26
+2024-08-22 00:05:59 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT estoque FROM produtos WHERE idproduto = ?
+2024-08-22 00:23:15 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - Starting MotelInteligenteApplication using Java 20.0.2 with PID 11400 (C:\Users\MOTEL\Desktop\MotelInteligente\target\classes started by MOTEL in C:\Users\MOTEL\Desktop\MotelInteligente)
+2024-08-22 00:23:15 DEBUG [Thread-1] c.m.d.MotelInteligenteApplication - Running with Spring Boot v3.3.1, Spring v6.1.10
+2024-08-22 00:23:15 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - No active profile set, falling back to 1 default profile: "default"
+2024-08-22 00:23:17 INFO  [Thread-1] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 1521 (http)
+2024-08-22 00:23:17 INFO  [Thread-1] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-0.0.0.0-1521"]
+2024-08-22 00:23:17 INFO  [Thread-1] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2024-08-22 00:23:17 INFO  [Thread-1] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.25]
+2024-08-22 00:23:17 INFO  [Thread-1] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-08-22 00:23:17 INFO  [Thread-1] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2149 ms
+2024-08-22 00:23:18 INFO  [Thread-1] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-0.0.0.0-1521"]
+2024-08-22 00:23:18 INFO  [Thread-1] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 1521 (http) with context path '/'
+2024-08-22 00:23:18 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - Started MotelInteligenteApplication in 5.54 seconds (process running for 17.004)
+2024-08-22 00:23:23 INFO  [http-nio-0.0.0.0-1521-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-08-22 00:23:23 INFO  [http-nio-0.0.0.0-1521-exec-1] o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2024-08-22 00:23:23 INFO  [http-nio-0.0.0.0-1521-exec-1] o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2024-08-22 00:34:43 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - Starting MotelInteligenteApplication using Java 20.0.2 with PID 3976 (C:\Users\MOTEL\Desktop\MotelInteligente\target\classes started by MOTEL in C:\Users\MOTEL\Desktop\MotelInteligente)
+2024-08-22 00:34:43 DEBUG [Thread-1] c.m.d.MotelInteligenteApplication - Running with Spring Boot v3.3.1, Spring v6.1.10
+2024-08-22 00:34:43 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - No active profile set, falling back to 1 default profile: "default"
+2024-08-22 00:34:45 INFO  [Thread-1] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 1521 (http)
+2024-08-22 00:34:45 INFO  [Thread-1] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-0.0.0.0-1521"]
+2024-08-22 00:34:45 INFO  [Thread-1] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2024-08-22 00:34:45 INFO  [Thread-1] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.25]
+2024-08-22 00:34:45 INFO  [Thread-1] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-08-22 00:34:45 INFO  [Thread-1] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2031 ms
+2024-08-22 00:34:46 INFO  [Thread-1] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-0.0.0.0-1521"]
+2024-08-22 00:34:46 INFO  [Thread-1] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 1521 (http) with context path '/'
+2024-08-22 00:34:46 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - Started MotelInteligenteApplication in 5.229 seconds (process running for 14.61)
+2024-08-22 00:34:59 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 26
+2024-08-22 00:34:59 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 1
+2024-08-22 00:34:59 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 23
+2024-08-22 00:34:59 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 3
+2024-08-22 00:34:59 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 24
+2024-08-22 00:34:59 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 9
+2024-08-22 01:05:07 INFO  [http-nio-0.0.0.0-1521-exec-1] o.a.coyote.http11.Http11Processor - Error parsing HTTP request header
+ Note: further occurrences of HTTP request parsing errors will be logged at DEBUG level.
+java.lang.IllegalArgumentException: Invalid character found in method name [0x00m0x000x000x010x000x000x000x0180x01,0x0cA ]. HTTP method names must be tokens
+	at org.apache.coyote.http11.Http11InputBuffer.parseRequestLine(Http11InputBuffer.java:407)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:262)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:904)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1741)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1190)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+	at java.base/java.lang.Thread.run(Thread.java:1623)
+2024-08-22 04:02:18 INFO  [http-nio-0.0.0.0-1521-exec-5] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-08-22 04:02:18 INFO  [http-nio-0.0.0.0-1521-exec-5] o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2024-08-22 04:02:18 INFO  [http-nio-0.0.0.0-1521-exec-5] o.s.web.servlet.DispatcherServlet - Completed initialization in 12 ms
+2024-08-22 07:00:40 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 2
+2024-08-22 07:00:40 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 23
+2024-08-22 07:00:41 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 23
+2024-08-22 07:00:41 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT valorproduto FROM produtos WHERE idproduto = 23
+2024-08-22 07:00:53 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 1
+2024-08-22 07:00:55 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 1
+2024-08-22 07:00:55 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT valorproduto FROM produtos WHERE idproduto = 1
+2024-08-22 07:00:56 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 7
+2024-08-22 07:00:56 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 77
+2024-08-22 07:00:58 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 77
+2024-08-22 07:00:58 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT valorproduto FROM produtos WHERE idproduto = 77
+2024-08-22 07:03:14 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT estoque FROM produtos WHERE idproduto = ?
+2024-08-22 07:03:14 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT estoque FROM produtos WHERE idproduto = ?
+2024-08-22 10:31:42 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 2
+2024-08-22 10:31:43 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 26
+2024-08-22 10:31:43 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 26
+2024-08-22 10:31:43 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT valorproduto FROM produtos WHERE idproduto = 26
+2024-08-22 10:33:13 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT estoque FROM produtos WHERE idproduto = ?
+2024-08-22 13:24:43 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 2
+2024-08-22 13:24:43 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 23
+2024-08-22 13:24:43 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 23
+2024-08-22 13:24:43 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT valorproduto FROM produtos WHERE idproduto = 23
+2024-08-22 13:25:04 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT estoque FROM produtos WHERE idproduto = ?
+2024-08-22 13:28:18 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 26
+2024-08-22 13:28:18 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 1
+2024-08-22 13:28:18 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 23
+2024-08-22 13:28:18 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 3
+2024-08-22 13:28:18 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 24
+2024-08-22 13:28:18 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 9
+2024-08-22 13:28:18 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 77
+2024-08-22 15:02:12 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 1
+2024-08-22 15:02:13 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 1
+2024-08-22 15:02:13 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT valorproduto FROM produtos WHERE idproduto = 1
+2024-08-22 15:02:54 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT estoque FROM produtos WHERE idproduto = ?
+2024-08-22 15:36:54 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 2
+2024-08-22 15:36:54 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 26
+2024-08-22 15:36:57 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 26
+2024-08-22 15:36:57 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT valorproduto FROM produtos WHERE idproduto = 26
+2024-08-22 16:16:21 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 2
+2024-08-22 16:16:21 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 23
+2024-08-22 16:16:22 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 23
+2024-08-22 16:16:22 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT valorproduto FROM produtos WHERE idproduto = 23
+2024-08-22 16:17:43 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT estoque FROM produtos WHERE idproduto = ?
+2024-08-22 16:21:21 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - Starting MotelInteligenteApplication using Java 20.0.2 with PID 3156 (C:\Users\MOTEL\Desktop\MotelInteligente\target\classes started by MOTEL in C:\Users\MOTEL\Desktop\MotelInteligente)
+2024-08-22 16:21:21 DEBUG [Thread-1] c.m.d.MotelInteligenteApplication - Running with Spring Boot v3.3.1, Spring v6.1.10
+2024-08-22 16:21:21 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - No active profile set, falling back to 1 default profile: "default"
+2024-08-22 16:21:24 INFO  [Thread-1] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 1521 (http)
+2024-08-22 16:21:24 INFO  [Thread-1] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-0.0.0.0-1521"]
+2024-08-22 16:21:24 INFO  [Thread-1] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2024-08-22 16:21:24 INFO  [Thread-1] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.25]
+2024-08-22 16:21:24 INFO  [Thread-1] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-08-22 16:21:24 INFO  [Thread-1] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 3014 ms
+2024-08-22 16:21:25 INFO  [Thread-1] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-0.0.0.0-1521"]
+2024-08-22 16:21:25 INFO  [Thread-1] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 1521 (http) with context path '/'
+2024-08-22 16:21:25 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - Started MotelInteligenteApplication in 5.717 seconds (process running for 12.395)
+2024-08-22 16:23:26 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - Starting MotelInteligenteApplication using Java 20.0.2 with PID 4072 (C:\Users\MOTEL\Desktop\MotelInteligente\target\classes started by MOTEL in C:\Users\MOTEL\Desktop\MotelInteligente)
+2024-08-22 16:23:26 DEBUG [Thread-1] c.m.d.MotelInteligenteApplication - Running with Spring Boot v3.3.1, Spring v6.1.10
+2024-08-22 16:23:26 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - No active profile set, falling back to 1 default profile: "default"
+2024-08-22 16:23:29 INFO  [Thread-1] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 1521 (http)
+2024-08-22 16:23:29 INFO  [Thread-1] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-0.0.0.0-1521"]
+2024-08-22 16:23:29 INFO  [Thread-1] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2024-08-22 16:23:29 INFO  [Thread-1] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.25]
+2024-08-22 16:23:29 INFO  [Thread-1] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-08-22 16:23:29 INFO  [Thread-1] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2421 ms
+2024-08-22 16:23:30 INFO  [Thread-1] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-0.0.0.0-1521"]
+2024-08-22 16:23:30 INFO  [Thread-1] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 1521 (http) with context path '/'
+2024-08-22 16:23:30 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - Started MotelInteligenteApplication in 4.875 seconds (process running for 11.08)
+2024-08-22 16:26:27 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - Starting MotelInteligenteApplication using Java 20.0.2 with PID 9452 (C:\Users\MOTEL\Desktop\MotelInteligente\target\classes started by MOTEL in C:\Users\MOTEL\Desktop\MotelInteligente)
+2024-08-22 16:26:27 DEBUG [Thread-1] c.m.d.MotelInteligenteApplication - Running with Spring Boot v3.3.1, Spring v6.1.10
+2024-08-22 16:26:27 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - No active profile set, falling back to 1 default profile: "default"
+2024-08-22 16:26:29 INFO  [Thread-1] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 1521 (http)
+2024-08-22 16:26:29 INFO  [Thread-1] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-0.0.0.0-1521"]
+2024-08-22 16:26:29 INFO  [Thread-1] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2024-08-22 16:26:29 INFO  [Thread-1] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.25]
+2024-08-22 16:26:30 INFO  [Thread-1] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-08-22 16:26:30 INFO  [Thread-1] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2339 ms
+2024-08-22 16:26:30 INFO  [Thread-1] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-0.0.0.0-1521"]
+2024-08-22 16:26:30 INFO  [Thread-1] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 1521 (http) with context path '/'
+2024-08-22 16:26:30 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - Started MotelInteligenteApplication in 4.898 seconds (process running for 11.087)
+2024-08-22 16:28:49 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - Starting MotelInteligenteApplication using Java 20.0.2 with PID 7280 (C:\Users\MOTEL\Desktop\MotelInteligente\target\classes started by MOTEL in C:\Users\MOTEL\Desktop\MotelInteligente)
+2024-08-22 16:28:49 DEBUG [Thread-1] c.m.d.MotelInteligenteApplication - Running with Spring Boot v3.3.1, Spring v6.1.10
+2024-08-22 16:28:49 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - No active profile set, falling back to 1 default profile: "default"
+2024-08-22 16:28:51 INFO  [Thread-1] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 1521 (http)
+2024-08-22 16:28:51 INFO  [Thread-1] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-0.0.0.0-1521"]
+2024-08-22 16:28:51 INFO  [Thread-1] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2024-08-22 16:28:51 INFO  [Thread-1] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.25]
+2024-08-22 16:28:52 INFO  [Thread-1] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-08-22 16:28:52 INFO  [Thread-1] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2172 ms
+2024-08-22 16:28:52 INFO  [Thread-1] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-0.0.0.0-1521"]
+2024-08-22 16:28:52 INFO  [Thread-1] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 1521 (http) with context path '/'
+2024-08-22 16:28:52 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - Started MotelInteligenteApplication in 4.533 seconds (process running for 10.683)
+2024-08-22 16:38:38 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - Starting MotelInteligenteApplication using Java 20.0.2 with PID 8996 (C:\Users\MOTEL\Desktop\MotelInteligente\target\classes started by MOTEL in C:\Users\MOTEL\Desktop\MotelInteligente)
+2024-08-22 16:38:38 DEBUG [Thread-1] c.m.d.MotelInteligenteApplication - Running with Spring Boot v3.3.1, Spring v6.1.10
+2024-08-22 16:38:38 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - No active profile set, falling back to 1 default profile: "default"
+2024-08-22 16:38:40 INFO  [Thread-1] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 1521 (http)
+2024-08-22 16:38:40 INFO  [Thread-1] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-0.0.0.0-1521"]
+2024-08-22 16:38:40 INFO  [Thread-1] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2024-08-22 16:38:40 INFO  [Thread-1] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.25]
+2024-08-22 16:38:40 INFO  [Thread-1] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-08-22 16:38:40 INFO  [Thread-1] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2366 ms
+2024-08-22 16:38:41 INFO  [Thread-1] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-0.0.0.0-1521"]
+2024-08-22 16:38:41 INFO  [Thread-1] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 1521 (http) with context path '/'
+2024-08-22 16:38:41 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - Started MotelInteligenteApplication in 4.934 seconds (process running for 11.842)
+2024-08-22 16:49:43 INFO  [http-nio-0.0.0.0-1521-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-08-22 16:49:43 INFO  [http-nio-0.0.0.0-1521-exec-1] o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2024-08-22 16:49:43 INFO  [http-nio-0.0.0.0-1521-exec-1] o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2024-08-22 16:56:26 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - Starting MotelInteligenteApplication using Java 20.0.2 with PID 2068 (C:\Users\MOTEL\Desktop\MotelInteligente\target\classes started by MOTEL in C:\Users\MOTEL\Desktop\MotelInteligente)
+2024-08-22 16:56:26 DEBUG [Thread-1] c.m.d.MotelInteligenteApplication - Running with Spring Boot v3.3.1, Spring v6.1.10
+2024-08-22 16:56:26 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - No active profile set, falling back to 1 default profile: "default"
+2024-08-22 16:56:29 INFO  [Thread-1] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 1521 (http)
+2024-08-22 16:56:29 INFO  [Thread-1] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-0.0.0.0-1521"]
+2024-08-22 16:56:29 INFO  [Thread-1] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2024-08-22 16:56:29 INFO  [Thread-1] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.25]
+2024-08-22 16:56:29 INFO  [Thread-1] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-08-22 16:56:29 INFO  [Thread-1] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2580 ms
+2024-08-22 16:56:30 INFO  [Thread-1] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-0.0.0.0-1521"]
+2024-08-22 16:56:30 INFO  [Thread-1] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 1521 (http) with context path '/'
+2024-08-22 16:56:30 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - Started MotelInteligenteApplication in 5.057 seconds (process running for 11.87)
+2024-08-22 17:01:11 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - Starting MotelInteligenteApplication using Java 20.0.2 with PID 6940 (C:\Users\MOTEL\Desktop\MotelInteligente\target\classes started by MOTEL in C:\Users\MOTEL\Desktop\MotelInteligente)
+2024-08-22 17:01:11 DEBUG [Thread-1] c.m.d.MotelInteligenteApplication - Running with Spring Boot v3.3.1, Spring v6.1.10
+2024-08-22 17:01:11 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - No active profile set, falling back to 1 default profile: "default"
+2024-08-22 17:01:14 INFO  [Thread-1] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 1521 (http)
+2024-08-22 17:01:14 INFO  [Thread-1] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-0.0.0.0-1521"]
+2024-08-22 17:01:14 INFO  [Thread-1] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2024-08-22 17:01:14 INFO  [Thread-1] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.25]
+2024-08-22 17:01:14 INFO  [Thread-1] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-08-22 17:01:14 INFO  [Thread-1] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2418 ms
+2024-08-22 17:01:14 INFO  [Thread-1] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-0.0.0.0-1521"]
+2024-08-22 17:01:15 INFO  [Thread-1] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 1521 (http) with context path '/'
+2024-08-22 17:01:15 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - Started MotelInteligenteApplication in 5.352 seconds (process running for 12.566)
+2024-08-22 17:08:19 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 2
+2024-08-22 17:08:19 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 23
+2024-08-22 17:08:20 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 23
+2024-08-22 17:08:20 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT valorproduto FROM produtos WHERE idproduto = 23
+2024-08-22 17:09:17 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT estoque FROM produtos WHERE idproduto = ?
+2024-08-22 17:09:59 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - Starting MotelInteligenteApplication using Java 20.0.2 with PID 7308 (C:\Users\MOTEL\Desktop\MotelInteligente\target\classes started by MOTEL in C:\Users\MOTEL\Desktop\MotelInteligente)
+2024-08-22 17:09:59 DEBUG [Thread-1] c.m.d.MotelInteligenteApplication - Running with Spring Boot v3.3.1, Spring v6.1.10
+2024-08-22 17:09:59 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - No active profile set, falling back to 1 default profile: "default"
+2024-08-22 17:10:02 INFO  [Thread-1] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 1521 (http)
+2024-08-22 17:10:02 INFO  [Thread-1] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-0.0.0.0-1521"]
+2024-08-22 17:10:02 INFO  [Thread-1] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2024-08-22 17:10:02 INFO  [Thread-1] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.25]
+2024-08-22 17:10:02 INFO  [Thread-1] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-08-22 17:10:02 INFO  [Thread-1] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2732 ms
+2024-08-22 17:10:03 INFO  [Thread-1] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-0.0.0.0-1521"]
+2024-08-22 17:10:03 INFO  [Thread-1] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 1521 (http) with context path '/'
+2024-08-22 17:10:03 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - Started MotelInteligenteApplication in 5.083 seconds (process running for 31.781)
+2024-08-22 17:15:57 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - Starting MotelInteligenteApplication using Java 20.0.2 with PID 6548 (C:\Users\MOTEL\Desktop\MotelInteligente\target\classes started by MOTEL in C:\Users\MOTEL\Desktop\MotelInteligente)
+2024-08-22 17:15:57 DEBUG [Thread-1] c.m.d.MotelInteligenteApplication - Running with Spring Boot v3.3.1, Spring v6.1.10
+2024-08-22 17:15:57 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - No active profile set, falling back to 1 default profile: "default"
+2024-08-22 17:15:59 INFO  [Thread-1] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 1521 (http)
+2024-08-22 17:15:59 INFO  [Thread-1] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-0.0.0.0-1521"]
+2024-08-22 17:15:59 INFO  [Thread-1] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2024-08-22 17:15:59 INFO  [Thread-1] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.25]
+2024-08-22 17:15:59 INFO  [Thread-1] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-08-22 17:15:59 INFO  [Thread-1] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2698 ms
+2024-08-22 17:16:00 INFO  [Thread-1] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-0.0.0.0-1521"]
+2024-08-22 17:16:00 INFO  [Thread-1] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 1521 (http) with context path '/'
+2024-08-22 17:16:00 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - Started MotelInteligenteApplication in 4.929 seconds (process running for 10.729)
+2024-08-22 17:20:14 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - Starting MotelInteligenteApplication using Java 20.0.2 with PID 11532 (C:\Users\MOTEL\Desktop\MotelInteligente\target\classes started by MOTEL in C:\Users\MOTEL\Desktop\MotelInteligente)
+2024-08-22 17:20:14 DEBUG [Thread-1] c.m.d.MotelInteligenteApplication - Running with Spring Boot v3.3.1, Spring v6.1.10
+2024-08-22 17:20:14 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - No active profile set, falling back to 1 default profile: "default"
+2024-08-22 17:20:16 INFO  [Thread-1] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 1521 (http)
+2024-08-22 17:20:16 INFO  [Thread-1] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-0.0.0.0-1521"]
+2024-08-22 17:20:16 INFO  [Thread-1] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2024-08-22 17:20:16 INFO  [Thread-1] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.25]
+2024-08-22 17:20:16 INFO  [Thread-1] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-08-22 17:20:16 INFO  [Thread-1] o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1862 ms
+2024-08-22 17:20:16 INFO  [Thread-1] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-0.0.0.0-1521"]
+2024-08-22 17:20:17 INFO  [Thread-1] o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 1521 (http) with context path '/'
+2024-08-22 17:20:17 INFO  [Thread-1] c.m.d.MotelInteligenteApplication - Started MotelInteligenteApplication in 4.169 seconds (process running for 11.847)
+2024-08-22 17:22:02 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 1
+2024-08-22 17:22:02 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 23
+2024-08-22 17:37:22 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 1
+2024-08-22 17:37:22 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 23
+2024-08-22 17:48:56 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 1
+2024-08-22 17:48:56 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 23
+2024-08-22 17:49:02 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 1
+2024-08-22 17:49:02 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 23
+2024-08-22 17:53:06 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 1
+2024-08-22 17:53:06 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 23
+2024-08-22 18:17:59 INFO  [http-nio-0.0.0.0-1521-exec-1] o.a.coyote.http11.Http11Processor - Error parsing HTTP request header
+ Note: further occurrences of HTTP request parsing errors will be logged at DEBUG level.
+java.lang.IllegalArgumentException: Invalid character found in method name [0x00Z0x000x000x010x000x000x000x0160x01,0x000x000x080x000x7f0xff0x7f0x080x000x000x000x010x00 ]. HTTP method names must be tokens
+	at org.apache.coyote.http11.Http11InputBuffer.parseRequestLine(Http11InputBuffer.java:407)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:262)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:904)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1741)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1190)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+	at java.base/java.lang.Thread.run(Thread.java:1623)
+2024-08-22 20:12:43 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 1
+2024-08-22 20:12:43 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 1
+2024-08-22 20:12:43 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT valorproduto FROM produtos WHERE idproduto = 1
+2024-08-22 20:13:40 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT estoque FROM produtos WHERE idproduto = ?
+2024-08-22 20:14:17 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 23
+2024-08-22 22:58:19 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 1
+2024-08-22 22:58:19 DEBUG [AWT-EventQueue-0] c.motelinteligente.dados.fprodutos - Executando consulta SQL: SELECT descricao FROM produtos WHERE idproduto = 23
+2024-08-22 23:03:19 INFO  [http-nio-0.0.0.0-1521-exec-3] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-08-22 23:03:19 INFO  [http-nio-0.0.0.0-1521-exec-3] o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2024-08-22 23:03:19 INFO  [http-nio-0.0.0.0-1521-exec-3] o.s.web.servlet.DispatcherServlet - Completed initialization in 18 ms

@@ -26,6 +26,7 @@ import javax.swing.table.DefaultTableModel;
 public class CaixaFrame extends javax.swing.JFrame {
 
     private boolean sair = false;
+    float valorDescontos = 0, valorAcrescimos = 0;
 
     /**
      * Creates new form CaixaFrame
@@ -73,6 +74,10 @@ public class CaixaFrame extends javax.swing.JFrame {
         jLabel12 = new javax.swing.JLabel();
         txtEntradaTotal = new javax.swing.JTextField();
         txtCaixaTotal = new javax.swing.JTextField();
+        txtAcrescimos = new javax.swing.JTextField();
+        jLabel17 = new javax.swing.JLabel();
+        txtDescontos = new javax.swing.JTextField();
+        jLabel18 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         tabelaProdutos = new javax.swing.JTable();
@@ -343,50 +348,82 @@ public class CaixaFrame extends javax.swing.JFrame {
             }
         });
 
+        txtAcrescimos.setBackground(new java.awt.Color(218, 218, 216));
+        txtAcrescimos.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        txtAcrescimos.setForeground(new java.awt.Color(0, 0, 255));
+        txtAcrescimos.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        txtAcrescimos.setFocusable(false);
+        txtAcrescimos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtAcrescimosActionPerformed(evt);
+            }
+        });
+
+        jLabel17.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel17.setText("Valor Acrescimos");
+
+        txtDescontos.setBackground(new java.awt.Color(218, 218, 216));
+        txtDescontos.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        txtDescontos.setForeground(new java.awt.Color(0, 0, 255));
+        txtDescontos.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        txtDescontos.setFocusable(false);
+        txtDescontos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtDescontosActionPerformed(evt);
+            }
+        });
+
+        jLabel18.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel18.setText("Valor Descontos");
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGap(28, 28, 28)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel12)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(28, 28, 28)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(138, 138, 138)
+                        .addComponent(txtCaixaTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addComponent(jLabel18)
+                                .addGap(18, 18, 18)
+                                .addComponent(txtDescontos))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                                .addComponent(jLabel11)
+                                .addGap(18, 18, 18)
+                                .addComponent(txtEntradaTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel6)
-                                    .addComponent(jLabel11)
-                                    .addComponent(jLabel5))
-                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(jPanel3Layout.createSequentialGroup()
-                                        .addGap(19, 19, 19)
-                                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(txtSaldoInicial, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(txtLocacoes, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(txtVendas)))
-                                    .addGroup(jPanel3Layout.createSequentialGroup()
-                                        .addGap(18, 18, 18)
-                                        .addComponent(txtEntradaTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                            .addComponent(jLabel10))
-                        .addGap(128, 128, 128)
+                                    .addComponent(jLabel5)
+                                    .addComponent(jLabel10))
+                                .addGap(18, 18, 18)
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(txtSaldoInicial, javax.swing.GroupLayout.DEFAULT_SIZE, 152, Short.MAX_VALUE)
+                                    .addComponent(txtLocacoes)
+                                    .addComponent(txtVendas))))
+                        .addGap(31, 31, 31)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel8)
-                            .addComponent(jLabel9)
-                            .addComponent(jLabel7)))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel12)
                             .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addGap(138, 138, 138)
-                                .addComponent(txtCaixaTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(35, 35, 35)))
-                .addGap(27, 27, 27)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(txtDinheiro, javax.swing.GroupLayout.DEFAULT_SIZE, 131, Short.MAX_VALUE)
-                    .addComponent(txtCartao)
-                    .addComponent(txtPix))
-                .addGap(217, 217, 217))
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel8)
+                                    .addComponent(jLabel9)
+                                    .addComponent(jLabel7))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(txtDinheiro)
+                                    .addComponent(txtCartao)
+                                    .addComponent(txtPix, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addComponent(jLabel17)
+                                .addGap(27, 27, 27)
+                                .addComponent(txtAcrescimos, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addGap(0, 204, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -409,15 +446,21 @@ public class CaixaFrame extends javax.swing.JFrame {
                     .addComponent(txtPix, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel10)
                     .addComponent(txtVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(65, 65, 65)
+                .addGap(33, 33, 33)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel18)
+                    .addComponent(txtDescontos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel17)
+                    .addComponent(txtAcrescimos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(34, 34, 34)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel11)
                     .addComponent(txtEntradaTotal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(46, 46, 46)
+                .addGap(34, 34, 34)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel12)
                     .addComponent(txtCaixaTotal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(60, Short.MAX_VALUE))
+                .addContainerGap(44, Short.MAX_VALUE))
         );
 
         tabPanel.addTab("Informações do Caixa", jPanel3);
@@ -704,8 +747,8 @@ public class CaixaFrame extends javax.swing.JFrame {
         int idCaixaAtual = config.getCaixa();
         String userAbriu;
         Timestamp dataAbriu;
-        
-        if(idCaixaAtual != 0){
+
+        if (idCaixaAtual != 0) {
             btAbrir.setEnabled(false);
             btFechar.setEnabled(true);
         }
@@ -727,12 +770,71 @@ public class CaixaFrame extends javax.swing.JFrame {
         txtLocacoes.setText("R$" + String.valueOf(val.entradaQuarto));
         txtVendas.setText("R$" + String.valueOf(val.entradaConsumo));
 
-        txtEntradaTotal.setText("R$" + String.valueOf(val.entradaConsumo + val.entradaQuarto));
-        txtCaixaTotal.setText("R$" + String.valueOf(val.entradaConsumo + val.entradaQuarto + saldoInicial));
+        List<Integer> idsLocacao = new fcaixa().getIdsLocacoes(idCaixaAtual);
+
+        //aqui carrega desconto e acrescimos
+        carregaDescontoAcrescimo(idsLocacao);
+        txtDescontos.setText("R$" + String.valueOf(valorDescontos));
+        txtAcrescimos.setText("R$" + String.valueOf(valorAcrescimos));
+        txtEntradaTotal.setText("R$" + String.valueOf(val.entradaConsumo + val.entradaQuarto + valorAcrescimos - valorDescontos));
+        txtCaixaTotal.setText("R$" + String.valueOf(val.entradaConsumo + val.entradaQuarto + saldoInicial + valorAcrescimos - valorDescontos));
 
         carregaTabelaProdutosVendidos();
         carregaTabelaQuartosLocados();
 
+    }
+
+    private void carregaDescontoAcrescimo(List<Integer> idsLocacao) {
+
+        if (idsLocacao == null || idsLocacao.size() == 0) {
+            valorAcrescimos = 0;
+            valorDescontos = 0;
+            return;
+        }
+
+        // Constrói a cláusula IN dinamicamente
+        StringBuilder idsLocacaoClause = new StringBuilder();
+        for (int i = 0; i < idsLocacao.size(); i++) {
+            idsLocacaoClause.append(idsLocacao.get(i));
+            if (i < idsLocacao.size() - 1) {
+                idsLocacaoClause.append(", ");
+            }
+        }
+        String sqlDesconto = "SELECT SUM(valor) AS totalDesconto FROM justificativa WHERE tipo = 'desconto' AND idlocacao IN (" + idsLocacaoClause.toString() + ")";
+        String sqlAcrescimo = "SELECT SUM(valor) AS totalAcrescimo FROM justificativa WHERE tipo = 'acrescimo' AND idlocacao IN (" + idsLocacaoClause.toString() + ")";
+
+        Connection link = null;
+        try {
+            link = new fazconexao().conectar();
+            Statement statement = link.createStatement();
+
+            // Consulta para calcular total de descontos
+            ResultSet resultadoDesconto = statement.executeQuery(sqlDesconto);
+            if (resultadoDesconto.next()) {
+                valorDescontos = resultadoDesconto.getFloat("totalDesconto");
+            }
+            resultadoDesconto.close();
+
+            // Consulta para calcular total de acréscimos
+            ResultSet resultadoAcrescimo = statement.executeQuery(sqlAcrescimo);
+            if (resultadoAcrescimo.next()) {
+                valorAcrescimos = resultadoAcrescimo.getFloat("totalAcrescimo");
+            }
+            resultadoAcrescimo.close();
+
+            statement.close();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao calcular descontos e acréscimos: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        } finally {
+            try {
+                if (link != null && !link.isClosed()) {
+                    link.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void carregaTabelaProdutosVendidos() {
@@ -863,9 +965,9 @@ public class CaixaFrame extends javax.swing.JFrame {
         boolean fechar = false;
         // pega o valot total do caixa
         try {
-            int indiceDoR = txtCaixaTotal.getText().indexOf("R$");
+            int indiceDoR = txtEntradaTotal.getText().indexOf("R$");
             if (indiceDoR != -1) {
-                String valorPegar = txtCaixaTotal.getText().substring(indiceDoR + 2);
+                String valorPegar = txtEntradaTotal.getText().substring(indiceDoR + 2);
                 valorPegar = valorPegar.replace(",", ".");
                 valCaixa = Float.parseFloat(valorPegar);
                 fechar = true;
@@ -892,6 +994,14 @@ public class CaixaFrame extends javax.swing.JFrame {
 
     }//GEN-LAST:event_btFecharActionPerformed
 
+    private void txtAcrescimosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtAcrescimosActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtAcrescimosActionPerformed
+
+    private void txtDescontosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDescontosActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtDescontosActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -917,6 +1027,8 @@ public class CaixaFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -941,12 +1053,14 @@ public class CaixaFrame extends javax.swing.JFrame {
     private javax.swing.JTabbedPane tabPanel;
     private javax.swing.JTable tabelaLocacoes;
     private javax.swing.JTable tabelaProdutos;
+    private javax.swing.JTextField txtAcrescimos;
     private javax.swing.JTextField txtCaixaTotal;
     private javax.swing.JTextField txtCartao;
     private javax.swing.JTextField txtCodigoCaixa;
     private javax.swing.JTextField txtCodigoCaixa3;
     private javax.swing.JTextField txtCodigoCaixa9;
     private javax.swing.JTextField txtDataAbre;
+    private javax.swing.JTextField txtDescontos;
     private javax.swing.JTextField txtDinheiro;
     private javax.swing.JTextField txtEntradaTotal;
     private javax.swing.JTextField txtLocacoes;

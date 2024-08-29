@@ -135,6 +135,7 @@ public class fcaixa {
         }
         return null;
     }
+
     public valores getValores(int idCaixa) {
         valores val = new valores();
 
@@ -172,6 +173,36 @@ public class fcaixa {
         return null;
     }
 
+    public List<Integer> getIdsLocacoes(int idCaixa) {
+        String consultaSQL = "SELECT idlocacao FROM registralocado WHERE idcaixaatual = " + idCaixa;
+        Connection link = null;
+        List<Integer> idsLocacaoList = new ArrayList<>();
+
+        try {
+            link = new fazconexao().conectar();
+            Statement statement = link.createStatement();
+            ResultSet resultado = statement.executeQuery(consultaSQL);
+
+            while (resultado.next()) {
+                idsLocacaoList.add(resultado.getInt("idlocacao"));
+            }
+            resultado.close();
+            statement.close();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            try {
+                if (link != null && !link.isClosed()) {
+                    link.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return idsLocacaoList;
+    }
+
     public int getIdCaixa() {
 
         String consultaSQL = "SELECT id FROM caixa WHERE horafecha IS NULL";
@@ -183,7 +214,7 @@ public class fcaixa {
 
             ResultSet resultado = statement.executeQuery(consultaSQL);
             if (resultado.next()) {
-                return  resultado.getInt("id");
+                return resultado.getInt("id");
             } else {
                 link.close();
                 statement.close();

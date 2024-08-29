@@ -112,8 +112,8 @@ public class ClienteEncerra extends javax.swing.JFrame {
         lblValorTotal.setText("R$" + String.valueOf(valorTotal) + "0");
     }
 
-    public void setValorQuarto(String valorQuarto) {
-        lblValorQuarto.setText(valorQuarto + "0");
+    public void setValorQuarto(float valorQuarto) {
+        lblValorQuarto.setText("R$" + String.valueOf(valorQuarto) + "0");
     }
 
     public void adicionaTabela(String id, String quantidade, String texto, float valor, float valorSoma) {

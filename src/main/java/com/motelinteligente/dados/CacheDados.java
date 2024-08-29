@@ -28,7 +28,7 @@ public class CacheDados {
     public Map<Integer, List<DadosVendidos>> cacheProdutosVendidos = new HashMap<>();
     public Map<Integer, List<Negociados>> cacheNegociado = new HashMap<>();
     public Map<Integer, Timestamp> despertador = new HashMap<>();
-    SerialPort arduinoPort;
+    public static SerialPort arduinoPort;
 
     private CacheDados() {
         // Construtor privado para impedir instâncias diretas
@@ -41,22 +41,15 @@ public class CacheDados {
         return instancia;
     }
 
-    public SerialPort getArduino() {
-        return arduinoPort;
-    }
-
-    public void limparCaches() {
-        cacheQuarto.clear();
-        cacheOcupado.clear();
-        cacheProdutosVendidos.clear();
-        cacheNegociado.clear();
-        despertador.clear();
-    }
-
-    public void carregaArduino() {
+     public static void carregaArduino() {
+        if (arduinoPort != null && arduinoPort.isOpen()) {
+            return; // A conexão já está aberta
+        }
+        
         arduinoPort = SerialPort.getCommPort("COM4");
+
         if (!arduinoPort.openPort()) {
-            JOptionPane.showMessageDialog(null, "Falha ao abrir a porta COM4 - Conecte o arduino.");
+            JOptionPane.showMessageDialog(null, "Falha ao abrir a porta COM4 - Conecte o Arduino.");
             return;
         }
 
@@ -67,6 +60,21 @@ public class CacheDados {
         arduinoPort.setParity(SerialPort.NO_PARITY); // Paridade
     }
 
+    public static SerialPort getArduinoPort() {
+        return arduinoPort;
+    }
+
+    public static void fecharConexao() {
+        if (arduinoPort != null && arduinoPort.isOpen()) {
+            arduinoPort.closePort();
+        }
+    }    public void limparCaches() {
+        cacheQuarto.clear();
+        cacheOcupado.clear();
+        cacheProdutosVendidos.clear();
+        cacheNegociado.clear();
+        despertador.clear();
+    }
     public void carregarOcupado(int numeroQuarto) {
         float valPeriodo = 0, valPernoite = 0, valAdicional = 0;
         int pessoas = 0;
