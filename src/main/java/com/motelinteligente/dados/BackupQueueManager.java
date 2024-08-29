@@ -1,14 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.motelinteligente.dados;
-
-/**
- *
- * @author MOTEL
- */
-
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -30,8 +20,6 @@ public class BackupQueueManager {
         return instance;
     }
 
-    ;
-
     public void addTask(BackupTask task) {
         try {
             queue.put(task); // Usa put() para comportamento bloqueante
@@ -42,12 +30,14 @@ public class BackupQueueManager {
     }
 
     public BackupTask takeTask() throws InterruptedException {
-        BackupTask task = queue.take();
-        return task;
+        return queue.take();
+    }
+
+    public BackupTask peekTask() {
+        return queue.peek();
     }
 
     public boolean isEmpty() {
         return queue.isEmpty();
     }
-
 }
