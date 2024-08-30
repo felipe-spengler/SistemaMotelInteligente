@@ -116,7 +116,14 @@ public class ObterProdutoFrame extends JFrame {
                 }
             }
         });
-
+        btnInserir.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    inserirProduto(); 
+                }
+            }
+        });
         
         
         setLocationRelativeTo(null); // Centralizar a tela

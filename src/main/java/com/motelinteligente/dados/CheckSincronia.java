@@ -338,7 +338,7 @@ public class CheckSincronia {
             case "registramanutencao":
                 return "id";
             case "registrareserva":
-                return "idfuncionario";
+                return "id";
             case "status":
                 return "numeroquarto";
             case "quartos":

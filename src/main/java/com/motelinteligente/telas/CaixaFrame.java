@@ -12,12 +12,15 @@ import com.motelinteligente.dados.valores;
 import com.motelinteligente.dados.vendaProdutos;
 import java.security.Timestamp;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 
 /**
  *
@@ -532,13 +535,14 @@ public class CaixaFrame extends javax.swing.JFrame {
         tabelaLocacoes.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         tabelaLocacoes.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null}
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Entrada", "Saída", "Numero Quarto", "Valor Quarto", "Valor Consumo"
+                "Entrada", "Saída", "Numero Quarto", "Valor Quarto", "Valor Consumo", "Desconto", "Acrescimo", "Valor Total"
             }
         ));
         jScrollPane1.setViewportView(tabelaLocacoes);
@@ -564,20 +568,20 @@ public class CaixaFrame extends javax.swing.JFrame {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 806, Short.MAX_VALUE)
                 .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addGap(15, 15, 15)
                 .addComponent(lblContador)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 207, Short.MAX_VALUE)
+                .addGap(52, 52, 52)
                 .addComponent(jLabel15)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(lbltQuarto)
-                .addGap(135, 135, 135)
+                .addGap(54, 54, 54)
                 .addComponent(jLabel16)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(lbltConsumo)
-                .addGap(70, 70, 70))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -867,26 +871,55 @@ public class CaixaFrame extends javax.swing.JFrame {
         configGlobal config = configGlobal.getInstance();
         int idCaixa = config.getCaixa();
         int count = 0;
-        String consultaSQL = "SELECT * FROM registralocado WHERE idcaixaatual = " + idCaixa;
+        String consultaSQL = "SELECT rl.*, j.valor, j.tipo "
+                + "FROM registralocado rl "
+                + "LEFT JOIN justificativa j ON rl.idlocacao = j.idlocacao "
+                + "WHERE rl.idcaixaatual = " + idCaixa + " "
+                + "ORDER BY rl.horainicio";
         System.out.println(consultaSQL);
         Connection link = null;
         DefaultTableModel modelo = (DefaultTableModel) tabelaLocacoes.getModel();
         modelo.setNumRows(0);
         float valQ = 0, valC = 0;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM HH:mm");
+
         try {
             link = new fazconexao().conectar();
             Statement statement = link.createStatement();
             ResultSet resultado = statement.executeQuery(consultaSQL);
             while (resultado.next()) {
                 int idlocacao = resultado.getInt("idlocacao");
-                valQ += resultado.getFloat("valorquarto");
-                valC += resultado.getFloat("valorconsumo");
+                float valorQuarto = resultado.getFloat("valorquarto");
+                float valorConsumo = resultado.getFloat("valorconsumo");
+                valQ += valorQuarto;
+                valC += valorConsumo;
+
+                // Variáveis para os valores de acréscimo e desconto
+                float acrescimo = 0;
+                float desconto = 0;
+
+                // Verifica se há um valor de justificativa e classifica como acréscimo ou desconto
+                if (resultado.getString("tipo") != null) {
+                    if (resultado.getString("tipo").equals("acrescimo")) {
+                        acrescimo = resultado.getFloat("valor");
+                    }
+                    if (resultado.getString("tipo").equals("desconto")) {
+                        desconto = resultado.getFloat("valor");
+                    }
+                }
+                // Formata as datas
+                String horaInicio = dateFormat.format(new Date(resultado.getTimestamp("horainicio").getTime()));
+                String horaFim = dateFormat.format(new Date(resultado.getTimestamp("horafim").getTime()));
+                // Adiciona a linha na tabela com os dados de acréscimo, desconto e total
                 modelo.addRow(new Object[]{
-                    resultado.getTimestamp("horainicio"),
-                    resultado.getTimestamp("horafim"),
+                    horaInicio,
+                    horaFim,
                     resultado.getInt("numquarto"),
-                    resultado.getFloat("valorquarto"),
-                    resultado.getFloat("valorconsumo")
+                    valorQuarto,
+                    valorConsumo,
+                    desconto,
+                    acrescimo,
+                    valorQuarto + valorConsumo + acrescimo - desconto
                 });
                 count++;
             }
@@ -901,10 +934,33 @@ public class CaixaFrame extends javax.swing.JFrame {
                 e.printStackTrace();
             }
         }
+        TableColumn column = null;
+        for (int i = 0; i < tabelaLocacoes.getColumnCount(); i++) {
+            column = tabelaLocacoes.getColumnModel().getColumn(i);
+            switch (i) {
+                case 0: // Hora Início
+                case 1: // Hora Fim
+                    column.setPreferredWidth(100);
+                    break;
+                case 2: // Número do Quarto
+                    column.setPreferredWidth(50);
+                    break;
+                case 3: // Valor Quarto
+                case 4: // Valor Consumo
+                case 7: // Total Quarto
+                    column.setPreferredWidth(50);
+                    break;
+                case 5: // Desconto
+                case 6: // Acréscimo
+                    column.setPreferredWidth(40);
+                    break;
+            }
+        }
         lblContador.setText(count + " locações");
         lbltConsumo.setText("R$" + String.valueOf(valC));
         lbltQuarto.setText("R$" + String.valueOf(valQ));
     }
+
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
         // TODO add your handling code here:
         configGlobal config = configGlobal.getInstance();
@@ -927,38 +983,6 @@ public class CaixaFrame extends javax.swing.JFrame {
     private void btAtualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btAtualizarActionPerformed
         carregaInfo();
     }//GEN-LAST:event_btAtualizarActionPerformed
-
-    private void txtCaixaTotalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCaixaTotalActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtCaixaTotalActionPerformed
-
-    private void txtEntradaTotalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtEntradaTotalActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtEntradaTotalActionPerformed
-
-    private void txtVendasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtVendasActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtVendasActionPerformed
-
-    private void txtDinheiroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDinheiroActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtDinheiroActionPerformed
-
-    private void txtPixActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPixActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtPixActionPerformed
-
-    private void txtCartaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCartaoActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtCartaoActionPerformed
-
-    private void txtSaldoInicialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSaldoInicialActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtSaldoInicialActionPerformed
-
-    private void txtLocacoesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtLocacoesActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtLocacoesActionPerformed
 
     private void btFecharActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btFecharActionPerformed
         // fechar o caixa
@@ -995,13 +1019,45 @@ public class CaixaFrame extends javax.swing.JFrame {
 
     }//GEN-LAST:event_btFecharActionPerformed
 
+    private void txtDescontosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDescontosActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtDescontosActionPerformed
+
     private void txtAcrescimosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtAcrescimosActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtAcrescimosActionPerformed
 
-    private void txtDescontosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDescontosActionPerformed
+    private void txtCaixaTotalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCaixaTotalActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtDescontosActionPerformed
+    }//GEN-LAST:event_txtCaixaTotalActionPerformed
+
+    private void txtEntradaTotalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtEntradaTotalActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtEntradaTotalActionPerformed
+
+    private void txtVendasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtVendasActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtVendasActionPerformed
+
+    private void txtDinheiroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDinheiroActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtDinheiroActionPerformed
+
+    private void txtPixActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPixActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtPixActionPerformed
+
+    private void txtCartaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCartaoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtCartaoActionPerformed
+
+    private void txtSaldoInicialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSaldoInicialActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtSaldoInicialActionPerformed
+
+    private void txtLocacoesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtLocacoesActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtLocacoesActionPerformed
 
     /**
      * @param args the command line arguments
