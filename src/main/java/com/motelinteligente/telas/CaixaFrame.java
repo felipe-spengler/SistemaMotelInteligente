@@ -23,6 +23,7 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author MOTEL
  */
+//atualizadooo
 public class CaixaFrame extends javax.swing.JFrame {
 
     private boolean sair = false;

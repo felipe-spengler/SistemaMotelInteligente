@@ -40,6 +40,9 @@ public class BackupExecutor {
                     // Remove a tarefa da fila antes de tentar executar
                     task = BackupQueueManager.getInstance().takeTask();
                     stmt.execute(task.getSqlCommand());
+                    configGlobal config = configGlobal.getInstance();
+                    config.incrementarContadorExecucoes();
+
                     System.out.println("Backup executado para o comando SQL: " + task.getSqlCommand());
                 } catch (SQLException e) {
                     e.printStackTrace();
@@ -59,7 +62,9 @@ public class BackupExecutor {
         } finally {
             if (linkOnline != null) {
                 try {
-                    if (stmt != null) stmt.close();
+                    if (stmt != null) {
+                        stmt.close();
+                    }
                     linkOnline.close();
                     System.out.println("Conexão fechada com o banco de dados.");
                 } catch (SQLException e) {

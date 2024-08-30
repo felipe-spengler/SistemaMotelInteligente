@@ -21,7 +21,9 @@ public class configGlobal {
     private boolean flagArduino;
     private boolean flagMesmoUserCaixa;
     private int limiteDesconto;
-    private BackupQueueManager backupQueueManager;    
+    private BackupQueueManager backupQueueManager; 
+    private static int contadorExecucoes = 0;
+    
 
     // Construtor privado para evitar a criação de múltiplas instâncias
     public configGlobal() {
@@ -33,6 +35,14 @@ public class configGlobal {
         controlaEstoque = false;
         flagSistemaSpring = flagArduino = false;
         
+    }
+    public static void incrementarContadorExecucoes() {
+        contadorExecucoes++;
+        System.out.println("Total de execuções no banco online: " + contadorExecucoes);
+    }
+
+    public static int getContadorExecucoes() {
+        return contadorExecucoes;
     }
      public BackupQueueManager getBackupQueueManager() {
         return backupQueueManager;

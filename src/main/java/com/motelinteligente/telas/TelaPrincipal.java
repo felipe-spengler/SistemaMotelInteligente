@@ -2202,7 +2202,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     }
 
     private void obterProduto() {
-        // Criação do campo de texto para o ID do produto
+        /*// Criação do campo de texto para o ID do produto
         JTextField txtIdProduto = new JTextField();
         txtIdProduto.setColumns(10);
 
@@ -2346,7 +2346,11 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 JOptionPane.showMessageDialog(rootPane, "Digite um valor válido!");
             }
         }
+        */
+        new ObterProdutoFrame((DefaultTableModel) tabela1.getModel(), quartoEmFoco);
+        tabela1.repaint();
         focoQuarto();
+        
     }
     private void txtDescontoNegociadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDescontoNegociadoActionPerformed
         float valorRecebido = 0;
