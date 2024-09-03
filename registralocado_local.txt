@@ -1,2 +1,2 @@
 idlocacao, numquarto, horainicio, horafim, numpessoas, valorquarto, valorconsumo, pagodinheiro, pagopix, pagocartao, idcaixaatual
-2334, 10, 2024-08-29 21:26:28, 2024-08-29 23:05:56, 2, 60.0, 20.0, 0.0, 0.0, 80.0, 156
+2247, 7, 2024-08-30 15:56:01, 2024-08-23 11:44:37, 2, 67.0, 0.0, 0.0, 0.0, 148.0, 151
