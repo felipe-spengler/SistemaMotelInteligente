@@ -140,6 +140,38 @@ public class fquartos {
         }
         return false;
     }
+    public boolean setStatusHorario(int numero, String status, Timestamp hora) {
+        Date dataAtual = new Date();
+
+        String consultaSQL = "update status set atualquarto='" + status + "' , horastatus= '" + hora 
+                + "' where numeroquarto= '" + numero + "'";
+
+        int n = 0;
+        Connection link = null;
+        try {
+            link = new fazconexao().conectar();
+            PreparedStatement statement = link.prepareStatement(consultaSQL);
+            //imprimir no output
+            n = statement.executeUpdate();
+            if (n != 0) {
+                link.close();
+                return true;
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null,"Erro setStatus " + e);
+        } finally {
+            try {
+                // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
+                if (link != null && !link.isClosed()) {
+                    link.close();
+                }
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(null, e);
+            }
+        }
+        return false;
+    }
+
     public boolean alteraOcupado(int numero, String status) {
         Date dataAtual = new Date();
         Timestamp timestamp = new Timestamp(dataAtual.getTime());

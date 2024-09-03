@@ -34,13 +34,9 @@ import java.util.Map;
 import javax.swing.JFrame;
 import javax.swing.SwingWorker;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.MouseInfo;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -53,9 +49,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.io.IOException;
@@ -1742,7 +1735,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private void itemReservaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemReservaActionPerformed
         // TODO add your handling code here:
         if (quartoEmFoco != 0) {
-            mudaStatusNaCache(quartoEmFoco, "reservado");
+            mudaStatusNaCache(quartoEmFoco, "reservado", null);
             mostraQuartos();
             // a seguir acontece em background
             SwingWorker<Void, Void> worker;
@@ -1764,7 +1757,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private void itemManutencaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemManutencaoActionPerformed
         // setar quarto em manutencao
         if (quartoEmFoco != 0) {
-            mudaStatusNaCache(quartoEmFoco, "manutencao");
+            mudaStatusNaCache(quartoEmFoco, "manutencao", null);
             mostraQuartos();
             // a seguir acontece em background
             SwingWorker<Void, Void> worker;
@@ -1831,7 +1824,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         }
     }
 
-    public boolean mudaStatusNaCache(int quartoMudar, String statusColocar) {
+    public boolean mudaStatusNaCache(int quartoMudar, String statusColocar, Timestamp hora) {
         CacheDados dados = CacheDados.getInstancia();
         // Obtém o quarto da cache
         CarregaQuarto quarto = dados.getCacheQuarto().get(quartoMudar);
@@ -1860,7 +1853,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             // Iniciar uma thread para desbloquear o botão após um segundo
             new Thread(() -> {
                 try {
-                    Thread.sleep(1000); // Esperar um segundo
+                    Thread.sleep(500); // Esperar meio segundo
                 } catch (InterruptedException ex) {
                     ex.printStackTrace();
                 } finally {
@@ -1875,7 +1868,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         // setar quarto como locado
 
         if (quartoEmFoco != 0) {
-            mudaStatusNaCache(quartoEmFoco, "ocupado-periodo");
+            mudaStatusNaCache(quartoEmFoco, "ocupado-periodo", null);
             mostraQuartos();
             if (new fquartos().registraLocacao(quartoEmFoco)) {
                 if (!new fquartos().setStatus(quartoEmFoco, "ocupado-periodo")) {
@@ -1885,9 +1878,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                     //abreportao
                     new Thread(() -> {
                         try {
-                            Thread.sleep(350); // Pausa por 0,3s
+                            Thread.sleep(300); // Pausa por 0,3s
                             new ConectaArduino(quartoEmFoco);
-                            Thread.sleep(600); // Pausa por 0,6s
+                            Thread.sleep(300); // Pausa por 0,3s
                         } catch (InterruptedException ex) {
                             JOptionPane.showMessageDialog(null, ex);
                         }
@@ -1912,7 +1905,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         // TODO add your handling code here:
         if (quartoEmFoco != 0) {
 
-            mudaStatusNaCache(quartoEmFoco, "livre");
+            mudaStatusNaCache(quartoEmFoco, "livre", null);
             mostraQuartos();
 
             SwingWorker<Void, Void> worker;
@@ -2346,11 +2339,11 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 JOptionPane.showMessageDialog(rootPane, "Digite um valor válido!");
             }
         }
-        */
+         */
         new ObterProdutoFrame((DefaultTableModel) tabela1.getModel(), quartoEmFoco);
         tabela1.repaint();
         focoQuarto();
-        
+
     }
     private void txtDescontoNegociadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDescontoNegociadoActionPerformed
         float valorRecebido = 0;
@@ -2503,7 +2496,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             public void actionPerformed(ActionEvent e) {
                 int row = table.getSelectedRow();  // Obtém a linha selecionada
                 if (row != -1) {
-                    int numeroQuarto = (int) table.getValueAt(row, 0);  // Obtém o número do quarto da linha selecionada
+                    Object value = table.getValueAt(row, 0);  // Obtém o valor da célula
+                    String numeroQuartoStr = value.toString();  // Converte o valor para String
+                    int numeroQuarto = Integer.parseInt(numeroQuartoStr);    // Obtém o número do quarto da linha selecionada
 
                     // Abre o JOptionPane de confirmação
                     int resposta = JOptionPane.showConfirmDialog(
@@ -2527,13 +2522,23 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
     }//GEN-LAST:event_botaoTrocaActionPerformed
     private void trocaQuarto(int idLocacao, int numeroNovoQuarto) {
-        mudaStatusNaCache(quartoEmFoco, "limpeza");
-        mudaStatusNaCache(numeroNovoQuarto, "ocupado-periodo");
         fquartos quarto = new fquartos();
+        String horaStatus = quarto.getDataInicio(quartoEmFoco);
+        Timestamp hStatus = null;
+        try {
+            System.out.println(horaStatus);
+            hStatus = Timestamp.valueOf(horaStatus);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        mudaStatusNaCache(quartoEmFoco, "limpeza", hStatus);
+        mudaStatusNaCache(numeroNovoQuarto, "ocupado-periodo", hStatus);
+
         quarto.adicionaRegistro(quartoEmFoco, "limpeza");
-        quarto.setStatus(quartoEmFoco, "limpeza");
-        quarto.setStatus(numeroNovoQuarto, "ocupado-periodo");
-        String SQL = "UPDATE table registralocado set numquarto=" + numeroNovoQuarto + " where idlocacao = " + idLocacao;
+        quarto.setStatusHorario(quartoEmFoco, "limpeza", hStatus);
+        quarto.setStatusHorario(numeroNovoQuarto, "ocupado-periodo", hStatus);
+        String SQL = "UPDATE registralocado set numquarto=" + numeroNovoQuarto + " where idlocacao = " + idLocacao;
         Connection link = null;
         try {
             link = new fazconexao().conectar();

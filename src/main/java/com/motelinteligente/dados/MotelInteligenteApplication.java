@@ -203,9 +203,9 @@ public class MotelInteligenteApplication {
                                     config.setMudanca(true);
                                     new Thread(() -> {
                                         try {
-                                            Thread.sleep(1000); // Pausa por 1s
+                                            Thread.sleep(500); // Pausa por 0,5s
                                             new ConectaArduino(quartoEmFoco);
-                                            Thread.sleep(1000); // Pausa por 1s
+                                            Thread.sleep(500); // Pausa por 0,5s
                                         } catch (InterruptedException ex) {
                                             ex.printStackTrace();
                                         }

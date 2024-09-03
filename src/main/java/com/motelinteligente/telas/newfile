@@ -1,0 +1,367 @@
+<?php
+// Função para formatar a data no formato MySQL (Y-m-d H:i:s)
+function formatarData($data, $horaInicial = true) {
+    // Divide a data em dia, mês e ano
+    $partes = explode('/', $data);
+		$dia = $partes[0];
+		$mes = $partes[1];
+		$ano = $partes[2];
+    
+    // Verifica se devemos adicionar a hora 00:00:00 ou 23:59:59
+    $hora = $horaInicial ? '00:00:00' : '23:59:59';
+    
+    // Formata a data e hora de acordo com o formato MySQL
+    return sprintf('%04d-%02d-%02d %s', $ano, $mes, $dia, $hora);
+}
+
+// Verifica se foi recebido um valor por método POST
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["period"])) {
+    $period = $_POST["period"];
+    switch ($period) {
+        case "7":
+            $dataInicio = date('Y-m-d', strtotime('-7 days')) . ' 00:00:00';
+            $dataFim = date('Y-m-d') . ' 23:59:59';
+            break;
+        case "15":
+            $dataInicio = date('Y-m-d', strtotime('-15 days')) . ' 00:00:00';
+            $dataFim = date('Y-m-d') . ' 23:59:59';
+            break;
+        case "30":
+            $dataInicio = date('Y-m-d', strtotime('-30 days')) . ' 00:00:00';
+            $dataFim = date('Y-m-d') . ' 23:59:59';
+            break;
+        case "this_month":
+            $dataInicio = date('Y-m-01') . ' 00:00:00';
+            $dataFim = date('Y-m-d') . ' 23:59:59';
+
+            echo $dataFim;
+            break;
+        case "last_month":
+            $dataInicio = date('Y-m-01', strtotime('-1 month')) . ' 00:00:00';
+            $dataFim = date('Y-m-t', strtotime('-1 month')) . ' 23:59:59';
+            break;
+        case "custom":
+            // Verifica se foram enviados dados de período personalizado
+            if (isset($_POST["data_inicio"]) &&  isset($_POST["data_fim"])) {
+				// Para adicionar a hora 00:00:00
+				$dataInicio = formatarData($_POST["data_inicio"], true);
+
+				// Para adicionar a hora 23:59:59
+				$dataFim = formatarData($_POST["data_fim"], false);
+
+            } else {
+                // Se não foram recebidos dados, assumir período "Este Mês"
+                $dataInicio = date('Y-m-01') . ' 00:00:00';
+                $dataFim = date('Y-m-d') . ' 23:59:59';
+            }
+            break;
+        default:
+            // Se nenhum dos casos corresponder, assume-se "Este Mês"
+            $dataInicio = date('Y-m-01') . ' 00:00:00';
+            $dataFim = date('Y-m-d') . ' 23:59:59';
+            break;
+    }
+} else {
+    // Se não foi recebido nenhum valor, assume-se "Este Mês"
+    $dataInicio = date('Y-m-01') . ' 00:00:00';
+    $dataFim = date('Y-m-d') . ' 23:59:59';
+}
+    
+    include 'verificar_acesso.php';
+	include 'conexao2.php';
+	$conexao = conectarAoBanco();
+	
+    $paginaAtual = basename($_SERVER['PHP_SELF']);
+    verificarCookie($conexao, $paginaAtual);
+    verificarCargoUsuario(['admin']);
+    if ($conexao === null) {
+        return ["erro" => true, "mensagem" => "Erro na conexão com o banco de dados."];
+    } else {
+        $idCaixas = obterIdCaixa($conexao, $dataInicio, $dataFim);
+        
+        
+        $numLocacoes = obterTotalLocacoes($conexao, $idCaixas);
+        $diferencaDias = diferencaDias($dataInicio, $dataFim);
+		if($diferencaDias === 0 ){
+			$mediaLocacoes = 0;
+		}else{
+			$mediaLocacoes = $numLocacoes / $diferencaDias;
+		}
+        
+		$numDias =  calcularNumeroDias($dataInicio, $dataFim);
+        $medias = calcularMedias($conexao, $idCaixas);
+        $faturamentoAtual = $medias["faturamentoTotal"];
+        $faturamentoMes = obterFaturamentoMes($conexao, $dataInicio, $dataFim) ;
+		if($diferencaDias === 0 ){
+			$mediaFaturamento = 0;
+		}else{
+			$mediaFaturamento = $faturamentoAtual / $diferencaDias;
+		}
+        // essas variaveis vou usar para imprimir o valor na tela
+    }
+
+    $conexao->close();
+
+
+function obterIdCaixa($conexao, $dataInicio, $dataFim) {
+   
+    $sql = "SELECT id FROM caixa WHERE horaabre >= '$dataInicio' AND horaabre <= '$dataFim'";
+
+    $result = $conexao->query($sql);
+
+    if ($result) {
+        $idCaixas = array();
+
+        while ($row = $result->fetch_assoc()) {
+            $idCaixas[] = $row['id'];
+        }
+
+        return $idCaixas;
+    } else {
+        return 0;
+    }
+}
+function obterFaturamentoMes($conexao, $dataInicio, $dataFim) {
+   
+    $sql = "SELECT SUM(saldofecha - saldoabre) AS faturamentomes 
+        FROM caixa 
+        WHERE horaabre >= '$dataInicio' AND horaabre <= '$dataFim'";
+
+    $result = $conexao->query($sql);
+
+    if ($result) {
+        while ($row = $result->fetch_assoc()) {
+            return $row['faturamentomes'];
+        }
+
+    } else {
+        return 0;
+    }
+}
+function diferencaDias($dataInicio, $dataFim) {
+    // Converte as datas para objetos DateTime
+    $inicio = new DateTime($dataInicio);
+    $fim = new DateTime($dataFim);
+    
+    // Calcula a diferença em dias
+    $diferenca = $fim->diff($inicio)->days;
+    
+    return $diferenca;
+}
+
+function obterTotalLocacoes($conexao, $idCaixas) {
+    if (empty($idCaixas)) {
+        return 0; // Retorna 0 se o array estiver vazio
+    }
+
+    $ids = implode(",", $idCaixas);
+
+    $sql = "SELECT SUM((SELECT COUNT(*) FROM registralocado WHERE idcaixaatual IN ($ids))) as totalLocacoes";
+
+            
+    $result = $conexao->query($sql);
+
+    if ($result) {
+        $row = $result->fetch_assoc();
+        return ($row['totalLocacoes'] != null) ? $row['totalLocacoes'] : 0;
+    } else {
+        return 0;
+    }
+}
+function calcularNumeroDias($dataInicio, $dataFim) {
+    // Converte as datas para o formato timestamp
+    $timestampInicio = strtotime($dataInicio);
+    $timestampFim = strtotime($dataFim);
+    
+    // Calcula a diferença em segundos
+    $diferencaSegundos = $timestampFim - $timestampInicio;
+    
+    // Converte a diferença de segundos para dias
+    $diferencaDias = round($diferencaSegundos / (60 * 60 * 24));
+    
+    return $diferencaDias;
+}
+function calcularMedias($conexao, $idCaixas) {
+    if (empty($idCaixas)) {
+        return [
+            "mediaValorConsumo" => 0,
+            "mediaValorQuarto" => 0,
+            "ticketMedioLocacoes" => 0,
+            "somaDinheiro" => 0,
+            "somaCartao" => 0,
+            "somaPix" => 0,
+            "somaValorConsumo" => 0, 
+            "somaValorQuarto" => 0,
+            "numRegistros" => 0 
+        ];
+    }
+
+    $ids = implode(",", $idCaixas);
+    $consulta = "SELECT valorconsumo, valorquarto, pagodinheiro, pagopix, pagocartao FROM registralocado WHERE idcaixaatual IN ($ids)";
+    $resultado = mysqli_query($conexao, $consulta);
+
+    if ($resultado) {
+        $somaValorConsumo = 0;
+        $somaValorQuarto = 0;
+        $somaLocacoes = 0;
+        $numRegistros = 0;
+		$somaDinheiro = 0;
+		$somaCartao = 0;
+		$somaPix = 0;
+
+        while ($registro = mysqli_fetch_assoc($resultado)) {
+            $somaValorConsumo += $registro['valorconsumo'];
+            $somaValorQuarto += $registro['valorquarto'];
+            $somaLocacoes += $registro['valorconsumo'] + $registro['valorquarto'];
+            $somaDinheiro += $registro['pagodinheiro'];
+            $somaCartao += $registro['pagocartao'];
+            $somaPix += $registro['pagopix'];
+            $numRegistros++;
+        }
+
+        if ($numRegistros > 0) {
+            $mediaValorConsumo = $somaValorConsumo / $numRegistros;
+            $mediaValorQuarto = $somaValorQuarto / $numRegistros;
+            $ticketMedioLocacoes = $somaLocacoes / $numRegistros;
+        } else {
+            $mediaValorConsumo = 0;
+            $mediaValorQuarto = 0;
+            $ticketMedioLocacoes = 0;
+        }
+        $faturamentoTotal = $somaValorConsumo + $somaValorQuarto;
+        return [
+            "mediaValorConsumo" => $mediaValorConsumo,
+            "mediaValorQuarto" => $mediaValorQuarto,
+            "ticketMedioLocacoes" => $ticketMedioLocacoes,
+			"somaDinheiro" => $somaDinheiro,
+            "somaCartao" => $somaCartao,
+            "somaPix" => $somaPix,
+			"somaValorConsumo" => $somaValorConsumo,
+			"somaValorQuarto" => $somaValorQuarto,
+			"numRegistros" => $numRegistros,
+			"faturamentoTotal" => $faturamentoTotal
+        ];
+    } else {
+        return ["mediaValorConsumo" => 0, "mediaValorQuarto" => 0, "ticketMedioLocacoes" => 0, "somaDinheiro" => 0, "somaCartao" => 0, "somaPix" => 0, "somaValorConsumo" => 0, "somaValorQuarto" => 0];
+    }
+	
+}
+
+?>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demonstrativo de Resultado</title>
+    <link rel="stylesheet" href="dre_styles.css">
+    <link rel="icon" href="imagens/iconeMI.png" type="image/png" sizes="32x32">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h3>Demonstrativo de Resultado</h3>
+        <div class="options">
+			<form method="post" action="Dre.php">
+                <label for="period">Selecione o período:</label>
+                <select name="period" id="period">
+                    <option value="7">Últimos 7 dias</option>
+                    <option value="15">Últimos 15 dias</option>
+                    <option value="30">Últimos 30 dias</option>
+                    <option value="this_month" selected>Este Mês</option>
+                    <option value="last_month">Mês Passado</option>
+                    <option value="custom">Definir um Período</option>
+                </select>
+        <div id="custom_period" style="display: none; text-align:center;">
+            <label for="data_inicio">Data de Início:</label>
+            <input type="text" id="data_inicio" name="data_inicio"><br>
+            <label for="data_fim">Data de Fim:</label>
+            <input type="text" id="data_fim" name="data_fim"><br>
+        </div>
+    <button type="submit">Enviar</button> <!-- Adicionando botão de envio -->
+</form>	
+	
+        <script>
+	$(function() {
+		$("#period").change(function() {
+			if ($(this).val() == 'custom') {
+				$("#custom_period").show();
+			} else {
+				$("#custom_period").hide();
+			}
+		});
+
+		$("#data_inicio, #data_fim").datepicker({
+			dateFormat: 'dd/mm/yy', // Formato de exibição da data
+			onSelect: function(dateText) {
+				// Define os valores dos campos hidden da data inicial e final
+				$("#data_inicio_hidden").val(formatarData(dateText));
+				$("#data_fim_hidden").val(formatarData(dateText));
+			}
+		});
+
+		function formatarData(data) {
+			var partes = data.split("/");
+			return partes[2] + "-" + partes[1] + "-" + partes[0] + " 00:00:00";
+		}
+
+		$("#submit_button").click(function() {
+			// Obter as datas dos campos hidden
+			var dataInicio = $("#data_inicio_hidden").val();
+			var dataFim = $("#data_fim_hidden").val();
+
+			// Converter as datas para objetos Date
+			var inicio = new Date(dataInicio);
+			var fim = new Date(dataFim);
+
+			// Verificar se a primeira data é menor que a segunda data
+			if (inicio >= fim) {
+				// Exibir mensagem de erro
+				alert("A data de início deve ser anterior à data de fim.");
+				return; // Impedir o envio do formulário
+			}
+
+			// Se a verificação passar, enviar os valores via POST para a página dre.php
+			$.post('Dre.php', {
+				valor: 'custom',
+				data_inicio: dataInicio,
+				data_fim: dataFim
+			}, function(response) {
+				// Se desejar, você pode manipular a resposta aqui
+				console.log(response);
+			});
+		});
+	});
+
+
+</script>
+		</div>
+        <div class="sales">
+    <h4>Vendas no Período</h4>
+    <p><span class="title">Quant. de Hospedagens:</span> <span class="value"><?php echo $numLocacoes; ?></span></p>
+    <p><span class="title">Valor Hospedagem:</span> <span class="value"><?php echo "R$ " . number_format($medias["somaValorQuarto"], 2, ',', '.'); ?></span></p>
+    <p><span class="title">Valor Consumo:</span> <span class="value"><?php echo "R$ " . number_format($medias["somaValorConsumo"], 2, ',', '.'); ?></span></p>
+    <p><span class="title">Valor Total:</span> <span class="value"><?php echo "R$ " . number_format(($faturamentoMes), 2, ',', '.'); ?></span></p>
+</div>
+<div class="sales">
+    <h4>Médias</h4>
+    <p><span class="title">Média Hospedagem:</span> <span class="value"><?php echo "R$ " . number_format($medias["mediaValorQuarto"], 2, ',', '.'); ?></span></p>
+    <p><span class="title">Média Consumo:</span> <span class="value"><?php echo "R$ " . number_format($medias["mediaValorConsumo"], 2, ',', '.'); ?></span></p>
+    <p><span class="title">Ticket Médio:</span> <span class="value"><?php echo "R$ " . number_format($medias["ticketMedioLocacoes"], 2, ',', '.'); ?></span></p> 
+    <p><span class="title">Média Diária (valor):</span> <span class="value"><?php echo "R$ " . number_format(($faturamentoAtual / $numDias), 2, ',', '.'); ?></span></p>
+    <p><span class="title">Média Diária (qnt):</span> <span class="value"><?php echo number_format(($numLocacoes / $numDias), 0, ',', '.'); ?></span></p>
+</div>
+<div class="sales">
+    <h4>Recebimentos</h4>
+    <p><span class="title">Dinheiro:</span> <span class="value"><?php echo "R$ " . number_format($medias["somaDinheiro"], 2, ',', '.'); ?></span></p>
+    <p><span class="title">Cartão Débito:</span> <span class="value"><?php echo "R$ " . number_format($medias["somaCartao"], 2, ',', '.'); ?></span></p>
+    <p><span class="title">Pix:</span> <span class="value"><?php echo "R$ " . number_format($medias["somaPix"], 2, ',', '.'); ?></span></p>
+</div>
+
+    </div>
+	<?php include 'menu.php'; ?> <!-- Inclui o menu -->
+</body>
+</html>
+

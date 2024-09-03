@@ -1,2 +1,2 @@
 id, horaabre, usuarioabre, saldoabre, horafecha, usuariofecha, saldofecha
-157, 2024-08-30 15:49:35, fe, 0.0, 
+161, 2024-09-03 13:00:57, fe, 0.0, 

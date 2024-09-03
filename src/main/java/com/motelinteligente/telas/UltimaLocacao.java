@@ -161,7 +161,7 @@ public class UltimaLocacao extends javax.swing.JFrame {
         txtNumPessoas.setText(String.valueOf(numPessoas));
         txtInicio.setText(String.valueOf(horaInicio));
         txtFim.setText(String.valueOf(horaFim));
-        txtValorQuarto.setText(String.valueOf(valorQuarto+desconto-acrescimo));
+        txtValorQuarto.setText(String.valueOf(valorQuarto));
         txtConsumo.setText(String.valueOf(valorConsumo));
         txtValorTotal.setText(String.valueOf(valorQuarto + valorConsumo - desconto + acrescimo));
 
