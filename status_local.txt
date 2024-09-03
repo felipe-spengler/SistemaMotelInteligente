@@ -1,2 +1,2 @@
 numeroquarto, atualquarto, horastatus, periodo, adicional
-6, limpeza, 2024-09-03 17:26:04, 2:30, 30.0
+8, livre, 2024-09-03 17:50:41, 2:30, 30.0
