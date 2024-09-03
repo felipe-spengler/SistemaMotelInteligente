@@ -31,4 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Ignorar arquivos específicos
 src/main/java/com/motelinteligente/dados/fazconexao.java
+src/main/java/Telas/MinhaClasse.java
