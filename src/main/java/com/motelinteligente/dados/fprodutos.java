@@ -34,7 +34,6 @@ public class fprodutos {
             link = new fazconexao().conectar();
             String consultaSQL = "select * from produtos order by idproduto";
             PreparedStatement statement = link.prepareStatement(consultaSQL);
-            logger.debug("Executando consulta SQL: {}", consultaSQL);
             ResultSet resultado = statement.executeQuery();
 
             // Processar o resultado
@@ -83,7 +82,6 @@ public class fprodutos {
             PreparedStatement statement = link.prepareStatement(estoqueQuery);
             statement.setInt(1, idProduto);
             ResultSet resultado = statement.executeQuery();
-            logger.debug("Executando consulta SQL: {}", estoqueQuery);
             if (resultado.next()) {
                 String estoque = resultado.getString("estoque");
                 try {
@@ -132,7 +130,6 @@ public class fprodutos {
         try {
             link = new fazconexao().conectar();
             PreparedStatement statement = link.prepareStatement(consultaSQL);
-            logger.debug("Executando consulta SQL: {}", consultaSQL);
 
             statement.setInt(1, numero);
             ResultSet resultado = statement.executeQuery();
@@ -176,7 +173,6 @@ public class fprodutos {
 
         try {
             link = new fazconexao().conectar();
-            logger.debug("Executando consulta SQL: {}", consultaSQL);
             PreparedStatement statement = link.prepareStatement(consultaSQL);
             statement.setInt(1, dados.getIdProduto());
             statement.setString(2, dados.getDescricao());
@@ -218,7 +214,6 @@ public class fprodutos {
         Connection link = null;
 
         try {
-            logger.debug("Executando consulta SQL: {}", consultaSQL);
             link = new fazconexao().conectar();
             PreparedStatement statement = link.prepareStatement(consultaSQL);
             int n = statement.executeUpdate();
@@ -257,7 +252,6 @@ public class fprodutos {
         try {
             link = new fazconexao().conectar();
             Statement statement = link.createStatement();
-            logger.debug("Executando consulta SQL: {}", consultaSQL);
 
             ResultSet resultado = statement.executeQuery(consultaSQL);
             if (resultado.next()) {
@@ -296,7 +290,6 @@ public class fprodutos {
         Connection link = null;
 
         try {
-            logger.debug("Executando consulta SQL: {}", consultaSQL);
             link = new fazconexao().conectar();
             PreparedStatement statement = link.prepareStatement(consultaSQL);
             int n = statement.executeUpdate();
@@ -333,7 +326,6 @@ public class fprodutos {
         try {
             link = new fazconexao().conectar();
             Statement statement = link.createStatement();
-            logger.debug("Executando consulta SQL: {}", consultaSQL);
             ResultSet resultado = statement.executeQuery(consultaSQL);
             if (resultado.next()) {
                 return (String) resultado.getString("descricao");
@@ -367,7 +359,6 @@ public class fprodutos {
             link = new fazconexao().conectar();
             PreparedStatement statement = link.prepareStatement(consultaSQL);
             statement.setString(1, desc);
-            logger.debug("Executando consulta SQL: {}", consultaSQL);
             ResultSet resultado = statement.executeQuery();
             if (resultado.next()) {
                 idProduto = resultado.getInt("idproduto");
@@ -411,7 +402,6 @@ public class fprodutos {
             PreparedStatement statement = link.prepareStatement(consultaSQL);
             statement.setInt(1, idLocacao);
             statement.setInt(2, idProduto);
-            logger.debug("Executando consulta SQL: {}", consultaSQL);
             statement.executeUpdate();
             statement.close();
             link.close();
@@ -440,7 +430,6 @@ public class fprodutos {
         try {
             link = new fazconexao().conectar();
             Statement statement = link.createStatement();
-            logger.debug("Executando consulta SQL: {}", consultaSQL);
 
             ResultSet resultado = statement.executeQuery(consultaSQL);
             if (resultado.next()) {
@@ -475,7 +464,6 @@ public class fprodutos {
             // Consulta SQL para inserção de dados na tabela prevendidos
             String consultaSQL = "INSERT INTO prevendidos (idlocacao, idproduto, quantidade) VALUES (?, ?, ?)";
             PreparedStatement statement = link.prepareStatement(consultaSQL);
-            logger.debug("Executando consulta SQL: {}", consultaSQL);
             // Define os parâmetros da consulta
             statement.setInt(1, idLocacao);
             statement.setInt(2, idProduto);
