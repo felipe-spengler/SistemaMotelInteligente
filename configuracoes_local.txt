@@ -1,2 +1,0 @@
-logoffcaixa, estoque, sistemaescolhe, meuip, flagMesmoUserCaixa, limitadesconto, isRunning, conexoes, id
-1, 1, 1, 138.99.249.228, 1, 15, 0, 0, 1

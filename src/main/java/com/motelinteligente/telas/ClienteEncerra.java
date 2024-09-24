@@ -210,7 +210,7 @@ public class ClienteEncerra extends javax.swing.JFrame {
 
         lblHoraAdicional.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         lblHoraAdicional.setForeground(new java.awt.Color(51, 51, 255));
-        lblHoraAdicional.setText("label");
+        lblHoraAdicional.setText("R$0.00");
 
         jLabel9.setFont(new java.awt.Font("Segoe UI", 0, 20)); // NOI18N
         jLabel9.setText("Tempo Locado:");

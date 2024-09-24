@@ -15,7 +15,12 @@
         <java.version>17</java.version>
     </properties>
     <dependencies>
-       
+        <!-- Dependência para OpenCV -->
+        <dependency>
+            <groupId>org.bytedeco</groupId>
+            <artifactId>javacv-platform</artifactId>
+            <version>1.5.7</version> <!-- ou uma versão mais recente -->
+        </dependency>
         <dependency>
             <groupId>com.fazecast</groupId>
             <artifactId>jSerialComm</artifactId>

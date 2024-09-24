@@ -63,7 +63,7 @@ public class MotelInteligenteApplication {
                             if (linhasAfetadas > 0) {
                                 System.out.println("Campo 'meuip' atualizado com sucesso.");
                             } else {
-                                System.out.println("Nenhuma linha foi atualizada.");
+                                System.out.println("O ip nao pode ser atualizado.");
                             }
 
                             // Fechar recursos
@@ -91,7 +91,7 @@ public class MotelInteligenteApplication {
 
         @PostMapping(value = "/receberNumeroQuarto", consumes = "text/plain", produces = "text/plain")
         public ResponseEntity<String> receberNumeroQuarto(@RequestBody String numeroQuarto) {
-            //logger.debug("Recebeu do sistema Spring Boot: " + numeroQuarto);
+            System.out.println("Recebeu do sistema Spring Boot: " + numeroQuarto);
             String[] partes = numeroQuarto.split(" ");
 
             if (partes.length != 2) {
