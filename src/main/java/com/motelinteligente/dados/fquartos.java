@@ -14,8 +14,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.sql.Timestamp;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class fquartos {
+
+    private static final Logger logger = LoggerFactory.getLogger(fprodutos.class);
 
     public List<CarregaQuarto> uploadQuartos() {
         List<CarregaQuarto> quartos = new ArrayList<>();
@@ -24,6 +28,7 @@ public class fquartos {
         String status;
         String tipo;
         Connection link = null;
+
         try {
             link = new fazconexao().conectar();
             String consultaSQL = "select * from quartos order by numeroquarto";
@@ -53,6 +58,8 @@ public class fquartos {
             link.close();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e);
+            logger.error("Erro : fquartos() : ", e);
+
         } finally {
             try {
                 // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
@@ -61,6 +68,7 @@ public class fquartos {
                 }
             } catch (SQLException e) {
                 JOptionPane.showMessageDialog(null, e);
+                logger.error("Erro : fquartos() : ", e);
             }
         }
         return quartos;
@@ -94,6 +102,7 @@ public class fquartos {
             statement.close();
             link.close();
         } catch (Exception e) {
+            logger.error("Erro : fquartos() : ", e);
             JOptionPane.showMessageDialog(null, e);
         } finally {
             try {
@@ -102,6 +111,7 @@ public class fquartos {
                     link.close();
                 }
             } catch (SQLException e) {
+                logger.error("Erro : fquartos() : ", e);
                 JOptionPane.showMessageDialog(null, e);
             }
         }
@@ -127,7 +137,8 @@ public class fquartos {
                 return true;
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null,"Erro setStatus " + e);
+            logger.error("Erro : fquartos() : ", e);
+            JOptionPane.showMessageDialog(null, "Erro setStatus " + e);
         } finally {
             try {
                 // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
@@ -135,15 +146,17 @@ public class fquartos {
                     link.close();
                 }
             } catch (SQLException e) {
+                logger.error("Erro : fquartos() : ", e);
                 JOptionPane.showMessageDialog(null, e);
             }
         }
         return false;
     }
+
     public boolean setStatusHorario(int numero, String status, Timestamp hora) {
         Date dataAtual = new Date();
 
-        String consultaSQL = "update status set atualquarto='" + status + "' , horastatus= '" + hora 
+        String consultaSQL = "update status set atualquarto='" + status + "' , horastatus= '" + hora
                 + "' where numeroquarto= '" + numero + "'";
 
         int n = 0;
@@ -158,7 +171,8 @@ public class fquartos {
                 return true;
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null,"Erro setStatus " + e);
+            logger.error("Erro : fquartos() : ", e);
+            JOptionPane.showMessageDialog(null, "Erro setStatus " + e);
         } finally {
             try {
                 // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
@@ -166,6 +180,7 @@ public class fquartos {
                     link.close();
                 }
             } catch (SQLException e) {
+                logger.error("Erro : fquartos() : ", e);
                 JOptionPane.showMessageDialog(null, e);
             }
         }
@@ -190,6 +205,7 @@ public class fquartos {
                 return true;
             }
         } catch (SQLException e) {
+            logger.error("Erro : fquartos() : ", e);
             JOptionPane.showMessageDialog(null, e);
         } finally {
             try {
@@ -198,6 +214,7 @@ public class fquartos {
                     link.close();
                 }
             } catch (SQLException e) {
+                logger.error("Erro : fquartos() : ", e);
                 JOptionPane.showMessageDialog(null, e);
             }
         }
@@ -250,6 +267,7 @@ public class fquartos {
             }
         } catch (Exception e) {
             JOptionPane.showConfirmDialog(null, e);
+            logger.error("Erro : fquartos() : ", e);
             return false;
         } finally {
             try {
@@ -259,6 +277,7 @@ public class fquartos {
                 }
             } catch (SQLException e) {
                 JOptionPane.showMessageDialog(null, e);
+                logger.error("Erro : fquartos() : ", e);
             }
         }
 
@@ -288,6 +307,7 @@ public class fquartos {
                 return false;
             }
         } catch (Exception e) {
+            logger.error("Erro : fquartos() : ", e);
             JOptionPane.showConfirmDialog(null, e);
             return false;
         } finally {
@@ -297,6 +317,7 @@ public class fquartos {
                     link.close();
                 }
             } catch (SQLException e) {
+                logger.error("Erro : fquartos() : ", e);
                 JOptionPane.showMessageDialog(null, e);
             }
         }
@@ -317,6 +338,7 @@ public class fquartos {
                 return 5;
             }
         } catch (SQLException e) {
+            logger.error("Erro : fquartos() : ", e);
             JOptionPane.showMessageDialog(null, e);
         } finally {
             try {
@@ -325,6 +347,7 @@ public class fquartos {
                     link.close();
                 }
             } catch (SQLException e) {
+                logger.error("Erro : fquartos() : ", e);
                 JOptionPane.showMessageDialog(null, e);
             }
         }
@@ -362,6 +385,7 @@ public class fquartos {
                 return false;
             }
         } catch (Exception e) {
+            logger.error("Erro : fquartos() : ", e);
             JOptionPane.showConfirmDialog(null, e);
             return false;
         } finally {
@@ -372,6 +396,7 @@ public class fquartos {
                 }
             } catch (SQLException e) {
                 JOptionPane.showMessageDialog(null, e);
+                logger.error("Erro : fquartos() : ", e);
             }
         }
     }
@@ -402,6 +427,7 @@ public class fquartos {
             }
         } catch (Exception e) {
             JOptionPane.showConfirmDialog(null, e);
+            logger.error("Erro : fquartos() : ", e);
             return true;
         } finally {
             try {
@@ -410,6 +436,7 @@ public class fquartos {
                     link.close();
                 }
             } catch (SQLException e) {
+                logger.error("Erro : fquartos() : ", e);
                 JOptionPane.showMessageDialog(null, e);
             }
         }
@@ -440,6 +467,7 @@ public class fquartos {
                     link.close();
                 }
             } catch (SQLException e) {
+                logger.error("Erro : fquartos() : ", e);
                 JOptionPane.showMessageDialog(null, e);
             }
         }
@@ -482,7 +510,8 @@ public class fquartos {
                 return false;
             }
         } catch (Exception e) {
-            JOptionPane.showConfirmDialog(null, "Erro addRegistro(): " +e);
+            logger.error("Erro : fquartos() : ", e);
+            JOptionPane.showConfirmDialog(null, "Erro addRegistro(): " + e);
             return false;
         } finally {
             try {
@@ -491,24 +520,26 @@ public class fquartos {
                     link.close();
                 }
             } catch (SQLException e) {
+                logger.error("Erro : fquartos() : ", e);
                 JOptionPane.showMessageDialog(null, e);
             }
         }
 
     }
 
-    public void salvaLocacao(int idPassado,Timestamp horaInicio, Timestamp horaFim, float valorDoQuarto, float valorConsumo, float valD, float valP, float valC) {
+    public void salvaLocacao(int idPassado, Timestamp horaInicio, Timestamp horaFim, float valorDoQuarto, float valorConsumo, float valD, float valP, float valC) {
         configGlobal config = configGlobal.getInstance();
         int idCaixa = config.getCaixa();
-        String consultaSQL = "UPDATE registralocado SET horafim='" + horaFim +
-            "', horainicio='" + horaInicio + // Adicione as aspas simples aqui
-            "', valorquarto=" + valorDoQuarto +
-            ", valorconsumo=" + valorConsumo +
-            ", pagodinheiro=" + valD +
-            ", pagopix=" + valP +
-            ", pagocartao=" + valC +
-            ", idcaixaatual=" + idCaixa +
-            " WHERE idlocacao=" + idPassado;
+        String consultaSQL = "UPDATE registralocado SET horafim='" + horaFim
+                + "', horainicio='" + horaInicio
+                + // Adicione as aspas simples aqui
+                "', valorquarto=" + valorDoQuarto
+                + ", valorconsumo=" + valorConsumo
+                + ", pagodinheiro=" + valD
+                + ", pagopix=" + valP
+                + ", pagocartao=" + valC
+                + ", idcaixaatual=" + idCaixa
+                + " WHERE idlocacao=" + idPassado;
         Connection link = null;
         try {
             link = new fazconexao().conectar();
@@ -523,6 +554,7 @@ public class fquartos {
                 statement.close();
             }
         } catch (Exception e) {
+            logger.error("Erro : fquartos() : ", e);
             JOptionPane.showConfirmDialog(null, e);
         } finally {
             try {
@@ -531,6 +563,7 @@ public class fquartos {
                     link.close();
                 }
             } catch (SQLException e) {
+                logger.error("Erro : fquartos() : ", e);
                 JOptionPane.showMessageDialog(null, e);
             }
         }
@@ -559,6 +592,7 @@ public class fquartos {
                 return false;
             }
         } catch (Exception e) {
+            logger.error("Erro : fquartos() : ", e);
             JOptionPane.showConfirmDialog(null, e);
             return false;
         } finally {
@@ -600,6 +634,7 @@ public class fquartos {
                 return false;
             }
         } catch (Exception e) {
+            logger.error("Erro : fquartos() : ", e);
             JOptionPane.showConfirmDialog(null, e);
             return false;
         } finally {
@@ -609,6 +644,7 @@ public class fquartos {
                     link.close();
                 }
             } catch (SQLException e) {
+                logger.error("Erro : fquartos() : ", e);
                 JOptionPane.showMessageDialog(null, e);
             }
         }
@@ -629,6 +665,7 @@ public class fquartos {
                 statement.close();
             }
         } catch (Exception e) {
+            logger.error("Erro : fquartos() : ", e);
             JOptionPane.showConfirmDialog(null, e);
         } finally {
             try {
@@ -637,6 +674,7 @@ public class fquartos {
                     link.close();
                 }
             } catch (SQLException e) {
+                logger.error("Erro : fquartos() : ", e);
                 JOptionPane.showMessageDialog(null, e);
             }
         }
@@ -656,6 +694,7 @@ public class fquartos {
                 statement.close();
             }
         } catch (Exception e) {
+            logger.error("Erro : fquartos() : ", e);
             JOptionPane.showConfirmDialog(null, e);
         } finally {
             try {
@@ -664,6 +703,7 @@ public class fquartos {
                     link.close();
                 }
             } catch (SQLException e) {
+                logger.error("Erro : fquartos() : ", e);
                 JOptionPane.showMessageDialog(null, e);
             }
         }
@@ -684,6 +724,7 @@ public class fquartos {
                 statement.close();
             }
         } catch (Exception e) {
+            logger.error("Erro : fquartos() : ", e);
             JOptionPane.showConfirmDialog(null, e);
         } finally {
             try {
@@ -692,6 +733,7 @@ public class fquartos {
                     link.close();
                 }
             } catch (SQLException e) {
+                logger.error("Erro : fquartos() : ", e);
                 JOptionPane.showMessageDialog(null, e);
             }
         }
@@ -733,7 +775,8 @@ public class fquartos {
                 statement.close();
             }
         } catch (Exception e) {
-            JOptionPane.showConfirmDialog(null, "Erro altReg() " +e);
+            logger.error("Erro : fquartos() : ", e);
+            JOptionPane.showConfirmDialog(null, "Erro altReg() " + e);
         } finally {
             try {
                 // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
@@ -741,6 +784,7 @@ public class fquartos {
                     link.close();
                 }
             } catch (SQLException e) {
+                logger.error("Erro : fquartos() : ", e);
                 JOptionPane.showMessageDialog(null, e);
             }
         }
@@ -772,7 +816,7 @@ public class fquartos {
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e);
-            JOptionPane.showConfirmDialog(null, e);
+            logger.error("Erro : fquartos() : ", e);
             return false;
         } finally {
             try {
@@ -781,6 +825,7 @@ public class fquartos {
                     link.close();
                 }
             } catch (SQLException e) {
+                logger.error("Erro : fquartos() : ", e);
                 JOptionPane.showMessageDialog(null, e);
             }
         }
@@ -802,6 +847,7 @@ public class fquartos {
                 statement.close();
             }
         } catch (Exception e) {
+            logger.error("Erro : fquartos() : ", e);
             JOptionPane.showConfirmDialog(null, e);
         } finally {
             try {
@@ -810,6 +856,7 @@ public class fquartos {
                     link.close();
                 }
             } catch (SQLException e) {
+                logger.error("Erro : fquartos() : ", e);
                 JOptionPane.showMessageDialog(null, e);
             }
         }
@@ -831,6 +878,7 @@ public class fquartos {
                 statement.close();
             }
         } catch (Exception e) {
+            logger.error("Erro : fquartos() : ", e);
             JOptionPane.showConfirmDialog(null, e);
         } finally {
             try {
@@ -839,6 +887,7 @@ public class fquartos {
                     link.close();
                 }
             } catch (SQLException e) {
+                logger.error("Erro : fquartos() : ", e);
                 JOptionPane.showMessageDialog(null, e);
             }
         }
@@ -860,6 +909,7 @@ public class fquartos {
                 statement.close();
             }
         } catch (Exception e) {
+            logger.error("Erro : fquartos() : ", e);
             JOptionPane.showConfirmDialog(null, e);
         }
         return 0;
@@ -882,6 +932,7 @@ public class fquartos {
                 statement.close();
             }
         } catch (Exception e) {
+            logger.error("Erro : fquartos() : ", e);
             JOptionPane.showConfirmDialog(null, e);
         } finally {
             try {
@@ -890,6 +941,7 @@ public class fquartos {
                     link.close();
                 }
             } catch (SQLException e) {
+                logger.error("Erro : fquartos() : ", e);
                 JOptionPane.showMessageDialog(null, e);
             }
         }
@@ -912,6 +964,7 @@ public class fquartos {
                 statement.close();
             }
         } catch (Exception e) {
+            logger.error("Erro : fquartos() : ", e);
             JOptionPane.showConfirmDialog(null, e);
         } finally {
             try {
@@ -920,6 +973,7 @@ public class fquartos {
                     link.close();
                 }
             } catch (SQLException e) {
+                logger.error("Erro : fquartos() : ", e);
                 JOptionPane.showMessageDialog(null, e);
             }
         }
@@ -953,6 +1007,7 @@ public class fquartos {
                 statement.close();
             }
         } catch (Exception e) {
+            logger.error("Erro : fquartos() : ", e);
             JOptionPane.showConfirmDialog(null, e);
         } finally {
             try {
@@ -961,6 +1016,7 @@ public class fquartos {
                     link.close();
                 }
             } catch (SQLException e) {
+                logger.error("Erro : fquartos() : ", e);
                 JOptionPane.showMessageDialog(null, e);
             }
         }
@@ -997,6 +1053,7 @@ public class fquartos {
                 //return false;
             }
         } catch (Exception e) {
+            logger.error("Erro : fquartos() : ", e);
             JOptionPane.showConfirmDialog(null, e);
         } finally {
             try {
@@ -1005,6 +1062,7 @@ public class fquartos {
                     link.close();
                 }
             } catch (SQLException e) {
+                logger.error("Erro : fquartos() : ", e);
                 JOptionPane.showMessageDialog(null, e);
             }
         }
@@ -1034,6 +1092,7 @@ public class fquartos {
                 //return false;
             }
         } catch (Exception e) {
+            logger.error("Erro : fquartos() : ", e);
             JOptionPane.showConfirmDialog(null, e);
         } finally {
             try {
@@ -1042,6 +1101,7 @@ public class fquartos {
                     link.close();
                 }
             } catch (SQLException e) {
+                logger.error("Erro : fquartos() : ", e);
                 JOptionPane.showMessageDialog(null, e);
             }
         }
@@ -1069,6 +1129,7 @@ public class fquartos {
                 statement.close();
             }
         } catch (Exception e) {
+            logger.error("Erro : fquartos() : ", e);
             JOptionPane.showConfirmDialog(null, e);
         } finally {
             try {
@@ -1076,6 +1137,7 @@ public class fquartos {
                     link.close();
                 }
             } catch (SQLException e) {
+                logger.error("Erro : fquartos() : ", e);
                 JOptionPane.showMessageDialog(null, e);
             }
         }
@@ -1102,6 +1164,7 @@ public class fquartos {
                 return true;
             }
         } catch (SQLException e) {
+            logger.error("Erro : fquartos() : ", e);
             JOptionPane.showMessageDialog(null, e);
         } finally {
             try {
@@ -1109,6 +1172,7 @@ public class fquartos {
                     link.close();
                 }
             } catch (SQLException e) {
+                logger.error("Erro : fquartos() : ", e);
                 JOptionPane.showMessageDialog(null, e);
             }
         }

@@ -5,21 +5,22 @@
 package com.motelinteligente.dados;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import javax.swing.JOptionPane;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.text.BadLocationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author MOTEL
  */
 public class ffuncionario {
+
+    private static final Logger logger = LoggerFactory.getLogger(fprodutos.class);
 
     public int totalRegistros;
 
@@ -50,7 +51,7 @@ public class ffuncionario {
             statement.close();
             link.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Erro : ffuncionario(): ", e);
         } finally {
             try {
                 // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
@@ -78,6 +79,7 @@ public class ffuncionario {
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e);
+            logger.error("Erro : ffuncionario(): ", e);
         } finally {
             try {
                 // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
@@ -120,6 +122,8 @@ public class ffuncionario {
                 return false;
             }
         } catch (Exception e) {
+            logger.error("Erro : ffuncionario(): ", e);
+
             JOptionPane.showConfirmDialog(null, e);
             return false;
         } finally {
@@ -161,6 +165,7 @@ public class ffuncionario {
                 }
             }
         } catch (SQLException e) {
+            logger.error("Erro : ffuncionario(): ", e);
             JOptionPane.showConfirmDialog(null, e);
             return true;
         } finally {
@@ -189,13 +194,14 @@ public class ffuncionario {
             statement.setString(1, texto_login);
             statement.setString(2, texto_senha);
 
-            try (ResultSet resultado = statement.executeQuery()) {
+            try ( ResultSet resultado = statement.executeQuery()) {
                 if (resultado.next()) {
                     cargo = resultado.getString("cargofuncionario"); // Supondo que a coluna na tabela seja chamada "cargo".
                     return cargo; // Retorna o cargo do usuário.
                 }
             }
         } catch (SQLException e) {
+            logger.error("Erro : ffuncionario(): ", e);
             JOptionPane.showConfirmDialog(null, e);
         } finally {
             try {

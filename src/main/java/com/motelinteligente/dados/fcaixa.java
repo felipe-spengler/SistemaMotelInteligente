@@ -14,12 +14,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.swing.JOptionPane;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author MOTEL
  */
 public class fcaixa {
+
+    private static final Logger logger = LoggerFactory.getLogger(fprodutos.class);
 
     public boolean abrirCaixa(float valorAbrir) {
 
@@ -51,6 +55,8 @@ public class fcaixa {
                 return true;
             }
         } catch (SQLException e) {
+                        logger.error("Erro : fcaixa(): ", e);
+
             JOptionPane.showMessageDialog(null, e);
         } finally {
             try {
@@ -93,6 +99,7 @@ public class fcaixa {
                 return true;
             }
         } catch (SQLException e) {
+            logger.error("Erro : fcaixa(): ", e);
             JOptionPane.showMessageDialog(null, e);
         } finally {
             try {
@@ -122,6 +129,7 @@ public class fcaixa {
                 statement.close();
             }
         } catch (Exception e) {
+            logger.error("Erro : fcaixa(): ", e);
             JOptionPane.showConfirmDialog(null, e);
         } finally {
             try {
@@ -159,6 +167,7 @@ public class fcaixa {
             statement.close();
             return val;
         } catch (Exception e) {
+            logger.error("Erro : fcaixa(): ", e);
             JOptionPane.showConfirmDialog(null, e);
         } finally {
             try {
@@ -189,6 +198,7 @@ public class fcaixa {
             resultado.close();
             statement.close();
         } catch (Exception e) {
+            logger.error("Erro : fcaixa(): ", e);
             JOptionPane.showMessageDialog(null, e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
         } finally {
             try {
@@ -220,6 +230,7 @@ public class fcaixa {
                 statement.close();
             }
         } catch (Exception e) {
+            logger.error("Erro : fcaixa(): ", e);
             JOptionPane.showConfirmDialog(null, e);
         } finally {
             try {
@@ -250,6 +261,7 @@ public class fcaixa {
                 statement.close();
             }
         } catch (Exception e) {
+            logger.error("Erro : fcaixa(): ", e);
             JOptionPane.showConfirmDialog(null, e);
         } finally {
             try {
@@ -280,6 +292,7 @@ public class fcaixa {
                 statement.close();
             }
         } catch (Exception e) {
+            logger.error("Erro : fcaixa(): ", e);
             JOptionPane.showConfirmDialog(null, e);
         } finally {
             try {
