@@ -113,7 +113,9 @@ public class MotelInteligenteApplication {
 
             } else {
                 int quartoEmFoco = Integer.parseInt(numero);
-                if (acao.equals("reservar")) {
+                if (acao.equals("reproduzir")) {
+                    new playSound().playSound("som/mensagem conferencia.wav");
+                }else if (acao.equals("reservar")) {
                     if (quartoEmFoco != 0) {
                         mudaStatusNaCache(quartoEmFoco, "reservado");
                         configGlobal config = configGlobal.getInstance();

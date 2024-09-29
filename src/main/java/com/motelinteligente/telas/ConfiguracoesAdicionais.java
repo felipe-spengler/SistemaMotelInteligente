@@ -220,11 +220,9 @@ public class ConfiguracoesAdicionais extends javax.swing.JFrame {
         if (checkLogoff.isSelected()) {
             funcaoSet("logoffcaixa", true);
             config.setLogoffecharcaixa(true);
-            System.out.println("setou logoff true");
         } else {
             funcaoSet("logoffcaixa", false);
             config.setLogoffecharcaixa(false);
-            System.out.println("setou logoff false");
         }
 
     }//GEN-LAST:event_checkLogoffActionPerformed
@@ -234,11 +232,9 @@ public class ConfiguracoesAdicionais extends javax.swing.JFrame {
         if (checkEstoque.isSelected()) {
             funcaoSet("estoque", true);
             config.setControlaEstoque(true);
-            System.out.println("setou estoque true");
         } else {
             funcaoSet("estoque", false);
             config.setControlaEstoque(false);
-            System.out.println("setou estoque false");
         }
     }//GEN-LAST:event_checkEstoqueActionPerformed
 
@@ -247,11 +243,9 @@ public class ConfiguracoesAdicionais extends javax.swing.JFrame {
         if (fechaCaixaUser.isSelected()) {
             funcaoSet("fechaUserCaixa", true);
             config.setFlagMesmoUserCaixa(true);
-            System.out.println("setou flag mesmo usuario caixa true");
         } else {
             funcaoSet("fechaUserCaixa", false);
             config.setFlagMesmoUserCaixa(false);
-            System.out.println("setou flag mesmo usuario caixa false");
         }
     }//GEN-LAST:event_fechaCaixaUserActionPerformed
 
@@ -281,7 +275,7 @@ public class ConfiguracoesAdicionais extends javax.swing.JFrame {
                     link.close();
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                JOptionPane.showConfirmDialog(null, e);
             }
         }
         
@@ -309,7 +303,7 @@ public class ConfiguracoesAdicionais extends javax.swing.JFrame {
                     link.close();
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                JOptionPane.showConfirmDialog(null, e);
             }
         }
     }

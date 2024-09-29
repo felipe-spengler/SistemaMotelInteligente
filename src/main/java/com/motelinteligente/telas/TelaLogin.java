@@ -164,7 +164,6 @@ public class TelaLogin extends javax.swing.JFrame {
         try {
             frame.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/imagens/iconeMotel.png")));
         } catch (Exception e) {
-            System.out.println(e.toString());
         }
     }
 
@@ -216,7 +215,6 @@ public class TelaLogin extends javax.swing.JFrame {
         texto_senha = txt_senha.getText();
         String cargo = new ffuncionario().verificaLogin(texto_login, texto_senha);
         if (cargo != null) {
-            System.out.println("obteve cargo");
             BarraCarregar progressDialog = new BarraCarregar();
             progressDialog.carregarDados();
 

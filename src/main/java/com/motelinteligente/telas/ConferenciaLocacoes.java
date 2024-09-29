@@ -464,7 +464,6 @@ public class ConferenciaLocacoes extends javax.swing.JFrame {
                 horaA2 = String.format("%02d", (int) horaAb1.getValue());
                 minA2 = String.format("%02d", (int) minAb1.getValue());
                 dataAbre2 = dataAbre2 + " " + horaA2 + ":" + minA2;
-                System.out.println(dataAbre2);
 
             } else {
                 dataAbre2 = null;
@@ -527,7 +526,6 @@ public class ConferenciaLocacoes extends javax.swing.JFrame {
                 stmt.setString(index, dataFecha2);
                 index++;
             }
-            System.out.println(stmt.toString());
             ResultSet resultSet = stmt.executeQuery();
 
             while (resultSet.next()) {
@@ -538,7 +536,7 @@ public class ConferenciaLocacoes extends javax.swing.JFrame {
             // chama a funcao para carregar a tabela
             carregaTabela(idList);
         } catch (Exception e) {
-            System.out.println(e);
+            JOptionPane.showConfirmDialog(null, e);
         }
     }//GEN-LAST:event_btgerarActionPerformed
     public void carregaTabela(ArrayList<Integer> idList) {

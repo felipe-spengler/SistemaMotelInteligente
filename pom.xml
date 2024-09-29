@@ -15,12 +15,12 @@
         <java.version>17</java.version>
     </properties>
     <dependencies>
-        <!-- Dependência para OpenCV -->
         <dependency>
-            <groupId>org.bytedeco</groupId>
-            <artifactId>javacv-platform</artifactId>
-            <version>1.5.7</version> <!-- ou uma versão mais recente -->
+            <groupId>com.googlecode.soundlibs</groupId>
+            <artifactId>mp3spi</artifactId>
+            <version>1.9.5.4</version>
         </dependency>
+        
         <dependency>
             <groupId>com.fazecast</groupId>
             <artifactId>jSerialComm</artifactId>

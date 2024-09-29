@@ -33,24 +33,23 @@ public class NumeroPorExtenso {
         String extenso = "";
 
         // Parte inteira
-       if (parteInteira == 100) {
-        extenso += "cem ";
-    } else if (parteInteira >= 1000) {
-        int milhar = parteInteira / 1000;
-        extenso += UNIDADES[milhar] + " mil ";
-        parteInteira %= 1000;
-    }
-
-    if (parteInteira >= 100) {
-        int centena = parteInteira / 100;
-        if (centena == 1 && parteInteira % 100 != 0) {
-            extenso += "cento e ";
-        } else if (centena > 0) {
-            extenso += CENTENAS[centena] + " ";
+        if (parteInteira == 100) {
+            extenso += "cem";
+        } else if (parteInteira >= 1000) {
+            int milhar = parteInteira / 1000;
+            extenso += UNIDADES[milhar] + " mil ";
+            parteInteira %= 1000;
         }
-        parteInteira %= 100;
-        
-    }
+
+        if (parteInteira >= 100) {
+            int centena = parteInteira / 100;
+            if (centena == 1 && parteInteira % 100 != 0) {
+                extenso += "cento e ";
+            } else if (centena > 0) {
+                extenso += CENTENAS[centena] + " ";
+            }
+            parteInteira %= 100;
+        }
 
         if (parteInteira >= 20) {
             int dezena = parteInteira / 10;
@@ -71,6 +70,4 @@ public class NumeroPorExtenso {
 
         return extenso.trim();
     }
-
-
 }

@@ -23,6 +23,7 @@ public class configGlobal {
     private int limiteDesconto;
     private BackupQueueManager backupQueueManager; 
     private static int contadorExecucoes = 0;
+    private int alarmesAtivos = 0;
     
 
     // Construtor privado para evitar a criação de múltiplas instâncias
@@ -36,11 +37,28 @@ public class configGlobal {
         flagSistemaSpring = flagArduino = false;
         
     }
+     public int getAlarmesAtivos() {
+        return alarmesAtivos;
+    }
+
+    public void setAlarmesAtivos(int alarmesAtivos) {
+        this.alarmesAtivos = alarmesAtivos;
+    }
+
+    public void incrementarAlarme() {
+        this.alarmesAtivos++;
+    }
+
+    public void decrementarAlarme() {
+        if (this.alarmesAtivos > 0) {
+            this.alarmesAtivos--;
+        }
+    }
     public static void incrementarContadorExecucoes() {
         contadorExecucoes++;
         System.out.println("Total de execuções no banco online: " + contadorExecucoes);
     }
-
+    
     public static int getContadorExecucoes() {
         return contadorExecucoes;
     }

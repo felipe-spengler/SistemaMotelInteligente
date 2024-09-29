@@ -876,7 +876,6 @@ public class CaixaFrame extends javax.swing.JFrame {
                 + "LEFT JOIN justificativa j ON rl.idlocacao = j.idlocacao "
                 + "WHERE rl.idcaixaatual = " + idCaixa + " "
                 + "ORDER BY rl.horainicio";
-        System.out.println(consultaSQL);
         Connection link = null;
         DefaultTableModel modelo = (DefaultTableModel) tabelaLocacoes.getModel();
         modelo.setNumRows(0);

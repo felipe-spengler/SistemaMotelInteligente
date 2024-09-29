@@ -1,5 +1,7 @@
 package com.motelinteligente.telas;
 
+import com.motelinteligente.alarme.AlarmApp;
+import com.motelinteligente.alarme.FAlarmes;
 import com.motelinteligente.arduino.ConectaArduino;
 import com.motelinteligente.dados.BackupExecutor;
 import com.motelinteligente.dados.CacheDados;
@@ -12,7 +14,7 @@ import com.motelinteligente.dados.configGlobal;
 import com.motelinteligente.dados.fazconexao;
 import com.motelinteligente.dados.fprodutos;
 import com.motelinteligente.dados.fquartos;
-import static com.motelinteligente.telas.EncerraQuarto.isInteger;
+import com.motelinteligente.dados.playSound;
 import com.motelinteligente.telas.Quadrado.QuartoClickListener;
 import java.awt.BorderLayout;
 import javax.swing.table.JTableHeader;
@@ -21,7 +23,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Calendar;
 import java.util.Date;
-import javax.swing.Timer;
 import java.text.SimpleDateFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,6 +39,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.MouseInfo;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.Connection;
@@ -52,6 +54,10 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.io.IOException;
+import java.io.InputStream;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JButton;
@@ -61,6 +67,13 @@ import javax.swing.ListSelectionModel;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
+import java.util.Timer;
+import java.util.TimerTask;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
+import javax.swing.KeyStroke;
 
 /**
  *
@@ -73,6 +86,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private int numeroQuartos = 0;
     private JPopupMenu popupMenu;
     private boolean isClickable = true;
+    private Timer alarmTimer; // Timer para verificar os alarmes
 
     private class NumOnly extends PlainDocument {
 
@@ -124,11 +138,26 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         int idCaixaAtual = new fazconexao().verificaCaixa();
 
         if (idCaixaAtual == 0) {
-            //JOptionPane.showMessageDialog(null, "Precisa Abrir o Caixa!");
+            JOptionPane.showMessageDialog(null, "Precisa Abrir o Caixa!");
         } else {
             configGlobal configuracao = configGlobal.getInstance();
             configuracao.setCaixa(idCaixaAtual);
         }
+         // Configurando o Key Binding para F2 diretamente no JFrame (this)
+        InputMap inputMap = this.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap actionMap = this.getRootPane().getActionMap();
+
+        // Mapeia a tecla F2
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), "playSound");
+
+        // Define a ação quando F2 for pressionada
+        actionMap.put("playSound", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Executa o código para tocar o som
+                new playSound().playSound("som/mensagem conferencia.wav");
+            }
+        });
 
     }
 
@@ -147,6 +176,103 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             }
             alteraPainel();
         });
+    }
+
+    private void checkAlarmsToRing() {
+        configGlobal config = configGlobal.getInstance();
+
+        if (config.getAlarmesAtivos() > 0) {
+            try ( Connection conn = new fazconexao().conectar();  Statement stmt = conn.createStatement();  ResultSet rs = stmt.executeQuery("SELECT id, hora_despertar, descricao FROM alarmes WHERE ativo = TRUE")) {
+
+                System.out.println("Tem " + config.getAlarmesAtivos() + " alarmes ativos");
+
+                while (rs.next()) {
+                    int idAlarme = rs.getInt("id");
+                    Timestamp horaDespertar = rs.getTimestamp("hora_despertar");
+                    String descricao = rs.getString("descricao");
+                    System.out.println("hora despertar no banco é " + horaDespertar);
+                    // Obtém a data e hora atuais
+                    Calendar agora = Calendar.getInstance();
+                    int anoAtual = agora.get(Calendar.YEAR);
+                    int mesAtual = agora.get(Calendar.MONTH) + 1; // Meses começam de 0, por isso somamos 1
+                    int diaAtual = agora.get(Calendar.DAY_OF_MONTH);
+                    int horaAtual = agora.get(Calendar.HOUR_OF_DAY);
+                    int minutoAtual = agora.get(Calendar.MINUTE);
+
+                    // Obtém a data e a hora do alarme
+                    Calendar alarmeCalendar = Calendar.getInstance();
+                    alarmeCalendar.setTime(horaDespertar);
+                    int anoAlarme = alarmeCalendar.get(Calendar.YEAR);
+                    int mesAlarme = alarmeCalendar.get(Calendar.MONTH) + 1;
+                    int diaAlarme = alarmeCalendar.get(Calendar.DAY_OF_MONTH);
+                    int horaAlarme = alarmeCalendar.get(Calendar.HOUR_OF_DAY);
+                    int minutoAlarme = alarmeCalendar.get(Calendar.MINUTE);
+
+                    // Saídas detalhadas para depuração
+                    System.out.println("Verificando alarme ID: " + idAlarme + " - Descrição: " + descricao);
+                    System.out.println("Data atual: " + anoAtual + "-" + mesAtual + "-" + diaAtual + " " + horaAtual + ":" + minutoAtual);
+                    System.out.println("Data do alarme: " + anoAlarme + "-" + mesAlarme + "-" + diaAlarme + " " + horaAlarme + ":" + minutoAlarme);
+
+                    // Comparar data (ano, mês e dia)
+                    if (anoAtual == anoAlarme && mesAtual == mesAlarme && diaAtual == diaAlarme) {
+                        System.out.println("Data do alarme coincide com a data atual.");
+
+                        // Comparar hora e minuto
+                        if (horaAtual == horaAlarme && minutoAtual == minutoAlarme) {
+                            System.out.println("Horário do alarme coincide com o horário atual - Despertando alarme ID: " + idAlarme);
+                            showAlarmAlert(idAlarme, descricao); // Chama a função para mostrar o alerta
+                        } else {
+                            System.out.println("Horário atual e do alarme não coincidem exatamente.");
+                        }
+
+                    } else {
+                        // Comparar se o alarme já passou da data atual
+                        System.out.println("Comparando alarme com horário atual...");
+
+                        // Verificar se o alarme está no passado
+                        if (anoAtual > anoAlarme
+                                || (anoAtual == anoAlarme && mesAtual > mesAlarme)
+                                || (anoAtual == anoAlarme && mesAtual == mesAlarme && diaAtual > diaAlarme)
+                                || (anoAtual == anoAlarme && mesAtual == mesAlarme && diaAtual == diaAlarme && horaAtual > horaAlarme)
+                                || (anoAtual == anoAlarme && mesAtual == mesAlarme && diaAtual == diaAlarme && horaAtual == horaAlarme && minutoAtual > minutoAlarme)) {
+
+                            // Verificar se passou mais de 15 minutos
+                            long diferencaMillis = agora.getTimeInMillis() - alarmeCalendar.getTimeInMillis();
+                            long quinzeMinutosMillis = 15 * 60 * 1000; // 15 minutos em milissegundos
+
+                            // Saídas de debug
+                            System.out.println("Diferença em milissegundos: " + diferencaMillis);
+                            System.out.println("15 minutos em milissegundos: " + quinzeMinutosMillis);
+
+                            if (diferencaMillis <= quinzeMinutosMillis) {
+                                System.out.println("Alarme ID: " + idAlarme + " ainda não deve ser removido, está dentro dos 15 minutos de tolerância.");
+                            } else {
+                                System.out.println("Alarme ID: " + idAlarme + " já passou mais de 15 minutos - deve remover.");
+                                new FAlarmes().removeAlarmFromDatabase(idAlarme);
+                            }
+                        } else {
+                            System.out.println("O horário do alarme ainda não chegou.");
+                        }
+                    }
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    private boolean isTimeToRing(Time alarmTime) {
+        Time currentTime = new Time(System.currentTimeMillis());
+        return currentTime.equals(alarmTime); // Verifica se a hora atual é igual à do alarme
+    }
+
+    private void showAlarmAlert(int idAlarme, String description) {
+        playSound soundPlayer = new playSound();
+        soundPlayer.playSoundLoop("som/despertador.mp3"); // Caminho relativo
+
+        JOptionPane.showMessageDialog(null, "Alarme: " + description, "Atenção!", JOptionPane.WARNING_MESSAGE);
+        soundPlayer.stopSound(); // Para o som quando o alerta é fechado
+        new FAlarmes().removeAlarmFromDatabase(idAlarme);
     }
 
     public void setaLabel() {
@@ -211,12 +337,10 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             String[] partes = status.split("-");
             int idLoca = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
             if (idLoca == 0) {
-                System.out.println("tinha dado idlocacao = 0 na cache");
                 DadosOcupados quartoOcupado = cache.getCacheOcupado().get(quartoEmFoco);
                 int novoID = new fquartos().getIdLocacao(quartoEmFoco);
                 quartoOcupado.setIdLoca(novoID);
                 cache.getCacheOcupado().put(quartoEmFoco, quartoOcupado);
-                System.out.println("resolvido novo id é " + novoID);
                 cache.carregaProdutosNegociadosCache(novoID);
             }
             //insere prevendidos tabela
@@ -257,11 +381,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 if (tipo.equals("negociado")) {
                     txtDescontoNegociado.setText(String.valueOf(valor));
                 }
-                System.out.println("Negociado setado - locacao " + idLocacao + " tipo " + tipo + " valor " + valor);
 
             }
         } else {
-            System.out.println("Não há antecipados para a locação " + idLocacao + " na cache.");
         }
 
     }
@@ -291,10 +413,13 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                     total
                 });
             }
+            System.out.println("valor consumo antecipado setado " + totalVendido);
+            lblValorConsumo.setText("R$ " + totalVendido);
+            lblValorConsumo.repaint();
         } else {
             System.out.println("Não há produtos vendidos para a locação " + locacao + " na cache.");
         }
-        lblValorConsumo.setText("R$ " + totalVendido);
+
     }
 
     public static String formatarData(String dataOriginal) {
@@ -340,7 +465,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             valor += calculaAdicionalPessoa(ocupado.getNumeroPessoas());
             lblValorQuarto.setText(String.valueOf(valor));
             int numeroAdicionais = subtrairHora(quartoEmFoco, horarioQuarto, ocupado.getTempoPeriodo());
-            System.out.println("num add" + numeroAdicionais);
             Float valorAdicional = Float.valueOf(numeroAdicionais) * ocupado.getValorAdicional();
             lblHoraAdicional.setText(String.valueOf(valorAdicional));
         }
@@ -484,11 +608,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         jLabel3 = new javax.swing.JLabel();
         txtAntecipado = new javax.swing.JTextField();
         txtDescontoNegociado = new javax.swing.JTextField();
-        jPanel4 = new javax.swing.JPanel();
-        pnAdicionarAlarme = new javax.swing.JPanel();
-        lblAdicionarAlarme = new javax.swing.JLabel();
-        jButton2 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         painelQuartos = new javax.swing.JPanel();
@@ -508,12 +627,14 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         btConfereLocacao = new javax.swing.JMenuItem();
         jMenu18 = new javax.swing.JMenu();
         menuRelaVenProdutos = new javax.swing.JMenuItem();
+        btConferencia = new javax.swing.JMenu();
         jMenu6 = new javax.swing.JMenu();
         menuFazBackup = new javax.swing.JMenuItem();
         menuResBackup = new javax.swing.JMenuItem();
         btFerramentas = new javax.swing.JMenu();
         menuConfigAd = new javax.swing.JMenu();
         menuSobSistema = new javax.swing.JMenuItem();
+        btDespertador = new javax.swing.JMenu();
         menuSair = new javax.swing.JMenu();
 
         javax.swing.GroupLayout jFrame1Layout = new javax.swing.GroupLayout(jFrame1.getContentPane());
@@ -628,7 +749,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         labelHora.setText("hora hora hora");
 
-        lblAlarmeAtivo.setText("jLabel4");
+        lblAlarmeAtivo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/bell.png"))); // NOI18N
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -639,9 +760,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 .addComponent(labelData)
                 .addGap(40, 40, 40)
                 .addComponent(labelHora)
-                .addGap(374, 374, 374)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(lblAlarmeAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, 322, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(252, 252, 252))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jSeparator1)
@@ -652,12 +773,16 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(29, 29, 29)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(labelData)
-                    .addComponent(labelHora)
-                    .addComponent(lblAlarmeAtivo))
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(29, 29, 29)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(labelData)
+                            .addComponent(labelHora)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addComponent(lblAlarmeAtivo)))
+                .addContainerGap(17, Short.MAX_VALUE))
         );
 
         jScrollPane1.setBorder(null);
@@ -1030,67 +1155,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         jTabbedPane1.addTab("Antecipado", jPanel5);
 
-        pnAdicionarAlarme.setBackground(new java.awt.Color(204, 204, 204));
-
-        lblAdicionarAlarme.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
-        lblAdicionarAlarme.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblAdicionarAlarme.setText("Clique Para Adicionar Alarme");
-        lblAdicionarAlarme.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                lblAdicionarAlarmeMouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout pnAdicionarAlarmeLayout = new javax.swing.GroupLayout(pnAdicionarAlarme);
-        pnAdicionarAlarme.setLayout(pnAdicionarAlarmeLayout);
-        pnAdicionarAlarmeLayout.setHorizontalGroup(
-            pnAdicionarAlarmeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnAdicionarAlarmeLayout.createSequentialGroup()
-                .addContainerGap(96, Short.MAX_VALUE)
-                .addComponent(lblAdicionarAlarme, javax.swing.GroupLayout.PREFERRED_SIZE, 207, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(91, 91, 91))
-        );
-        pnAdicionarAlarmeLayout.setVerticalGroup(
-            pnAdicionarAlarmeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnAdicionarAlarmeLayout.createSequentialGroup()
-                .addGap(26, 26, 26)
-                .addComponent(lblAdicionarAlarme, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(26, Short.MAX_VALUE))
-        );
-
-        jButton2.setText("Excluir Alarme");
-
-        jButton5.setText("Modificar Alarme");
-
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                .addGap(79, 79, 79)
-                .addComponent(jButton5)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(43, 43, 43))
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGap(12, 12, 12)
-                .addComponent(pnAdicionarAlarme, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(12, Short.MAX_VALUE))
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGap(35, 35, 35)
-                .addComponent(pnAdicionarAlarme, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 136, Short.MAX_VALUE)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(94, 94, 94))
-        );
-
-        jTabbedPane1.addTab("Alarme", jPanel4);
-
         painelSecundario2.setLayer(jTabbedPane1, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         javax.swing.GroupLayout painelSecundario2Layout = new javax.swing.GroupLayout(painelSecundario2);
@@ -1348,6 +1412,16 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         jMenuBar1.add(jMenu5);
 
+        btConferencia.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/musica.png"))); // NOI18N
+        btConferencia.setText("Conferência (F2)");
+        btConferencia.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btConferencia.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btConferenciaMouseClicked(evt);
+            }
+        });
+        jMenuBar1.add(btConferencia);
+
         jMenu6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/seguranca.png"))); // NOI18N
         jMenu6.setText("Segurança   |");
         jMenu6.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -1414,6 +1488,16 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         btFerramentas.add(menuSobSistema);
 
         jMenuBar1.add(btFerramentas);
+
+        btDespertador.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/alarme.png"))); // NOI18N
+        btDespertador.setText("Despertador");
+        btDespertador.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btDespertador.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btDespertadorMouseClicked(evt);
+            }
+        });
+        jMenuBar1.add(btDespertador);
 
         menuSair.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/sair.png"))); // NOI18N
         menuSair.setText("Sair");
@@ -1486,24 +1570,78 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
         configGlobal config = configGlobal.getInstance();
         setLabel(config.getUsuario(), config.getCargoUsuario());
+        // Mostra os quartos inicialmente
+        mostraQuartos();
         if (config.getCaixa() == 0) {
             JOptionPane.showMessageDialog(null, "Precisa abrir o caixa");
             new CaixaFrame().setVisible(true);
         }
+
         if (config.getCargoUsuario().equals("comum")) {
             btFerramentas.setEnabled(false);
             btCadastros.setEnabled(false);
             menuCadastraProduto.setEnabled(false);
         }
+
+        // carrega o numero de alarmes ativos ao iniciar o sistema
+        try ( Connection conn = new fazconexao().conectar();  Statement stmt = conn.createStatement();  ResultSet rs = stmt.executeQuery(" SELECT COUNT(*) AS total FROM alarmes ")) {
+            if (rs.next()) {
+                int alarmesAtivos = rs.getInt("total");
+                config.setAlarmesAtivos(alarmesAtivos);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        // Atualiza a data na interface
         Date dataSistema = new Date();
         SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
         labelData.setText(formato.format(dataSistema));
 
-        Timer timer = new Timer(1000, new hora());
-        Timer outroTimer = new Timer(30000, new horaQuarto());
-        timer.start();
-        mostraQuartos();
-        outroTimer.start();
+        // Utiliza java.util.Timer para atualizar a hora a cada 1 segundo
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                // A ação para atualizar a hora, equivalente à classe `hora`
+                Calendar now = Calendar.getInstance();
+                labelHora.setText(String.format("%1$tH:%1$tM:%1$tS", now));
+
+                configGlobal config = configGlobal.getInstance();
+
+                if (config.getMudanca()) {
+                    SwingUtilities.invokeLater(() -> {
+                        mostraQuartos();
+                        focoQuarto();
+                        config.setMudanca(false);
+                        painelSecundario.repaint();
+                    });
+                }
+            }
+        }, 0, 1000);  // Atualiza a cada 1 segundo
+
+        Timer alarmeTimer = new Timer();
+        alarmeTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                configGlobal config = configGlobal.getInstance();
+                if (config.getAlarmesAtivos() > 0) {
+                    lblAlarmeAtivo.setVisible(true);
+                    checkAlarmsToRing();
+                }else{
+                    lblAlarmeAtivo.setVisible(false);
+                }
+            }
+        }, 0, 60 * 1000); // Verifica a cada 1 minuto
+
+        // Utiliza outro java.util.Timer para verificar os quartos a cada 30 segundos
+        Timer outroTimer = new Timer();
+        outroTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                mostraQuartos();
+            }
+        }, 0, 20000);  // Atualiza a cada 20 segundos
 
     }
 
@@ -1651,37 +1789,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         verLocacaoItem.setFont(new Font("Arial", Font.PLAIN, 16));
         editarLocacaoItem.setFont(new Font("Arial", Font.PLAIN, 16));
         popupMenu.add(editarLocacaoItem);
-    }
 
-    class horaQuarto implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            mostraQuartos();
-        }
-
-    }
-
-    class hora implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            Calendar now = Calendar.getInstance();
-            labelHora.setText(String.format("%1$tH:%1$tM:%1$tS", now));
-            configGlobal config = configGlobal.getInstance();
-
-            if (config.getMudanca()) {
-                SwingUtilities.invokeLater(() -> {
-                    System.out.println("algo mudou");
-                    mostraQuartos();
-                    focoQuarto();
-                    config.setMudanca(false);
-                    painelSecundario.repaint();
-                });
-
-            }
-
-        }
     }//GEN-LAST:event_formWindowOpened
     public void fecharTela() throws IOException {
         this.dispose();
@@ -1701,36 +1809,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private void lblUsuarioPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_lblUsuarioPropertyChange
         // TODO add your handling code here:
     }//GEN-LAST:event_lblUsuarioPropertyChange
-
-    private void botaoStatusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoStatusActionPerformed
-        // TODO add your handling code here:
-        if (quartoEmFoco != 0) {
-            CacheDados cacheDados = CacheDados.getInstancia();
-            CarregaQuarto q = cacheDados.getCacheQuarto().get(quartoEmFoco);
-            String status = q.getStatusQuarto();
-            if (status.equals("limpeza") || status.equals("manutencao") || status.equals("reservado")) {
-                menuLimpeza.show(botaoStatus, 20, 20);
-
-            } else if (status.contains("ocupado")) {
-                menuOcupado.show(botaoStatus, 20, 20);
-                String[] partes = status.split("-");
-                if (partes[1].equals("pernoite")) {
-                    radioPeriodo.setSelected(false);
-                    radioPernoite.setSelected(true);
-                } else if (partes[1].equals("periodo")) {
-                    radioPeriodo.setSelected(true);
-                    radioPernoite.setSelected(false);
-                }
-                radioPeriodo.setFont(new Font("Arial", Font.PLAIN, 16));
-                radioPernoite.setFont(new Font("Arial", Font.PLAIN, 16));
-            } else {
-                menuStatus.show(botaoStatus, 20, 20);
-            }
-        }
-        quartoClicado(quartoEmFoco);
-        mostraQuartos();
-
-    }//GEN-LAST:event_botaoStatusActionPerformed
 
     private void itemReservaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemReservaActionPerformed
         // TODO add your handling code here:
@@ -1790,24 +1868,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         }
     }//GEN-LAST:event_btFuncionarioActionPerformed
-
-    private void botaoEncerrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoEncerrarActionPerformed
-        if (isClickable) {
-            isClickable = false;
-
-            executarFinalizar();
-            // Iniciar uma thread para desbloquear o botão após um segundo
-            new Thread(() -> {
-                try {
-                    Thread.sleep(1000); // Esperar um segundo
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
-                } finally {
-                    isClickable = true; // Desbloquear o botão
-                }
-            }).start();
-        }
-    }//GEN-LAST:event_botaoEncerrarActionPerformed
     public void executarFinalizar() {
         configGlobal config = configGlobal.getInstance();
         int idCaixa = config.getCaixa();
@@ -1832,7 +1892,12 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         Timestamp timestamp = new Timestamp(dataAtual.getTime());
         // Atualiza o status e a data do quarto
         quarto.setStatusQuarto(statusColocar);
-        quarto.setHoraStatus(String.valueOf(timestamp));
+        if(hora != null){
+            quarto.setHoraStatus(String.valueOf(hora));
+        }else{
+            quarto.setHoraStatus(String.valueOf(timestamp));
+        }
+        
         // Atualiza o quarto na cache
         dados.getCacheQuarto().put(quartoMudar, quarto);
         if (statusColocar.contains("ocupado")) {
@@ -1844,26 +1909,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         return true;
 
     }
-    private void botaoIniciarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoIniciarActionPerformed
-        //lidar com problema de duplo clique
-        if (isClickable) {
-            isClickable = false;
 
-            executaIniciar();
-            // Iniciar uma thread para desbloquear o botão após um segundo
-            new Thread(() -> {
-                try {
-                    Thread.sleep(500); // Esperar meio segundo
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
-                } finally {
-                    isClickable = true; // Desbloquear o botão
-                }
-            }).start();
-        }
-
-
-    }//GEN-LAST:event_botaoIniciarActionPerformed
     public void executaIniciar() {
         // setar quarto como locado
 
@@ -1941,35 +1987,11 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         try {
             frame.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/imagens/iconeMotel.png")));
         } catch (Exception e) {
-            System.out.println(e.toString());
         }
     }
     private void menuCaixaBtMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menuCaixaBtMouseClicked
         new CaixaFrame().setVisible(true);
     }//GEN-LAST:event_menuCaixaBtMouseClicked
-
-    private void txtPessoasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPessoasActionPerformed
-        try {
-            int numeroPessoas = Integer.valueOf(txtPessoas.getText());
-            new fquartos().atualizaPessoas(quartoEmFoco, numeroPessoas);
-            if (numeroPessoas < 2) {
-                numeroPessoas = 2;
-            }
-            //atualizar na cache também
-            CacheDados cache = CacheDados.getInstancia();
-            Map<Integer, DadosOcupados> dadosOcupados = cache.getCacheOcupado();
-            if (dadosOcupados.containsKey(quartoEmFoco)) {
-                DadosOcupados quartoOcupado = dadosOcupados.get(quartoEmFoco);
-                quartoOcupado.setNumeroPessoas(numeroPessoas);
-                dadosOcupados.put(quartoEmFoco, quartoOcupado);
-            } else {
-                JOptionPane.showMessageDialog(null, "Quarto não está na Cache Ocupado!");
-            }
-            setValorQuarto();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }//GEN-LAST:event_txtPessoasActionPerformed
 
     private void btQuartosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btQuartosActionPerformed
         //alterar quartos
@@ -2073,13 +2095,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        // abre o portão do quarto
-        SwingUtilities.invokeLater(() -> {
-            new ConectaArduino(quartoEmFoco);
-        });
-    }//GEN-LAST:event_jButton4ActionPerformed
-
     private void radioPernoiteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioPernoiteActionPerformed
         // clicou no radiopernoite - altera status para pernoite
         if (quartoEmFoco != 0) {
@@ -2127,60 +2142,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         CacheDados cache = CacheDados.getInstancia();
         cache.mostrarCacheProdutosVendidos();
     }//GEN-LAST:event_jMenu6ActionPerformed
-
-    private void bt_apagarProdutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_apagarProdutoActionPerformed
-        DefaultTableModel modelo = (DefaultTableModel) tabela1.getModel();
-        int linhaSelecionada = tabela1.getSelectedRow();
-        if (linhaSelecionada != -1) {
-            String desc = modelo.getValueAt(linhaSelecionada, 1).toString();
-            int qntVendida = Integer.valueOf(modelo.getValueAt(linhaSelecionada, 0).toString());
-            modelo.removeRow(linhaSelecionada);
-            new fprodutos().removePreVendido(quartoEmFoco, desc);
-            JOptionPane.showMessageDialog(null, "Excluido com sucesso");
-
-            //remove da cache tbm
-            CacheDados cache = CacheDados.getInstancia();
-            int idLoca = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
-            int idProduto = new fprodutos().getIdProduto(desc);
-            if (idLoca == 0) {
-                DadosOcupados quartoOcupado = cache.getCacheOcupado().get(quartoEmFoco);
-                int novoID = new fquartos().getIdLocacao(quartoEmFoco);
-                quartoOcupado.setIdLoca(novoID);
-                cache.getCacheOcupado().put(quartoEmFoco, quartoOcupado);
-
-                cache.carregaProdutosNegociadosCache(novoID);
-            }
-            List<DadosVendidos> produtosVendidos = new ArrayList<>();
-            int limitador = 0;
-            if (cache.cacheProdutosVendidos.containsKey(idLoca)) {
-                // Itera sobre a lista usando um índice para poder remover um item
-                for (int i = 0; i < produtosVendidos.size(); i++) {
-                    DadosVendidos dados = produtosVendidos.get(i);
-                    if (dados.idProduto == idProduto && dados.quantidadeVendida == qntVendida) {
-                        produtosVendidos.remove(i); // Remove o item da lista
-                        limitador++;
-                        break; // Sai do loop após remover o item desejado
-                    }
-                }
-
-                // Verifica se a lista ficou vazia
-                if (produtosVendidos.isEmpty()) {
-                    // Remove a entrada correspondente da cache
-                    cache.cacheProdutosVendidos.remove(idLoca);
-                } else {
-                    // Atualiza a lista na cache
-                    cache.cacheProdutosVendidos.put(idLoca, produtosVendidos);
-                }
-
-            }
-        } else {
-            JOptionPane.showMessageDialog(null, "Nenhum produto selecionado");
-        }
-    }//GEN-LAST:event_bt_apagarProdutoActionPerformed
-
-    private void bt_inserirProdutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_inserirProdutoActionPerformed
-        obterProduto();
-    }//GEN-LAST:event_bt_inserirProdutoActionPerformed
     class CentralizarCelulasRenderer extends DefaultTableCellRenderer {
 
         @Override
@@ -2345,36 +2306,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         focoQuarto();
 
     }
-    private void txtDescontoNegociadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDescontoNegociadoActionPerformed
-        float valorRecebido = 0;
-        try {
-            valorRecebido = Float.parseFloat(txtDescontoNegociado.getText().replace(',', '.'));
-            CacheDados cache = CacheDados.getInstancia();
-            int idLocacao = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
-
-            salvaAntecipado(idLocacao, "negociado", valorRecebido);
-            JOptionPane.showMessageDialog(null, "Desconto Antecipado adicionado com Sucesso!");
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Valor digitado não é monetário");
-        }
-    }//GEN-LAST:event_txtDescontoNegociadoActionPerformed
-
-    private void txtAntecipadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtAntecipadoActionPerformed
-        float valorRecebido = 0;
-        try {
-            valorRecebido = Float.parseFloat(txtAntecipado.getText().replace(',', '.'));
-            CacheDados cache = CacheDados.getInstancia();
-            int idLocacao = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
-
-            salvaAntecipado(idLocacao, "recebido", valorRecebido);
-            JOptionPane.showMessageDialog(null, "Recebimento Antecipado adicionado com Sucesso!");
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Valor digitado não é monetário");
-        }
-
-
-    }//GEN-LAST:event_txtAntecipadoActionPerformed
-
     private void menuResBackupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuResBackupActionPerformed
         CacheDados cache = CacheDados.getInstancia();
         cache.mostrarCacheQuarto();
@@ -2406,10 +2337,88 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         }
     }//GEN-LAST:event_formWindowClosing
 
-    private void lblAdicionarAlarmeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblAdicionarAlarmeMouseClicked
-        //EventroAbrirAlarme
+    private void txtDescontoNegociadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDescontoNegociadoActionPerformed
+        float valorRecebido = 0;
+        try {
+            valorRecebido = Float.parseFloat(txtDescontoNegociado.getText().replace(',', '.'));
+            CacheDados cache = CacheDados.getInstancia();
+            int idLocacao = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
 
-    }//GEN-LAST:event_lblAdicionarAlarmeMouseClicked
+            salvaAntecipado(idLocacao, "negociado", valorRecebido);
+            JOptionPane.showMessageDialog(null, "Desconto Antecipado adicionado com Sucesso!");
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Valor digitado não é monetário");
+        }
+    }//GEN-LAST:event_txtDescontoNegociadoActionPerformed
+
+    private void txtAntecipadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtAntecipadoActionPerformed
+        float valorRecebido = 0;
+        try {
+            valorRecebido = Float.parseFloat(txtAntecipado.getText().replace(',', '.'));
+            CacheDados cache = CacheDados.getInstancia();
+            int idLocacao = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
+
+            salvaAntecipado(idLocacao, "recebido", valorRecebido);
+            JOptionPane.showMessageDialog(null, "Recebimento Antecipado adicionado com Sucesso!");
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Valor digitado não é monetário");
+        }
+
+    }//GEN-LAST:event_txtAntecipadoActionPerformed
+
+    private void bt_inserirProdutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_inserirProdutoActionPerformed
+        obterProduto();
+    }//GEN-LAST:event_bt_inserirProdutoActionPerformed
+
+    private void bt_apagarProdutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_apagarProdutoActionPerformed
+        DefaultTableModel modelo = (DefaultTableModel) tabela1.getModel();
+        int linhaSelecionada = tabela1.getSelectedRow();
+        if (linhaSelecionada != -1) {
+            String desc = modelo.getValueAt(linhaSelecionada, 1).toString();
+            int qntVendida = Integer.valueOf(modelo.getValueAt(linhaSelecionada, 0).toString());
+            modelo.removeRow(linhaSelecionada);
+            new fprodutos().removePreVendido(quartoEmFoco, desc);
+            JOptionPane.showMessageDialog(null, "Excluido com sucesso");
+
+            //remove da cache tbm
+            CacheDados cache = CacheDados.getInstancia();
+            int idLoca = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
+            int idProduto = new fprodutos().getIdProduto(desc);
+            if (idLoca == 0) {
+                DadosOcupados quartoOcupado = cache.getCacheOcupado().get(quartoEmFoco);
+                int novoID = new fquartos().getIdLocacao(quartoEmFoco);
+                quartoOcupado.setIdLoca(novoID);
+                cache.getCacheOcupado().put(quartoEmFoco, quartoOcupado);
+
+                cache.carregaProdutosNegociadosCache(novoID);
+            }
+            List<DadosVendidos> produtosVendidos = new ArrayList<>();
+            int limitador = 0;
+            if (cache.cacheProdutosVendidos.containsKey(idLoca)) {
+                // Itera sobre a lista usando um índice para poder remover um item
+                for (int i = 0; i < produtosVendidos.size(); i++) {
+                    DadosVendidos dados = produtosVendidos.get(i);
+                    if (dados.idProduto == idProduto && dados.quantidadeVendida == qntVendida) {
+                        produtosVendidos.remove(i); // Remove o item da lista
+                        limitador++;
+                        break; // Sai do loop após remover o item desejado
+                    }
+                }
+
+                // Verifica se a lista ficou vazia
+                if (produtosVendidos.isEmpty()) {
+                    // Remove a entrada correspondente da cache
+                    cache.cacheProdutosVendidos.remove(idLoca);
+                } else {
+                    // Atualiza a lista na cache
+                    cache.cacheProdutosVendidos.put(idLoca, produtosVendidos);
+                }
+
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Nenhum produto selecionado");
+        }
+    }//GEN-LAST:event_bt_apagarProdutoActionPerformed
 
     private void botaoTrocaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoTrocaActionPerformed
         // Obtém a instância da cache de dados
@@ -2519,14 +2528,118 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         });
         // Exibe o JDialog
         dialog.setVisible(true);
-
     }//GEN-LAST:event_botaoTrocaActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        // abre o portão do quarto
+        SwingUtilities.invokeLater(() -> {
+            new ConectaArduino(quartoEmFoco);
+        });
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void txtPessoasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPessoasActionPerformed
+        try {
+            int numeroPessoas = Integer.valueOf(txtPessoas.getText());
+            new fquartos().atualizaPessoas(quartoEmFoco, numeroPessoas);
+            if (numeroPessoas < 2) {
+                numeroPessoas = 2;
+            }
+            //atualizar na cache também
+            CacheDados cache = CacheDados.getInstancia();
+            Map<Integer, DadosOcupados> dadosOcupados = cache.getCacheOcupado();
+            if (dadosOcupados.containsKey(quartoEmFoco)) {
+                DadosOcupados quartoOcupado = dadosOcupados.get(quartoEmFoco);
+                quartoOcupado.setNumeroPessoas(numeroPessoas);
+                dadosOcupados.put(quartoEmFoco, quartoOcupado);
+            } else {
+                JOptionPane.showMessageDialog(null, "Quarto não está na Cache Ocupado!");
+            }
+            setValorQuarto();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_txtPessoasActionPerformed
+
+    private void botaoIniciarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoIniciarActionPerformed
+        //lidar com problema de duplo clique
+        if (isClickable) {
+            isClickable = false;
+
+            executaIniciar();
+            // Iniciar uma thread para desbloquear o botão após um segundo
+            new Thread(() -> {
+                try {
+                    Thread.sleep(500); // Esperar meio segundo
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                } finally {
+                    isClickable = true; // Desbloquear o botão
+                }
+            }).start();
+        }
+
+    }//GEN-LAST:event_botaoIniciarActionPerformed
+
+    private void botaoEncerrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoEncerrarActionPerformed
+        if (isClickable) {
+            isClickable = false;
+
+            executarFinalizar();
+            // Iniciar uma thread para desbloquear o botão após um segundo
+            new Thread(() -> {
+                try {
+                    Thread.sleep(1000); // Esperar um segundo
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                } finally {
+                    isClickable = true; // Desbloquear o botão
+                }
+            }).start();
+        }
+    }//GEN-LAST:event_botaoEncerrarActionPerformed
+
+    private void botaoStatusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoStatusActionPerformed
+        // TODO add your handling code here:
+        if (quartoEmFoco != 0) {
+            CacheDados cacheDados = CacheDados.getInstancia();
+            CarregaQuarto q = cacheDados.getCacheQuarto().get(quartoEmFoco);
+            String status = q.getStatusQuarto();
+            if (status.equals("limpeza") || status.equals("manutencao") || status.equals("reservado")) {
+                menuLimpeza.show(botaoStatus, 20, 20);
+
+            } else if (status.contains("ocupado")) {
+                menuOcupado.show(botaoStatus, 20, 20);
+                String[] partes = status.split("-");
+                if (partes[1].equals("pernoite")) {
+                    radioPeriodo.setSelected(false);
+                    radioPernoite.setSelected(true);
+                } else if (partes[1].equals("periodo")) {
+                    radioPeriodo.setSelected(true);
+                    radioPernoite.setSelected(false);
+                }
+                radioPeriodo.setFont(new Font("Arial", Font.PLAIN, 16));
+                radioPernoite.setFont(new Font("Arial", Font.PLAIN, 16));
+            } else {
+                menuStatus.show(botaoStatus, 20, 20);
+            }
+        }
+        quartoClicado(quartoEmFoco);
+        mostraQuartos();
+    }//GEN-LAST:event_botaoStatusActionPerformed
+
+    private void btDespertadorMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btDespertadorMouseClicked
+        System.out.println("clicou no alarme");
+        new AlarmApp();
+    }//GEN-LAST:event_btDespertadorMouseClicked
+
+    private void btConferenciaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btConferenciaMouseClicked
+        new playSound().playSound("som/mensagem conferencia.wav");
+    }//GEN-LAST:event_btConferenciaMouseClicked
     private void trocaQuarto(int idLocacao, int numeroNovoQuarto) {
         fquartos quarto = new fquartos();
         String horaStatus = quarto.getDataInicio(quartoEmFoco);
         Timestamp hStatus = null;
         try {
-            System.out.println(horaStatus);
             hStatus = Timestamp.valueOf(horaStatus);
         } catch (Exception e) {
             e.printStackTrace();
@@ -2679,6 +2792,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private javax.swing.JMenu btCadastros;
     private javax.swing.JMenuItem btConfereCaixa;
     private javax.swing.JMenuItem btConfereLocacao;
+    private javax.swing.JMenu btConferencia;
+    private javax.swing.JMenu btDespertador;
     private javax.swing.JMenu btFerramentas;
     private javax.swing.JMenu btFuncionario;
     private javax.swing.JMenu btQuartos;
@@ -2687,10 +2802,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private javax.swing.JMenuItem itemManutencao;
     private javax.swing.JMenuItem itemReserva;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
     private javax.swing.JFrame jFrame1;
     private javax.swing.JFrame jFrame2;
     private javax.swing.JFrame jFrame3;
@@ -2716,7 +2829,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JScrollPane jScrollPane1;
@@ -2729,7 +2841,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private javax.swing.JTextField jTextField2;
     private javax.swing.JLabel labelData;
     private javax.swing.JLabel labelHora;
-    private javax.swing.JLabel lblAdicionarAlarme;
     private javax.swing.JLabel lblAlarmeAtivo;
     private javax.swing.JLabel lblCargo;
     private javax.swing.JLabel lblEntrada;
@@ -2755,7 +2866,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private javax.swing.JPanel painelQuartos;
     private javax.swing.JPanel painelSecundario;
     private javax.swing.JDesktopPane painelSecundario2;
-    private javax.swing.JPanel pnAdicionarAlarme;
     private javax.swing.JRadioButtonMenuItem radioPeriodo;
     private javax.swing.JRadioButtonMenuItem radioPernoite;
     private javax.swing.JDesktopPane srPane;

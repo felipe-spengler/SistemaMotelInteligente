@@ -1,9 +1,6 @@
 package com.motelinteligente.telas;
 
-import org.bytedeco.javacv.FFmpegFrameGrabber;
-import org.bytedeco.javacv.FFmpegFrameRecorder;
-import org.bytedeco.javacv.Frame;
-import org.bytedeco.javacv.FrameGrabber;
+import com.formdev.flatlaf.FlatLightLaf;
 import com.motelinteligente.arduino.ConectaArduino;
 import com.motelinteligente.dados.CacheDados;
 import com.motelinteligente.dados.CacheDados.DadosVendidos;
@@ -16,7 +13,9 @@ import com.motelinteligente.dados.fazconexao;
 import com.motelinteligente.dados.fprodutos;
 import com.motelinteligente.dados.fquartos;
 import com.motelinteligente.dados.playSound;
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -25,9 +24,8 @@ import java.awt.KeyboardFocusManager;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
@@ -42,13 +40,23 @@ import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineEvent;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
@@ -59,7 +67,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
-import org.bytedeco.ffmpeg.global.avcodec;
 
 /**
  *
@@ -67,7 +74,6 @@ import org.bytedeco.ffmpeg.global.avcodec;
  */
 public class EncerraQuarto extends javax.swing.JFrame {
 
-    
     private boolean isFrameOpen = false;
     private JFrame secondaryFrame;
 
@@ -187,10 +193,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
         // Adicione yourKeyEventDispatcher ao KeyboardFocusManager
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(yourKeyEventDispatcher);
         txtIdProduto.grabFocus();
-        
-    }
 
-    
+    }
 
     public void setaLabelGeral(int numeroQuarto) {
         DefaultTableModel modelo = (DefaultTableModel) tabela.getModel();
@@ -328,8 +332,6 @@ public class EncerraQuarto extends javax.swing.JFrame {
 
             }
         } else {
-            // Se a cache não contiver a locação, exibe uma mensagem informando que não há dados antecipados para essa locação
-            System.out.println("Não há dados antecipados para a locação " + locacao + " na cache.");
         }
     }
 
@@ -1236,7 +1238,6 @@ public class EncerraQuarto extends javax.swing.JFrame {
                             salvaJustifica("acrescimo", valorAcrescimo);
                         }
                         salvaVendidos(numeroDoQuarto);
-                        System.out.println("Justificativa salva");
                     }
                 }
 
@@ -1244,7 +1245,6 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 // nao precisa justificativa
                 if (chamaJOP()) {
                     salvaVendidos(numeroDoQuarto);
-                    System.out.println("não precisou justificar");
 
                 }
             }
@@ -1388,69 +1388,228 @@ public class EncerraQuarto extends javax.swing.JFrame {
     }
 
     public boolean chamaJOP() {
-        JTextField pixField = new JTextField(10);
-        JTextField cartaoField = new JTextField(10);
-        JTextField dinheiroField = new JTextField(10);
-        Font biggerFont = new Font(pixField.getFont().getName(), pixField.getFont().getStyle(), 16);
-        pixField.setFont(biggerFont);
-        cartaoField.setFont(biggerFont);
-        dinheiroField.setFont(biggerFont);
+        // Criação dos campos e botões
 
-        dinheiroField.setText(String.valueOf(valorDivida));
-        cartaoField.setText(String.valueOf("0"));
-        pixField.setText(String.valueOf("0"));
+        JTextField valorField = new JTextField(10);
+        JTextArea valoresRecebidosArea = new JTextArea(5, 20);
+        valoresRecebidosArea.setEditable(false); // Não permitir edição
+        JScrollPane scrollPane = new JScrollPane(valoresRecebidosArea); // Adicionando barra de rolagem
+        valoresRecebidosArea.setEditable(false);
+        valoresRecebidosArea.setBackground(this.getBackground()); // Define o fundo igual ao painel
+        valoresRecebidosArea.setBorder(BorderFactory.createEmptyBorder()); // Remove a borda padrão
+        valoresRecebidosArea.setOpaque(false); // Torna a área de texto transparente
+        Font biggerFont = new Font(valorField.getFont().getName(), valorField.getFont().getStyle(), 16);
+        valorField.setFont(biggerFont);
+        JButton botaoEnter = new JButton("Enter"); // Botão Enter
+        JButton botaoCredito = new JButton("Crédito (C)");
+        JButton botaoDebito = new JButton("Débito (D)");
+        JButton botaoDinheiro = new JButton("Dinheiro (O)");
+        JButton botaoPix = new JButton("Pix (P)");
+        JButton botaoSalvar = new JButton("Salvar (S)");
+
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.add(new JLabel("Digite o valor recebido em Dinheiro:"));
-        panel.add(dinheiroField);
-        panel.add(new JLabel("Digite o valor recebido em Pix:"));
-        panel.add(pixField);
-        panel.add(new JLabel("Digite o valor recebido em Cartão:"));
-        panel.add(cartaoField);
 
-        // Exiba o JOptionPane personalizado
-        int result = JOptionPane.showConfirmDialog(null, panel, "Digite os valores recebidos",
-                JOptionPane.OK_CANCEL_OPTION);
+        JPanel topButtonPanel = new JPanel(); // Painel para os botões superiores
+        topButtonPanel.setLayout(new BoxLayout(topButtonPanel, BoxLayout.X_AXIS));
+        // No seu código onde adiciona os botões ao painel, adicione espaçadores
+        topButtonPanel.add(botaoCredito);
+        topButtonPanel.add(Box.createRigidArea(new Dimension(5, 0))); // Espaçador horizontal
+        topButtonPanel.add(botaoDebito);
+        topButtonPanel.add(Box.createRigidArea(new Dimension(5, 0))); // Espaçador horizontal
+        topButtonPanel.add(botaoDinheiro);
+        topButtonPanel.add(Box.createRigidArea(new Dimension(5, 0))); // Espaçador horizontal
+        topButtonPanel.add(botaoPix);
 
-        if (result == JOptionPane.OK_OPTION) {
-            String valorPix = pixField.getText().replace(",", ".");;
-            String valorCartao = cartaoField.getText().replace(",", ".");;
-            String valorDinheiro = dinheiroField.getText().replace(",", ".");;
+        panel.add(topButtonPanel);
+        panel.add(new JLabel("Valor:"), BorderLayout.WEST);
+        panel.add(valorField);
+        panel.add(new JLabel("Valores Recebidos:"), BorderLayout.WEST);
+        panel.add(scrollPane);
+        panel.add(Box.createRigidArea(new Dimension(5, 0))); // Espaçador horizontal
+        panel.add(botaoSalvar);
 
-            try {
-                float valPix = 0, valCartao = 0, valDinheiro = 0;
-                if (valorPix != null) {
-                    valPix = Float.parseFloat(valorPix);
-                }
+        // Inicializando a cor de fundo dos botões como Light Gray
+        // Resetando a aparência dos botões para o estado não selecionado
+        resetarBotoes(botaoCredito, botaoDebito, botaoDinheiro, botaoPix);
 
-                if (valorCartao != null) {
-                    valCartao = Float.parseFloat(valorCartao);
-                }
+        // Definindo tamanho uniforme para os botões
+        Dimension buttonSize = new Dimension(120, 40);
+        botaoCredito.setPreferredSize(buttonSize);
+        botaoDebito.setPreferredSize(buttonSize);
+        botaoDinheiro.setPreferredSize(buttonSize);
+        botaoPix.setPreferredSize(buttonSize);
+        botaoSalvar.setPreferredSize(buttonSize);
 
-                if (valorDinheiro != null) {
-                    valDinheiro = Float.parseFloat(valorDinheiro);
-                }
+        // Variáveis de controle
+        final String[] tipoPagamento = {""}; // Armazena o tipo de pagamento selecionado
+        final float[] recebidoDin = {0}, recebidoPix = {0}, recebidoCredito = {0}, recebidoDebito = {0};
+        boolean[] sucesso = {false}; // Variável de controle para indicar sucesso do pagamento
 
-                float soma = valPix + valCartao + valDinheiro;
-                // vê se fecha com o valor da conta
+        // Listener comum para selecionar o tipo de pagamento e focar no campo de valor
+        ActionListener selecionarMetodo = e -> {
+            JButton source = (JButton) e.getSource();
+            tipoPagamento[0] = source.getText().substring(source.getText().indexOf("(") + 1, source.getText().indexOf(")"));
+            System.out.println(tipoPagamento[0]);
+            // Coloca o foco no campo de texto
 
-                if (soma == valorDivida) {
-                    valD = valDinheiro;
-                    valC = valCartao;
-                    valP = valPix;
-                    JOptionPane.getRootFrame().dispose();
+            // Marca o botão como selecionado visualmente
+            resetarBotoes(botaoCredito, botaoDebito, botaoDinheiro, botaoPix);
+            source.setBackground(Color.GRAY);
+            source.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
 
-                    return true;
-                } else {
-                    System.out.println("");
-                    JOptionPane.showMessageDialog(null, "valores divergentes!");
-                }
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(null, "Valores inválidos. Certifique-se de inserir números válidos.");
-                return false;
+            valorField.requestFocus();
+        };
+
+        // Adicionando o listener aos botões
+        botaoCredito.addActionListener(selecionarMetodo);
+        botaoDebito.addActionListener(selecionarMetodo);
+        botaoDinheiro.addActionListener(selecionarMetodo);
+        botaoPix.addActionListener(selecionarMetodo);
+
+        // Função para atualizar a área de texto com os valores recebidos
+        Runnable atualizarValoresRecebidos = () -> {
+            valoresRecebidosArea.setText(""); // Limpa a área de texto
+            if (recebidoCredito[0] > 0) {
+                valoresRecebidosArea.append(String.format("%.2f Crédito\n", recebidoCredito[0]));
             }
+            if (recebidoDebito[0] > 0) {
+                valoresRecebidosArea.append(String.format("%.2f Débito\n", recebidoDebito[0]));
+            }
+            if (recebidoDin[0] > 0) {
+                valoresRecebidosArea.append(String.format("%.2f Dinheiro\n", recebidoDin[0]));
+            }
+            if (recebidoPix[0] > 0) {
+                valoresRecebidosArea.append(String.format("%.2f Pix\n", recebidoPix[0]));
+            }
+        };
+
+        // Validação do campo de valor (apenas números, ponto e vírgula permitidos)
+        valorField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                char c = e.getKeyChar();
+                // Permitir números, ponto, vírgula, e teclas de controle como backspace
+                if (!Character.isDigit(c) && c != '.' && c != ',' && c != KeyEvent.VK_BACK_SPACE) {
+                    e.consume(); // Ignorar o caractere
+                }
+            }
+        });
+
+        // Ação para quando o cliente pressionar Enter no campo de texto
+        valorField.addActionListener(e -> {
+            String valorInserido = valorField.getText().replace(",", ".");
+            try {
+                float valor = Float.parseFloat(valorInserido);
+
+                switch (tipoPagamento[0]) {
+                    case "C":
+                        recebidoCredito[0] += valor;
+
+                        break;
+                    case "D":
+                        recebidoDebito[0] += valor;
+
+                        break;
+                    case "O":
+                        recebidoDin[0] += valor;
+
+                        break;
+                    case "P":
+                        recebidoPix[0] += valor;
+
+                        break;
+                    default:
+                        JOptionPane.showMessageDialog(null, "Selecione um tipo de pagamento antes de inserir o valor.");
+                        break;
+                }
+                // Resetando a aparência dos botões para o estado não selecionado
+                resetarBotoes(botaoCredito, botaoDebito, botaoDinheiro, botaoPix);
+                valorField.setText(""); // Limpa o campo de valor após registrar
+                atualizarValoresRecebidos.run(); // Atualiza os valores recebidos na área de texto
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(null, "Valor inválido. Insira um número válido.");
+            }
+        });
+        // Definindo a ação para o botão Enter
+        botaoEnter.addActionListener(e -> {
+            valorField.requestFocus(); // Define o foco no campo de texto
+            valorField.postActionEvent(); // Simula o pressionamento da tecla Enter
+        });
+        // Exibição do JOptionPane
+        JOptionPane optionPane = new JOptionPane(panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.DEFAULT_OPTION, null, new Object[]{}, null);
+        JDialog dialog = optionPane.createDialog("Digite os valores recebidos");
+
+        // Adicionando suporte para atalhos de teclado (teclas C, D, O, P, S) no JRootPane do diálogo
+        JRootPane rootPane = dialog.getRootPane();
+        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("C"), "credito");
+        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("D"), "debito");
+        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("O"), "dinheiro");
+        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("P"), "pix");
+        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("S"), "salvar");
+
+        rootPane.getActionMap().put("credito", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                botaoCredito.doClick(); // Simula o clique do botão
+            }
+        });
+        rootPane.getActionMap().put("debito", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                botaoDebito.doClick();
+            }
+        });
+        rootPane.getActionMap().put("dinheiro", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                botaoDinheiro.doClick();
+            }
+        });
+        rootPane.getActionMap().put("pix", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                botaoPix.doClick();
+            }
+        });
+        rootPane.getActionMap().put("salvar", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                botaoSalvar.doClick(); // Simula o clique do botão Salvar
+            }
+        });
+        // Ação do botão "Salvar"
+        botaoSalvar.addActionListener(e -> {
+            float totalRecebido = recebidoDin[0] + recebidoPix[0] + recebidoCredito[0] + recebidoDebito[0];
+
+            // Verifica se o valor total recebido fecha com o valor da dívida
+            if (totalRecebido == valorDivida) {
+                valD = recebidoDin[0];
+                valC = recebidoCredito[0] + recebidoDebito[0];
+                valP = recebidoPix[0];
+                JOptionPane.showMessageDialog(null, "Pagamento concluído com sucesso.");
+                sucesso[0] = true; // Indica que o pagamento foi bem-sucedido
+                dialog.dispose(); // Fecha o JDialog
+            } else {
+                JOptionPane.showMessageDialog(null, "Valores divergentes! Total recebido: " + totalRecebido);
+            }
+        });
+        dialog.setVisible(true);
+
+        return sucesso[0]; // Retorna o status de sucesso do pagamento
+    }
+    // Função para resetar os botões para o estado normal
+
+    private void resetarBotoes(JButton... botoes) {
+        Dimension buttonSize = new Dimension(120, 40);
+        for (JButton botao : botoes) {
+            botao.setBackground(new Color(200, 200, 200)); // Fundo Light Gray quando não selecionado
+            botao.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1)); // Borda padrão fina
+
+            botao.setPreferredSize(buttonSize);
+            botao.setMaximumSize(buttonSize); // Define o tamanho máximo
+            botao.setMinimumSize(buttonSize); // Define o tamanho mínimo
         }
-        return false;
     }
 
     public int objectToInt(int x, int y) {
@@ -1469,7 +1628,6 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 e.printStackTrace();
             }
         }
-        System.out.println("deu ruim");
         return -1;
     }
 
@@ -1544,6 +1702,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         String valorDebito;
         float valor = (valorDivida - valoreRecebido);
         String falar = "SuaConta " + NumeroPorExtenso.NumeroPorExtenso(valor) + " reais";
+        System.out.println(falar);
         String[] palavras = falar.split(" ");
 
         // Itere pelo array de palavras e imprima cada uma
@@ -1635,7 +1794,6 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 valorDesconto = (valorPorcento / 100) * valorDivida;
                 txtDesconto.setText("" + valorDesconto);
             } catch (Exception e) {
-                System.out.println(e);
                 JOptionPane.showMessageDialog(null, "Digite um valor válido");
             }
 
