@@ -574,6 +574,8 @@ public class fquartos {
         Date dataAtual = new Date();
         Timestamp timestamp = new Timestamp(dataAtual.getTime());
         Connection link = null;
+        int idLocacao = -1;  // Variável para armazenar o id gerado
+
         try {
             link = new fazconexao().conectar();
             PreparedStatement statement = link.prepareStatement(consultaSQL);

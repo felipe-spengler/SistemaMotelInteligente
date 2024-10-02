@@ -98,6 +98,7 @@ public class UltimaLocacao extends javax.swing.JFrame {
 
             if (resultado.next()) {
                 idLocacao = resultado.getInt("idlocacao");
+                setTitle("Locação " + idLocacao);
                 horaInicio = resultado.getTimestamp("horainicio");
                 horaFim = resultado.getTimestamp("horafim");
 

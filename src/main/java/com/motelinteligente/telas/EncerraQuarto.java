@@ -1,6 +1,5 @@
 package com.motelinteligente.telas;
 
-import com.formdev.flatlaf.FlatLightLaf;
 import com.motelinteligente.arduino.ConectaArduino;
 import com.motelinteligente.dados.CacheDados;
 import com.motelinteligente.dados.CacheDados.DadosVendidos;
@@ -13,7 +12,6 @@ import com.motelinteligente.dados.fazconexao;
 import com.motelinteligente.dados.fprodutos;
 import com.motelinteligente.dados.fquartos;
 import com.motelinteligente.dados.playSound;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -42,8 +40,6 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -67,6 +63,9 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
+import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
+import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery;
+import uk.co.caprica.vlcj.player.base.MediaPlayer;
 
 /**
  *
@@ -77,6 +76,10 @@ public class EncerraQuarto extends javax.swing.JFrame {
     private boolean isFrameOpen = false;
     private JFrame secondaryFrame;
 
+    private MediaPlayerFactory mediaPlayerFactory;
+    private MediaPlayer mediaPlayer;
+    private boolean recording = false;  // Controle de gravação
+    private boolean jopAberto = false;
     String dataInicio, dataFim, tempoTotalLocado;
     float valorAcrescimo = 0, valorDesconto = 0;
     float valoreRecebido = 0, valorDivida = 0;
@@ -118,7 +121,14 @@ public class EncerraQuarto extends javax.swing.JFrame {
         txtPessoas.setDocument(new numOnly());
         this.setVisible(true);
         setaLabelGeral(numeroQuarto);
+        // Definir o caminho para as bibliotecas nativas do VLC
+        System.setProperty("jna.library.path", "C:\\Program Files\\VideoLAN\\VLC");
+        System.setProperty("VLC_PLUGIN_PATH", "C:\\Program Files\\VideoLAN\\VLC\\plugins");
 
+        // Inicializa a fábrica e o media player
+        mediaPlayerFactory = new MediaPlayerFactory();
+        mediaPlayer = mediaPlayerFactory.mediaPlayers().newMediaPlayer();
+        startRecording(numeroQuarto);
         tabela.getModel().addTableModelListener(new TableModelListener() {
             @Override
             public void tableChanged(TableModelEvent e) {
@@ -136,7 +146,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
         });
 
         setValorDivida();
-        // Inicialize yourKeyEventDispatcher
+
+        // Adicione yourKeyEventDispatcher ao KeyboardFocusManager
         yourKeyEventDispatcher = new KeyEventDispatcher() {
             boolean eventConsumed = false;
 
@@ -155,10 +166,16 @@ public class EncerraQuarto extends javax.swing.JFrame {
                         eventConsumed = true;
                         break;
                     case KeyEvent.VK_F9:
-                        btSalvar.doClick();
-                        eventConsumed = true;
+                        if (!jopAberto) {
+                            jopAberto = true;
+                            System.out.println("clicou no f9");
+                            btSalvar.doClick();
+                            eventConsumed = true;
+                        }
+
                         break;
                     case KeyEvent.VK_F2:
+                        System.out.println("clicou no f2");
                         btConferencia.doClick();
                         eventConsumed = true;
                         break;
@@ -178,7 +195,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 if (timer != null) {
                     timer.stop();
                 }
-                timer = new Timer(1000, new ActionListener() {
+                timer = new Timer(2000, new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent evt) {
                         eventConsumed = false;
@@ -190,9 +207,14 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 return false; // Indica se o evento foi consumido ou não
             }
         };
-        // Adicione yourKeyEventDispatcher ao KeyboardFocusManager
-        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(yourKeyEventDispatcher);
+
         txtIdProduto.grabFocus();
+
+        boolean found = new NativeDiscovery().discover();
+        if (!found) {
+            System.err.println("Não foi possível localizar as bibliotecas VLC. Certifique-se de que o VLC está instalado.");
+            return;  // Sai do construtor se as bibliotecas não forem encontradas
+        }
 
     }
 
@@ -347,7 +369,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
     @Override
     public void dispose() {
         KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(yourKeyEventDispatcher);
-
+        stopRecording();
         outraTela.dispose();
         super.dispose();
     }
@@ -482,7 +504,17 @@ public class EncerraQuarto extends javax.swing.JFrame {
         labelEncerramento = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        addWindowFocusListener(new java.awt.event.WindowFocusListener() {
+            public void windowGainedFocus(java.awt.event.WindowEvent evt) {
+                formWindowGainedFocus(evt);
+            }
+            public void windowLostFocus(java.awt.event.WindowEvent evt) {
+            }
+        });
         addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowActivated(java.awt.event.WindowEvent evt) {
+                formWindowActivated(evt);
+            }
             public void windowOpened(java.awt.event.WindowEvent evt) {
                 formWindowOpened(evt);
             }
@@ -1249,15 +1281,21 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 }
             }
         }
-
+        System.out.println("setando jopAberto false");
+        jopAberto = false;
         KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(yourKeyEventDispatcher);
-
+        
     }//GEN-LAST:event_btSalvarActionPerformed
     public void salvaJustifica(String tipoValor, float valorSalvar) {
         Connection link = null;
         CacheDados cache = CacheDados.getInstancia();
         int idLocacao = cache.getCacheOcupado().get(numeroDoQuarto).getIdLoca();
-
+        if (idLocacao == 0) {
+            DadosOcupados quartoOcupado = cache.getCacheOcupado().get(numeroDoQuarto);
+            int novoID = new fquartos().getIdLocacao(numeroDoQuarto);
+            quartoOcupado.setIdLoca(novoID);
+            cache.getCacheOcupado().put(numeroDoQuarto, quartoOcupado);
+        }
         try {
             link = new fazconexao().conectar();
             String consultaSQL = "INSERT INTO justificativa (idlocacao, valor, tipo, justificativa) VALUES (?, ?, ?, ?)";
@@ -1301,6 +1339,12 @@ public class EncerraQuarto extends javax.swing.JFrame {
         fquartos quartodao = new fquartos();
         CacheDados cache = CacheDados.getInstancia();
         int idLocacao = cache.getCacheOcupado().get(numeroDoQuarto).getIdLoca();
+        if (idLocacao == 0) {
+            DadosOcupados quartoOcupado = cache.getCacheOcupado().get(numeroDoQuarto);
+            int novoID = new fquartos().getIdLocacao(numeroDoQuarto);
+            quartoOcupado.setIdLoca(novoID);
+            cache.getCacheOcupado().put(numeroDoQuarto, quartoOcupado);
+        }
         String horaFim = lblFimLocacao.getText();
         String horaInicio = lblInicioLocacao.getText();
         Connection link = null;
@@ -1389,57 +1433,84 @@ public class EncerraQuarto extends javax.swing.JFrame {
 
     public boolean chamaJOP() {
         // Criação dos campos e botões
-
         JTextField valorField = new JTextField(10);
         JTextArea valoresRecebidosArea = new JTextArea(5, 20);
         valoresRecebidosArea.setEditable(false); // Não permitir edição
         JScrollPane scrollPane = new JScrollPane(valoresRecebidosArea); // Adicionando barra de rolagem
-        valoresRecebidosArea.setEditable(false);
-        valoresRecebidosArea.setBackground(this.getBackground()); // Define o fundo igual ao painel
-        valoresRecebidosArea.setBorder(BorderFactory.createEmptyBorder()); // Remove a borda padrão
-        valoresRecebidosArea.setOpaque(false); // Torna a área de texto transparente
+
+        // Ajuste visual para o JTextArea parecer desabilitado
+        valoresRecebidosArea.setOpaque(false); // Deixa o fundo transparente (igual ao painel)
+        valoresRecebidosArea.setBackground(new Color(240, 240, 240)); // Cor de fundo igual ao painel
+        valoresRecebidosArea.setForeground(Color.BLACK); // Cor do texto
+        valoresRecebidosArea.setBorder(BorderFactory.createEmptyBorder()); // Remove a borda
+
         Font biggerFont = new Font(valorField.getFont().getName(), valorField.getFont().getStyle(), 16);
         valorField.setFont(biggerFont);
-        JButton botaoEnter = new JButton("Enter"); // Botão Enter
+
+        // Botões de pagamento
         JButton botaoCredito = new JButton("Crédito (C)");
         JButton botaoDebito = new JButton("Débito (D)");
         JButton botaoDinheiro = new JButton("Dinheiro (O)");
         JButton botaoPix = new JButton("Pix (P)");
+
+        // Botões de ação
+        JButton botaoAcertouDinheiro = new JButton("Acertou no Dinheiro (F6)");
+        JButton botaoAcertouDebito = new JButton("Acertou no Débito (F7)");
+        JButton botaoAcertouCredito = new JButton("Acertou no Crédito (F8)");
+        JButton botaoAcertouPix = new JButton("Acertou no Pix (F9)");
+
         JButton botaoSalvar = new JButton("Salvar (S)");
 
+        // Painel principal com layout nulo
         JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setPreferredSize(new Dimension(700, 400)); // Defina um tamanho adequado para o painel
+        panel.setSize(700, 400); // Definindo o tamanho físico do painel
+        panel.setLayout(null); // Para posicionamento manual dos componentes
 
-        JPanel topButtonPanel = new JPanel(); // Painel para os botões superiores
-        topButtonPanel.setLayout(new BoxLayout(topButtonPanel, BoxLayout.X_AXIS));
-        // No seu código onde adiciona os botões ao painel, adicione espaçadores
-        topButtonPanel.add(botaoCredito);
-        topButtonPanel.add(Box.createRigidArea(new Dimension(5, 0))); // Espaçador horizontal
-        topButtonPanel.add(botaoDebito);
-        topButtonPanel.add(Box.createRigidArea(new Dimension(5, 0))); // Espaçador horizontal
-        topButtonPanel.add(botaoDinheiro);
-        topButtonPanel.add(Box.createRigidArea(new Dimension(5, 0))); // Espaçador horizontal
-        topButtonPanel.add(botaoPix);
+        // Definindo posição e tamanho dos componentes
+        // Dispor os botões de pagamento em 2 colunas por 2 linhas
+        botaoCredito.setBounds(50, 20, 150, 50);
+        botaoDebito.setBounds(220, 20, 150, 50);
+        botaoDinheiro.setBounds(50, 80, 150, 50);
+        botaoPix.setBounds(220, 80, 150, 50);
 
-        panel.add(topButtonPanel);
-        panel.add(new JLabel("Valor:"), BorderLayout.WEST);
+        // Campo de valor e botão ENTER na mesma linha que os botões de pagamento
+        JLabel labelValor = new JLabel("Valor:");
+        labelValor.setBounds(390, 20, 60, 30); // Alinhado ao lado dos botões
+        valorField.setBounds(450, 20, 150, 30);
+        JButton botaoEnter = new JButton("ENTER");
+        botaoEnter.setForeground(Color.RED); // Cor do texto vermelha
+        botaoEnter.setBounds(610, 20, 80, 30); // Alinhado ao lado do valorField
+
+        // Botões inferiores organizados em uma única linha
+        botaoAcertouDinheiro.setBounds(50, 150, 170, 40);
+        botaoAcertouDebito.setBounds(230, 150, 170, 40);
+        botaoAcertouCredito.setBounds(410, 150, 170, 40);
+        botaoAcertouPix.setBounds(590, 150, 170, 40);
+
+        JLabel labelRecebidos = new JLabel("Valores Recebidos:");
+        labelRecebidos.setBounds(50, 210, 200, 30);
+        scrollPane.setBounds(50, 240, 350, 100);
+
+        botaoSalvar.setBounds(420, 300, 100, 40);
+
+        // Adicionando os componentes ao painel
+        panel.add(botaoCredito);
+        panel.add(botaoDebito);
+        panel.add(botaoDinheiro);
+        panel.add(botaoPix);
+        panel.add(labelValor);
         panel.add(valorField);
-        panel.add(new JLabel("Valores Recebidos:"), BorderLayout.WEST);
+        panel.add(botaoEnter);
+        panel.add(botaoAcertouDinheiro);
+        panel.add(botaoAcertouDebito);
+        panel.add(botaoAcertouCredito);
+        panel.add(botaoAcertouPix);
+        panel.add(labelRecebidos);
         panel.add(scrollPane);
-        panel.add(Box.createRigidArea(new Dimension(5, 0))); // Espaçador horizontal
         panel.add(botaoSalvar);
-
-        // Inicializando a cor de fundo dos botões como Light Gray
         // Resetando a aparência dos botões para o estado não selecionado
         resetarBotoes(botaoCredito, botaoDebito, botaoDinheiro, botaoPix);
-
-        // Definindo tamanho uniforme para os botões
-        Dimension buttonSize = new Dimension(120, 40);
-        botaoCredito.setPreferredSize(buttonSize);
-        botaoDebito.setPreferredSize(buttonSize);
-        botaoDinheiro.setPreferredSize(buttonSize);
-        botaoPix.setPreferredSize(buttonSize);
-        botaoSalvar.setPreferredSize(buttonSize);
 
         // Variáveis de controle
         final String[] tipoPagamento = {""}; // Armazena o tipo de pagamento selecionado
@@ -1537,9 +1608,10 @@ public class EncerraQuarto extends javax.swing.JFrame {
             valorField.postActionEvent(); // Simula o pressionamento da tecla Enter
         });
         // Exibição do JOptionPane
+
         JOptionPane optionPane = new JOptionPane(panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.DEFAULT_OPTION, null, new Object[]{}, null);
         JDialog dialog = optionPane.createDialog("Digite os valores recebidos");
-
+        dialog.setSize(800, 500);
         // Adicionando suporte para atalhos de teclado (teclas C, D, O, P, S) no JRootPane do diálogo
         JRootPane rootPane = dialog.getRootPane();
         rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("C"), "credito");
@@ -1578,6 +1650,64 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 botaoSalvar.doClick(); // Simula o clique do botão Salvar
             }
         });
+        // Listener para acertar o valor no dinheiro
+        botaoAcertouDinheiro.addActionListener(e -> {
+            recebidoDin[0] = valorDivida;
+            atualizarValoresRecebidos.run(); // Atualiza a área de texto com os valores recebidos
+            resetarBotoes(botaoCredito, botaoDebito, botaoDinheiro, botaoPix);
+        });
+
+// Listener para acertar o valor no débito
+        botaoAcertouDebito.addActionListener(e -> {
+            recebidoDebito[0] = valorDivida;
+            atualizarValoresRecebidos.run();
+            resetarBotoes(botaoCredito, botaoDebito, botaoDinheiro, botaoPix);
+        });
+
+// Listener para acertar o valor no crédito
+        botaoAcertouCredito.addActionListener(e -> {
+            recebidoCredito[0] = valorDivida;
+            atualizarValoresRecebidos.run();
+            resetarBotoes(botaoCredito, botaoDebito, botaoDinheiro, botaoPix);
+        });
+
+// Listener para acertar o valor no pix
+        botaoAcertouPix.addActionListener(e -> {
+            recebidoPix[0] = valorDivida;
+            atualizarValoresRecebidos.run();
+            resetarBotoes(botaoCredito, botaoDebito, botaoDinheiro, botaoPix);
+        });
+
+// Adicionando atalhos de teclado F6, F7, F8, F9 no JRootPane
+        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F6"), "acertouDinheiro");
+        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F7"), "acertouDebito");
+        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F8"), "acertouCredito");
+        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F9"), "acertouPix");
+
+        rootPane.getActionMap().put("acertouDinheiro", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                botaoAcertouDinheiro.doClick(); // Simula o clique do botão "Acertou no Dinheiro"
+            }
+        });
+        rootPane.getActionMap().put("acertouDebito", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                botaoAcertouDebito.doClick(); // Simula o clique do botão "Acertou no Débito"
+            }
+        });
+        rootPane.getActionMap().put("acertouCredito", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                botaoAcertouCredito.doClick(); // Simula o clique do botão "Acertou no Crédito"
+            }
+        });
+        rootPane.getActionMap().put("acertouPix", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                botaoAcertouPix.doClick(); // Simula o clique do botão "Acertou no Pix"
+            }
+        });
         // Ação do botão "Salvar"
         botaoSalvar.addActionListener(e -> {
             float totalRecebido = recebidoDin[0] + recebidoPix[0] + recebidoCredito[0] + recebidoDebito[0];
@@ -1587,7 +1717,6 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 valD = recebidoDin[0];
                 valC = recebidoCredito[0] + recebidoDebito[0];
                 valP = recebidoPix[0];
-                JOptionPane.showMessageDialog(null, "Pagamento concluído com sucesso.");
                 sucesso[0] = true; // Indica que o pagamento foi bem-sucedido
                 dialog.dispose(); // Fecha o JDialog
             } else {
@@ -1598,7 +1727,6 @@ public class EncerraQuarto extends javax.swing.JFrame {
 
         return sucesso[0]; // Retorna o status de sucesso do pagamento
     }
-    // Função para resetar os botões para o estado normal
 
     private void resetarBotoes(JButton... botoes) {
         Dimension buttonSize = new Dimension(120, 40);
@@ -1635,6 +1763,12 @@ public class EncerraQuarto extends javax.swing.JFrame {
         fquartos quartodao = new fquartos();
         CacheDados cache = CacheDados.getInstancia();
         int idLocacao = cache.getCacheOcupado().get(numeroDoQuarto).getIdLoca();
+        if (idLocacao == 0) {
+            DadosOcupados quartoOcupado = cache.getCacheOcupado().get(numeroDoQuarto);
+            int novoID = new fquartos().getIdLocacao(numeroDoQuarto);
+            quartoOcupado.setIdLoca(novoID);
+            cache.getCacheOcupado().put(numeroDoQuarto, quartoOcupado);
+        }
         DefaultTableModel model = (DefaultTableModel) tabela.getModel();
         int rowCount = model.getRowCount();
         for (int i = 0; i < rowCount; i++) {
@@ -1653,7 +1787,6 @@ public class EncerraQuarto extends javax.swing.JFrame {
         quartodao.salvaLocacao(idLocacao, Timestamp.valueOf(horaInicio), Timestamp.valueOf(horaFim), valorDoQuarto, valorConsumo, valD, valP, valC);
         new playSound().playSound("som/agradecemosPreferencia.wav");
         new ConectaArduino(999);
-        JOptionPane.showMessageDialog(null, "Registro Salvo com sucesso!");
 
         // altera o status do quarto para limpeza
         mudaStatusNaCache(numeroDoQuarto, "limpeza");
@@ -1673,6 +1806,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         config.setMudanca(true);
         outraTela.dispose();
         this.dispose();
+        JOptionPane.showMessageDialog(null, "Registro Salvo com sucesso!");
     }
 
     public boolean mudaStatusNaCache(int quartoMudar, String statusColocar) {
@@ -1871,9 +2005,48 @@ public class EncerraQuarto extends javax.swing.JFrame {
     }//GEN-LAST:event_btApagarActionPerformed
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
-        // TODO add your handling code here:
     }//GEN-LAST:event_formWindowOpened
+    // Iniciar gravação
 
+    private void startRecording(int numeroQuarto) {
+        if (!recording) {
+            CacheDados cache = CacheDados.getInstancia();
+            int idLocacao = cache.getCacheOcupado().get(numeroQuarto).getIdLoca();
+            if (idLocacao == 0) {
+                DadosOcupados quartoOcupado = cache.getCacheOcupado().get(numeroQuarto);
+                int novoID = new fquartos().getIdLocacao(numeroQuarto);
+                quartoOcupado.setIdLoca(novoID);
+                cache.getCacheOcupado().put(numeroQuarto, quartoOcupado);
+            }
+            // Caminho onde o vídeo será salvo (alterar conforme necessário)
+            String outputFilePath = new File("src/main/resources/videos", idLocacao + ".mp4").getAbsolutePath();
+
+            // URL da câmera (RTSP)
+            String mediaUrl = "rtsp://admin:Felipe0110@192.168.100.135:554/cam/realmonitor?channel=1&subtype=0";
+
+            String[] mediaOptions = {
+                ":sout=#file{dst=" + outputFilePath + "}",
+                ":network-caching=1000", // Cache de rede para suavizar
+                ":no-sout-all",
+                ":sout-keep"
+            };
+
+            // Inicia a gravação diretamente, sem exibir vídeo
+            mediaPlayer.media().play(mediaUrl, mediaOptions);
+            recording = true;  // Marca que a gravação está em andamento
+            System.out.println("Gravação iniciada.");
+        }
+    }
+
+    // Parar gravação
+    private void stopRecording() {
+        if (recording) {
+            // Para a gravação
+            mediaPlayer.controls().stop();
+            recording = false;  // Marca que a gravação foi interrompida
+            System.out.println("Gravação salva com sucesso.");
+        }
+    }
     private void btWifiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btWifiActionPerformed
         // mostra a img de conexao de wi-fi na 2a Tela
         if (!isFrameOpen) {
@@ -1922,6 +2095,17 @@ public class EncerraQuarto extends javax.swing.JFrame {
             isFrameOpen = false;
         }
     }//GEN-LAST:event_btWifiActionPerformed
+
+    private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
+        // TODO add your handling code here:
+    }//GEN-LAST:event_formWindowActivated
+
+    private void formWindowGainedFocus(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowGainedFocus
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(yourKeyEventDispatcher);
+
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(yourKeyEventDispatcher);
+
+    }//GEN-LAST:event_formWindowGainedFocus
 
     /**
      * @param args the command line arguments
