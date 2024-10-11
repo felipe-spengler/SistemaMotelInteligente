@@ -5,7 +5,6 @@ import com.motelinteligente.dados.BarraCarregar;
 import com.motelinteligente.dados.CacheDados;
 import com.motelinteligente.dados.MotelInteligenteApplication;
 import com.motelinteligente.dados.configGlobal;
-import com.motelinteligente.dados.fazconexao;
 import com.motelinteligente.dados.ffuncionario;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -17,10 +16,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.JOptionPane;
 import java.awt.Toolkit;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+
 import javax.swing.JFrame;
 import javax.swing.JProgressBar;
 

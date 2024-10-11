@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.Calendar;
 import java.util.Date;
 
 public class AddAlarmDialog extends JDialog {
@@ -22,46 +23,52 @@ public class AddAlarmDialog extends JDialog {
     private JTextField noteField;
 
     public AddAlarmDialog() {
-        setTitle("Adicionar Novo Alarme");
-        setLayout(new GridLayout(5, 2));
-        setSize(300, 200);
-        setLocationRelativeTo(null);
+    setTitle("Adicionar Novo Alarme");
+    setLayout(new GridLayout(5, 2));
+    setSize(300, 200);
+    setLocationRelativeTo(null);
 
-        // Criar e configurar o SpinnerDateModel para data
-        SpinnerDateModel dateModel = new SpinnerDateModel(new Date(), null, null, java.util.Calendar.DAY_OF_MONTH);
-        dateSpinner = new JSpinner(dateModel);
-        JSpinner.DateEditor dateEditor = new JSpinner.DateEditor(dateSpinner, "dd/MM/yyyy");
-        dateSpinner.setEditor(dateEditor);
+    // Obter a data e hora atuais
+    Calendar calendar = Calendar.getInstance();
 
-        // Configurar centralização para o editor de data
-        JTextField dateField = ((JSpinner.DateEditor) dateSpinner.getEditor()).getTextField();
-        dateField.setHorizontalAlignment(JTextField.CENTER);
+    // Criar e configurar o SpinnerDateModel para data
+    SpinnerDateModel dateModel = new SpinnerDateModel(new Date(), null, null, java.util.Calendar.DAY_OF_MONTH);
+    dateSpinner = new JSpinner(dateModel);
+    JSpinner.DateEditor dateEditor = new JSpinner.DateEditor(dateSpinner, "dd/MM/yyyy");
+    dateSpinner.setEditor(dateEditor);
 
-        // Criar e configurar os spinners para hora e minuto
-        hourSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 23, 1));
-        minuteSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 59, 1));
+    // Configurar centralização para o editor de data
+    JTextField dateField = ((JSpinner.DateEditor) dateSpinner.getEditor()).getTextField();
+    dateField.setHorizontalAlignment(JTextField.CENTER);
 
-        // Configurar centralização para os editores de hora e minuto
-        JTextField hourField = ((JSpinner.NumberEditor) hourSpinner.getEditor()).getTextField();
-        hourField.setHorizontalAlignment(JTextField.CENTER);
-        JTextField minuteField = ((JSpinner.NumberEditor) minuteSpinner.getEditor()).getTextField();
-        minuteField.setHorizontalAlignment(JTextField.CENTER);
+    // Criar e configurar os spinners para hora e minuto
+    int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
+    int currentMinute = calendar.get(Calendar.MINUTE);
+    
+    hourSpinner = new JSpinner(new SpinnerNumberModel(currentHour, 0, 23, 1));
+    minuteSpinner = new JSpinner(new SpinnerNumberModel(currentMinute, 0, 59, 1));
 
-        noteField = new JTextField();
+    // Configurar centralização para os editores de hora e minuto
+    JTextField hourField = ((JSpinner.NumberEditor) hourSpinner.getEditor()).getTextField();
+    hourField.setHorizontalAlignment(JTextField.CENTER);
+    JTextField minuteField = ((JSpinner.NumberEditor) minuteSpinner.getEditor()).getTextField();
+    minuteField.setHorizontalAlignment(JTextField.CENTER);
 
-        JButton addButton = new JButton("Adicionar Alarme");
-        addButton.addActionListener(e -> addAlarm());
+    noteField = new JTextField();
 
-        add(new JLabel("Data:"));
-        add(dateSpinner);
-        add(new JLabel("Hora:"));
-        add(hourSpinner);
-        add(new JLabel("Minuto:"));
-        add(minuteSpinner);
-        add(new JLabel("Título do Alarme:"));
-        add(noteField);
-        add(addButton);
-    }
+    JButton addButton = new JButton("Adicionar Alarme");
+    addButton.addActionListener(e -> addAlarm());
+
+    add(new JLabel("Data:"));
+    add(dateSpinner);
+    add(new JLabel("Hora:"));
+    add(hourSpinner);
+    add(new JLabel("Minuto:"));
+    add(minuteSpinner);
+    add(new JLabel("Título do Alarme:"));
+    add(noteField);
+    add(addButton);
+}
 
     private void addAlarm() {
         // Obtendo a data selecionada no dateSpinner

@@ -17,8 +17,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
-import java.awt.KeyEventDispatcher;
-import java.awt.KeyboardFocusManager;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -39,8 +37,10 @@ import javax.sound.sampled.LineEvent;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -89,7 +89,6 @@ public class EncerraQuarto extends javax.swing.JFrame {
     int numeroDoQuarto;
     int numeroDePessoas = 2;
     String motivo = null;
-    private KeyEventDispatcher yourKeyEventDispatcher;
     private Timer timer;
 
     class numOnly extends PlainDocument {
@@ -128,7 +127,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         // Inicializa a fábrica e o media player
         mediaPlayerFactory = new MediaPlayerFactory();
         mediaPlayer = mediaPlayerFactory.mediaPlayers().newMediaPlayer();
-        startRecording(numeroQuarto);
+        //startRecording(numeroQuarto);
         tabela.getModel().addTableModelListener(new TableModelListener() {
             @Override
             public void tableChanged(TableModelEvent e) {
@@ -147,66 +146,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
 
         setValorDivida();
 
-        // Adicione yourKeyEventDispatcher ao KeyboardFocusManager
-        yourKeyEventDispatcher = new KeyEventDispatcher() {
-            boolean eventConsumed = false;
-
-            @Override
-            public boolean dispatchKeyEvent(KeyEvent e) {
-                if (eventConsumed) {
-                    // Se o evento já foi consumido, retorne false para indicar que não foi tratado novamente
-                    return false;
-                }
-
-                int keyCode = e.getKeyCode();
-
-                switch (keyCode) {
-                    case KeyEvent.VK_ESCAPE:
-                        btVoltar.doClick();
-                        eventConsumed = true;
-                        break;
-                    case KeyEvent.VK_F9:
-                        if (!jopAberto) {
-                            jopAberto = true;
-                            System.out.println("clicou no f9");
-                            btSalvar.doClick();
-                            eventConsumed = true;
-                        }
-
-                        break;
-                    case KeyEvent.VK_F2:
-                        System.out.println("clicou no f2");
-                        btConferencia.doClick();
-                        eventConsumed = true;
-                        break;
-                    case KeyEvent.VK_F4:
-                        btDebito.doClick();
-                        eventConsumed = true;
-                        break;
-                    case KeyEvent.VK_F6:
-                        btDesistencia.doClick();
-                        eventConsumed = true;
-                        break;
-                    default:
-                        break;
-                }
-
-                // Inicie um temporizador para redefinir eventConsumed após um curto período de tempo
-                if (timer != null) {
-                    timer.stop();
-                }
-                timer = new Timer(2000, new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent evt) {
-                        eventConsumed = false;
-                        timer.stop();
-                    }
-                });
-                timer.start();
-
-                return false; // Indica se o evento foi consumido ou não
-            }
-        };
+        setupKeyboardShortcuts();
 
         txtIdProduto.grabFocus();
 
@@ -216,6 +156,61 @@ public class EncerraQuarto extends javax.swing.JFrame {
             return;  // Sai do construtor se as bibliotecas não forem encontradas
         }
 
+    }
+
+    private void setupKeyboardShortcuts() {
+        // Obtém o InputMap e ActionMap da janela principal (RootPane)
+        InputMap inputMap = this.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap actionMap = this.getRootPane().getActionMap();
+
+        // Mapeia a tecla ESC para a ação de voltar
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "ESCAPE");
+        actionMap.put("ESCAPE", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btVoltar.doClick();  // Simula o clique no botão "Voltar"
+            }
+        });
+
+        // Mapeia a tecla F9 para salvar
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F9, 0), "F9");
+        actionMap.put("F9", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!jopAberto) {
+                    jopAberto = true;
+                    btSalvar.doClick();  // Simula o clique no botão "Salvar"
+                    jopAberto = false;    // Reseta o estado após a ação
+                }
+            }
+        });
+
+        // Mapeia a tecla F2 para conferência
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0), "F2");
+        actionMap.put("F2", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btConferencia.doClick();  // Simula o clique no botão "Conferência"
+            }
+        });
+
+        // Mapeia a tecla F4 para débito
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F4, 0), "F4");
+        actionMap.put("F4", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btDebito.doClick();  // Simula o clique no botão "Débito"
+            }
+        });
+
+        // Mapeia a tecla F6 para desistência
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F6, 0), "F6");
+        actionMap.put("F6", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btDesistencia.doClick();  // Simula o clique no botão "Desistência"
+            }
+        });
     }
 
     public void setaLabelGeral(int numeroQuarto) {
@@ -368,8 +363,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
 
     @Override
     public void dispose() {
-        KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(yourKeyEventDispatcher);
-        stopRecording();
+        //stopRecording();
         outraTela.dispose();
         super.dispose();
     }
@@ -1283,8 +1277,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         }
         System.out.println("setando jopAberto false");
         jopAberto = false;
-        KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(yourKeyEventDispatcher);
-        
+
     }//GEN-LAST:event_btSalvarActionPerformed
     public void salvaJustifica(String tipoValor, float valorSalvar) {
         Connection link = null;
@@ -1825,7 +1818,6 @@ public class EncerraQuarto extends javax.swing.JFrame {
     }
     private void btVoltarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btVoltarActionPerformed
         // TODO add your handling code here:
-        KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(yourKeyEventDispatcher);
 
         outraTela.dispose();
         this.dispose();
@@ -1836,7 +1828,6 @@ public class EncerraQuarto extends javax.swing.JFrame {
         String valorDebito;
         float valor = (valorDivida - valoreRecebido);
         String falar = "SuaConta " + NumeroPorExtenso.NumeroPorExtenso(valor) + " reais";
-        System.out.println(falar);
         String[] palavras = falar.split(" ");
 
         // Itere pelo array de palavras e imprima cada uma
@@ -2101,10 +2092,6 @@ public class EncerraQuarto extends javax.swing.JFrame {
     }//GEN-LAST:event_formWindowActivated
 
     private void formWindowGainedFocus(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowGainedFocus
-        KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(yourKeyEventDispatcher);
-
-        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(yourKeyEventDispatcher);
-
     }//GEN-LAST:event_formWindowGainedFocus
 
     /**

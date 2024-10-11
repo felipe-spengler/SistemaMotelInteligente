@@ -36,8 +36,6 @@ public class MotelInteligenteApplication {
             URLConnection con = url.openConnection();
             BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
             String externalIP = reader.readLine();
-            System.out.println("Servidor Iniciado: " + externalIP);
-            //logger.debug("Servidor Iniciado: " + externalIP);
             reader.close();
 
             // Verifica o IP no banco de dados
@@ -79,10 +77,10 @@ public class MotelInteligenteApplication {
                 statement.close();
                 link.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                JOptionPane.showMessageDialog(null, e);;
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, e);
         }
     }
 

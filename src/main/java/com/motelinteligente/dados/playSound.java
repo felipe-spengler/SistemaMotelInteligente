@@ -32,33 +32,27 @@ public class playSound {
     // Função para tocar o som em loop continuamente
 
     public void playSoundLoop(String nomeSom) {
-        try {
-            FileInputStream fileInputStream = new FileInputStream(nomeSom);
-            player = new Player(fileInputStream);
-            isPlaying = true;
+        isPlaying = true;
 
-            new Thread(() -> {
-                try {
-                    while (isPlaying) {
-                        player.play();
-                        fileInputStream.getChannel().position(0); // Reset the stream to loop
-                        player = new Player(fileInputStream);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+        new Thread(() -> {
+            try {
+                while (isPlaying) {
+                    // Cria um novo FileInputStream e Player a cada loop
+                    FileInputStream fileInputStream = new FileInputStream(nomeSom);
+                    player = new Player(fileInputStream);
+                    player.play();
+                    fileInputStream.close(); // Fecha o stream após tocar o som
                 }
-            }).start();
-
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, "Erro ao executar som!");
-            ex.printStackTrace();
-        }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
-    // Função para parar o som que está sendo reproduzido
     public void stopSound() {
-        if (clip != null && clip.isRunning()) {
-            clip.stop(); // Para o som
+        if (player != null) {
+            isPlaying = false; // Interrompe o loop
+            player.close(); // Fecha o player, parando a execução do som
         }
     }
 }

@@ -143,7 +143,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             configGlobal configuracao = configGlobal.getInstance();
             configuracao.setCaixa(idCaixaAtual);
         }
-         // Configurando o Key Binding para F2 diretamente no JFrame (this)
+        // Configurando o Key Binding para F2 diretamente no JFrame (this)
         InputMap inputMap = this.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap actionMap = this.getRootPane().getActionMap();
 
@@ -270,7 +270,12 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         playSound soundPlayer = new playSound();
         soundPlayer.playSoundLoop("som/despertador.mp3"); // Caminho relativo
 
-        JOptionPane.showMessageDialog(null, "Alarme: " + description, "Atenção!", JOptionPane.WARNING_MESSAGE);
+        JOptionPane.showMessageDialog(
+                null,
+                "<html><span style='font-size:32px;'>  " + description + " </span></html>",
+                "Atenção!",
+                JOptionPane.WARNING_MESSAGE
+        );
         soundPlayer.stopSound(); // Para o som quando o alerta é fechado
         new FAlarmes().removeAlarmFromDatabase(idAlarme);
     }
@@ -1275,11 +1280,11 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         srPane.setLayout(srPaneLayout);
         srPaneLayout.setHorizontalGroup(
             srPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 925, Short.MAX_VALUE)
+            .addGap(0, 1100, Short.MAX_VALUE)
         );
         srPaneLayout.setVerticalGroup(
             srPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 588, Short.MAX_VALUE)
+            .addGap(0, 591, Short.MAX_VALUE)
         );
 
         btCadastros.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/cadastro.png"))); // NOI18N
@@ -1522,9 +1527,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
-                .addGap(18, 18, 18)
+                .addContainerGap()
                 .addComponent(srPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(25, 25, 25)
+                .addGap(0, 0, 0)
                 .addComponent(painelQuartos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(tabela, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1535,18 +1540,18 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 605, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                             .addComponent(tabela, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(139, 139, 139)
-                                .addComponent(painelQuartos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(17, 17, 17)
-                        .addComponent(srPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                .addComponent(painelQuartos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(srPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -1628,7 +1633,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 if (config.getAlarmesAtivos() > 0) {
                     lblAlarmeAtivo.setVisible(true);
                     checkAlarmsToRing();
-                }else{
+                } else {
                     lblAlarmeAtivo.setVisible(false);
                 }
             }
@@ -1639,6 +1644,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         outroTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
+                srPane.removeAll();
                 mostraQuartos();
             }
         }, 0, 20000);  // Atualiza a cada 20 segundos
@@ -1892,12 +1898,12 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         Timestamp timestamp = new Timestamp(dataAtual.getTime());
         // Atualiza o status e a data do quarto
         quarto.setStatusQuarto(statusColocar);
-        if(hora != null){
+        if (hora != null) {
             quarto.setHoraStatus(String.valueOf(hora));
-        }else{
+        } else {
             quarto.setHoraStatus(String.valueOf(timestamp));
         }
-        
+
         // Atualiza o quarto na cache
         dados.getCacheQuarto().put(quartoMudar, quarto);
         if (statusColocar.contains("ocupado")) {
