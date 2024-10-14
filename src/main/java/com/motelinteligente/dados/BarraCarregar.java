@@ -19,6 +19,7 @@ public class BarraCarregar {
         frame.setSize(300, 100);
         frame.setLocationRelativeTo(null);
         frame.add(progressBar);
+        frame.setVisible(true);
     }
 
     public JFrame getFrame() {
@@ -32,7 +33,7 @@ public class BarraCarregar {
     public void carregarDados() {
         frame.setVisible(true); // Exibe a barra de carregamento
 
-        Thread thread = new Thread(() -> {
+        
             CacheDados carregamento = CacheDados.getInstancia();
             carregamento.carregarDadosQuarto();
 
@@ -41,9 +42,8 @@ public class BarraCarregar {
                 frame.dispose(); // Fecha a barra de carregamento
                 iniciarTelaPrincipal(); // Inicia a tela principal após o carregamento completo
             });
-        });
 
-        thread.start(); // Inicia a thread para carregar os dados
+        //thread.start(); // Inicia a thread para carregar os dados
     }
 
     private void iniciarTelaPrincipal() {

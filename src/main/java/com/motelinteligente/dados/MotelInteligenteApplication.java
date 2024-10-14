@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
 import java.sql.Connection;
@@ -19,6 +20,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,7 +37,9 @@ public class MotelInteligenteApplication {
             URL url = new URL("http://checkip.amazonaws.com/");
             URLConnection con = url.openConnection();
             BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            String externalIP = reader.readLine();
+           // String externalIP = reader.readLine();
+            String externalIP = InetAddress.getLocalHost().getHostAddress();
+            System.out.println("IP interno: " + externalIP);
             reader.close();
 
             // Verifica o IP no banco de dados
@@ -69,6 +73,8 @@ public class MotelInteligenteApplication {
                         } catch (SQLException e) {
                             e.printStackTrace();
                         }
+                    } else {
+                        System.out.println(" o ip do servidor e do banco sao iguais");
                     }
                 }
 
@@ -113,7 +119,7 @@ public class MotelInteligenteApplication {
                 int quartoEmFoco = Integer.parseInt(numero);
                 if (acao.equals("reproduzir")) {
                     new playSound().playSound("som/mensagem conferencia.wav");
-                }else if (acao.equals("reservar")) {
+                } else if (acao.equals("reservar")) {
                     if (quartoEmFoco != 0) {
                         mudaStatusNaCache(quartoEmFoco, "reservado");
                         configGlobal config = configGlobal.getInstance();
@@ -250,5 +256,12 @@ public class MotelInteligenteApplication {
             return true;
 
         }
+
+        // Novo endpoint GET para teste
+        @GetMapping("/teste")
+        public ResponseEntity<String> getTeste() {
+            return ResponseEntity.ok("GET funcionando! Teste realizado com sucesso.");
+        }
     }
+
 }

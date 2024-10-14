@@ -22,8 +22,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -1837,10 +1839,15 @@ public class EncerraQuarto extends javax.swing.JFrame {
     public static void reproduzirSonsEmSequencia(String[] palavras, int indice) {
         if (indice < palavras.length) {
             String palavraAtual = palavras[indice];
-            String caminhoSom = "som/" + palavraAtual + ".wav";
+            String caminhoSom = "/som/" + palavraAtual + ".wav";  // Caminho relativo dentro do .jar
 
-            try {
-                AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(caminhoSom));
+            try ( InputStream audioSrc = EncerraQuarto.class.getResourceAsStream(caminhoSom)) {
+                if (audioSrc == null) {
+                    System.out.println("Som não encontrado: " + caminhoSom);
+                    return;
+                }
+
+                AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new BufferedInputStream(audioSrc));
                 Clip clip = AudioSystem.getClip();
                 clip.open(audioInputStream);
 
@@ -1857,9 +1864,9 @@ public class EncerraQuarto extends javax.swing.JFrame {
             } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
                 e.printStackTrace();
             }
+
         }
     }
-
 
     private void btConferenciaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btConferenciaActionPerformed
         // TODO add your handling code here:

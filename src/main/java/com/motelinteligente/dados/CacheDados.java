@@ -41,15 +41,32 @@ public class CacheDados {
         return instancia;
     }
 
-     public static void carregaArduino() {
+    public static void carregaArduino() {
         if (arduinoPort != null && arduinoPort.isOpen()) {
             return; // A conexão já está aberta
         }
-        
-        arduinoPort = SerialPort.getCommPort("COM4");
+
+        SerialPort[] portas = SerialPort.getCommPorts();
+        System.out.println("Portas seriais disponíveis:");
+
+        for (SerialPort porta : portas) {
+            System.out.println("Nome: " + porta.getSystemPortName() + ", Descrição: " + porta.getDescriptivePortName());
+
+            // Verifica se a porta corresponde ao USB-SERIAL CH340
+            if (porta.getDescriptivePortName().toLowerCase().contains("usb-serial ch340")) {
+                System.out.println("Arduino (CH340) encontrado na porta: " + porta.getSystemPortName());
+                arduinoPort = porta; // Define a porta do Arduino
+                break;
+            }
+        }
+
+        if (arduinoPort == null) {
+            JOptionPane.showMessageDialog(null, "Nenhum Arduino (CH340) encontrado.");
+            return;
+        }
 
         if (!arduinoPort.openPort()) {
-            JOptionPane.showMessageDialog(null, "Falha ao abrir a porta COM4 - Conecte o Arduino.");
+            JOptionPane.showMessageDialog(null, "Falha ao abrir a porta " + arduinoPort.getSystemPortName() + " - Conecte o Arduino.");
             return;
         }
 
@@ -68,13 +85,16 @@ public class CacheDados {
         if (arduinoPort != null && arduinoPort.isOpen()) {
             arduinoPort.closePort();
         }
-    }    public void limparCaches() {
+    }
+
+    public void limparCaches() {
         cacheQuarto.clear();
         cacheOcupado.clear();
         cacheProdutosVendidos.clear();
         cacheNegociado.clear();
         despertador.clear();
     }
+
     public void carregarOcupado(int numeroQuarto) {
         float valPeriodo = 0, valPernoite = 0, valAdicional = 0;
         int pessoas = 0;

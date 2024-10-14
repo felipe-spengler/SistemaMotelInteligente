@@ -1,6 +1,5 @@
 package com.motelinteligente.telas;
 
-
 import com.motelinteligente.dados.BarraCarregar;
 import com.motelinteligente.dados.CacheDados;
 import com.motelinteligente.dados.MotelInteligenteApplication;
@@ -33,7 +32,7 @@ public class TelaLogin extends javax.swing.JFrame {
 
     public TelaLogin() throws IOException {
         // Inicializa o contexto do Spring
-                
+
         setVisible(true);
         initComponents();
         insereIcone(this);
@@ -137,7 +136,7 @@ public class TelaLogin extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(bt_entrar, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(bt_sair, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(208, 208, 208))
+                .addGap(50, 50, 50))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -150,7 +149,7 @@ public class TelaLogin extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 436, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         pack();
@@ -211,16 +210,21 @@ public class TelaLogin extends javax.swing.JFrame {
         texto_senha = txt_senha.getText();
         String cargo = new ffuncionario().verificaLogin(texto_login, texto_senha);
         if (cargo != null) {
-            BarraCarregar progressDialog = new BarraCarregar();
-            progressDialog.carregarDados();
-
-            configGlobal configuracoes = configGlobal.getInstance();
-            configuracoes.carregarInformacoes(cargo, texto_login);
+            // Carregar dados diretamente na tela de login
             CacheDados cache = CacheDados.getInstancia();
+            configGlobal configuracoes = configGlobal.getInstance();
+
+            // Carrega informações globais de configuração do usuário logado
+            configuracoes.carregarInformacoes(cargo, texto_login);
+            cache.carregarDadosQuarto();
+
+            // Carrega Arduino, se necessário
             if (!configuracoes.isFlagArduino()) {
                 cache.carregaArduino();
                 configuracoes.setFlagArduino(true);
             }
+
+            // Iniciar sistema Spring, se ainda não foi iniciado
             if (!configuracoes.isFlagSistemaSpring()) {
                 new Thread(() -> {
                     MotelInteligenteApplication.main(new String[]{});
@@ -228,6 +232,11 @@ public class TelaLogin extends javax.swing.JFrame {
                 configuracoes.setFlagSistemaSpring(true);
             }
 
+            // Abrir diretamente a tela principal
+            TelaPrincipal tela = new TelaPrincipal();
+            tela.setVisible(true);
+
+            // Fechar a tela de login
             dispose();
         } else {
             JOptionPane.showMessageDialog(null, "Erro no login!!");
@@ -269,7 +278,6 @@ public class TelaLogin extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(TelaLogin.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         new TelaLogin().setVisible(true);
-        
 
         //}
         //});

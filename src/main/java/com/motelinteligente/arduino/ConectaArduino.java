@@ -1,11 +1,7 @@
 package com.motelinteligente.arduino;
 
-import com.fazecast.jSerialComm.SerialPort;
 import com.motelinteligente.dados.CacheDados;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Scanner;
-import javax.swing.JOptionPane;
+
 
 public class ConectaArduino {
     private static final int MAX_TENTATIVAS = 3;

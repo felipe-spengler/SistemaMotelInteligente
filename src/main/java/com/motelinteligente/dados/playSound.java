@@ -4,8 +4,11 @@
  */
 package com.motelinteligente.dados;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.AudioSystem;
@@ -20,25 +23,33 @@ public class playSound {
 
     public void playSound(String nomeSom) {
         try {
-            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(nomeSom).getAbsoluteFile());
+            // Use getResourceAsStream para carregar o som do resources
+            InputStream audioInputStream = getClass().getClassLoader().getResourceAsStream(nomeSom);
+            if (audioInputStream == null) {
+                throw new FileNotFoundException("Arquivo de som não encontrado: " + nomeSom);
+            }
+            AudioInputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(audioInputStream));
             clip = AudioSystem.getClip();
-            clip.open(audioInputStream);
+            clip.open(ais);
             clip.start();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, "Erro ao executar som!.");
+            JOptionPane.showMessageDialog(null, "Erro ao executar som!");
             ex.printStackTrace();
         }
     }
     // Função para tocar o som em loop continuamente
-
+    
     public void playSoundLoop(String nomeSom) {
         isPlaying = true;
 
         new Thread(() -> {
             try {
                 while (isPlaying) {
-                    // Cria um novo FileInputStream e Player a cada loop
-                    FileInputStream fileInputStream = new FileInputStream(nomeSom);
+                    // Use getResourceAsStream para carregar o som do resources
+                    InputStream fileInputStream = getClass().getClassLoader().getResourceAsStream(nomeSom);
+                    if (fileInputStream == null) {
+                        throw new FileNotFoundException("Arquivo de som não encontrado: " + nomeSom);
+                    }
                     player = new Player(fileInputStream);
                     player.play();
                     fileInputStream.close(); // Fecha o stream após tocar o som

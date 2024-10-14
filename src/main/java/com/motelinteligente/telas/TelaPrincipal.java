@@ -184,13 +184,11 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         if (config.getAlarmesAtivos() > 0) {
             try ( Connection conn = new fazconexao().conectar();  Statement stmt = conn.createStatement();  ResultSet rs = stmt.executeQuery("SELECT id, hora_despertar, descricao FROM alarmes WHERE ativo = TRUE")) {
 
-                System.out.println("Tem " + config.getAlarmesAtivos() + " alarmes ativos");
 
                 while (rs.next()) {
                     int idAlarme = rs.getInt("id");
                     Timestamp horaDespertar = rs.getTimestamp("hora_despertar");
                     String descricao = rs.getString("descricao");
-                    System.out.println("hora despertar no banco é " + horaDespertar);
                     // Obtém a data e hora atuais
                     Calendar agora = Calendar.getInstance();
                     int anoAtual = agora.get(Calendar.YEAR);
@@ -209,25 +207,17 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                     int minutoAlarme = alarmeCalendar.get(Calendar.MINUTE);
 
                     // Saídas detalhadas para depuração
-                    System.out.println("Verificando alarme ID: " + idAlarme + " - Descrição: " + descricao);
-                    System.out.println("Data atual: " + anoAtual + "-" + mesAtual + "-" + diaAtual + " " + horaAtual + ":" + minutoAtual);
-                    System.out.println("Data do alarme: " + anoAlarme + "-" + mesAlarme + "-" + diaAlarme + " " + horaAlarme + ":" + minutoAlarme);
-
+                  
                     // Comparar data (ano, mês e dia)
                     if (anoAtual == anoAlarme && mesAtual == mesAlarme && diaAtual == diaAlarme) {
-                        System.out.println("Data do alarme coincide com a data atual.");
 
                         // Comparar hora e minuto
                         if (horaAtual == horaAlarme && minutoAtual == minutoAlarme) {
-                            System.out.println("Horário do alarme coincide com o horário atual - Despertando alarme ID: " + idAlarme);
                             showAlarmAlert(idAlarme, descricao); // Chama a função para mostrar o alerta
-                        } else {
-                            System.out.println("Horário atual e do alarme não coincidem exatamente.");
-                        }
+                        } 
 
                     } else {
                         // Comparar se o alarme já passou da data atual
-                        System.out.println("Comparando alarme com horário atual...");
 
                         // Verificar se o alarme está no passado
                         if (anoAtual > anoAlarme
@@ -240,18 +230,12 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                             long diferencaMillis = agora.getTimeInMillis() - alarmeCalendar.getTimeInMillis();
                             long quinzeMinutosMillis = 15 * 60 * 1000; // 15 minutos em milissegundos
 
-                            // Saídas de debug
-                            System.out.println("Diferença em milissegundos: " + diferencaMillis);
-                            System.out.println("15 minutos em milissegundos: " + quinzeMinutosMillis);
+                            
 
-                            if (diferencaMillis <= quinzeMinutosMillis) {
-                                System.out.println("Alarme ID: " + idAlarme + " ainda não deve ser removido, está dentro dos 15 minutos de tolerância.");
-                            } else {
+                            if (!(diferencaMillis <= quinzeMinutosMillis)) {
                                 System.out.println("Alarme ID: " + idAlarme + " já passou mais de 15 minutos - deve remover.");
                                 new FAlarmes().removeAlarmFromDatabase(idAlarme);
                             }
-                        } else {
-                            System.out.println("O horário do alarme ainda não chegou.");
                         }
                     }
                 }
@@ -418,7 +402,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                     total
                 });
             }
-            System.out.println("valor consumo antecipado setado " + totalVendido);
             lblValorConsumo.setText("R$ " + totalVendido);
             lblValorConsumo.repaint();
         } else {
@@ -2634,7 +2617,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     }//GEN-LAST:event_botaoStatusActionPerformed
 
     private void btDespertadorMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btDespertadorMouseClicked
-        System.out.println("clicou no alarme");
         new AlarmApp();
     }//GEN-LAST:event_btDespertadorMouseClicked
 
