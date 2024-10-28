@@ -625,8 +625,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         txtDescontoNegociado = new javax.swing.JTextField();
         bt_Antecipado = new javax.swing.JButton();
         btNegociar = new javax.swing.JButton();
-        portaoEntrada = new javax.swing.JButton();
-        portaoSaida = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
         painelQuartos = new javax.swing.JPanel();
         tabela = new javax.swing.JPanel();
         srPane = new javax.swing.JDesktopPane();
@@ -1216,25 +1216,23 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 .addComponent(jTabbedPane1))
         );
 
-        portaoEntrada.setFont(new java.awt.Font("Stencil", 0, 14)); // NOI18N
-        portaoEntrada.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/bt_entrada_icone.png"))); // NOI18N
-        portaoEntrada.setText("Portão Entrada");
-        portaoEntrada.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        portaoEntrada.setFocusable(false);
-        portaoEntrada.addActionListener(new java.awt.event.ActionListener() {
+        jButton1.setFont(new java.awt.Font("Stencil", 0, 14)); // NOI18N
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/bt_entrada_icone.png"))); // NOI18N
+        jButton1.setText("Portão Entrada");
+        jButton1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                portaoEntradaActionPerformed(evt);
+                jButton1ActionPerformed(evt);
             }
         });
 
-        portaoSaida.setFont(new java.awt.Font("Stencil", 0, 14)); // NOI18N
-        portaoSaida.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/bt_saida_icone.png"))); // NOI18N
-        portaoSaida.setText("Portão Saída");
-        portaoSaida.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        portaoSaida.setFocusable(false);
-        portaoSaida.addActionListener(new java.awt.event.ActionListener() {
+        jButton3.setFont(new java.awt.Font("Stencil", 0, 14)); // NOI18N
+        jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/bt_saida_icone.png"))); // NOI18N
+        jButton3.setText("Portão Saída");
+        jButton3.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                portaoSaidaActionPerformed(evt);
+                jButton3ActionPerformed(evt);
             }
         });
 
@@ -1271,9 +1269,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addGap(6, 6, 6)
-                                .addComponent(portaoEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(portaoSaida, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(painelSecundario2))
                         .addGap(35, 35, 35))))
         );
@@ -1295,8 +1293,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(portaoEntrada)
-                    .addComponent(portaoSaida))
+                    .addComponent(jButton1)
+                    .addComponent(jButton3))
                 .addGap(1, 1, 1)
                 .addComponent(painelSecundario2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -1330,6 +1328,11 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         btQuartos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_quarto.png"))); // NOI18N
         btQuartos.setText("Quartos");
         btQuartos.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btQuartos.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btQuartosMouseClicked(evt);
+            }
+        });
         btQuartos.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btQuartosActionPerformed(evt);
@@ -1340,6 +1343,11 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         btFuncionario.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_funcionario.png"))); // NOI18N
         btFuncionario.setText("Funcionários");
         btFuncionario.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btFuncionario.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btFuncionarioMouseClicked(evt);
+            }
+        });
         btFuncionario.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btFuncionarioActionPerformed(evt);
@@ -1383,6 +1391,11 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         menuCaixaBt.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/financeiro.png"))); // NOI18N
         menuCaixaBt.setText("Caixa");
         menuCaixaBt.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        menuCaixaBt.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                menuCaixaBtMouseClicked(evt);
+            }
+        });
         menuCaixaBt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 menuCaixaBtActionPerformed(evt);
@@ -1883,17 +1896,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     }//GEN-LAST:event_itemManutencaoActionPerformed
 
     private void btFuncionarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btFuncionarioActionPerformed
-        //cadastrar funcionario
-        if (cargo != null) {
-            if (cargo.equals("admin")) {
-                new TelaCadFuncionario().setVisible(true);
-            } else {
-                JOptionPane.showMessageDialog(null, "Você não tem permissão! Somente admin");
-            }
-        } else {
-            JOptionPane.showMessageDialog(null, "Você não tem permissão! Somente admin");
-
-        }
+        
     }//GEN-LAST:event_btFuncionarioActionPerformed
     public void executarFinalizar() {
         configGlobal config = configGlobal.getInstance();
@@ -2007,17 +2010,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         }
     }
     private void btQuartosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btQuartosActionPerformed
-        //alterar quartos
-        if (cargo != null) {
-            if (cargo.equals("admin")) {
-                new CadastraQuarto().setVisible(true);
-            } else {
-                JOptionPane.showMessageDialog(null, "Você não tem permissão! Somente admin");
-            }
-        } else {
-            JOptionPane.showMessageDialog(null, "Você não tem permissão! Somente admin");
-
-        }
+        
     }//GEN-LAST:event_btQuartosActionPerformed
 
     private void btConfereCaixaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btConfereCaixaActionPerformed
@@ -2714,21 +2707,60 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         dialog.setVisible(true);
     }//GEN-LAST:event_bt_AntecipadoActionPerformed
 
-    private void portaoEntradaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_portaoEntradaActionPerformed
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         SwingUtilities.invokeLater(() -> {
             new ConectaArduino(888);
         });
-    }//GEN-LAST:event_portaoEntradaActionPerformed
+    }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void portaoSaidaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_portaoSaidaActionPerformed
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         SwingUtilities.invokeLater(() -> {
             new ConectaArduino(999);
         });
-    }//GEN-LAST:event_portaoSaidaActionPerformed
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void btFuncionarioMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btFuncionarioMouseClicked
+        //cadastrar funcionario
+        System.out.println("clicou func");
+        if (cargo != null) {
+            if (cargo.equals("admin")) {
+                new TelaCadFuncionario().setVisible(true);
+            } else {
+                JOptionPane.showMessageDialog(null, "Você não tem permissão! Somente admin");
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Você não tem permissão! Somente admin");
+
+        }
+
+    }//GEN-LAST:event_btFuncionarioMouseClicked
+
+    private void btQuartosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btQuartosMouseClicked
+        //alterar quartos
+        System.out.println("clicou abrir quartos");
+        if (cargo != null) {
+            if (cargo.equals("admin")) {
+                new CadastraQuarto().setVisible(true);
+            } else {
+                JOptionPane.showMessageDialog(null, "Você não tem permissão! Somente admin");
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Você não tem permissão! Somente admin");
+
+        }
+    }//GEN-LAST:event_btQuartosMouseClicked
 
     private void menuCaixaBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuCaixaBtActionPerformed
+        System.out.println("click botao caixaaa");
         new CaixaFrame().setVisible(true);
+        System.out.println("abriu caixaFrame");
     }//GEN-LAST:event_menuCaixaBtActionPerformed
+
+    private void menuCaixaBtMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menuCaixaBtMouseClicked
+        System.out.println("click botao caixaaa");
+        new CaixaFrame().setVisible(true);
+        System.out.println("abriu caixaFrame");
+    }//GEN-LAST:event_menuCaixaBtMouseClicked
     private void trocaQuarto(int idLocacao, int numeroNovoQuarto) {
         fquartos quarto = new fquartos();
         String horaStatus = quarto.getDataInicio(quartoEmFoco);
@@ -2873,6 +2905,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private javax.swing.JButton bt_inserirProduto;
     private javax.swing.JMenuItem itemManutencao;
     private javax.swing.JMenuItem itemReserva;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JFrame jFrame1;
     private javax.swing.JFrame jFrame2;
@@ -2936,8 +2970,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private javax.swing.JPanel painelQuartos;
     private javax.swing.JPanel painelSecundario;
     private javax.swing.JDesktopPane painelSecundario2;
-    private javax.swing.JButton portaoEntrada;
-    private javax.swing.JButton portaoSaida;
     private javax.swing.JRadioButtonMenuItem radioPeriodo;
     private javax.swing.JRadioButtonMenuItem radioPernoite;
     private javax.swing.JDesktopPane srPane;
