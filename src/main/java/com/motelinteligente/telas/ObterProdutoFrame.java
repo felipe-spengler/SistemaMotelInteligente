@@ -49,11 +49,13 @@ public class ObterProdutoFrame extends JFrame {
         txtCodProduto.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
+                if(!txtCodProduto.getText().isEmpty())
                 atualizarDescricaoProduto();
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
+                if(!txtCodProduto.getText().isEmpty())
                 atualizarDescricaoProduto();
             }
 

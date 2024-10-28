@@ -1,9 +1,9 @@
 package com.motelinteligente.telas;
 
 import com.motelinteligente.arduino.ConectaArduino;
+import com.motelinteligente.dados.Antecipado;
 import com.motelinteligente.dados.CacheDados;
 import com.motelinteligente.dados.CacheDados.DadosVendidos;
-import com.motelinteligente.dados.CacheDados.Negociados;
 import com.motelinteligente.dados.CarregaQuarto;
 import com.motelinteligente.dados.DadosOcupados;
 import com.motelinteligente.dados.NumeroPorExtenso;
@@ -28,8 +28,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.sound.sampled.AudioInputStream;
@@ -89,9 +91,10 @@ public class EncerraQuarto extends javax.swing.JFrame {
     float valD = 0, valP = 0, valC = 0;
     ClienteEncerra outraTela = new ClienteEncerra();
     int numeroDoQuarto;
-    int numeroDePessoas = 2;
+    //int numeroDePessoas = 2;
     String motivo = null;
     private Timer timer;
+    List<Antecipado> antecipados;
 
     class numOnly extends PlainDocument {
 
@@ -294,7 +297,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
             cache.getCacheOcupado().put(numeroQuarto, quartoOcupado);
         }
         adicionaPreVendidos(idLocacao);
-        verAntecipado(idLocacao);
+        antecipados = verAntecipado(idLocacao);
         setValorDivida();
 
         //setar as datas da tela do cliente
@@ -328,30 +331,61 @@ public class EncerraQuarto extends javax.swing.JFrame {
         }
     }
 
-    public void verAntecipado(int locacao) {
-        // Verifica se a cache de negociações antecipadas contém a locação
-        CacheDados cache = CacheDados.getInstancia();
-        if (cache.cacheNegociado.containsKey(locacao)) {
-            // Obtém a lista de negociações antecipadas associada a essa locação
-            List<Negociados> negociacoes = cache.cacheNegociado.get(locacao);
+    public List<Antecipado> verAntecipado(int locacao) {
+        List<Antecipado> antecipados = new ArrayList<>();
+        Connection link = null;
+        float jaRecebeu = 0;
+        try {
+            link = new fazconexao().conectar();
+            // Consulta SQL para buscar registros da tabela "antecipado" para a locação especificada
+            String selectSQL = "SELECT tipo, valor, hora FROM antecipado WHERE idlocacao = ?";
+            PreparedStatement preparedStatement = link.prepareStatement(selectSQL);
+            preparedStatement.setInt(1, locacao);
+            ResultSet resultSet = preparedStatement.executeQuery();
 
-            // Itera sobre a lista de negociações antecipadas
-            for (Negociados negociado : negociacoes) {
-                String tipo = negociado.tipo;
-                float valor = negociado.valor;
-                if (valor > 0) {
-                    if (tipo.equals("recebido")) {
-                        valoreRecebido += valor;
-                        JOptionPane.showMessageDialog(null, valor + " recebidos antecipadamente!", "Aviso", JOptionPane.WARNING_MESSAGE);
-                    }
-                    if (tipo.equals("negociado")) {
-                        JOptionPane.showMessageDialog(null, valor + " desconto negociado!", "Aviso", JOptionPane.WARNING_MESSAGE);
-                    }
+            // Itera sobre os resultados da consulta
+            while (resultSet.next()) {
+
+                String tipo = resultSet.getString("tipo");
+                float valor = resultSet.getFloat("valor");
+                Timestamp hora = resultSet.getTimestamp("hora");
+
+                // Cria o objeto Antecipado para cada registro retornado
+                if (tipo.equals("desconto")) {
+                    this.valorDesconto = valor;
+                    txtDesconto.setText("" + valorDesconto);
+
+                    txtJustifica.setText("negociado antecipado");
+                } else {
+                    System.out.println("setando valor");
+                    jaRecebeu += valor;
+                    Antecipado antecipado = new Antecipado(tipo, valor, hora);
+                    antecipados.add(antecipado);
                 }
 
             }
-        } else {
+            valoreRecebido = jaRecebeu;
+            txtRecebidoAntecipado.setText("" + jaRecebeu);
+            // Fecha os recursos
+            resultSet.close();
+            preparedStatement.close();
+            link.close();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao buscar dados antecipados: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        } finally {
+            try {
+                if (link != null && !link.isClosed()) {
+                    link.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
+
+        // Retorna a lista de pagamentos antecipados
+        return antecipados;
+
     }
 
     public float calculaAdicionalPessoa(int numeroPessoas) {
@@ -491,7 +525,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         jLabel18 = new javax.swing.JLabel();
         lblAReceber = new javax.swing.JLabel();
         jLabel19 = new javax.swing.JLabel();
-        txtValorRecebido = new javax.swing.JTextField();
+        txtRecebidoAntecipado = new javax.swing.JTextField();
         jLabel14 = new javax.swing.JLabel();
         txtDesconto = new javax.swing.JTextField();
         txtDescontoPorcento = new javax.swing.JTextField();
@@ -884,12 +918,12 @@ public class EncerraQuarto extends javax.swing.JFrame {
         jLabel19.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jLabel19.setText("Valor Recebido:");
 
-        txtValorRecebido.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        txtValorRecebido.setMinimumSize(new java.awt.Dimension(80, 22));
-        txtValorRecebido.setPreferredSize(new java.awt.Dimension(80, 22));
-        txtValorRecebido.addActionListener(new java.awt.event.ActionListener() {
+        txtRecebidoAntecipado.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        txtRecebidoAntecipado.setMinimumSize(new java.awt.Dimension(80, 22));
+        txtRecebidoAntecipado.setPreferredSize(new java.awt.Dimension(80, 22));
+        txtRecebidoAntecipado.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtValorRecebidoActionPerformed(evt);
+                txtRecebidoAntecipadoActionPerformed(evt);
             }
         });
 
@@ -916,7 +950,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 .addGap(0, 17, Short.MAX_VALUE)
                 .addComponent(jLabel19)
                 .addGap(18, 18, 18)
-                .addComponent(txtValorRecebido, javax.swing.GroupLayout.PREFERRED_SIZE, 161, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txtRecebidoAntecipado, javax.swing.GroupLayout.PREFERRED_SIZE, 161, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(61, 61, 61))
         );
         jPanel2Layout.setVerticalGroup(
@@ -927,7 +961,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel19)
-                    .addComponent(txtValorRecebido, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtRecebidoAntecipado, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, Short.MAX_VALUE)
                 .addComponent(jLabel18)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1240,7 +1274,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         float valorSomar = valorAcrescimo + valorQuarto + valorConsumo + valorAdicionalPeriodo + valorAdicionalPessoa;
         valorDivida = valorSomar - valorDesconto;
         txtValorDivida.setText(String.valueOf(valorDivida));
-        txtValorRecebido.setText(String.valueOf(valoreRecebido));
+        txtRecebidoAntecipado.setText(String.valueOf(valoreRecebido));
         lblValorQuarto.setText(String.valueOf(valorAdicionalPessoa + valorQuarto));
         lblValorConsumo.setText(String.valueOf(valorConsumo));
         lblAReceber.setText(String.valueOf(valorDivida - valoreRecebido));
@@ -1277,7 +1311,6 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 }
             }
         }
-        System.out.println("setando jopAberto false");
         jopAberto = false;
 
     }//GEN-LAST:event_btSalvarActionPerformed
@@ -1366,9 +1399,6 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 cache.getCacheOcupado().remove(numeroDoQuarto);
 
                 //se tiver prevendidos ou negociados retira tambem
-                if (cache.cacheNegociado.containsKey(idLocacao)) {
-                    cache.cacheNegociado.remove(idLocacao);
-                }
                 if (cache.cacheProdutosVendidos.containsKey(idLocacao)) {
                     cache.cacheProdutosVendidos.remove(idLocacao);
                 }
@@ -1517,7 +1547,6 @@ public class EncerraQuarto extends javax.swing.JFrame {
             JButton source = (JButton) e.getSource();
             tipoPagamento[0] = source.getText().substring(source.getText().indexOf("(") + 1, source.getText().indexOf(")"));
             System.out.println(tipoPagamento[0]);
-            // Coloca o foco no campo de texto
 
             // Marca o botão como selecionado visualmente
             resetarBotoes(botaoCredito, botaoDebito, botaoDinheiro, botaoPix);
@@ -1549,7 +1578,32 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 valoresRecebidosArea.append(String.format("%.2f Pix\n", recebidoPix[0]));
             }
         };
+        for (Antecipado antecipado : antecipados) {
+            String tipo = antecipado.getTipo();
+            float valor = antecipado.getValor();
 
+            // Se quiser somar o total já pago de todos os tipos de pagamento
+            switch (tipo) {
+                case "credito":
+                    recebidoCredito[0] += valor;
+
+                    break;
+                case "debito":
+                    recebidoDebito[0] += valor;
+
+                    break;
+                case "dinheiro":
+                    recebidoDin[0] += valor;
+
+                    break;
+                case "pix":
+                    recebidoPix[0] += valor;
+                    break;
+
+            }
+            atualizarValoresRecebidos.run(); // Atualiza os valores recebidos na área de texto
+
+        }
         // Validação do campo de valor (apenas números, ponto e vírgula permitidos)
         valorField.addKeyListener(new KeyAdapter() {
             @Override
@@ -1606,7 +1660,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
 
         JOptionPane optionPane = new JOptionPane(panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.DEFAULT_OPTION, null, new Object[]{}, null);
         JDialog dialog = optionPane.createDialog("Digite os valores recebidos");
-        dialog.setSize(800, 500);
+        dialog.setSize(800, 400);
         // Adicionando suporte para atalhos de teclado (teclas C, D, O, P, S) no JRootPane do diálogo
         JRootPane rootPane = dialog.getRootPane();
         rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("C"), "credito");
@@ -1647,28 +1701,28 @@ public class EncerraQuarto extends javax.swing.JFrame {
         });
         // Listener para acertar o valor no dinheiro
         botaoAcertouDinheiro.addActionListener(e -> {
-            recebidoDin[0] = valorDivida;
+            recebidoDin[0] = valorDivida - valoreRecebido;
             atualizarValoresRecebidos.run(); // Atualiza a área de texto com os valores recebidos
             resetarBotoes(botaoCredito, botaoDebito, botaoDinheiro, botaoPix);
         });
 
 // Listener para acertar o valor no débito
         botaoAcertouDebito.addActionListener(e -> {
-            recebidoDebito[0] = valorDivida;
+            recebidoDebito[0] = valorDivida - valoreRecebido;
             atualizarValoresRecebidos.run();
             resetarBotoes(botaoCredito, botaoDebito, botaoDinheiro, botaoPix);
         });
 
 // Listener para acertar o valor no crédito
         botaoAcertouCredito.addActionListener(e -> {
-            recebidoCredito[0] = valorDivida;
+            recebidoCredito[0] = valorDivida - valoreRecebido;
             atualizarValoresRecebidos.run();
             resetarBotoes(botaoCredito, botaoDebito, botaoDinheiro, botaoPix);
         });
 
 // Listener para acertar o valor no pix
         botaoAcertouPix.addActionListener(e -> {
-            recebidoPix[0] = valorDivida;
+            recebidoPix[0] = valorDivida - valoreRecebido;
             atualizarValoresRecebidos.run();
             resetarBotoes(botaoCredito, botaoDebito, botaoDinheiro, botaoPix);
         });
@@ -1789,9 +1843,6 @@ public class EncerraQuarto extends javax.swing.JFrame {
         cache.getCacheOcupado().remove(numeroDoQuarto);
 
         //se tiver prevendidos ou negociados retira tambem
-        if (cache.cacheNegociado.containsKey(idLocacao)) {
-            cache.cacheNegociado.remove(idLocacao);
-        }
         if (cache.cacheProdutosVendidos.containsKey(idLocacao)) {
             cache.cacheProdutosVendidos.remove(idLocacao);
         }
@@ -1969,10 +2020,10 @@ public class EncerraQuarto extends javax.swing.JFrame {
         // setar justificativa
     }//GEN-LAST:event_txtJustificaActionPerformed
 
-    private void txtValorRecebidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtValorRecebidoActionPerformed
+    private void txtRecebidoAntecipadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtRecebidoAntecipadoActionPerformed
         // TODO add your handling code here:
         try {
-            String recebido = txtValorRecebido.getText();
+            String recebido = txtRecebidoAntecipado.getText();
             recebido = recebido.replace(",", ".");
             if (recebido != null) {
                 float valorRecebido = Float.valueOf(recebido);
@@ -1983,7 +2034,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }//GEN-LAST:event_txtValorRecebidoActionPerformed
+    }//GEN-LAST:event_txtRecebidoAntecipadoActionPerformed
 
     private void btApagarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btApagarActionPerformed
         DefaultTableModel modelo = (DefaultTableModel) tabela.getModel();
@@ -2156,7 +2207,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
     private javax.swing.JTextField txtJustifica;
     private javax.swing.JTextField txtPessoas;
     private javax.swing.JTextField txtQuantidade;
+    private javax.swing.JTextField txtRecebidoAntecipado;
     private javax.swing.JLabel txtValorDivida;
-    private javax.swing.JTextField txtValorRecebido;
     // End of variables declaration//GEN-END:variables
 }

@@ -593,10 +593,18 @@ public class fquartos {
                 statement.close();
                 return false;
             }
-        } catch (Exception e) {
-            logger.error("Erro : fquartos() : ", e);
-            JOptionPane.showConfirmDialog(null, e);
-            return false;
+        } catch (SQLException  e) {
+            // Captura a exceção gerada pela trigger
+            if ("45000".equals(e.getSQLState())) {
+                // Lida com o erro específico de duplicidade
+                JOptionPane.showMessageDialog(null, "ERRO CRITICO, avise o FELIPE imediatamente");
+            } else {
+                e.printStackTrace();  // Para outras exceções SQL
+                logger.error("Erro : fquartos() : ", e);
+                JOptionPane.showMessageDialog(null, e);
+                return false;
+            }
+
         } finally {
             try {
                 // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
@@ -607,6 +615,7 @@ public class fquartos {
                 JOptionPane.showMessageDialog(null, e);
             }
         }
+        return false;
     }
 
     public boolean salvaProduto(int id, int idProduto, int qnt, float valor, float valorTotal) {
@@ -653,34 +662,31 @@ public class fquartos {
     }
 
     public void atualizaPessoas(int idPassado, int numPessoas) {
-        Connection link = null;
-        String consultaSQL = "UPDATE registralocado SET numpessoas=" + numPessoas + "  WHERE numquarto = " + idPassado + " AND horafim IS NULL";
+    Connection link = null;
+    String consultaSQL = "UPDATE registralocado SET numpessoas = ? WHERE numquarto = ? AND horafim IS NULL";
+    try {
+        link = new fazconexao().conectar();
+        PreparedStatement statement = link.prepareStatement(consultaSQL);
+        statement.setInt(1, numPessoas);
+        statement.setInt(2, idPassado);
+        int n = statement.executeUpdate();
+        statement.close();
+        link.close();
+    } catch (Exception e) {
+        logger.error("Erro : fquartos() : ", e);
+        JOptionPane.showConfirmDialog(null, e);
+    } finally {
         try {
-            link = new fazconexao().conectar();
-            PreparedStatement statement = link.prepareStatement(consultaSQL);
-            int n = statement.executeUpdate();
-            if (n != 0) {
+            if (link != null && !link.isClosed()) {
                 link.close();
-                statement.close();
-            } else {
-                link.close();
-                statement.close();
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             logger.error("Erro : fquartos() : ", e);
-            JOptionPane.showConfirmDialog(null, e);
-        } finally {
-            try {
-                // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
-                if (link != null && !link.isClosed()) {
-                    link.close();
-                }
-            } catch (SQLException e) {
-                logger.error("Erro : fquartos() : ", e);
-                JOptionPane.showMessageDialog(null, e);
-            }
+            JOptionPane.showMessageDialog(null, e);
         }
     }
+}
+
 
     public int getPessoas(int idPassado) {
         Connection link = null;

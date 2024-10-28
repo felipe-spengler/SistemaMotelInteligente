@@ -26,7 +26,6 @@ public class CacheDados {
     private Map<Integer, CarregaQuarto> cacheQuarto = new HashMap<>();
     private Map<Integer, DadosOcupados> cacheOcupado = new HashMap<>();
     public Map<Integer, List<DadosVendidos>> cacheProdutosVendidos = new HashMap<>();
-    public Map<Integer, List<Negociados>> cacheNegociado = new HashMap<>();
     public Map<Integer, Timestamp> despertador = new HashMap<>();
     public static SerialPort arduinoPort;
 
@@ -91,7 +90,6 @@ public class CacheDados {
         cacheQuarto.clear();
         cacheOcupado.clear();
         cacheProdutosVendidos.clear();
-        cacheNegociado.clear();
         despertador.clear();
     }
 
@@ -184,7 +182,6 @@ public class CacheDados {
                         negociacoes.add(negociado);
                     }
 
-                    cacheNegociado.put(idLoca, negociacoes);
                 }
             }
         } catch (SQLException e) {
@@ -291,21 +288,7 @@ public class CacheDados {
                 System.out.println("--------------------------------------");
             }
         }
-        if (cacheNegociado.isEmpty()) {
-            System.out.println("A cache de negociados está vazia.");
-        } else {
-            System.out.println("Conteúdo da cache de negociados:");
-            for (Map.Entry<Integer, List<Negociados>> entry : cacheNegociado.entrySet()) {
-                int idLocacao = entry.getKey();
-                List<Negociados> negociados = entry.getValue();
-                System.out.println("ID da Locação: " + idLocacao);
-                for (Negociados negociado : negociados) {
-                    System.out.println("Tipo: " + negociado.tipo
-                            + ", Valor: " + negociado.valor);
-                }
-                System.out.println("--------------------------------------");
-            }
-        }
+        
     }
 
     public static class DadosVendidos {

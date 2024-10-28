@@ -942,7 +942,7 @@
                               <EmptySpace min="0" pref="17" max="32767" attributes="0"/>
                               <Component id="jLabel19" min="-2" max="-2" attributes="0"/>
                               <EmptySpace type="separate" max="-2" attributes="0"/>
-                              <Component id="txtValorRecebido" min="-2" pref="161" max="-2" attributes="0"/>
+                              <Component id="txtRecebidoAntecipado" min="-2" pref="161" max="-2" attributes="0"/>
                               <EmptySpace min="-2" pref="61" max="-2" attributes="0"/>
                           </Group>
                       </Group>
@@ -955,7 +955,7 @@
                               <EmptySpace type="separate" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="3" attributes="0">
                                   <Component id="jLabel19" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="txtValorRecebido" alignment="3" min="-2" pref="32" max="-2" attributes="0"/>
+                                  <Component id="txtRecebidoAntecipado" alignment="3" min="-2" pref="32" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace type="separate" max="32767" attributes="0"/>
                               <Component id="jLabel18" min="-2" max="-2" attributes="0"/>
@@ -1013,7 +1013,7 @@
                         <Property name="text" type="java.lang.String" value="Valor Recebido:"/>
                       </Properties>
                     </Component>
-                    <Component class="javax.swing.JTextField" name="txtValorRecebido">
+                    <Component class="javax.swing.JTextField" name="txtRecebidoAntecipado">
                       <Properties>
                         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                           <Font name="Segoe UI" size="18" style="0"/>
@@ -1026,7 +1026,7 @@
                         </Property>
                       </Properties>
                       <Events>
-                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtValorRecebidoActionPerformed"/>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtRecebidoAntecipadoActionPerformed"/>
                       </Events>
                     </Component>
                   </SubComponents>

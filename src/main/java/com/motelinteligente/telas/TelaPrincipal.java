@@ -3,6 +3,7 @@ package com.motelinteligente.telas;
 import com.motelinteligente.alarme.AlarmApp;
 import com.motelinteligente.alarme.FAlarmes;
 import com.motelinteligente.arduino.ConectaArduino;
+import com.motelinteligente.dados.Antecipado;
 import com.motelinteligente.dados.BackupExecutor;
 import com.motelinteligente.dados.CacheDados;
 import com.motelinteligente.dados.CacheDados.DadosVendidos;
@@ -35,10 +36,12 @@ import java.util.Map;
 import javax.swing.JFrame;
 import javax.swing.SwingWorker;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.MouseInfo;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -71,8 +74,12 @@ import java.util.Timer;
 import java.util.TimerTask;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
+import javax.swing.JRootPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
 /**
@@ -184,7 +191,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         if (config.getAlarmesAtivos() > 0) {
             try ( Connection conn = new fazconexao().conectar();  Statement stmt = conn.createStatement();  ResultSet rs = stmt.executeQuery("SELECT id, hora_despertar, descricao FROM alarmes WHERE ativo = TRUE")) {
 
-
                 while (rs.next()) {
                     int idAlarme = rs.getInt("id");
                     Timestamp horaDespertar = rs.getTimestamp("hora_despertar");
@@ -207,14 +213,13 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                     int minutoAlarme = alarmeCalendar.get(Calendar.MINUTE);
 
                     // Saídas detalhadas para depuração
-                  
                     // Comparar data (ano, mês e dia)
                     if (anoAtual == anoAlarme && mesAtual == mesAlarme && diaAtual == diaAlarme) {
 
                         // Comparar hora e minuto
                         if (horaAtual == horaAlarme && minutoAtual == minutoAlarme) {
                             showAlarmAlert(idAlarme, descricao); // Chama a função para mostrar o alerta
-                        } 
+                        }
 
                     } else {
                         // Comparar se o alarme já passou da data atual
@@ -229,8 +234,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                             // Verificar se passou mais de 15 minutos
                             long diferencaMillis = agora.getTimeInMillis() - alarmeCalendar.getTimeInMillis();
                             long quinzeMinutosMillis = 15 * 60 * 1000; // 15 minutos em milissegundos
-
-                            
 
                             if (!(diferencaMillis <= quinzeMinutosMillis)) {
                                 System.out.println("Alarme ID: " + idAlarme + " já passou mais de 15 minutos - deve remover.");
@@ -323,6 +326,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             botaoStatus.setEnabled(true);
             txtPessoas.setEnabled(true);
             txtPessoas.setText(String.valueOf(cache.getCacheOcupado().get(quartoEmFoco).getNumeroPessoas()));
+            System.out.println("setou pessoas = " + String.valueOf(cache.getCacheOcupado().get(quartoEmFoco).getNumeroPessoas()));
             String[] partes = status.split("-");
             int idLoca = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
             if (idLoca == 0) {
@@ -334,7 +338,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             }
             //insere prevendidos tabela
             populaPrevendidos(idLoca, modelo);
-            //popula os txtAntecipado
             populaAntecipado(idLoca);
             if (partes[1].equals("pernoite")) {
                 this.painelSecundario.setBackground(Color.MAGENTA);
@@ -353,30 +356,54 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         lblNumero.setText(String.valueOf(quartoEmFoco));
         painelSecundario.repaint();
     }
+    public void populaAntecipado(int locacao) {
+        List<Antecipado> antecipados = new ArrayList<>();
+        Connection link = null;
+        float jaRecebeu = 0;
+        try {
+            link = new fazconexao().conectar();
+            // Consulta SQL para buscar registros da tabela "antecipado" para a locação especificada
+            String selectSQL = "SELECT tipo, valor, hora FROM antecipado WHERE idlocacao = ?";
+            PreparedStatement preparedStatement = link.prepareStatement(selectSQL);
+            preparedStatement.setInt(1, locacao);
+            ResultSet resultSet = preparedStatement.executeQuery();
 
-    public void populaAntecipado(int idLocacao) {
-        CacheDados cache = CacheDados.getInstancia();
-        // Verifica se a cache contém produtos vendidos para essa locação
-        if (cache.cacheNegociado.containsKey(idLocacao)) {
-            // Obtém a lista de produtos vendidos associada a essa locação
-            List<Negociados> negociados = cache.cacheNegociado.get(idLocacao);
+            // Itera sobre os resultados da consulta
+            while (resultSet.next()) {
 
-            for (Negociados negociado : negociados) {
-                float valor = negociado.valor;
-                String tipo = negociado.tipo;
-                if (tipo.equals("recebido")) {
-                    txtAntecipado.setText(String.valueOf(valor));
-                }
-                if (tipo.equals("negociado")) {
-                    txtDescontoNegociado.setText(String.valueOf(valor));
+                String tipo = resultSet.getString("tipo");
+                float valor = resultSet.getFloat("valor");
+                Timestamp hora = resultSet.getTimestamp("hora");
+                
+                // Cria o objeto Antecipado para cada registro retornado
+                if (tipo.equals("desconto")) {
+                    txtDescontoNegociado.setText("R$ " + valor);
+                } else {
+                    jaRecebeu += valor;
                 }
 
             }
-        } else {
+            txtAntecipado.setText("R$ " + jaRecebeu);
+            // Fecha os recursos
+            resultSet.close();
+            preparedStatement.close();
+            link.close();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao buscar dados antecipados: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        } finally {
+            try {
+                if (link != null && !link.isClosed()) {
+                    link.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
 
-    }
+        // Retorna a lista de pagamentos antecipados
 
+    }
     public void populaPrevendidos(int locacao, DefaultTableModel modelo) {
         CacheDados cache = CacheDados.getInstancia();
         float totalVendido = 0;
@@ -596,6 +623,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         jLabel3 = new javax.swing.JLabel();
         txtAntecipado = new javax.swing.JTextField();
         txtDescontoNegociado = new javax.swing.JTextField();
+        bt_Antecipado = new javax.swing.JButton();
+        btNegociar = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         painelQuartos = new javax.swing.JPanel();
@@ -1059,13 +1088,14 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         jPanel6.setBackground(new java.awt.Color(204, 204, 204));
 
         jLabel1.setFont(new java.awt.Font("Palatino Linotype", 0, 14)); // NOI18N
-        jLabel1.setText("Recebido Antecipado:");
+        jLabel1.setText("Já recebeu:");
 
         jLabel3.setFont(new java.awt.Font("Palatino Linotype", 0, 14)); // NOI18N
         jLabel3.setText("Desconto Negociado:");
 
         txtAntecipado.setFont(new java.awt.Font("Palatino Linotype", 0, 14)); // NOI18N
         txtAntecipado.setText("0.00");
+        txtAntecipado.setFocusable(false);
         txtAntecipado.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtAntecipadoActionPerformed(evt);
@@ -1074,9 +1104,26 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         txtDescontoNegociado.setFont(new java.awt.Font("Palatino Linotype", 0, 14)); // NOI18N
         txtDescontoNegociado.setText("0,00");
+        txtDescontoNegociado.setFocusable(false);
         txtDescontoNegociado.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtDescontoNegociadoActionPerformed(evt);
+            }
+        });
+
+        bt_Antecipado.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_conta_recebe.png"))); // NOI18N
+        bt_Antecipado.setText("Receber Antecipado");
+        bt_Antecipado.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bt_AntecipadoActionPerformed(evt);
+            }
+        });
+
+        btNegociar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_conta_paga.png"))); // NOI18N
+        btNegociar.setText("Negociar Valor");
+        btNegociar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btNegociarActionPerformed(evt);
             }
         });
 
@@ -1085,21 +1132,30 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
-                .addGap(25, 25, 25)
-                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
-                        .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(txtDescontoNegociado, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(29, 29, 29)
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
+                            .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addComponent(txtDescontoNegociado, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(jPanel6Layout.createSequentialGroup()
+                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(txtAntecipado, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel6Layout.createSequentialGroup()
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtAntecipado, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(76, Short.MAX_VALUE))
+                        .addComponent(bt_Antecipado, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btNegociar, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(31, Short.MAX_VALUE))
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel6Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
+                .addContainerGap(24, Short.MAX_VALUE)
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(bt_Antecipado)
+                    .addComponent(btNegociar))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
@@ -1108,7 +1164,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(txtDescontoNegociado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(87, Short.MAX_VALUE))
+                .addGap(36, 36, 36))
         );
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
@@ -1164,11 +1220,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/bt_entrada_icone.png"))); // NOI18N
         jButton1.setText("POrtão Entrada");
         jButton1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        jButton1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jButton1MouseClicked(evt);
-            }
-        });
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -1179,9 +1230,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/bt_saida_icone.png"))); // NOI18N
         jButton3.setText("POrtão saída");
         jButton3.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        jButton3.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jButton3MouseClicked(evt);
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
             }
         });
 
@@ -2066,24 +2117,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         new ConfigAutoAtend().setVisible(true);
     }//GEN-LAST:event_menuSobSistemaMouseClicked
 
-    private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
-        // botaosaida enviar numero 888 arduino
-        SwingUtilities.invokeLater(() -> {
-            new ConectaArduino(888);
-        });
-    }//GEN-LAST:event_jButton1MouseClicked
-
-    private void jButton3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton3MouseClicked
-        // botaosaida enviar numero 999 arduino
-        SwingUtilities.invokeLater(() -> {
-            new ConectaArduino(999);
-        });
-    }//GEN-LAST:event_jButton3MouseClicked
-
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
-
     private void radioPernoiteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioPernoiteActionPerformed
         // clicou no radiopernoite - altera status para pernoite
         if (quartoEmFoco != 0) {
@@ -2145,151 +2178,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     }
 
     private void obterProduto() {
-        /*// Criação do campo de texto para o ID do produto
-        JTextField txtIdProduto = new JTextField();
-        txtIdProduto.setColumns(10);
-
-        // Criação do campo de texto para a quantidade
-        JTextField txtQuantidade = new JTextField();
-        txtQuantidade.setColumns(10);
-
-        // Label para exibir a descrição do produto
-        JLabel lblDescricaoProduto = new JLabel();
-        lblDescricaoProduto.setPreferredSize(new Dimension(200, 20));
-
-        // Adiciona um DocumentListener ao campo de texto para monitorar as mudanças no texto
-        txtIdProduto.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                atualizarDescricaoProduto();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                if (isInteger(txtIdProduto.getText())) {
-                    atualizarDescricaoProduto();
-                }
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-            }
-
-            // Método para atualizar a descrição do produto com base no ID do produto
-            private void atualizarDescricaoProduto() {
-                String descricao = new fprodutos().getDescicao(txtIdProduto.getText());
-                lblDescricaoProduto.setText(descricao);
-            }
-        });
-        txtIdProduto.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txtQuantidade.requestFocusInWindow(); // Move o foco para txtQuantidade ao pressionar Enter em txtIdProduto
-            }
-        });
-
-        JPanel panel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(5, 5, 5, 5); // Margens
-
-// Label e campo de texto para o ID do produto
-        JLabel labelIdProduto = new JLabel("ID do Produto:");
-        labelIdProduto.setFont(new Font("Arial", Font.PLAIN, 14)); // Define a fonte
-        panel.add(labelIdProduto, gbc);
-
-        gbc.gridx++;
-        panel.add(txtIdProduto, gbc);
-
-        gbc.gridx++;
-        gbc.fill = GridBagConstraints.HORIZONTAL; // Expande o componente horizontalmente
-        panel.add(lblDescricaoProduto, gbc);
-
-// Reinicializa os GridBagConstraints para a próxima linha
-        gbc.gridx = 0;
-        gbc.gridy++;
-
-// Label e campo de texto para a quantidade
-        JLabel labelQuantidade = new JLabel("Quantidade:");
-        labelQuantidade.setFont(new Font("Arial", Font.PLAIN, 14)); // Define a fonte
-        panel.add(labelQuantidade, gbc);
-
-        gbc.gridx++;
-        panel.add(txtQuantidade, gbc);
-
-        class CentralizarCelulasRenderer extends DefaultTableCellRenderer {
-
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                Component cellComponent = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-
-                // Configurando a centralização do texto
-                if (cellComponent instanceof JLabel) {
-                    ((JLabel) cellComponent).setHorizontalAlignment(JLabel.CENTER);
-                }
-
-                return cellComponent;
-            }
-
-        }
-
-        // Exibe um JOptionPane com o painel contendo os componentes
-        int result = JOptionPane.showConfirmDialog(null, panel, "Obter Produto", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-        txtIdProduto.grabFocus();
-        if (result == JOptionPane.OK_OPTION) {
-            // Aqui você pode usar os valores inseridos pelo usuário, por exemplo:
-            String idProdutoStr = txtIdProduto.getText();
-            String quantidadeStr = txtQuantidade.getText();
-            DefaultTableModel modelo = (DefaultTableModel) tabela1.getModel();
-
-            if (isInteger(idProdutoStr)) {
-                fprodutos produtodao = new fprodutos();
-                String texto = produtodao.getDescicao(idProdutoStr);
-                if (texto != null) {
-                    if (quantidadeStr != null) {
-                        float valor = produtodao.getValorProduto(Integer.parseInt(idProdutoStr));
-                        float valorSoma = valor * Integer.parseInt(quantidadeStr);
-                        tabela1.setDefaultRenderer(Object.class, new CentralizarCelulasRenderer());
-                        modelo.addRow(new Object[]{
-                            quantidadeStr,
-                            texto,
-                            valor,
-                            valorSoma
-                        });
-                        // insere nos produtosvendidos
-                        CacheDados cache = CacheDados.getInstancia();
-                        int idLoca = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
-                        if (idLoca == 0) {
-                            DadosOcupados quartoOcupado = cache.getCacheOcupado().get(quartoEmFoco);
-                            int novoID = new fquartos().getIdLocacao(quartoEmFoco);
-                            quartoOcupado.setIdLoca(novoID);
-                            cache.getCacheOcupado().put(quartoEmFoco, quartoOcupado);
-
-                            cache.carregaProdutosNegociadosCache(novoID);
-                        }
-                        List<DadosVendidos> produtosVendidos = new ArrayList<>();
-                        if (cache.cacheProdutosVendidos.containsKey(idLoca)) {
-                            produtosVendidos = cache.cacheProdutosVendidos.get(idLoca);
-
-                        }
-                        produtosVendidos.add(new DadosVendidos(Integer.valueOf(idProdutoStr), Integer.valueOf(quantidadeStr)));
-                        cache.cacheProdutosVendidos.put(idLoca, produtosVendidos);
-
-                        produtodao.inserirPrevendido(idLoca, Integer.valueOf(idProdutoStr), Integer.valueOf(quantidadeStr));
-                    } else {
-                        JOptionPane.showMessageDialog(rootPane, "Quantidade inválida!");
-
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(rootPane, "Código inserido invalido!");
-                }
-            } else {
-                JOptionPane.showMessageDialog(rootPane, "Digite um valor válido!");
-            }
-        }
-         */
         new ObterProdutoFrame((DefaultTableModel) tabela1.getModel(), quartoEmFoco);
         tabela1.repaint();
         focoQuarto();
@@ -2327,17 +2215,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     }//GEN-LAST:event_formWindowClosing
 
     private void txtDescontoNegociadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDescontoNegociadoActionPerformed
-        float valorRecebido = 0;
-        try {
-            valorRecebido = Float.parseFloat(txtDescontoNegociado.getText().replace(',', '.'));
-            CacheDados cache = CacheDados.getInstancia();
-            int idLocacao = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
 
-            salvaAntecipado(idLocacao, "negociado", valorRecebido);
-            JOptionPane.showMessageDialog(null, "Desconto Antecipado adicionado com Sucesso!");
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Valor digitado não é monetário");
-        }
     }//GEN-LAST:event_txtDescontoNegociadoActionPerformed
 
     private void txtAntecipadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtAntecipadoActionPerformed
@@ -2623,6 +2501,288 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private void btConferenciaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btConferenciaMouseClicked
         new playSound().playSound("som/mensagem conferencia.wav");
     }//GEN-LAST:event_btConferenciaMouseClicked
+    private void resetarBotoes(JButton... botoes) {
+        Dimension buttonSize = new Dimension(120, 40);
+        for (JButton botao : botoes) {
+            botao.setBackground(new Color(200, 200, 200)); // Fundo Light Gray quando não selecionado
+            botao.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1)); // Borda padrão fina
+
+            botao.setPreferredSize(buttonSize);
+            botao.setMaximumSize(buttonSize); // Define o tamanho máximo
+            botao.setMinimumSize(buttonSize); // Define o tamanho mínimo
+        }
+    }
+    private void btNegociarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btNegociarActionPerformed
+        // Exibe um JOptionPane para o cliente inserir o valor de desconto
+        String descontoInput = JOptionPane.showInputDialog(null, "Digite o valor do desconto:", "Desconto", JOptionPane.PLAIN_MESSAGE);
+
+        // Verifica se o cliente inseriu algum valor
+        if (descontoInput != null && !descontoInput.isEmpty()) {
+            try {
+                // Converte o valor de desconto inserido para float
+                float valorDesconto = Float.parseFloat(descontoInput.replace(",", "."));
+
+                // Agora você pode usar o valorDesconto no seu código
+                CacheDados cache = CacheDados.getInstancia();
+                int idLocacao = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
+
+                // Chama a função salvaAntecipado ou outra lógica com o valor de desconto
+                salvaAntecipado(idLocacao, "desconto", valorDesconto);
+                JOptionPane.showMessageDialog(null, "Valor de desconto salvo");
+                txtDescontoNegociado.setText("R$" + valorDesconto);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(null, "Valor inválido! Insira um número válido.", "Erro", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_btNegociarActionPerformed
+
+    private void bt_AntecipadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_AntecipadoActionPerformed
+        System.out.println("toooooooo no antecipadoooooooooooooooo");
+        JTextField valorField = new JTextField(10);
+        JTextArea valoresRecebidosArea = new JTextArea(5, 20);
+        valoresRecebidosArea.setEditable(false); // Não permitir edição
+        JScrollPane scrollPane = new JScrollPane(valoresRecebidosArea); // Adicionando barra de rolagem
+
+        // Ajuste visual para o JTextArea parecer desabilitado
+        valoresRecebidosArea.setOpaque(false); // Deixa o fundo transparente (igual ao painel)
+        valoresRecebidosArea.setBackground(new Color(240, 240, 240)); // Cor de fundo igual ao painel
+        valoresRecebidosArea.setForeground(Color.BLACK); // Cor do texto
+        valoresRecebidosArea.setBorder(BorderFactory.createEmptyBorder()); // Remove a borda
+
+        Font biggerFont = new Font(valorField.getFont().getName(), valorField.getFont().getStyle(), 16);
+        valorField.setFont(biggerFont);
+
+        // Botões de pagamento
+        JButton botaoCredito = new JButton("Crédito (C)");
+        JButton botaoDebito = new JButton("Débito (D)");
+        JButton botaoDinheiro = new JButton("Dinheiro (O)");
+        JButton botaoPix = new JButton("Pix (P)");
+        JButton botaoSalvar = new JButton("Salvar (S)");
+
+        // Painel principal com layout nulo
+        JPanel panel = new JPanel();
+        panel.setPreferredSize(new Dimension(700, 400)); // Defina um tamanho adequado para o painel
+        panel.setSize(700, 400); // Definindo o tamanho físico do painel
+        panel.setLayout(null); // Para posicionamento manual dos componentes
+
+        // Definindo posição e tamanho dos componentes
+        // Dispor os botões de pagamento em 2 colunas por 2 linhas
+        botaoCredito.setBounds(50, 20, 150, 50);
+        botaoDebito.setBounds(220, 20, 150, 50);
+        botaoDinheiro.setBounds(50, 80, 150, 50);
+        botaoPix.setBounds(220, 80, 150, 50);
+
+        // Campo de valor e botão ENTER na mesma linha que os botões de pagamento
+        JLabel labelValor = new JLabel("Valor:");
+        labelValor.setBounds(390, 20, 60, 30); // Alinhado ao lado dos botões
+        valorField.setBounds(450, 20, 150, 30);
+        JButton botaoEnter = new JButton("ENTER");
+        botaoEnter.setForeground(Color.RED); // Cor do texto vermelha
+        botaoEnter.setBounds(610, 20, 80, 30); // Alinhado ao lado do valorField
+
+        JLabel labelRecebidos = new JLabel("Valores Recebidos:");
+        labelRecebidos.setBounds(50, 210, 200, 30);
+        scrollPane.setBounds(50, 240, 350, 100);
+
+        botaoSalvar.setBounds(420, 300, 100, 40);
+
+        // Adicionando os componentes ao painel
+        panel.add(botaoCredito);
+        panel.add(botaoDebito);
+        panel.add(botaoDinheiro);
+        panel.add(botaoPix);
+        panel.add(labelValor);
+        panel.add(valorField);
+        panel.add(botaoEnter);
+
+        panel.add(labelRecebidos);
+        panel.add(scrollPane);
+        panel.add(botaoSalvar);
+        // Resetando a aparência dos botões para o estado não selecionado
+        resetarBotoes(botaoCredito, botaoDebito, botaoDinheiro, botaoPix);
+
+        // Variáveis de controle
+        final String[] tipoPagamento = {""}; // Armazena o tipo de pagamento selecionado
+        final float[] recebidoDin = {0}, recebidoPix = {0}, recebidoCredito = {0}, recebidoDebito = {0};
+        boolean[] sucesso = {false}; // Variável de controle para indicar sucesso do pagamento
+
+        // Listener comum para selecionar o tipo de pagamento e focar no campo de valor
+        ActionListener selecionarMetodo = e -> {
+            JButton source = (JButton) e.getSource();
+            tipoPagamento[0] = source.getText().substring(source.getText().indexOf("(") + 1, source.getText().indexOf(")"));
+            System.out.println(tipoPagamento[0]);
+            // Coloca o foco no campo de texto
+
+            // Marca o botão como selecionado visualmente
+            resetarBotoes(botaoCredito, botaoDebito, botaoDinheiro, botaoPix);
+            source.setBackground(Color.GRAY);
+            source.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+
+            valorField.requestFocus();
+        };
+
+        // Adicionando o listener aos botões
+        botaoCredito.addActionListener(selecionarMetodo);
+        botaoDebito.addActionListener(selecionarMetodo);
+        botaoDinheiro.addActionListener(selecionarMetodo);
+        botaoPix.addActionListener(selecionarMetodo);
+
+        // Função para atualizar a área de texto com os valores recebidos
+        Runnable atualizarValoresRecebidos = () -> {
+            valoresRecebidosArea.setText(""); // Limpa a área de texto
+            if (recebidoCredito[0] > 0) {
+                valoresRecebidosArea.append(String.format("%.2f Crédito\n", recebidoCredito[0]));
+            }
+            if (recebidoDebito[0] > 0) {
+                valoresRecebidosArea.append(String.format("%.2f Débito\n", recebidoDebito[0]));
+            }
+            if (recebidoDin[0] > 0) {
+                valoresRecebidosArea.append(String.format("%.2f Dinheiro\n", recebidoDin[0]));
+            }
+            if (recebidoPix[0] > 0) {
+                valoresRecebidosArea.append(String.format("%.2f Pix\n", recebidoPix[0]));
+            }
+        };
+
+        // Validação do campo de valor (apenas números, ponto e vírgula permitidos)
+        valorField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                char c = e.getKeyChar();
+                // Permitir números, ponto, vírgula, e teclas de controle como backspace
+                if (!Character.isDigit(c) && c != '.' && c != ',' && c != KeyEvent.VK_BACK_SPACE) {
+                    e.consume(); // Ignorar o caractere
+                }
+            }
+        });
+
+        // Ação para quando o cliente pressionar Enter no campo de texto
+        valorField.addActionListener(e -> {
+            String valorInserido = valorField.getText().replace(",", ".");
+            try {
+                float valor = Float.parseFloat(valorInserido);
+
+                switch (tipoPagamento[0]) {
+                    case "C":
+                        recebidoCredito[0] += valor;
+
+                        break;
+                    case "D":
+                        recebidoDebito[0] += valor;
+
+                        break;
+                    case "O":
+                        recebidoDin[0] += valor;
+
+                        break;
+                    case "P":
+                        recebidoPix[0] += valor;
+
+                        break;
+                    default:
+                        JOptionPane.showMessageDialog(null, "Selecione um tipo de pagamento antes de inserir o valor.");
+                        break;
+                }
+                // Resetando a aparência dos botões para o estado não selecionado
+                resetarBotoes(botaoCredito, botaoDebito, botaoDinheiro, botaoPix);
+                valorField.setText(""); // Limpa o campo de valor após registrar
+                atualizarValoresRecebidos.run(); // Atualiza os valores recebidos na área de texto
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(null, "Valor inválido. Insira um número válido.");
+            }
+        });
+        // Definindo a ação para o botão Enter
+        botaoEnter.addActionListener(e -> {
+            valorField.requestFocus(); // Define o foco no campo de texto
+            valorField.postActionEvent(); // Simula o pressionamento da tecla Enter
+        });
+        // Exibição do JOptionPane
+
+        JOptionPane optionPane = new JOptionPane(panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.DEFAULT_OPTION, null, new Object[]{}, null);
+        JDialog dialog = optionPane.createDialog("Digite os valores recebidos");
+        dialog.setSize(800, 500);
+        // Adicionando suporte para atalhos de teclado (teclas C, D, O, P, S) no JRootPane do diálogo
+        JRootPane rootPane = dialog.getRootPane();
+        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("C"), "credito");
+        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("D"), "debito");
+        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("O"), "dinheiro");
+        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("P"), "pix");
+        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("S"), "salvar");
+
+        rootPane.getActionMap().put("credito", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                botaoCredito.doClick(); // Simula o clique do botão
+            }
+        });
+        rootPane.getActionMap().put("debito", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                botaoDebito.doClick();
+            }
+        });
+        rootPane.getActionMap().put("dinheiro", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                botaoDinheiro.doClick();
+            }
+        });
+        rootPane.getActionMap().put("pix", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                botaoPix.doClick();
+            }
+        });
+        rootPane.getActionMap().put("salvar", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                botaoSalvar.doClick(); // Simula o clique do botão Salvar
+            }
+        });
+
+// Adicionando atalhos de teclado F6, F7, F8, F9 no JRootPane
+        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F6"), "acertouDinheiro");
+        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F7"), "acertouDebito");
+        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F8"), "acertouCredito");
+        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F9"), "acertouPix");
+
+        // Ação do botão "Salvar"
+        botaoSalvar.addActionListener(e -> {
+            float totalRecebido = recebidoDin[0] + recebidoPix[0] + recebidoCredito[0] + recebidoDebito[0];
+            txtAntecipado.setText("R$ " + totalRecebido);
+            CacheDados cache = CacheDados.getInstancia();
+            int idLocacao = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
+
+            // Chama a função salvaAntecipado para cada tipo de pagamento se o valor for > 0
+            if (recebidoDin[0] > 0) {
+                salvaAntecipado(idLocacao, "dinheiro", recebidoDin[0]);
+            }
+            if (recebidoPix[0] > 0) {
+                salvaAntecipado(idLocacao, "pix", recebidoPix[0]);
+            }
+            if (recebidoCredito[0] > 0) {
+                salvaAntecipado(idLocacao, "credito", recebidoCredito[0]);
+            }
+            if (recebidoDebito[0] > 0) {
+                salvaAntecipado(idLocacao, "debito", recebidoDebito[0]);
+            }
+
+            dialog.dispose(); // Fecha o JDialog
+        });
+        dialog.setVisible(true);
+    }//GEN-LAST:event_bt_AntecipadoActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        SwingUtilities.invokeLater(() -> {
+            new ConectaArduino(888);
+        });
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        SwingUtilities.invokeLater(() -> {
+            new ConectaArduino(999);
+        });
+    }//GEN-LAST:event_jButton3ActionPerformed
     private void trocaQuarto(int idLocacao, int numeroNovoQuarto) {
         fquartos quarto = new fquartos();
         String horaStatus = quarto.getDataInicio(quartoEmFoco);
@@ -2666,65 +2826,41 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     }
 
     public void salvaAntecipado(int idLocacao, String tipo, float valor) {
-        CacheDados cache = CacheDados.getInstancia();
-        if (idLocacao == 0) {
-            DadosOcupados quartoOcupado = cache.getCacheOcupado().get(quartoEmFoco);
-            int novoID = new fquartos().getIdLocacao(quartoEmFoco);
-            quartoOcupado.setIdLoca(novoID);
-            cache.getCacheOcupado().put(quartoEmFoco, quartoOcupado);
-        }
-
-        List<Negociados> negociacoes = new ArrayList<>();
-        if (cache.cacheNegociado.containsKey(idLocacao)) {
-            negociacoes = cache.cacheNegociado.get(idLocacao);
-
-            //preciso iterar em negociações ver se tem algum negociado onde tipo = tipoNegociado
-            for (Negociados negociado : negociacoes) {
-                if (negociado.tipo.equals(tipo)) {
-                    negociado.valor = valor;
-                }
-            }
-
-        } else {
-            Negociados negociado = new Negociados(tipo, valor);
-            negociacoes.add(negociado);
-            cache.cacheNegociado.put(idLocacao, negociacoes);
-        }
-
         Connection link = null;
         try {
             link = new fazconexao().conectar();
+            String currentTime = new java.sql.Timestamp(System.currentTimeMillis()).toString();
+
             // Primeiro, tenta atualizar um registro existente
-            String updateSQL = "UPDATE antecipado SET valor = ? WHERE idlocacao = ? AND tipo = ?";
+            String updateSQL = "UPDATE antecipado SET valor = ?, hora = ? WHERE idlocacao = ? AND tipo = ?";
             PreparedStatement updateStatement = link.prepareStatement(updateSQL);
             updateStatement.setFloat(1, valor);
-            updateStatement.setInt(2, idLocacao);
-            updateStatement.setString(3, tipo);
+            updateStatement.setString(2, currentTime); // Adiciona a hora atual
+            updateStatement.setInt(3, idLocacao);
+            updateStatement.setString(4, tipo);
 
             int rowsUpdated = updateStatement.executeUpdate();
             updateStatement.close();
 
-            // Se nenhum registro foi atualizado, significa que não existe registro para o idLocacao e tipo, então faz a inserção
+            // Se nenhum registro foi atualizado, faz a inserção
             if (rowsUpdated == 0) {
-                // Consulta SQL para inserção de dados na tabela antecipado
-                String insertSQL = "INSERT INTO antecipado (idlocacao, tipo, valor) VALUES (?, ?, ?)";
+                String insertSQL = "INSERT INTO antecipado (idlocacao, tipo, valor, hora) VALUES (?, ?, ?, ?)";
                 PreparedStatement insertStatement = link.prepareStatement(insertSQL);
                 insertStatement.setInt(1, idLocacao);
                 insertStatement.setString(2, tipo);
                 insertStatement.setFloat(3, valor);
+                insertStatement.setString(4, currentTime); // Adiciona a hora atual
                 insertStatement.executeUpdate();
                 insertStatement.close();
             }
 
-            // Fecha os recursos
+            // Fecha a conexão
             link.close();
         } catch (SQLException e) {
-            // Tratamento de erro
             JOptionPane.showMessageDialog(null, "Erro ao inserir/atualizar: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace(); // Isso pode ser removido em versões finais para evitar vazamento de informações sensíveis
+            e.printStackTrace();
         } finally {
             try {
-                // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
                 if (link != null && !link.isClosed()) {
                     link.close();
                 }
@@ -2784,7 +2920,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private javax.swing.JMenu btDespertador;
     private javax.swing.JMenu btFerramentas;
     private javax.swing.JMenu btFuncionario;
+    private javax.swing.JButton btNegociar;
     private javax.swing.JMenu btQuartos;
+    private javax.swing.JButton bt_Antecipado;
     private javax.swing.JButton bt_apagarProduto;
     private javax.swing.JButton bt_inserirProduto;
     private javax.swing.JMenuItem itemManutencao;

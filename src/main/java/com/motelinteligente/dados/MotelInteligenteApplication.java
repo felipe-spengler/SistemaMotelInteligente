@@ -37,9 +37,9 @@ public class MotelInteligenteApplication {
             URL url = new URL("http://checkip.amazonaws.com/");
             URLConnection con = url.openConnection();
             BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-           // String externalIP = reader.readLine();
-            String externalIP = InetAddress.getLocalHost().getHostAddress();
-            System.out.println("IP interno: " + externalIP);
+            String externalIP = reader.readLine();
+            //String externalIP = InetAddress.getLocalHost().getHostAddress();
+            //System.out.println("IP interno: " + externalIP);
             reader.close();
 
             // Verifica o IP no banco de dados
