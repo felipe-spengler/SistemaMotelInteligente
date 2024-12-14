@@ -5,6 +5,7 @@
 package com.motelinteligente.telas;
 
 
+import com.motelinteligente.dados.configGlobal;
 import java.awt.Component;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -46,24 +47,31 @@ public class ClienteEncerra extends javax.swing.JFrame {
     public ClienteEncerra() {
         initComponents();
 
-        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        // Obtém a tela a mostrar da instância global
+        String telaMostrar = configGlobal.getInstance().getTelaMostrar();
 
-        // Obtém todos os dispositivos gráficos (monitores)
-        GraphicsDevice[] screens = ge.getScreenDevices();
+        // Verifica se a telaMostrar não é nula ou vazia
+        if (telaMostrar != null && !telaMostrar.isEmpty()) {
+            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            GraphicsDevice[] screens = ge.getScreenDevices();
 
-        // Verifica se há pelo menos dois monitores
-        if (screens.length >= 2) {
-
-            // Define a tela secundária como a tela de exibição
-            GraphicsDevice segundaTela = screens[1];
-            this.setLocation(segundaTela.getDefaultConfiguration().getBounds().x, 0);
-
-            this.setExtendedState(JFrame.MAXIMIZED_BOTH);
-            this.setVisible(true);
+            // Encontra o dispositivo correspondente ao ID da tela
+            for (GraphicsDevice screen : screens) {
+                if (screen.getIDstring().equals(telaMostrar)) {
+                    // Define a localização da janela com base na tela selecionada
+                    this.setLocation(screen.getDefaultConfiguration().getBounds().x, 0);
+                    break; // Para sair do loop após encontrar a tela correspondente
+                }
+            }
         } else {
-            JOptionPane.showMessageDialog(null, "Não há uma tela secundária disponível.");
+            JOptionPane.showMessageDialog(null, "Nenhuma tela selecionada. Usando a tela padrão.");
         }
 
+        // Maximiza a janela
+        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        this.setVisible(true);
+
+        // Configuração da tabela
         DefaultTableModel modelo = (DefaultTableModel) tabela.getModel();
         modelo.setNumRows(0);
         tabela.getColumn(tabela.getColumnName(0)).setPreferredWidth(55);
@@ -103,9 +111,9 @@ public class ClienteEncerra extends javax.swing.JFrame {
         lblPessoasQuarto.setText(String.valueOf(numeroPessoas));
     }
 
-    public void setarValores(String valorQuarto, String valorAdicionalPeriodo) {
-        lblHoraAdicional.setText(valorAdicionalPeriodo + "0");
-        lblValorQuarto.setText(valorQuarto + "0");
+    public void setarValores(float valorQuarto, float valorAdicionalPeriodo) {
+        lblHoraAdicional.setText(String.valueOf(valorAdicionalPeriodo) + "0");
+        lblValorQuarto.setText(String.valueOf(valorQuarto) + "0");
     }
 
     public void setValorTotal(float valorTotal) {

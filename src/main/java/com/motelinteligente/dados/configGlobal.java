@@ -124,6 +124,7 @@ public class configGlobal {
                 this.controlaEstoque = resultado.getBoolean("estoque");
                 this.flagMesmoUserCaixa = resultado.getBoolean("flagMesmoUserCaixa");
                 this.limiteDesconto = resultado.getInt("limitadesconto");
+                this.telaMostrar = resultado.getString("telaMostrar");
             } else {
                 JOptionPane.showMessageDialog(null, "Erro ao carregar Informações Adicionais.");
                 link.close();

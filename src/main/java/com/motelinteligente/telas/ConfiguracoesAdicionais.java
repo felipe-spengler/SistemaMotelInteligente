@@ -322,7 +322,7 @@ public class ConfiguracoesAdicionais extends javax.swing.JFrame {
          // Atualiza a variável global com a tela selecionada
         telaMostrar = (String) jComboBoxTelas.getSelectedItem();
         JOptionPane.showMessageDialog(this, "Tela selecionada: " + telaMostrar);
-        // Aqui você pode adicionar lógica para mudar a tela no sistema
+        // muda a tela no sistema e no banco de dados tbm
         configGlobal config = configGlobal.getInstance();
         config.setTelaMostrar(telaMostrar);
         setarTela(telaMostrar);

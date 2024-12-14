@@ -1293,7 +1293,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         lblValorQuarto.setText(String.valueOf(valorAdicionalPessoa + valorQuarto));
         lblValorConsumo.setText(String.valueOf(valorConsumo));
         lblAReceber.setText(String.valueOf(valorDivida - valoreRecebido));
-        outraTela.setValorQuarto(valorAdicionalPessoa + valorQuarto);
+        outraTela.setarValores(valorAdicionalPessoa + valorQuarto, valorAdicionalPeriodo);
         outraTela.setValorTotal(valorDivida);
         outraTela.setConsumo(valorConsumo);
     }
@@ -1914,7 +1914,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
             String palavraAtual = palavras[indice];
             String caminhoSom = "/som/" + palavraAtual + ".wav";  // Caminho relativo dentro do .jar
 
-            try ( InputStream audioSrc = EncerraQuarto.class.getResourceAsStream(caminhoSom)) {
+            try (InputStream audioSrc = EncerraQuarto.class.getResourceAsStream(caminhoSom)) {
                 if (audioSrc == null) {
                     System.out.println("Som não encontrado: " + caminhoSom);
                     return;
@@ -2212,7 +2212,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
     }
 
     private void saveInfoToFile(String filePath, int idLocacao, float valorQuarto) {
-        try ( BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             writer.write("Locação: " + idLocacao);
             writer.newLine();
             writer.write("Número do Quarto: " + numeroDoQuarto);
@@ -2240,138 +2240,141 @@ public class EncerraQuarto extends javax.swing.JFrame {
     }
 
     public void checkVideoFolder() {
-    File folder = new File("src/main/resources/videos/definitivo");
+        File folder = new File("src/main/resources/videos/definitivo");
 
-    if (!folder.exists() || !folder.isDirectory()) {
-        System.out.println("A pasta de vídeos não foi encontrada!");
-        return;
+        if (!folder.exists() || !folder.isDirectory()) {
+            System.out.println("A pasta de vídeos não foi encontrada!");
+            return;
+        }
+
+        // Lista arquivos de vídeo na pasta
+        File[] videoFiles = folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".mp4"));
+        if (videoFiles == null) {
+            System.out.println("Erro ao acessar a pasta de vídeos.");
+            return;
+        }
+
+        System.out.println("Número de vídeos encontrados: " + videoFiles.length);
+
+        if (videoFiles.length >= 5) {
+            System.out.println("Temos 5 ou mais vídeos, hora de concatenar!");
+            try {
+                createBlackScreensForVideos();
+                List<String> videoPaths = Arrays.stream(videoFiles)
+                        .map(File::getAbsolutePath)
+                        .collect(Collectors.toList());
+                concatenateVideos(videoPaths, "src/main/resources/videos/definitivo/concatenated_video.mp4");
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Ainda não há vídeos suficientes para concatenar.");
+        }
     }
 
-    // Lista arquivos de vídeo na pasta
-    File[] videoFiles = folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".mp4"));
-    if (videoFiles == null) {
-        System.out.println("Erro ao acessar a pasta de vídeos.");
-        return;
+// Lê os arquivos de texto e cria as telas pretas correspondentes
+    public void createBlackScreensForVideos() throws IOException, InterruptedException {
+        File folder = new File("src/main/resources/videos/definitivo");
+        File[] textFiles = folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".txt"));
+
+        if (textFiles == null) {
+            System.out.println("Nenhum arquivo de texto encontrado.");
+            return;
+        }
+
+        for (File textFile : textFiles) {
+            String infoText = readTextFromFile(textFile);
+            String idLocacao = textFile.getName().replace("locacao_", "").replace(".txt", "");
+            String outputFilePath = new File("src/main/resources/videos/definitivo", "black_" + idLocacao + ".mp4").getAbsolutePath();
+            createBlackScreen(infoText, outputFilePath);
+        }
     }
 
-    System.out.println("Número de vídeos encontrados: " + videoFiles.length);
+// Lê o conteúdo do arquivo de texto
+    private static String readTextFromFile(File file) throws IOException {
+        StringBuilder content = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                content.append(line).append("\\n"); // \\n para quebra de linha no FFmpeg
+            }
+        }
+        return content.toString();
+    }
 
-    if (videoFiles.length >= 5) {
-        System.out.println("Temos 5 ou mais vídeos, hora de concatenar!");
+// Gera a tela preta com texto usando FFmpeg
+    private void createBlackScreen(String text, String outputFilePath) throws IOException, InterruptedException {
+        // Substitua "/path/to/font.ttf" pelo caminho completo de uma fonte TTF no seu sistema
+        String fontFilePath = "C:/Windows/Fonts/Arial.ttf"; // Certifique-se de que o caminho para a fonte está correto
+        String command = String.format("ffmpeg -f lavfi -i color=c=black:s=1280x720:d=5 -vf \"drawtext=fontfile='%s': "
+                + "text='%s': fontcolor=white: fontsize=36: box=1: boxcolor=black@0.5: boxborderw=5: x=(w-text_w)/2: y=(h-text_h)/2\" "
+                + "-codec:a copy \"%s\"",
+                fontFilePath, text.replace("'", "\\'"), outputFilePath);
+
+        executeCommand(command);
+    }
+
+    private void executeCommand(String command) {
         try {
-            createBlackScreensForVideos();
-            List<String> videoPaths = Arrays.stream(videoFiles)
-                                            .map(File::getAbsolutePath)
-                                            .collect(Collectors.toList());
-            concatenateVideos(videoPaths, "src/main/resources/videos/definitivo/concatenated_video.mp4");
+            // Use "cmd" no Windows
+            ProcessBuilder builder = new ProcessBuilder("cmd", "/c", command);
+            builder.redirectErrorStream(true);
+            Process process = builder.start();
+
+            // Lê a saída do processo
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+
+            process.waitFor();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
-    } else {
-        System.out.println("Ainda não há vídeos suficientes para concatenar.");
     }
-}
-
-// Lê os arquivos de texto e cria as telas pretas correspondentes
-public void createBlackScreensForVideos() throws IOException, InterruptedException {
-    File folder = new File("src/main/resources/videos/definitivo");
-    File[] textFiles = folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".txt"));
-
-    if (textFiles == null) {
-        System.out.println("Nenhum arquivo de texto encontrado.");
-        return;
-    }
-
-    for (File textFile : textFiles) {
-        String infoText = readTextFromFile(textFile);
-        String idLocacao = textFile.getName().replace("locacao_", "").replace(".txt", "");
-        String outputFilePath = new File("src/main/resources/videos/definitivo", "black_" + idLocacao + ".mp4").getAbsolutePath();
-        createBlackScreen(infoText, outputFilePath);
-    }
-}
-
-// Lê o conteúdo do arquivo de texto
-private static String readTextFromFile(File file) throws IOException {
-    StringBuilder content = new StringBuilder();
-    try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-        String line;
-        while ((line = reader.readLine()) != null) {
-            content.append(line).append("\\n"); // \\n para quebra de linha no FFmpeg
-        }
-    }
-    return content.toString();
-}
-
-// Gera a tela preta com texto usando FFmpeg
-private void createBlackScreen(String text, String outputFilePath) throws IOException, InterruptedException {
-    // Substitua "/path/to/font.ttf" pelo caminho completo de uma fonte TTF no seu sistema
-    String fontFilePath = "C:/Windows/Fonts/Arial.ttf"; // Certifique-se de que o caminho para a fonte está correto
-    String command = String.format("ffmpeg -f lavfi -i color=c=black:s=1280x720:d=5 -vf \"drawtext=fontfile='%s': "
-            + "text='%s': fontcolor=white: fontsize=36: box=1: boxcolor=black@0.5: boxborderw=5: x=(w-text_w)/2: y=(h-text_h)/2\" "
-            + "-codec:a copy \"%s\"",
-            fontFilePath, text.replace("'", "\\'"), outputFilePath);
-
-    executeCommand(command);
-}
-
-private void executeCommand(String command) {
-    try {
-        // Use "cmd" no Windows
-        ProcessBuilder builder = new ProcessBuilder("cmd", "/c", command);
-        builder.redirectErrorStream(true);
-        Process process = builder.start();
-
-        // Lê a saída do processo
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        String line;
-        while ((line = reader.readLine()) != null) {
-            System.out.println(line);
-        }
-
-        process.waitFor();
-    } catch (IOException | InterruptedException e) {
-        e.printStackTrace();
-    }
-}
 
 // Concatena os vídeos usando FFmpeg
-private void concatenateVideos(List<String> videoPaths, String outputVideoPath) {
-    try {
-        // Cria a string de comando para o FFMPEG
-        StringBuilder command = new StringBuilder("ffmpeg -y -f concat -safe 0 -i ");
-        String listFilePath = "src/main/resources/videos/temp/video_list.txt";
+    private void concatenateVideos(List<String> videoPaths, String outputVideoPath) {
+        try {
+            // Cria a string de comando para o FFMPEG
+            StringBuilder command = new StringBuilder("ffmpeg -y -f concat -safe 0 -i ");
+            String listFilePath = "src/main/resources/videos/temp/video_list.txt";
 
-        // Cria o arquivo temporário com a lista de vídeos
-        File tempFolder = new File("src/main/resources/videos/temp");
-        if (!tempFolder.exists()) {
-            tempFolder.mkdirs();
-        }
-
-        try (PrintWriter writer = new PrintWriter(listFilePath)) {
-            for (String videoPath : videoPaths) {
-                writer.println("file '" + videoPath.replace("\\", "/") + "'");
+            // Cria o arquivo temporário com a lista de vídeos
+            File tempFolder = new File("src/main/resources/videos/temp");
+            if (!tempFolder.exists()) {
+                tempFolder.mkdirs();
             }
+
+            try (PrintWriter writer = new PrintWriter(listFilePath)) {
+                for (String videoPath : videoPaths) {
+                    writer.println("file '" + videoPath.replace("\\", "/") + "'");
+                }
+            }
+
+            // Adiciona o caminho do arquivo de lista de vídeos ao comando
+            command.append("\"").append(listFilePath).append("\"").append(" -c copy \"").append(outputVideoPath).append("\"");
+
+            // Executa o comando usando o CMD no Windows
+            executeCommand(command.toString());
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-        // Adiciona o caminho do arquivo de lista de vídeos ao comando
-        command.append("\"").append(listFilePath).append("\"").append(" -c copy \"").append(outputVideoPath).append("\"");
-
-        // Executa o comando usando o CMD no Windows
-        executeCommand(command.toString());
-
-    } catch (IOException e) {
-        e.printStackTrace();
     }
-}
 
     private void btWifiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btWifiActionPerformed
         // mostra a img de conexao de wi-fi na 2a Tela
         if (!isFrameOpen) {
+            // Obtém a tela a mostrar da instância global
+            String telaMostrar = configGlobal.getInstance().getTelaMostrar();
+
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
             GraphicsDevice[] screens = ge.getScreenDevices();
 
-            // Verifica se há pelo menos dois monitores
-            if (screens.length >= 2) {
+            // Verifica se há pelo menos uma tela
+            if (screens.length > 0) {
                 // Cria o frame secundário
                 secondaryFrame = new JFrame("Conexão Wi-Fi");
                 secondaryFrame.setSize(600, 600);
@@ -2389,10 +2392,23 @@ private void concatenateVideos(List<String> videoPaths, String outputVideoPath) 
                 JLabel imgLabel = new JLabel(wifiImage);
                 secondaryFrame.add(imgLabel);
 
-                // Mover o frame para a segunda tela
-                GraphicsDevice segundaTela = screens[1];
-                Rectangle bounds = segundaTela.getDefaultConfiguration().getBounds();
-                secondaryFrame.setLocation(bounds.x, bounds.y);
+                // Define a localização do frame com base na tela selecionada
+                boolean telaEncontrada = false;
+                for (GraphicsDevice screen : screens) {
+                    if (screen.getIDstring().equals(telaMostrar)) {
+                        Rectangle bounds = screen.getDefaultConfiguration().getBounds();
+                        secondaryFrame.setLocation(bounds.x, bounds.y);
+                        telaEncontrada = true;
+                        break; // Sai do loop após encontrar a tela correspondente
+                    }
+                }
+
+                // Se não encontrar a tela, usa a primeira tela disponível
+                if (!telaEncontrada) {
+                    Rectangle bounds = screens[0].getDefaultConfiguration().getBounds();
+                    secondaryFrame.setLocation(bounds.x, bounds.y);
+                }
+
                 secondaryFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
                 secondaryFrame.setVisible(true);
 
@@ -2400,7 +2416,7 @@ private void concatenateVideos(List<String> videoPaths, String outputVideoPath) 
                 btWifi.setBackground(Color.DARK_GRAY);
                 isFrameOpen = true;
             } else {
-                JOptionPane.showMessageDialog(this, "Não há uma tela secundária disponível.");
+                JOptionPane.showMessageDialog(this, "Não há uma tela disponível.");
             }
         } else {
             // Fecha a tela secundária se já estiver aberta
