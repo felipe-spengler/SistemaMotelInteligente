@@ -12,6 +12,7 @@ public class configGlobal {
     private String usuario;
     private String cargoUsuario;
     private int caixaAberto;
+    private String telaMostrar;
     private boolean mudanca;
     private boolean logoffecharcaixa;
     private boolean controlaEstoque;
@@ -35,6 +36,7 @@ public class configGlobal {
         logoffecharcaixa = false;
         controlaEstoque = false;
         flagSistemaSpring = flagArduino = false;
+        telaMostrar = null;
         
     }
      public int getAlarmesAtivos() {
@@ -203,5 +205,11 @@ public class configGlobal {
         }
         return instancia;
     }
+    public String getTelaMostrar() {
+        return telaMostrar;
+    }
 
+    public void setTelaMostrar(String usuario) {
+        this.telaMostrar = usuario;
+    }
 }

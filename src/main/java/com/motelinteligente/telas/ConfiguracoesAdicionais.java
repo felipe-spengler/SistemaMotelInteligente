@@ -6,6 +6,8 @@ package com.motelinteligente.telas;
 
 import com.motelinteligente.dados.configGlobal;
 import com.motelinteligente.dados.fazconexao;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
@@ -19,6 +21,7 @@ import javax.swing.text.PlainDocument;
  * @author johnc
  */
 public class ConfiguracoesAdicionais extends javax.swing.JFrame {
+        private String telaMostrar; // Variável global para armazenar a tela selecionada
 
     /**
      * Creates new form ConfiguracoesAdicionais
@@ -54,9 +57,29 @@ public class ConfiguracoesAdicionais extends javax.swing.JFrame {
         
         txtLimiteDesconto.setDocument(new NumOnly());
         txtLimiteDesconto.setText(String.valueOf(config.getLimiteDesconto()));
+        carregarTelas();
+        
         
     }
+    private void carregarTelas() {
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice[] devices = ge.getScreenDevices();
 
+        // Limpa as opções anteriores
+        jComboBoxTelas.removeAllItems();
+
+        // Adiciona as telas disponíveis ao JComboBox
+        for (GraphicsDevice device : devices) {
+            String nomeTela = device.getIDstring(); // Nome da tela
+            jComboBoxTelas.addItem(nomeTela);
+        }
+
+        // Seleciona a última tela por padrão
+        if (devices.length > 0) {
+            jComboBoxTelas.setSelectedIndex(devices.length - 1);
+            telaMostrar = devices[devices.length - 1].getIDstring(); // Atualiza a variável global
+        }
+    }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -73,6 +96,7 @@ public class ConfiguracoesAdicionais extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
+        jComboBoxTelas = new javax.swing.JComboBox<>();
 
         jLabel5.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel5.setText("%");
@@ -149,30 +173,41 @@ public class ConfiguracoesAdicionais extends javax.swing.JFrame {
         jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel6.setText("*");
 
+        jComboBoxTelas.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jComboBoxTelas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBoxTelasActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addGap(42, 42, 42)
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel4)
+                                .addComponent(checkEstoque)
+                                .addComponent(fechaCaixaUser)
+                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                    .addComponent(checkLogoff)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(jLabel6)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(txtLimiteDesconto, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(jLabel3)
+                                    .addGap(106, 106, 106)))))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(42, 42, 42)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel4)
-                            .addComponent(checkEstoque)
-                            .addComponent(fechaCaixaUser)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(checkLogoff)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel6)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtLimiteDesconto, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel3)
-                                .addGap(106, 106, 106)))))
+                        .addGap(52, 52, 52)
+                        .addComponent(jComboBoxTelas, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -191,7 +226,9 @@ public class ConfiguracoesAdicionais extends javax.swing.JFrame {
                 .addComponent(checkEstoque)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(fechaCaixaUser)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 274, Short.MAX_VALUE)
+                .addGap(39, 39, 39)
+                .addComponent(jComboBoxTelas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 213, Short.MAX_VALUE)
                 .addComponent(jLabel4)
                 .addGap(19, 19, 19))
         );
@@ -280,6 +317,16 @@ public class ConfiguracoesAdicionais extends javax.swing.JFrame {
         }
         
     }//GEN-LAST:event_txtLimiteDescontoActionPerformed
+
+    private void jComboBoxTelasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxTelasActionPerformed
+         // Atualiza a variável global com a tela selecionada
+        telaMostrar = (String) jComboBoxTelas.getSelectedItem();
+        JOptionPane.showMessageDialog(this, "Tela selecionada: " + telaMostrar);
+        // Aqui você pode adicionar lógica para mudar a tela no sistema
+        configGlobal config = configGlobal.getInstance();
+        config.setTelaMostrar(telaMostrar);
+        setarTela(telaMostrar);
+    }//GEN-LAST:event_jComboBoxTelasActionPerformed
     public void funcaoSet(String campo, boolean flag) {
         String consultaSQL = "UPDATE configuracoes SET " + campo + " = ?";
         Connection link = null;
@@ -289,6 +336,32 @@ public class ConfiguracoesAdicionais extends javax.swing.JFrame {
 
             // Atribuir o valor booleano ao parâmetro da consulta
             statement.setBoolean(1, flag);
+
+            int n = statement.executeUpdate();
+            if (n != 0) {
+                link.close();
+                statement.close();
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, e);
+        } finally {
+            try {
+                if (link != null && !link.isClosed()) {
+                    link.close();
+                }
+            } catch (SQLException e) {
+                JOptionPane.showConfirmDialog(null, e);
+            }
+        }
+    }
+    public void setarTela(String campo) {
+        String consultaSQL = "update configuracoes set telaMostrar='" + campo + "'";
+        Connection link = null;
+        try {
+            link = new fazconexao().conectar();
+            PreparedStatement statement = link.prepareStatement(consultaSQL);
+
+            statement.setString(1, campo);
 
             int n = statement.executeUpdate();
             if (n != 0) {
@@ -347,6 +420,7 @@ public class ConfiguracoesAdicionais extends javax.swing.JFrame {
     private javax.swing.JCheckBox checkEstoque;
     private javax.swing.JCheckBox checkLogoff;
     private javax.swing.JCheckBox fechaCaixaUser;
+    private javax.swing.JComboBox<String> jComboBoxTelas;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

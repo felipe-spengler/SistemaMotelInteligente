@@ -88,3 +88,46 @@
 2024-10-28 00:38:58 INFO  [Thread-0] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
 2024-10-28 00:39:00 INFO  [Thread-0] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-0.0.0.0-1521"]
 2024-10-28 00:39:00 INFO  [Thread-0] c.m.d.MotelInteligenteApplication - Started MotelInteligenteApplication in 7.289 seconds (process running for 16.097)
+2024-12-13 21:44:04 INFO  [Thread-0] c.m.d.MotelInteligenteApplication - Starting MotelInteligenteApplication using Java 21.0.5 with PID 5268 (C:\Users\usuario\Desktop\SistemaMotelInteligente\target\classes started by usuario in C:\Users\usuario\Desktop\SistemaMotelInteligente)
+2024-12-13 21:44:04 DEBUG [Thread-0] c.m.d.MotelInteligenteApplication - Running with Spring Boot v3.3.4, Spring v6.1.13
+2024-12-13 21:44:04 INFO  [Thread-0] c.m.d.MotelInteligenteApplication - No active profile set, falling back to 1 default profile: "default"
+2024-12-13 21:44:08 INFO  [Thread-0] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-0.0.0.0-1521"]
+2024-12-13 21:44:08 INFO  [Thread-0] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2024-12-13 21:44:08 INFO  [Thread-0] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.30]
+2024-12-13 21:44:08 INFO  [Thread-0] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-12-13 21:44:10 INFO  [Thread-0] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-0.0.0.0-1521"]
+2024-12-13 21:44:10 ERROR [Thread-0] o.s.b.d.LoggingFailureAnalysisReporter - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 1521 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 1521 or configure this application to listen on another port.
+
+2024-12-13 21:46:30 INFO  [Thread-0] c.m.d.MotelInteligenteApplication - Starting MotelInteligenteApplication using Java 21.0.5 with PID 8860 (C:\Users\usuario\Desktop\SistemaMotelInteligente\target\classes started by usuario in C:\Users\usuario\Desktop\SistemaMotelInteligente)
+2024-12-13 21:46:30 DEBUG [Thread-0] c.m.d.MotelInteligenteApplication - Running with Spring Boot v3.3.4, Spring v6.1.13
+2024-12-13 21:46:30 INFO  [Thread-0] c.m.d.MotelInteligenteApplication - No active profile set, falling back to 1 default profile: "default"
+2024-12-13 21:46:33 INFO  [Thread-0] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-0.0.0.0-1521"]
+2024-12-13 21:46:33 INFO  [Thread-0] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2024-12-13 21:46:33 INFO  [Thread-0] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.30]
+2024-12-13 21:46:33 INFO  [Thread-0] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-12-13 21:46:34 INFO  [Thread-0] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-0.0.0.0-1521"]
+2024-12-13 21:46:34 INFO  [Thread-0] c.m.d.MotelInteligenteApplication - Started MotelInteligenteApplication in 6.753 seconds (process running for 17.06)
+2024-12-13 21:48:09 INFO  [Thread-0] c.m.d.MotelInteligenteApplication - Starting MotelInteligenteApplication using Java 21.0.5 with PID 2692 (C:\Users\usuario\Desktop\SistemaMotelInteligente\target\classes started by usuario in C:\Users\usuario\Desktop\SistemaMotelInteligente)
+2024-12-13 21:48:09 DEBUG [Thread-0] c.m.d.MotelInteligenteApplication - Running with Spring Boot v3.3.4, Spring v6.1.13
+2024-12-13 21:48:09 INFO  [Thread-0] c.m.d.MotelInteligenteApplication - No active profile set, falling back to 1 default profile: "default"
+2024-12-13 21:48:12 INFO  [Thread-0] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-0.0.0.0-1521"]
+2024-12-13 21:48:12 INFO  [Thread-0] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2024-12-13 21:48:12 INFO  [Thread-0] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.30]
+2024-12-13 21:48:12 INFO  [Thread-0] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-12-13 21:48:13 INFO  [Thread-0] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-0.0.0.0-1521"]
+2024-12-13 21:48:13 INFO  [Thread-0] c.m.d.MotelInteligenteApplication - Started MotelInteligenteApplication in 6.691 seconds (process running for 16.459)
+2024-12-13 22:33:47 INFO  [http-nio-0.0.0.0-1521-exec-5] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-12-13 22:33:47 INFO  [http-nio-0.0.0.0-1521-exec-5] o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2024-12-13 22:33:47 INFO  [http-nio-0.0.0.0-1521-exec-5] o.s.web.servlet.DispatcherServlet - Completed initialization in 82 ms
