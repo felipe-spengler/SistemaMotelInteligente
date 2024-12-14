@@ -23,17 +23,29 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -77,9 +89,9 @@ import uk.co.caprica.vlcj.player.base.MediaPlayer;
  */
 public class EncerraQuarto extends javax.swing.JFrame {
 
-    private boolean isFrameOpen = false;
+    private boolean isFrameOpen = false, salvouLocacao = false;
     private JFrame secondaryFrame;
-
+    int idLocacao = 0;
     private MediaPlayerFactory mediaPlayerFactory;
     private MediaPlayer mediaPlayer;
     private boolean recording = false;  // Controle de gravação
@@ -132,7 +144,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         // Inicializa a fábrica e o media player
         mediaPlayerFactory = new MediaPlayerFactory();
         mediaPlayer = mediaPlayerFactory.mediaPlayers().newMediaPlayer();
-        //startRecording(numeroQuarto);
+        startRecording(numeroQuarto);
         tabela.getModel().addTableModelListener(new TableModelListener() {
             @Override
             public void tableChanged(TableModelEvent e) {
@@ -288,14 +300,16 @@ public class EncerraQuarto extends javax.swing.JFrame {
             valorAdicionalPeriodo = Float.valueOf(numeroAdicionais) * ocupado.getValorAdicional();
             lblHoraAdicional.setText("R$" + String.valueOf(valorAdicionalPeriodo));
         }
-
-        int idLocacao = cache.getCacheOcupado().get(numeroQuarto).getIdLoca();
         if (idLocacao == 0) {
-            DadosOcupados quartoOcupado = cache.getCacheOcupado().get(numeroQuarto);
-            int novoID = new fquartos().getIdLocacao(numeroQuarto);
-            quartoOcupado.setIdLoca(novoID);
-            cache.getCacheOcupado().put(numeroQuarto, quartoOcupado);
+            idLocacao = cache.getCacheOcupado().get(numeroQuarto).getIdLoca();
+            if (idLocacao == 0) {
+                DadosOcupados quartoOcupado = cache.getCacheOcupado().get(numeroQuarto);
+                int novoID = new fquartos().getIdLocacao(numeroQuarto);
+                idLocacao = novoID;
+
+            }
         }
+
         adicionaPreVendidos(idLocacao);
         antecipados = verAntecipado(idLocacao);
         setValorDivida();
@@ -399,9 +413,10 @@ public class EncerraQuarto extends javax.swing.JFrame {
 
     @Override
     public void dispose() {
-        //stopRecording();
-        outraTela.dispose();
         super.dispose();
+        outraTela.dispose();
+        stopRecording();
+
     }
 
     public String calculaData(String dataBanco) {
@@ -687,7 +702,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         jLabel2.setText("Adicionar Consumo");
 
         jLabel7.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        jLabel7.setText("id do Produto:");
+        jLabel7.setText("Cod Produto:");
 
         txtIdProduto.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         txtIdProduto.addActionListener(new java.awt.event.ActionListener() {
@@ -1317,12 +1332,14 @@ public class EncerraQuarto extends javax.swing.JFrame {
     public void salvaJustifica(String tipoValor, float valorSalvar) {
         Connection link = null;
         CacheDados cache = CacheDados.getInstancia();
-        int idLocacao = cache.getCacheOcupado().get(numeroDoQuarto).getIdLoca();
         if (idLocacao == 0) {
-            DadosOcupados quartoOcupado = cache.getCacheOcupado().get(numeroDoQuarto);
-            int novoID = new fquartos().getIdLocacao(numeroDoQuarto);
-            quartoOcupado.setIdLoca(novoID);
-            cache.getCacheOcupado().put(numeroDoQuarto, quartoOcupado);
+            idLocacao = cache.getCacheOcupado().get(numeroDoQuarto).getIdLoca();
+            if (idLocacao == 0) {
+                DadosOcupados quartoOcupado = cache.getCacheOcupado().get(numeroDoQuarto);
+                int novoID = new fquartos().getIdLocacao(numeroDoQuarto);
+                idLocacao = novoID;
+
+            }
         }
         try {
             link = new fazconexao().conectar();
@@ -1366,12 +1383,14 @@ public class EncerraQuarto extends javax.swing.JFrame {
         int idCaixa = config.getCaixa();
         fquartos quartodao = new fquartos();
         CacheDados cache = CacheDados.getInstancia();
-        int idLocacao = cache.getCacheOcupado().get(numeroDoQuarto).getIdLoca();
         if (idLocacao == 0) {
-            DadosOcupados quartoOcupado = cache.getCacheOcupado().get(numeroDoQuarto);
-            int novoID = new fquartos().getIdLocacao(numeroDoQuarto);
-            quartoOcupado.setIdLoca(novoID);
-            cache.getCacheOcupado().put(numeroDoQuarto, quartoOcupado);
+            idLocacao = cache.getCacheOcupado().get(numeroDoQuarto).getIdLoca();
+            if (idLocacao == 0) {
+                DadosOcupados quartoOcupado = cache.getCacheOcupado().get(numeroDoQuarto);
+                int novoID = new fquartos().getIdLocacao(numeroDoQuarto);
+                idLocacao = novoID;
+
+            }
         }
         String horaFim = lblFimLocacao.getText();
         String horaInicio = lblInicioLocacao.getText();
@@ -1660,7 +1679,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
 
         JOptionPane optionPane = new JOptionPane(panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.DEFAULT_OPTION, null, new Object[]{}, null);
         JDialog dialog = optionPane.createDialog("Digite os valores recebidos");
-        dialog.setSize(800, 400);
+        dialog.setSize(800, 500);
         // Adicionando suporte para atalhos de teclado (teclas C, D, O, P, S) no JRootPane do diálogo
         JRootPane rootPane = dialog.getRootPane();
         rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("C"), "credito");
@@ -1809,14 +1828,17 @@ public class EncerraQuarto extends javax.swing.JFrame {
     }
 
     public void salvaVendidos(int numero) {
+        salvouLocacao = true;
         fquartos quartodao = new fquartos();
         CacheDados cache = CacheDados.getInstancia();
-        int idLocacao = cache.getCacheOcupado().get(numeroDoQuarto).getIdLoca();
         if (idLocacao == 0) {
-            DadosOcupados quartoOcupado = cache.getCacheOcupado().get(numeroDoQuarto);
-            int novoID = new fquartos().getIdLocacao(numeroDoQuarto);
-            quartoOcupado.setIdLoca(novoID);
-            cache.getCacheOcupado().put(numeroDoQuarto, quartoOcupado);
+            idLocacao = cache.getCacheOcupado().get(numeroDoQuarto).getIdLoca();
+            if (idLocacao == 0) {
+                DadosOcupados quartoOcupado = cache.getCacheOcupado().get(numeroDoQuarto);
+                int novoID = new fquartos().getIdLocacao(numeroDoQuarto);
+                idLocacao = novoID;
+
+            }
         }
         DefaultTableModel model = (DefaultTableModel) tabela.getModel();
         int rowCount = model.getRowCount();
@@ -2060,15 +2082,17 @@ public class EncerraQuarto extends javax.swing.JFrame {
     private void startRecording(int numeroQuarto) {
         if (!recording) {
             CacheDados cache = CacheDados.getInstancia();
-            int idLocacao = cache.getCacheOcupado().get(numeroQuarto).getIdLoca();
             if (idLocacao == 0) {
-                DadosOcupados quartoOcupado = cache.getCacheOcupado().get(numeroQuarto);
-                int novoID = new fquartos().getIdLocacao(numeroQuarto);
-                quartoOcupado.setIdLoca(novoID);
-                cache.getCacheOcupado().put(numeroQuarto, quartoOcupado);
+                idLocacao = cache.getCacheOcupado().get(numeroDoQuarto).getIdLoca();
+                if (idLocacao == 0) {
+                    DadosOcupados quartoOcupado = cache.getCacheOcupado().get(numeroDoQuarto);
+                    int novoID = new fquartos().getIdLocacao(numeroDoQuarto);
+                    idLocacao = novoID;
+
+                }
             }
             // Caminho onde o vídeo será salvo (alterar conforme necessário)
-            String outputFilePath = new File("src/main/resources/videos", idLocacao + ".mp4").getAbsolutePath();
+            String outputFilePath = new File("src/main/resources/videos/temp", idLocacao + ".mp4").getAbsolutePath();
 
             // URL da câmera (RTSP)
             String mediaUrl = "rtsp://admin:Felipe0110@192.168.100.135:554/cam/realmonitor?channel=1&subtype=0";
@@ -2093,9 +2117,253 @@ public class EncerraQuarto extends javax.swing.JFrame {
             // Para a gravação
             mediaPlayer.controls().stop();
             recording = false;  // Marca que a gravação foi interrompida
-            System.out.println("Gravação salva com sucesso.");
+            String infoFilePath = new File("src/main/resources/videos/temp", "locacao_" + idLocacao + ".txt").getAbsolutePath();
+            String videoFilePath = new File("src/main/resources/videos/temp", idLocacao + ".mp4").getAbsolutePath();
+
+            if (salvouLocacao) {
+                float valorDoQuarto = valorQuarto + valorAdicionalPeriodo + valorAdicionalPessoa;
+
+                // Se a locação foi salva, move para a pasta definitivo
+                saveInfoToFile(infoFilePath, idLocacao, valorDoQuarto);
+
+                System.out.println("Gravação salva com sucesso.");
+                Thread thread = new Thread(() -> {
+                    try {
+                        // Pausa de 2 segundos
+                        Thread.sleep(2000);
+
+                        // Chama o método para mover os arquivos
+                        moveFilesToFinalFolder(videoFilePath, infoFilePath);
+                        Thread.sleep(2000);
+                        VideoProcessorTest processor = new VideoProcessorTest();
+                        processor.checkVideoFolder();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    // A thread termina automaticamente após isso.
+                });
+                thread.start();
+
+            } else {
+                // Se a locação não foi salva, exclui os arquivos temporários
+                deleteTempFiles(videoFilePath, infoFilePath);
+            }
+        }
+
+    }
+
+    private void moveFilesToFinalFolder(String videoFilePath, String infoFilePath) {
+        int maxRetries = 5; // Número máximo de tentativas
+        int waitTime = 2000; // Tempo de espera entre as tentativas (em milissegundos)
+        int retries = 0;
+
+        while (retries < maxRetries) {
+            try {
+                // Tenta mover os arquivos
+                Files.move(Path.of(videoFilePath), Path.of("src/main/resources/videos/definitivo", new File(videoFilePath).getName()), StandardCopyOption.REPLACE_EXISTING);
+                Files.move(Path.of(infoFilePath), Path.of("src/main/resources/videos/definitivo", new File(infoFilePath).getName()), StandardCopyOption.REPLACE_EXISTING);
+
+                System.out.println("Arquivos movidos com sucesso.");
+                return; // Se mover os arquivos com sucesso, sai do método
+
+            } catch (IOException e) {
+                // Se o arquivo estiver em uso, aguarda 2 segundos e tenta novamente
+                if (e instanceof java.nio.file.FileSystemException) {
+                    System.out.println("Arquivo em uso, aguardando " + waitTime + "ms antes de tentar novamente...");
+                    try {
+                        Thread.sleep(waitTime); // Aguarda antes de tentar novamente
+                    } catch (InterruptedException ie) {
+                        ie.printStackTrace();
+                    }
+                    retries++; // Incrementa o número de tentativas
+                } else {
+                    e.printStackTrace(); // Caso seja outro erro, imprime a exceção
+                    return; // Caso contrário, sai do método
+                }
+            }
+        }
+
+        // Se não conseguiu mover os arquivos após várias tentativas
+        System.out.println("Falha ao mover os arquivos após " + maxRetries + " tentativas.");
+    }
+
+    // Método para excluir arquivos temporários
+    private void deleteTempFiles(String videoFilePath, String infoFilePath) {
+        try {
+            File tempVideoFile = new File(videoFilePath);
+            File tempInfoFile = new File(infoFilePath);
+
+            if (tempVideoFile.exists()) {
+                boolean videoDeleted = tempVideoFile.delete();
+                if (videoDeleted) {
+                    System.out.println("Vídeo temporário excluído.");
+                }
+            }
+
+            if (tempInfoFile.exists()) {
+                boolean infoDeleted = tempInfoFile.delete();
+                if (infoDeleted) {
+                    System.out.println("Arquivo de informações temporário excluído.");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
+
+    private void saveInfoToFile(String filePath, int idLocacao, float valorQuarto) {
+        try ( BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            writer.write("Locação: " + idLocacao);
+            writer.newLine();
+            writer.write("Número do Quarto: " + numeroDoQuarto);
+            writer.newLine();
+            writer.write("Entrada: " + (dataInicio));
+            writer.newLine();
+            writer.write("Saída: " + (dataFim));
+            writer.newLine();
+            writer.write(String.format("Valor do Quarto: R$ %.2f", valorQuarto));
+            writer.newLine();
+            writer.write(String.format("Consumo: R$ %.2f", valorConsumo));
+            writer.newLine();
+            writer.write(String.format("Desconto: R$ %.2f", valorDesconto));
+            writer.newLine();
+            writer.write(String.format("Acréscimo: R$ %.2f", valorAcrescimo));
+            writer.newLine();
+            writer.write(String.format("Pagou em Dinheiro: R$ %.2f", valD));
+            writer.newLine();
+            writer.write(String.format("Pagou com Cartão: R$ %.2f", valC));
+            writer.newLine();
+            writer.write(String.format("Pagou com Pix: R$ %.2f", valP));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void checkVideoFolder() {
+    File folder = new File("src/main/resources/videos/definitivo");
+
+    if (!folder.exists() || !folder.isDirectory()) {
+        System.out.println("A pasta de vídeos não foi encontrada!");
+        return;
+    }
+
+    // Lista arquivos de vídeo na pasta
+    File[] videoFiles = folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".mp4"));
+    if (videoFiles == null) {
+        System.out.println("Erro ao acessar a pasta de vídeos.");
+        return;
+    }
+
+    System.out.println("Número de vídeos encontrados: " + videoFiles.length);
+
+    if (videoFiles.length >= 5) {
+        System.out.println("Temos 5 ou mais vídeos, hora de concatenar!");
+        try {
+            createBlackScreensForVideos();
+            List<String> videoPaths = Arrays.stream(videoFiles)
+                                            .map(File::getAbsolutePath)
+                                            .collect(Collectors.toList());
+            concatenateVideos(videoPaths, "src/main/resources/videos/definitivo/concatenated_video.mp4");
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    } else {
+        System.out.println("Ainda não há vídeos suficientes para concatenar.");
+    }
+}
+
+// Lê os arquivos de texto e cria as telas pretas correspondentes
+public void createBlackScreensForVideos() throws IOException, InterruptedException {
+    File folder = new File("src/main/resources/videos/definitivo");
+    File[] textFiles = folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".txt"));
+
+    if (textFiles == null) {
+        System.out.println("Nenhum arquivo de texto encontrado.");
+        return;
+    }
+
+    for (File textFile : textFiles) {
+        String infoText = readTextFromFile(textFile);
+        String idLocacao = textFile.getName().replace("locacao_", "").replace(".txt", "");
+        String outputFilePath = new File("src/main/resources/videos/definitivo", "black_" + idLocacao + ".mp4").getAbsolutePath();
+        createBlackScreen(infoText, outputFilePath);
+    }
+}
+
+// Lê o conteúdo do arquivo de texto
+private static String readTextFromFile(File file) throws IOException {
+    StringBuilder content = new StringBuilder();
+    try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+        String line;
+        while ((line = reader.readLine()) != null) {
+            content.append(line).append("\\n"); // \\n para quebra de linha no FFmpeg
+        }
+    }
+    return content.toString();
+}
+
+// Gera a tela preta com texto usando FFmpeg
+private void createBlackScreen(String text, String outputFilePath) throws IOException, InterruptedException {
+    // Substitua "/path/to/font.ttf" pelo caminho completo de uma fonte TTF no seu sistema
+    String fontFilePath = "C:/Windows/Fonts/Arial.ttf"; // Certifique-se de que o caminho para a fonte está correto
+    String command = String.format("ffmpeg -f lavfi -i color=c=black:s=1280x720:d=5 -vf \"drawtext=fontfile='%s': "
+            + "text='%s': fontcolor=white: fontsize=36: box=1: boxcolor=black@0.5: boxborderw=5: x=(w-text_w)/2: y=(h-text_h)/2\" "
+            + "-codec:a copy \"%s\"",
+            fontFilePath, text.replace("'", "\\'"), outputFilePath);
+
+    executeCommand(command);
+}
+
+private void executeCommand(String command) {
+    try {
+        // Use "cmd" no Windows
+        ProcessBuilder builder = new ProcessBuilder("cmd", "/c", command);
+        builder.redirectErrorStream(true);
+        Process process = builder.start();
+
+        // Lê a saída do processo
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            System.out.println(line);
+        }
+
+        process.waitFor();
+    } catch (IOException | InterruptedException e) {
+        e.printStackTrace();
+    }
+}
+
+// Concatena os vídeos usando FFmpeg
+private void concatenateVideos(List<String> videoPaths, String outputVideoPath) {
+    try {
+        // Cria a string de comando para o FFMPEG
+        StringBuilder command = new StringBuilder("ffmpeg -y -f concat -safe 0 -i ");
+        String listFilePath = "src/main/resources/videos/temp/video_list.txt";
+
+        // Cria o arquivo temporário com a lista de vídeos
+        File tempFolder = new File("src/main/resources/videos/temp");
+        if (!tempFolder.exists()) {
+            tempFolder.mkdirs();
+        }
+
+        try (PrintWriter writer = new PrintWriter(listFilePath)) {
+            for (String videoPath : videoPaths) {
+                writer.println("file '" + videoPath.replace("\\", "/") + "'");
+            }
+        }
+
+        // Adiciona o caminho do arquivo de lista de vídeos ao comando
+        command.append("\"").append(listFilePath).append("\"").append(" -c copy \"").append(outputVideoPath).append("\"");
+
+        // Executa o comando usando o CMD no Windows
+        executeCommand(command.toString());
+
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}
+
     private void btWifiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btWifiActionPerformed
         // mostra a img de conexao de wi-fi na 2a Tela
         if (!isFrameOpen) {

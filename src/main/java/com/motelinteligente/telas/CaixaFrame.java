@@ -47,7 +47,6 @@ public class CaixaFrame extends javax.swing.JFrame {
         txtCodigoCaixa9 = new javax.swing.JTextField();
         painelBotoes = new javax.swing.JPanel();
         btVoltar = new javax.swing.JButton();
-        btAtualizar = new javax.swing.JButton();
         painelDadosCaixa = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -132,14 +131,6 @@ public class CaixaFrame extends javax.swing.JFrame {
             }
         });
 
-        btAtualizar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/seguranca.png"))); // NOI18N
-        btAtualizar.setText("Atualizar");
-        btAtualizar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btAtualizarActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout painelBotoesLayout = new javax.swing.GroupLayout(painelBotoes);
         painelBotoes.setLayout(painelBotoesLayout);
         painelBotoesLayout.setHorizontalGroup(
@@ -147,17 +138,13 @@ public class CaixaFrame extends javax.swing.JFrame {
             .addGroup(painelBotoesLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(btVoltar)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btAtualizar)
-                .addContainerGap(619, Short.MAX_VALUE))
+                .addContainerGap(743, Short.MAX_VALUE))
         );
         painelBotoesLayout.setVerticalGroup(
             painelBotoesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(painelBotoesLayout.createSequentialGroup()
                 .addGap(15, 15, 15)
-                .addGroup(painelBotoesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btVoltar)
-                    .addComponent(btAtualizar))
+                .addComponent(btVoltar)
                 .addContainerGap(23, Short.MAX_VALUE))
         );
 
@@ -481,6 +468,7 @@ public class CaixaFrame extends javax.swing.JFrame {
                 "id", "Descrição", "Quantidade", "Valor Und", "Total"
             }
         ));
+        tabelaProdutos.setFocusable(false);
         jScrollPane2.setViewportView(tabelaProdutos);
         if (tabelaProdutos.getColumnModel().getColumnCount() > 0) {
             tabelaProdutos.getColumnModel().getColumn(1).setResizable(false);
@@ -545,6 +533,7 @@ public class CaixaFrame extends javax.swing.JFrame {
                 "Entrada", "Saída", "Numero Quarto", "Valor Quarto", "Valor Consumo", "Desconto", "Acrescimo", "Valor Total"
             }
         ));
+        tabelaLocacoes.setFocusable(false);
         jScrollPane1.setViewportView(tabelaLocacoes);
 
         jLabel15.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -979,10 +968,6 @@ public class CaixaFrame extends javax.swing.JFrame {
 
     }//GEN-LAST:event_formWindowOpened
 
-    private void btAtualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btAtualizarActionPerformed
-        carregaInfo();
-    }//GEN-LAST:event_btAtualizarActionPerformed
-
     private void btFecharActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btFecharActionPerformed
         // fechar o caixa
         float valCaixa = 0;
@@ -1072,7 +1057,6 @@ public class CaixaFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btAbrir;
-    private javax.swing.JButton btAtualizar;
     private javax.swing.JButton btFechar;
     private javax.swing.JButton btVoltar;
     private javax.swing.JLabel jLabel1;

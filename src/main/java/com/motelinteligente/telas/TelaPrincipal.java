@@ -7,7 +7,6 @@ import com.motelinteligente.dados.Antecipado;
 import com.motelinteligente.dados.BackupExecutor;
 import com.motelinteligente.dados.CacheDados;
 import com.motelinteligente.dados.CacheDados.DadosVendidos;
-import com.motelinteligente.dados.CacheDados.Negociados;
 import com.motelinteligente.dados.CarregaQuarto;
 import com.motelinteligente.dados.CheckSincronia;
 import com.motelinteligente.dados.DadosOcupados;
@@ -57,7 +56,6 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Time;
@@ -94,6 +92,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private JPopupMenu popupMenu;
     private boolean isClickable = true;
     private Timer alarmTimer; // Timer para verificar os alarmes
+    private long lastUpdate = 0;
+// Intervalo mínimo entre execuções em milissegundos
+    private static final long UPDATE_INTERVAL = 1000; // 1 segundo
 
     private class NumOnly extends PlainDocument {
 
@@ -356,6 +357,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         lblNumero.setText(String.valueOf(quartoEmFoco));
         painelSecundario.repaint();
     }
+
     public void populaAntecipado(int locacao) {
         List<Antecipado> antecipados = new ArrayList<>();
         Connection link = null;
@@ -374,7 +376,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 String tipo = resultSet.getString("tipo");
                 float valor = resultSet.getFloat("valor");
                 Timestamp hora = resultSet.getTimestamp("hora");
-                
+
                 // Cria o objeto Antecipado para cada registro retornado
                 if (tipo.equals("desconto")) {
                     txtDescontoNegociado.setText("R$ " + valor);
@@ -402,8 +404,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         }
 
         // Retorna a lista de pagamentos antecipados
-
     }
+
     public void populaPrevendidos(int locacao, DefaultTableModel modelo) {
         CacheDados cache = CacheDados.getInstancia();
         float totalVendido = 0;
@@ -1220,6 +1222,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/bt_entrada_icone.png"))); // NOI18N
         jButton1.setText("Portão Entrada");
         jButton1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jButton1.setFocusable(false);
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -1687,6 +1690,18 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
     private void mostraQuartos() {
         String status = null, data = null;
+        long currentTime = System.currentTimeMillis();
+        // Se a última atualização foi há menos de UPDATE_INTERVAL, cancela esta execução
+        if (currentTime - lastUpdate < UPDATE_INTERVAL) {
+            try {
+                Thread.sleep(1000); // espera 1 segundo
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt(); // restaura o estado de interrupção
+            }
+        }
+
+        // Atualiza o timestamp da última execução
+        lastUpdate = currentTime;
         srPane.removeAll();
         srPane.setLayout(new GridLayout(3, 3));
 
@@ -1717,16 +1732,13 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 quadrado.setBackground(meuVerde);
 
                 srPane.add(quadrado);
-                srPane.revalidate();
-                srPane.repaint();
+
             }
             if (status.equals("manutencao")) {
                 Quadrado quadrado = new Quadrado(q.getNumeroQuarto(), q.getTipoQuarto(), "MANUTENÇÃO", outroCinza);
                 quadrado.setQuartoClickListener(this); // Registre a TelaPrincipal como ouvinte
                 quadrado.setBackground(meuCinza);
                 srPane.add(quadrado);
-                srPane.revalidate();
-                srPane.repaint();
 
             }
             if (status.equals("limpeza")) {
@@ -1734,8 +1746,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 quadrado.setQuartoClickListener(this); // Registre a TelaPrincipal como ouvinte
                 quadrado.setBackground(meuAmarelo);
                 srPane.add(quadrado);
-                srPane.revalidate();
-                srPane.repaint();
 
             }
             if (status.contains("-")) {
@@ -1751,8 +1761,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 quadrado.setQuartoClickListener(this); // Registre a TelaPrincipal como ouvinte
                 quadrado.setVisible(true);
                 srPane.add(quadrado);
-                srPane.revalidate();
-                srPane.repaint();
+
             }
             if (status.equals("reservado")) {
                 Quadrado quadrado = new Quadrado(q.getNumeroQuarto(), q.getTipoQuarto(), "RESERVADO", outroAzul);
@@ -1760,10 +1769,10 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 quadrado.setQuartoClickListener(this); // Registre a TelaPrincipal como ouvinte
                 quadrado.setVisible(true);
                 srPane.add(quadrado);
-                srPane.revalidate();
-                srPane.repaint();
             }
         }
+        srPane.revalidate();
+        srPane.repaint();
     }
 
     public String calculaData(String dataBanco) {
@@ -1896,7 +1905,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     }//GEN-LAST:event_itemManutencaoActionPerformed
 
     private void btFuncionarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btFuncionarioActionPerformed
-        
+
     }//GEN-LAST:event_btFuncionarioActionPerformed
     public void executarFinalizar() {
         configGlobal config = configGlobal.getInstance();
@@ -2010,7 +2019,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         }
     }
     private void btQuartosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btQuartosActionPerformed
-        
+
     }//GEN-LAST:event_btQuartosActionPerformed
 
     private void btConfereCaixaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btConfereCaixaActionPerformed
