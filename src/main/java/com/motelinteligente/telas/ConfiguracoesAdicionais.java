@@ -21,12 +21,14 @@ import javax.swing.text.PlainDocument;
  * @author johnc
  */
 public class ConfiguracoesAdicionais extends javax.swing.JFrame {
-        private String telaMostrar; // Variável global para armazenar a tela selecionada
 
+    private String telaMostrar; // Variável global para armazenar a tela selecionada
+    private boolean isInitializing = false;
     /**
      * Creates new form ConfiguracoesAdicionais
      */
     private class NumOnly extends PlainDocument {
+
         @Override
         public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
             if (str != null) {
@@ -43,6 +45,7 @@ public class ConfiguracoesAdicionais extends javax.swing.JFrame {
     }
 
     public ConfiguracoesAdicionais() {
+        
         initComponents();
         configGlobal config = configGlobal.getInstance();
         if (config.getLogoffecharcaixa()) {
@@ -54,13 +57,15 @@ public class ConfiguracoesAdicionais extends javax.swing.JFrame {
         if (config.isFlagMesmoUserCaixa()) {
             fechaCaixaUser.setSelected(true);
         }
-        
+
         txtLimiteDesconto.setDocument(new NumOnly());
         txtLimiteDesconto.setText(String.valueOf(config.getLimiteDesconto()));
+        isInitializing = true;
         carregarTelas();
-        
-        
+        isInitializing = false;
+
     }
+
     private void carregarTelas() {
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice[] devices = ge.getScreenDevices();
@@ -80,6 +85,7 @@ public class ConfiguracoesAdicionais extends javax.swing.JFrame {
             telaMostrar = devices[devices.length - 1].getIDstring(); // Atualiza a variável global
         }
     }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -174,9 +180,9 @@ public class ConfiguracoesAdicionais extends javax.swing.JFrame {
         jLabel6.setText("*");
 
         jComboBoxTelas.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jComboBoxTelas.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBoxTelasActionPerformed(evt);
+        jComboBoxTelas.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jComboBoxTelasItemStateChanged(evt);
             }
         });
 
@@ -315,18 +321,23 @@ public class ConfiguracoesAdicionais extends javax.swing.JFrame {
                 JOptionPane.showConfirmDialog(null, e);
             }
         }
-        
+
     }//GEN-LAST:event_txtLimiteDescontoActionPerformed
 
-    private void jComboBoxTelasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxTelasActionPerformed
-         // Atualiza a variável global com a tela selecionada
-        telaMostrar = (String) jComboBoxTelas.getSelectedItem();
-        JOptionPane.showMessageDialog(this, "Tela selecionada: " + telaMostrar);
-        // muda a tela no sistema e no banco de dados tbm
-        configGlobal config = configGlobal.getInstance();
-        config.setTelaMostrar(telaMostrar);
-        setarTela(telaMostrar);
-    }//GEN-LAST:event_jComboBoxTelasActionPerformed
+    private void jComboBoxTelasItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jComboBoxTelasItemStateChanged
+        if (isInitializing) {
+        return; // Ignora o evento se estiver na fase de inicialização
+    }
+
+    // Atualiza a variável global com a tela selecionada
+    telaMostrar = (String) jComboBoxTelas.getSelectedItem();
+    JOptionPane.showMessageDialog(this, "Tela selecionada: " + telaMostrar);
+
+    // Muda a tela no sistema e no banco de dados também
+    configGlobal config = configGlobal.getInstance();
+    config.setTelaMostrar(telaMostrar);
+    setarTela(telaMostrar);
+    }//GEN-LAST:event_jComboBoxTelasItemStateChanged
     public void funcaoSet(String campo, boolean flag) {
         String consultaSQL = "UPDATE configuracoes SET " + campo + " = ?";
         Connection link = null;
@@ -354,29 +365,37 @@ public class ConfiguracoesAdicionais extends javax.swing.JFrame {
             }
         }
     }
+
     public void setarTela(String campo) {
-        String consultaSQL = "update configuracoes set telaMostrar='" + campo + "'";
+        String consultaSQL = "UPDATE configuracoes SET telaMostrar = ?"; // Usando '?' como placeholder
         Connection link = null;
+        PreparedStatement statement = null; // Declarar fora do try para o uso no finally
         try {
             link = new fazconexao().conectar();
-            PreparedStatement statement = link.prepareStatement(consultaSQL);
+            statement = link.prepareStatement(consultaSQL);
 
+            // Define o valor do placeholder
             statement.setString(1, campo);
 
+            // Executa a atualização
             int n = statement.executeUpdate();
             if (n != 0) {
-                link.close();
-                statement.close();
+                // Sucesso na atualização
+                JOptionPane.showMessageDialog(null, "Tela atualizada com sucesso.");
             }
         } catch (SQLException e) {
+            // Exibe a mensagem de erro
             JOptionPane.showMessageDialog(null, e);
         } finally {
             try {
+                if (statement != null) {
+                    statement.close(); // Fecha o PreparedStatement
+                }
                 if (link != null && !link.isClosed()) {
-                    link.close();
+                    link.close(); // Fecha a conexão
                 }
             } catch (SQLException e) {
-                JOptionPane.showConfirmDialog(null, e);
+                JOptionPane.showMessageDialog(null, e);
             }
         }
     }
