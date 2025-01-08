@@ -93,7 +93,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private boolean isClickable = true;
     private Timer alarmTimer; // Timer para verificar os alarmes
     private long lastUpdate = 0;
-// Intervalo mínimo entre execuções em milissegundos
+    // Intervalo mínimo entre execuções em milissegundos
     private static final long UPDATE_INTERVAL = 1000; // 1 segundo
 
     private class NumOnly extends PlainDocument {

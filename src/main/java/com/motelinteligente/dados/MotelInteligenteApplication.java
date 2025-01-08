@@ -17,6 +17,8 @@ import java.sql.Timestamp;
 import java.util.Date;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 public class MotelInteligenteApplication {
-
+    private static final Logger logger = LoggerFactory.getLogger(fprodutos.class);
     public static void main(String[] args) {
 
         SSLUtil.disableSSLCertificateChecking();
@@ -60,12 +62,7 @@ public class MotelInteligenteApplication {
                         try {
                             PreparedStatement statementUpdate = link.prepareStatement(sql);
                             statementUpdate.setString(1, externalIP);
-                            int linhasAfetadas = statementUpdate.executeUpdate();
-                            if (linhasAfetadas > 0) {
-                                System.out.println("Campo 'meuip' atualizado com sucesso.");
-                            } else {
-                                System.out.println("O ip nao pode ser atualizado.");
-                            }
+                            statementUpdate.executeUpdate();
 
                             // Fechar recursos
                             statementUpdate.close();
@@ -94,7 +91,7 @@ public class MotelInteligenteApplication {
 
         @PostMapping(value = "/receberNumeroQuarto", consumes = "text/plain", produces = "text/plain")
         public ResponseEntity<String> receberNumeroQuarto(@RequestBody String numeroQuarto) {
-            System.out.println("Recebeu do sistema Spring Boot: " + numeroQuarto);
+            logger.info("Recebeu requisição com corpo: {}", numeroQuarto);
             String[] partes = numeroQuarto.split(" ");
 
             if (partes.length != 2) {
@@ -102,7 +99,6 @@ public class MotelInteligenteApplication {
             }
             String acao = partes[0];
             String numero = partes[1];
-            System.out.println(acao + numero);
 
             if (acao.equals("abrir")) {
                 switch (numero) {
@@ -218,13 +214,13 @@ public class MotelInteligenteApplication {
                                     }).start(); // Inicia a thread
                                 }
                             } else {
-                                //logger.error("Erro ao tentar locar - recebido SpringBoot - return false ");
+                                logger.error("Erro ao tentar locar - recebido SpringBoot - return false ");
                                 JOptionPane.showMessageDialog(null, "Falha ao iniciar locação!");
 
                             }
                         } else {
                             JOptionPane.showMessageDialog(null, "Tentando alugar quarto não disponível");
-                            //logger.error("Tentou Inicializar quarto com status ", statusAtual);
+                            logger.error("Tentando alugar quarto não disponível");
                         }
 
                     }

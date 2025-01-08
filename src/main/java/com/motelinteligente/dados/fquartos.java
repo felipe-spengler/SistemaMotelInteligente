@@ -749,96 +749,79 @@ public class fquartos {
     }
 
     public boolean alteraRegistro(int numeroQuarto, String tipoSet) {
-        System.out.println("altera reg " + numeroQuarto);
-        String nomeTabela = null;
-        Connection link = null;
-        if (tipoSet.contains("-")) {
-            nomeTabela = "registralocacao";
-        }
-        if (tipoSet.equals("manutencao")) {
-            nomeTabela = "registramanutencao";
-        }
-        if (tipoSet.equals("limpeza")) {
-            nomeTabela = "registralimpeza";
-        }
-        if (tipoSet.equals("reservado")) {
-            nomeTabela = "registrareserva";
-        }
-        if (tipoSet.equals("ocupado")) {
-            nomeTabela = "registralocacao";
-        }
-        Date dataAtual = new Date();
-        Timestamp horaAtual = new Timestamp(dataAtual.getTime());
-        Timestamp horaBanco = null;
-        String consultaSQL = "SELECT horaEntrada FROM " + nomeTabela + " WHERE numquarto = '" + numeroQuarto + "' AND tempoTotal IS NULL";
-        try {
-            link = new fazconexao().conectar();
-            Statement statement = link.createStatement();
-            System.out.println(consultaSQL);
-            ResultSet resultado = statement.executeQuery(consultaSQL);
+    String nomeTabela = null;
+
+    if (tipoSet.contains("-")) {
+        nomeTabela = "registralocacao";
+    } else if (tipoSet.equals("manutencao")) {
+        nomeTabela = "registramanutencao";
+    } else if (tipoSet.equals("limpeza")) {
+        nomeTabela = "registralimpeza";
+    } else if (tipoSet.equals("reservado")) {
+        nomeTabela = "registrareserva";
+    } else if (tipoSet.equals("ocupado")) {
+        nomeTabela = "registralocacao";
+    }
+
+    if (nomeTabela == null) {
+        JOptionPane.showMessageDialog(null, "Tipo inválido: " + tipoSet);
+        return false;
+    }
+
+    String consultaSQL = "SELECT horaEntrada FROM " + nomeTabela + " WHERE numquarto = ? AND tempoTotal IS NULL";
+    Timestamp horaBanco = null;
+
+    try (Connection link = new fazconexao().conectar();
+         PreparedStatement statement = link.prepareStatement(consultaSQL)) {
+
+        statement.setInt(1, numeroQuarto);
+        System.out.println("Consulta SQL: " + consultaSQL);
+
+        try (ResultSet resultado = statement.executeQuery()) {
             if (resultado.next()) {
                 horaBanco = resultado.getTimestamp("horaEntrada");
-            } else {
-                link.close();
-                statement.close();
-            }
-        } catch (Exception e) {
-            logger.error("Erro : fquartos() : ", e);
-            JOptionPane.showConfirmDialog(null, "Erro altReg() " + e);
-        } finally {
-            try {
-                // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
-                if (link != null && !link.isClosed()) {
-                    link.close();
-                }
-            } catch (SQLException e) {
-                logger.error("Erro : fquartos() : ", e);
-                JOptionPane.showMessageDialog(null, e);
             }
         }
 
-        long diferencaMillis = horaAtual.getTime() - horaBanco.getTime();
-
-        // Calcula a diferença em horas, minutos e segundos
-        long minutos = diferencaMillis / (60 * 1000) % 60;
-        long horas = diferencaMillis / (60 * 60 * 1000);
-
-        // Formata a diferença no formato hh:mm:ss
-        String diferencaFormatada = String.format("%02d:%02d", horas, minutos);
-        consultaSQL = "UPDATE " + nomeTabela + " SET tempoTotal = '"
-                + diferencaFormatada + "', horaEntrada = '"
-                + horaBanco + "' WHERE numquarto = '" + numeroQuarto + "' AND tempoTotal IS NULL";
-
-        try {
-            link = new fazconexao().conectar();
-            PreparedStatement statement = link.prepareStatement(consultaSQL);
-            int n = statement.executeUpdate();
-            if (n != 0) {
-                link.close();
-                statement.close();
-                return true;
-            } else {
-                link.close();
-                statement.close();
-                return false;
-            }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, e);
-            logger.error("Erro : fquartos() : ", e);
-            return false;
-        } finally {
-            try {
-                // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
-                if (link != null && !link.isClosed()) {
-                    link.close();
-                }
-            } catch (SQLException e) {
-                logger.error("Erro : fquartos() : ", e);
-                JOptionPane.showMessageDialog(null, e);
-            }
-        }
-
+    } catch (Exception e) {
+        logger.error("Erro ao consultar horaEntrada. SQL: " + consultaSQL, e);
+        JOptionPane.showMessageDialog(null, "Erro ao consultar horaEntrada: " + e.getMessage());
+        return false;
     }
+
+    if (horaBanco == null) {
+        JOptionPane.showMessageDialog(null, "Hora de entrada não encontrada para o quarto: " + numeroQuarto);
+        return false;
+    }
+
+    Timestamp horaAtual = new Timestamp(System.currentTimeMillis());
+    long diferencaMillis = horaAtual.getTime() - horaBanco.getTime();
+
+    long minutos = diferencaMillis / (60 * 1000) % 60;
+    long horas = diferencaMillis / (60 * 60 * 1000);
+    String diferencaFormatada = String.format("%02d:%02d", horas, minutos);
+
+    consultaSQL = "UPDATE " + nomeTabela + " SET tempoTotal = ?, horaEntrada = ? WHERE numquarto = ? AND tempoTotal IS NULL";
+
+    try (Connection link = new fazconexao().conectar();
+         PreparedStatement statement = link.prepareStatement(consultaSQL)) {
+
+        statement.setString(1, diferencaFormatada);
+        statement.setTimestamp(2, horaBanco);
+        statement.setInt(3, numeroQuarto);
+
+        System.out.println("Consulta SQL: " + consultaSQL);
+
+        int n = statement.executeUpdate();
+        return n != 0;
+
+    } catch (Exception e) {
+        logger.error("Erro ao atualizar registro. SQL: " + consultaSQL, e);
+        JOptionPane.showMessageDialog(null, "Erro ao atualizar registro: " + e.getMessage());
+        return false;
+    }
+}
+
 
     public String getStatus(int idPassado) {
         Connection link = null;
