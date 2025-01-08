@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 
 public class fquartos {
 
-    private static final Logger logger = LoggerFactory.getLogger(fprodutos.class);
+    private static final Logger logger = LoggerFactory.getLogger(fquartos.class);
 
     public List<CarregaQuarto> uploadQuartos() {
         List<CarregaQuarto> quartos = new ArrayList<>();

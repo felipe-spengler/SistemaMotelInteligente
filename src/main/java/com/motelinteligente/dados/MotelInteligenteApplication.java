@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 public class MotelInteligenteApplication {
-    private static final Logger logger = LoggerFactory.getLogger(fprodutos.class);
+    private static final Logger logger = LoggerFactory.getLogger(MotelInteligenteApplication.class);
     public static void main(String[] args) {
 
         SSLUtil.disableSSLCertificateChecking();
