@@ -286,7 +286,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         String status = quarto.getStatusQuarto();
         String horarioQuarto = quarto.getHoraStatus();
         String[] partes = status.split("-");
-
+        
         txtPessoas.setText(String.valueOf(ocupado.getNumeroPessoas()));
         valorAdicionalPessoa = calculaAdicionalPessoa(ocupado.getNumeroPessoas());
         if (partes[1].equals("pernoite")) {

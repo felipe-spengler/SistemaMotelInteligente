@@ -487,9 +487,7 @@ public class fquartos {
         if (tipoSet.equals("reservado")) {
             nomeTabela = "registrareserva";
         }
-        if (tipoSet.equals("ocupado")) {
-            nomeTabela = "registralocacao";
-        }
+
         String consultaSQL = "INSERT INTO " + nomeTabela + " (numquarto, horaentrada) VALUES ( ?, ?)";
         Date dataAtual = new Date();
         Timestamp timestamp = new Timestamp(dataAtual.getTime());
@@ -532,91 +530,113 @@ public class fquartos {
         int idCaixa = config.getCaixa();
         String consultaSQL = "UPDATE registralocado SET horafim='" + horaFim
                 + "', horainicio='" + horaInicio
-                + // Adicione as aspas simples aqui
-                "', valorquarto=" + valorDoQuarto
+                + "', valorquarto=" + valorDoQuarto
                 + ", valorconsumo=" + valorConsumo
                 + ", pagodinheiro=" + valD
                 + ", pagopix=" + valP
                 + ", pagocartao=" + valC
                 + ", idcaixaatual=" + idCaixa
                 + " WHERE idlocacao=" + idPassado;
+
         Connection link = null;
+        PreparedStatement statement = null;
+
         try {
             link = new fazconexao().conectar();
-            PreparedStatement statement = link.prepareStatement(consultaSQL);
+            statement = link.prepareStatement(consultaSQL);
 
             int n = statement.executeUpdate();
+
             if (n != 0) {
-                link.close();
-                statement.close();
+                // Loga o sucesso com a consulta SQL
+                logger.info("Operação bem-sucedida: " + consultaSQL);
             } else {
-                link.close();
-                statement.close();
+                // Loga que a operação não fez alterações
+                logger.warn("Nenhuma linha foi atualizada: " + consultaSQL);
             }
         } catch (Exception e) {
-            logger.error("Erro : fquartos() : ", e);
+            logger.error("Erro ao executar salvaLocacao: ", e);
             JOptionPane.showConfirmDialog(null, e);
         } finally {
             try {
-                // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
+                if (statement != null && !statement.isClosed()) {
+                    statement.close();
+                }
                 if (link != null && !link.isClosed()) {
                     link.close();
                 }
             } catch (SQLException e) {
-                logger.error("Erro : fquartos() : ", e);
+                logger.error("Erro ao fechar recursos na salvaLocacao: ", e);
                 JOptionPane.showMessageDialog(null, e);
             }
         }
     }
 
-    public boolean registraLocacao(int numeroQuarto) {
-        String consultaSQL = "INSERT INTO registralocado (numquarto, horainicio, numpessoas) VALUES ( ?, ?, ?)";
-        Date dataAtual = new Date();
-        Timestamp timestamp = new Timestamp(dataAtual.getTime());
-        Connection link = null;
-        int idLocacao = -1;  // Variável para armazenar o id gerado
+public boolean registraLocacao(int numeroQuarto) {
+    String verificaDuplicidadeSQL = "SELECT COUNT(*) FROM registralocado WHERE numquarto = ? AND horainicio = ?";
+    String consultaSQL = "INSERT INTO registralocado (numquarto, horainicio, numpessoas) VALUES (?, ?, ?)";
+    Date dataAtual = new Date();
+    Timestamp timestamp = new Timestamp(dataAtual.getTime());
+    Connection link = null;
+    PreparedStatement statement = null;
 
+    try {
+        link = new fazconexao().conectar();
+
+        // Verificar duplicidade
+        statement = link.prepareStatement(verificaDuplicidadeSQL);
+        statement.setInt(1, numeroQuarto);
+        statement.setTimestamp(2, timestamp);
+        ResultSet rs = statement.executeQuery();
+
+        if (rs.next() && rs.getInt(1) > 0) {
+            // Registro duplicado encontrado
+            String mensagemErro = "Tentativa de inserir registro duplicado: Quarto = " + numeroQuarto + ", Horário = " + timestamp;
+            logger.error(mensagemErro);
+            JOptionPane.showMessageDialog(null, "Erro: Registro duplicado encontrado.\n" + mensagemErro);
+            return false;
+        }
+
+        // Fechar o statement de verificação antes de criar o próximo
+        statement.close();
+
+        // Inserir registro
+        statement = link.prepareStatement(consultaSQL, PreparedStatement.RETURN_GENERATED_KEYS);
+        statement.setInt(1, numeroQuarto);
+        statement.setTimestamp(2, timestamp);
+        statement.setInt(3, 2);
+
+        int n = statement.executeUpdate();
+        if (n != 0) {
+            ResultSet generatedKeys = statement.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                int idLocacaoGerado = generatedKeys.getInt(1);
+                logger.info("Registro inserido com sucesso: ID = " + idLocacaoGerado + ", Quarto = " + numeroQuarto);
+                generatedKeys.close();
+            } else {
+                logger.warn("Registro inserido, mas nenhum ID foi retornado. Quarto = " + numeroQuarto + ", Horário = " + timestamp);
+            }
+            return true;
+        } else {
+            logger.warn("Falha ao inserir registro. Nenhuma linha afetada. SQL: " + consultaSQL);
+        }
+    } catch (SQLException e) {
+        logger.error("Erro ao executar registraLocacao: ", e);
+        JOptionPane.showMessageDialog(null, "Erro ao registrar locação: " + e.getMessage());
+    } finally {
         try {
-            link = new fazconexao().conectar();
-            PreparedStatement statement = link.prepareStatement(consultaSQL);
-            statement.setInt(1, numeroQuarto);
-            statement.setTimestamp(2, timestamp);
-            statement.setInt(3, 2);
-
-            int n = statement.executeUpdate();
-            if (n != 0) {
-                link.close();
+            if (statement != null && !statement.isClosed()) {
                 statement.close();
-                return true;
-            } else {
+            }
+            if (link != null && !link.isClosed()) {
                 link.close();
-                statement.close();
-                return false;
             }
-        } catch (SQLException  e) {
-            // Captura a exceção gerada pela trigger
-            if ("45000".equals(e.getSQLState())) {
-                // Lida com o erro específico de duplicidade
-                JOptionPane.showMessageDialog(null, "ERRO CRITICO, avise o FELIPE imediatamente");
-            } else {
-                e.printStackTrace();  // Para outras exceções SQL
-                logger.error("Erro : fquartos() : ", e);
-                JOptionPane.showMessageDialog(null, e);
-                return false;
-            }
-
-        } finally {
-            try {
-                // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
-                if (link != null && !link.isClosed()) {
-                    link.close();
-                }
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(null, e);
-            }
+        } catch (SQLException e) {
+            logger.error("Erro ao fechar recursos: ", e);
         }
-        return false;
     }
+    return false;
+}
 
     public boolean salvaProduto(int id, int idProduto, int qnt, float valor, float valorTotal) {
         configGlobal config = configGlobal.getInstance();
@@ -662,31 +682,30 @@ public class fquartos {
     }
 
     public void atualizaPessoas(int idPassado, int numPessoas) {
-    Connection link = null;
-    String consultaSQL = "UPDATE registralocado SET numpessoas = ? WHERE numquarto = ? AND horafim IS NULL";
-    try {
-        link = new fazconexao().conectar();
-        PreparedStatement statement = link.prepareStatement(consultaSQL);
-        statement.setInt(1, numPessoas);
-        statement.setInt(2, idPassado);
-        int n = statement.executeUpdate();
-        statement.close();
-        link.close();
-    } catch (Exception e) {
-        logger.error("Erro : fquartos() : ", e);
-        JOptionPane.showConfirmDialog(null, e);
-    } finally {
+        Connection link = null;
+        String consultaSQL = "UPDATE registralocado SET numpessoas = ? WHERE numquarto = ? AND horafim IS NULL";
         try {
-            if (link != null && !link.isClosed()) {
-                link.close();
-            }
-        } catch (SQLException e) {
+            link = new fazconexao().conectar();
+            PreparedStatement statement = link.prepareStatement(consultaSQL);
+            statement.setInt(1, numPessoas);
+            statement.setInt(2, idPassado);
+            int n = statement.executeUpdate();
+            statement.close();
+            link.close();
+        } catch (Exception e) {
             logger.error("Erro : fquartos() : ", e);
-            JOptionPane.showMessageDialog(null, e);
+            JOptionPane.showConfirmDialog(null, e);
+        } finally {
+            try {
+                if (link != null && !link.isClosed()) {
+                    link.close();
+                }
+            } catch (SQLException e) {
+                logger.error("Erro : fquartos() : ", e);
+                JOptionPane.showMessageDialog(null, e);
+            }
         }
     }
-}
-
 
     public int getPessoas(int idPassado) {
         Connection link = null;

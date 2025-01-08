@@ -40,41 +40,52 @@ public class ConfereCaixa extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
         Font labelFont = new Font("Arial", Font.BOLD, 14);
-        // Painel superior para filtros
+
+// Painel superior para filtros
         JPanel topPanel = new JPanel(new FlowLayout());
         topPanel.setBackground(new Color(60, 60, 60)); // Define o background do painel superior
 
-        // Inicializa os JDateChoosers
+// Inicializa os JDateChoosers
         dateChooserInicio = new JDateChooser();
         dateChooserFim = new JDateChooser();
         dateChooserInicio.setPreferredSize(new Dimension(200, 30));
         dateChooserFim.setPreferredSize(new Dimension(200, 30));
-        // Define a cor de fundo dos campos dos JDateChoosers
-        dateChooserInicio.getDateEditor().getUiComponent().setBackground(new Color(80, 80, 80)); // Um pouco mais claro que o topPanel
-        dateChooserFim.getDateEditor().getUiComponent().setBackground(new Color(80, 80, 80));
 
-        // Define a cor da fonte dos campos dos JDateChoosers
-        dateChooserInicio.getDateEditor().getUiComponent().setForeground(Color.WHITE);
-        dateChooserFim.getDateEditor().getUiComponent().setForeground(Color.WHITE);
-        // Define a fonte para 14px para os campos de texto dos JDateChoosers
+// Define a cor de fundo dos campos dos JDateChoosers
+        dateChooserInicio.getDateEditor().getUiComponent().setBackground(new Color(255, 255, 255));
+        dateChooserFim.getDateEditor().getUiComponent().setBackground(new Color(255, 255, 255));
+
+// Acessa o JTextField interno do JDateChooser e define a cor e a fonte
+        JTextField startDateField = (JTextField) dateChooserInicio.getDateEditor().getUiComponent();
+        JTextField endDateField = (JTextField) dateChooserFim.getDateEditor().getUiComponent();
+
+        startDateField.setForeground(Color.WHITE);
+        endDateField.setForeground(Color.WHITE);
+
+// Define a fonte para 14px para os campos de texto dos JDateChoosers
         Font font = new Font("SansSerif", Font.PLAIN, 14);
         dateChooserInicio.setFont(font);
         dateChooserFim.setFont(font);
-        dateChooserInicio.getDateEditor().getUiComponent().setForeground(Color.WHITE);
-        dateChooserFim.getDateEditor().getUiComponent().setForeground(Color.WHITE);
+        startDateField.setFont(font);
+        endDateField.setFont(font);
+
+// Criação dos rótulos
         JLabel labelInicio = new JLabel("Data Início:");
         JLabel labelFim = new JLabel("Data Fim:");
 
-        // Define a cor da fonte das labels
+// Define a cor da fonte das labels
         labelInicio.setForeground(Color.WHITE);
         labelFim.setForeground(Color.WHITE);
         labelInicio.setFont(labelFont);
-        labelInicio.setFont(labelFont);
+        labelFim.setFont(labelFont);
+
+// Adiciona os componentes ao painel
         topPanel.add(labelInicio);
         topPanel.add(dateChooserInicio);
         topPanel.add(labelFim);
         topPanel.add(dateChooserFim);
-
+        
+        
         // Botão para buscar
         buscarButton = new JButton("Buscar");
         topPanel.add(buscarButton);
