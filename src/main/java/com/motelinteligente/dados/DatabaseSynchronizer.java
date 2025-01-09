@@ -1,11 +1,6 @@
 package com.motelinteligente.dados;
 
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +13,8 @@ public class DatabaseSynchronizer {
 
     public void sincronizarBanco() throws SQLException {
         String[] tables = getTables();
-        try ( Connection conexaoLocal = DriverManager.getConnection(LOCAL_DB_URL, USER, PASSWORD);  Connection conexaoRemoto = DriverManager.getConnection(REMOTE_DB_URL, USER, PASSWORD)) {
+        try (Connection conexaoLocal = DriverManager.getConnection(LOCAL_DB_URL, USER, PASSWORD);
+             Connection conexaoRemoto = DriverManager.getConnection(REMOTE_DB_URL, USER, PASSWORD)) {
 
             for (String tabela : tables) {
                 if (!sincronizarTabela(tabela, conexaoLocal, conexaoRemoto)) {
@@ -30,7 +26,7 @@ public class DatabaseSynchronizer {
 
     private String[] getTables() throws SQLException {
         List<String> tableList = new ArrayList<>();
-        try ( Connection conexao = DriverManager.getConnection(LOCAL_DB_URL, USER, PASSWORD)) {
+        try (Connection conexao = DriverManager.getConnection(LOCAL_DB_URL, USER, PASSWORD)) {
             DatabaseMetaData metaData = conexao.getMetaData();
             ResultSet tables = metaData.getTables(null, null, "%", new String[]{"TABLE"});
 
@@ -43,22 +39,12 @@ public class DatabaseSynchronizer {
     }
 
     private boolean sincronizarTabela(String tabela, Connection conexaoLocal, Connection conexaoRemoto) throws SQLException {
-        System.out.printf("Iniciando sincronização para a tabela: %s%n", tabela);  // Mensagem de log
+        System.out.printf("Iniciando sincronização para a tabela: %s%n", tabela);
 
         if (!tableExists(tabela, conexaoLocal) || !tableExists(tabela, conexaoRemoto)) {
             System.out.printf("A tabela %s não existe em um dos bancos de dados.%n", tabela);
             return false;
         }
-
-        List<String> columns = getTableColumns(tabela, conexaoLocal);
-        if (columns.isEmpty()) {
-            System.out.printf("Tabela %s não possui colunas.%n", tabela);
-            return false;
-        }
-
-        String columnList = String.join(", ", columns);
-        String queryLocal = "SELECT *, CRC32(CONCAT_WS('|', " + columnList + ")) AS checksum FROM " + tabela;
-        String queryRemoto = "SELECT *, CRC32(CONCAT_WS('|', " + columnList + ")) AS checksum FROM " + tabela;
 
         String pkColumnName = getPrimaryKeyColumn(tabela, conexaoLocal);
         if (pkColumnName == null) {
@@ -66,33 +52,12 @@ public class DatabaseSynchronizer {
             return false;
         }
 
-        try ( PreparedStatement stmtLocal = conexaoLocal.prepareStatement(queryLocal);  PreparedStatement stmtRemoto = conexaoRemoto.prepareStatement(queryRemoto);  ResultSet rsLocal = stmtLocal.executeQuery();  ResultSet rsRemoto = stmtRemoto.executeQuery()) {
+        // Sincronizar registros do local para o remoto
+        sincronizarRegistros(tabela, pkColumnName, conexaoLocal, conexaoRemoto, "local");
 
-            // Armazenar resultados do remoto em uma lista
-            List<Long> remoteChecksums = new ArrayList<>();
-            List<Integer> remotePkValues = new ArrayList<>();
-            while (rsRemoto.next()) {
-                remoteChecksums.add(rsRemoto.getLong("checksum"));
-                remotePkValues.add(rsRemoto.getInt(pkColumnName));
-            }
+        // Sincronizar registros do remoto para o local
+        sincronizarRegistros(tabela, pkColumnName, conexaoRemoto, conexaoLocal, "remoto");
 
-            while (rsLocal.next()) {
-                Long checksumLocal = rsLocal.getLong("checksum");
-                int pkValueLocal = rsLocal.getInt(pkColumnName);
-
-                int index = remotePkValues.indexOf(pkValueLocal);
-                if (index != -1) {
-                    Long checksumRemoto = remoteChecksums.get(index);
-                    if (!checksumLocal.equals(checksumRemoto)) {
-                        System.out.printf("Discrepância encontrada na tabela %s para %s %d: Local: %d, Remoto: %d%n",
-                                tabela, pkColumnName, pkValueLocal, checksumLocal, checksumRemoto);
-                        corrigirLinha(tabela, pkValueLocal, conexaoLocal, conexaoRemoto);
-                    }
-                } else {
-                    System.out.printf("Registro com %s %d não encontrado na tabela remota %s.%n", pkColumnName, pkValueLocal, tabela);
-                }
-            }
-        }
         return true;
     }
 
@@ -100,17 +65,6 @@ public class DatabaseSynchronizer {
         DatabaseMetaData metaData = conexao.getMetaData();
         ResultSet rs = metaData.getTables(null, null, tableName, new String[]{"TABLE"});
         return rs.next();
-    }
-
-    private List<String> getTableColumns(String tabela, Connection conexao) throws SQLException {
-        List<String> columns = new ArrayList<>();
-        DatabaseMetaData metaData = conexao.getMetaData();
-        ResultSet resultSet = metaData.getColumns(null, null, tabela, null);
-
-        while (resultSet.next()) {
-            columns.add(resultSet.getString("COLUMN_NAME"));
-        }
-        return columns;
     }
 
     private String getPrimaryKeyColumn(String tabela, Connection conexao) throws SQLException {
@@ -123,40 +77,51 @@ public class DatabaseSynchronizer {
         return null;
     }
 
-    private void corrigirLinha(String tabela, int pkValue, Connection conexaoLocal, Connection conexaoRemoto) throws SQLException {
-        String pkColumnName = getPrimaryKeyColumn(tabela, conexaoLocal);
+    private void sincronizarRegistros(String tabela, String pkColumnName, Connection origem, Connection destino, String tipoOrigem) throws SQLException {
+        String selectQuery = "SELECT * FROM " + tabela;
+        String insertQuery = buildInsertQuery(tabela, origem);
 
-        String selectQuery = "SELECT * FROM " + tabela + " WHERE " + pkColumnName + " = ?";
-        try ( PreparedStatement stmtSelect = conexaoLocal.prepareStatement(selectQuery)) {
-            stmtSelect.setInt(1, pkValue);
-            ResultSet rs = stmtSelect.executeQuery();
+        try (PreparedStatement stmtOrigem = origem.prepareStatement(selectQuery);
+             ResultSet rsOrigem = stmtOrigem.executeQuery();
+             PreparedStatement stmtDestino = destino.prepareStatement(selectQuery);
+             ResultSet rsDestino = stmtDestino.executeQuery()) {
 
-            if (rs.next()) {
-                StringBuilder updateQuery = new StringBuilder("UPDATE " + tabela + " SET ");
-                int columnCount = rs.getMetaData().getColumnCount();
-                List<Object> parameters = new ArrayList<>();
+            List<Object> pkDestinos = new ArrayList<>();
+            while (rsDestino.next()) {
+                pkDestinos.add(rsDestino.getObject(pkColumnName));
+            }
 
-                for (int i = 1; i <= columnCount; i++) {
-                    String columnName = rs.getMetaData().getColumnName(i);
-                    if (!columnName.equals(pkColumnName)) {
-                        updateQuery.append(columnName).append(" = ?, ");
-                        parameters.add(rs.getObject(i));  // Adiciona o valor correspondente à lista
+            while (rsOrigem.next()) {
+                Object pkValorOrigem = rsOrigem.getObject(pkColumnName);
+
+                if (!pkDestinos.contains(pkValorOrigem)) {
+                    // Registro do origem não está no destino, então insere
+                    try (PreparedStatement insertStmt = destino.prepareStatement(insertQuery)) {
+                        for (int i = 1; i <= rsOrigem.getMetaData().getColumnCount(); i++) {
+                            insertStmt.setObject(i, rsOrigem.getObject(i));
+                        }
+                        insertStmt.executeUpdate();
+                        System.out.printf("Registro com %s = %s inserido de %s para %s na tabela %s.%n",
+                                pkColumnName, pkValorOrigem, tipoOrigem, tipoOrigem.equals("local") ? "remoto" : "local", tabela);
                     }
-                }
-
-                updateQuery.setLength(updateQuery.length() - 2); // Remove última vírgula
-                updateQuery.append(" WHERE " + pkColumnName + " = ?");
-                parameters.add(pkValue);  // Adiciona o valor da chave primária
-
-                try ( PreparedStatement stmtUpdate = conexaoRemoto.prepareStatement(updateQuery.toString())) {
-                    for (int i = 0; i < parameters.size(); i++) {
-                        stmtUpdate.setObject(i + 1, parameters.get(i));  // Define todos os parâmetros
-                    }
-                    stmtUpdate.executeUpdate();
-                    System.out.printf("Linha com %s %d na tabela %s foi corrigida.%n", pkColumnName, pkValue, tabela);
                 }
             }
         }
+    }
+
+    private String buildInsertQuery(String tabela, Connection conexao) throws SQLException {
+        List<String> columns = new ArrayList<>();
+        DatabaseMetaData metaData = conexao.getMetaData();
+        ResultSet resultSet = metaData.getColumns(null, null, tabela, null);
+
+        while (resultSet.next()) {
+            columns.add(resultSet.getString("COLUMN_NAME"));
+        }
+
+        String columnList = String.join(", ", columns);
+        String valuePlaceholders = String.join(", ", columns.stream().map(c -> "?").toList());
+
+        return "INSERT INTO " + tabela + " (" + columnList + ") VALUES (" + valuePlaceholders + ")";
     }
 
     public static void main(String[] args) {
