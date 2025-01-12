@@ -190,7 +190,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         configGlobal config = configGlobal.getInstance();
 
         if (config.getAlarmesAtivos() > 0) {
-            try ( Connection conn = new fazconexao().conectar();  Statement stmt = conn.createStatement();  ResultSet rs = stmt.executeQuery("SELECT id, hora_despertar, descricao FROM alarmes WHERE ativo = TRUE")) {
+            try (Connection conn = new fazconexao().conectar(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery("SELECT id, hora_despertar, descricao FROM alarmes WHERE ativo = TRUE")) {
 
                 while (rs.next()) {
                     int idAlarme = rs.getInt("id");
@@ -1626,7 +1626,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         }
 
         // carrega o numero de alarmes ativos ao iniciar o sistema
-        try ( Connection conn = new fazconexao().conectar();  Statement stmt = conn.createStatement();  ResultSet rs = stmt.executeQuery(" SELECT COUNT(*) AS total FROM alarmes ")) {
+        try (Connection conn = new fazconexao().conectar(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(" SELECT COUNT(*) AS total FROM alarmes ")) {
             if (rs.next()) {
                 int alarmesAtivos = rs.getInt("total");
                 config.setAlarmesAtivos(alarmesAtivos);
@@ -2482,240 +2482,115 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
     private void bt_AntecipadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_AntecipadoActionPerformed
         System.out.println("toooooooo no antecipadoooooooooooooooo");
-        JTextField valorField = new JTextField(10);
-        JTextArea valoresRecebidosArea = new JTextArea(5, 20);
-        valoresRecebidosArea.setEditable(false); // Não permitir edição
-        JScrollPane scrollPane = new JScrollPane(valoresRecebidosArea); // Adicionando barra de rolagem
 
-        // Ajuste visual para o JTextArea parecer desabilitado
-        valoresRecebidosArea.setOpaque(false); // Deixa o fundo transparente (igual ao painel)
-        valoresRecebidosArea.setBackground(new Color(240, 240, 240)); // Cor de fundo igual ao painel
-        valoresRecebidosArea.setForeground(Color.BLACK); // Cor do texto
-        valoresRecebidosArea.setBorder(BorderFactory.createEmptyBorder()); // Remove a borda
+        CacheDados cache = CacheDados.getInstancia();
+        int idLocacao = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
+        criarTelaSelecaoPagamento(idLocacao);
 
-        Font biggerFont = new Font(valorField.getFont().getName(), valorField.getFont().getStyle(), 16);
-        valorField.setFont(biggerFont);
+    }//GEN-LAST:event_bt_AntecipadoActionPerformed
+    private void criarTelaSelecaoPagamento(int idLocacao) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(5, 1));
 
-        // Botões de pagamento
         JButton botaoCredito = new JButton("Crédito (C)");
         JButton botaoDebito = new JButton("Débito (D)");
         JButton botaoDinheiro = new JButton("Dinheiro (O)");
         JButton botaoPix = new JButton("Pix (P)");
-        JButton botaoSalvar = new JButton("Salvar (S)");
 
-        // Painel principal com layout nulo
-        JPanel panel = new JPanel();
-        panel.setPreferredSize(new Dimension(700, 400)); // Defina um tamanho adequado para o painel
-        panel.setSize(700, 400); // Definindo o tamanho físico do painel
-        panel.setLayout(null); // Para posicionamento manual dos componentes
-
-        // Definindo posição e tamanho dos componentes
-        // Dispor os botões de pagamento em 2 colunas por 2 linhas
-        botaoCredito.setBounds(50, 20, 150, 50);
-        botaoDebito.setBounds(220, 20, 150, 50);
-        botaoDinheiro.setBounds(50, 80, 150, 50);
-        botaoPix.setBounds(220, 80, 150, 50);
-
-        // Campo de valor e botão ENTER na mesma linha que os botões de pagamento
-        JLabel labelValor = new JLabel("Valor:");
-        labelValor.setBounds(390, 20, 60, 30); // Alinhado ao lado dos botões
-        valorField.setBounds(450, 20, 150, 30);
-        JButton botaoEnter = new JButton("ENTER");
-        botaoEnter.setForeground(Color.RED); // Cor do texto vermelha
-        botaoEnter.setBounds(610, 20, 80, 30); // Alinhado ao lado do valorField
-
-        JLabel labelRecebidos = new JLabel("Valores Recebidos:");
-        labelRecebidos.setBounds(50, 210, 200, 30);
-        scrollPane.setBounds(50, 240, 350, 100);
-
-        botaoSalvar.setBounds(420, 300, 100, 40);
-
-        // Adicionando os componentes ao painel
         panel.add(botaoCredito);
         panel.add(botaoDebito);
         panel.add(botaoDinheiro);
         panel.add(botaoPix);
-        panel.add(labelValor);
-        panel.add(valorField);
-        panel.add(botaoEnter);
 
-        panel.add(labelRecebidos);
-        panel.add(scrollPane);
-        panel.add(botaoSalvar);
-        // Resetando a aparência dos botões para o estado não selecionado
-        resetarBotoes(botaoCredito, botaoDebito, botaoDinheiro, botaoPix);
-
-        // Variáveis de controle
-        final String[] tipoPagamento = {""}; // Armazena o tipo de pagamento selecionado
-        final float[] recebidoDin = {0}, recebidoPix = {0}, recebidoCredito = {0}, recebidoDebito = {0};
-        boolean[] sucesso = {false}; // Variável de controle para indicar sucesso do pagamento
-
-        // Listener comum para selecionar o tipo de pagamento e focar no campo de valor
         ActionListener selecionarMetodo = e -> {
             JButton source = (JButton) e.getSource();
-            tipoPagamento[0] = source.getText().substring(source.getText().indexOf("(") + 1, source.getText().indexOf(")"));
-            System.out.println(tipoPagamento[0]);
-            // Coloca o foco no campo de texto
-
-            // Marca o botão como selecionado visualmente
-            resetarBotoes(botaoCredito, botaoDebito, botaoDinheiro, botaoPix);
-            source.setBackground(Color.GRAY);
-            source.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-
-            valorField.requestFocus();
+            String tipoPagamentoEscolhido = source.getText().substring(source.getText().indexOf("(") + 1, source.getText().indexOf(")"));
+            float valorRecebido = carregarValorRecebido(tipoPagamentoEscolhido, idLocacao); // Carrega o valor do banco
+            criarTelaEntradaValor(valorRecebido, tipoPagamentoEscolhido, idLocacao);
         };
 
-        // Adicionando o listener aos botões
         botaoCredito.addActionListener(selecionarMetodo);
         botaoDebito.addActionListener(selecionarMetodo);
         botaoDinheiro.addActionListener(selecionarMetodo);
         botaoPix.addActionListener(selecionarMetodo);
 
-        // Função para atualizar a área de texto com os valores recebidos
-        Runnable atualizarValoresRecebidos = () -> {
-            valoresRecebidosArea.setText(""); // Limpa a área de texto
-            if (recebidoCredito[0] > 0) {
-                valoresRecebidosArea.append(String.format("%.2f Crédito\n", recebidoCredito[0]));
-            }
-            if (recebidoDebito[0] > 0) {
-                valoresRecebidosArea.append(String.format("%.2f Débito\n", recebidoDebito[0]));
-            }
-            if (recebidoDin[0] > 0) {
-                valoresRecebidosArea.append(String.format("%.2f Dinheiro\n", recebidoDin[0]));
-            }
-            if (recebidoPix[0] > 0) {
-                valoresRecebidosArea.append(String.format("%.2f Pix\n", recebidoPix[0]));
-            }
-        };
+        JOptionPane.showMessageDialog(null, panel, "Selecione o Tipo de Pagamento", JOptionPane.PLAIN_MESSAGE);
+    }
+    private void criarTelaEntradaValor(float valorRecebido, String tipoPago, int idLocacao) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+        String recebido = null;
+        // Determina o tipo de pagamento correspondente
+        switch (tipoPago) {
+            case "C" -> recebido = "credito";
+            case "D" -> recebido = "debito";
+            case "O" -> recebido = "dinheiro";
+            case "P" -> recebido = "pix";
+        }
+        
+        JLabel label = new JLabel(String.format("Havia recebido: R$ %.2f em %s\nDigite o valor total já recebido em %s:", valorRecebido, recebido, recebido));
+        JTextField valorField = new JTextField(10);
+        JButton botaoSalvar = new JButton("Salvar");
 
-        // Validação do campo de valor (apenas números, ponto e vírgula permitidos)
-        valorField.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-                char c = e.getKeyChar();
-                // Permitir números, ponto, vírgula, e teclas de controle como backspace
-                if (!Character.isDigit(c) && c != '.' && c != ',' && c != KeyEvent.VK_BACK_SPACE) {
-                    e.consume(); // Ignorar o caractere
-                }
-            }
-        });
+        panel.add(label, BorderLayout.NORTH);
+        panel.add(valorField, BorderLayout.CENTER);
+        panel.add(botaoSalvar, BorderLayout.SOUTH);
 
-        // Ação para quando o cliente pressionar Enter no campo de texto
-        valorField.addActionListener(e -> {
+        botaoSalvar.addActionListener(e -> {
             String valorInserido = valorField.getText().replace(",", ".");
             try {
                 float valor = Float.parseFloat(valorInserido);
-
-                switch (tipoPagamento[0]) {
-                    case "C":
-                        recebidoCredito[0] += valor;
-
-                        break;
-                    case "D":
-                        recebidoDebito[0] += valor;
-
-                        break;
-                    case "O":
-                        recebidoDin[0] += valor;
-
-                        break;
-                    case "P":
-                        recebidoPix[0] += valor;
-
-                        break;
-                    default:
-                        JOptionPane.showMessageDialog(null, "Selecione um tipo de pagamento antes de inserir o valor.");
-                        break;
-                }
-                // Resetando a aparência dos botões para o estado não selecionado
-                resetarBotoes(botaoCredito, botaoDebito, botaoDinheiro, botaoPix);
-                valorField.setText(""); // Limpa o campo de valor após registrar
-                atualizarValoresRecebidos.run(); // Atualiza os valores recebidos na área de texto
+                // Salvar no banco
+                salvaAntecipado(idLocacao, tipoPago, valor);
+                JOptionPane.showMessageDialog(null, "Valor salvo com sucesso!");
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(null, "Valor inválido. Insira um número válido.");
             }
         });
-        // Definindo a ação para o botão Enter
-        botaoEnter.addActionListener(e -> {
-            valorField.requestFocus(); // Define o foco no campo de texto
-            valorField.postActionEvent(); // Simula o pressionamento da tecla Enter
-        });
-        // Exibição do JOptionPane
 
-        JOptionPane optionPane = new JOptionPane(panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.DEFAULT_OPTION, null, new Object[]{}, null);
-        JDialog dialog = optionPane.createDialog("Digite os valores recebidos");
-        dialog.setSize(800, 500);
-        // Adicionando suporte para atalhos de teclado (teclas C, D, O, P, S) no JRootPane do diálogo
-        JRootPane rootPane = dialog.getRootPane();
-        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("C"), "credito");
-        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("D"), "debito");
-        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("O"), "dinheiro");
-        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("P"), "pix");
-        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("S"), "salvar");
+        JOptionPane.showMessageDialog(null, panel, "Entrada de Valor", JOptionPane.PLAIN_MESSAGE);
+    }
 
-        rootPane.getActionMap().put("credito", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                botaoCredito.doClick(); // Simula o clique do botão
-            }
-        });
-        rootPane.getActionMap().put("debito", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                botaoDebito.doClick();
-            }
-        });
-        rootPane.getActionMap().put("dinheiro", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                botaoDinheiro.doClick();
-            }
-        });
-        rootPane.getActionMap().put("pix", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                botaoPix.doClick();
-            }
-        });
-        rootPane.getActionMap().put("salvar", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                botaoSalvar.doClick(); // Simula o clique do botão Salvar
-            }
-        });
+    private static float carregarValorRecebido(String tipoPagamento, int idLocacao) {
+        String recebido = null;
 
-// Adicionando atalhos de teclado F6, F7, F8, F9 no JRootPane
-        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F6"), "acertouDinheiro");
-        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F7"), "acertouDebito");
-        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F8"), "acertouCredito");
-        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F9"), "acertouPix");
+        // Determina o tipo de pagamento correspondente
+        switch (tipoPagamento) {
+            case "C" -> recebido = "credito";
+            case "D" -> recebido = "debito";
+            case "O" -> recebido = "dinheiro";
+            case "P" -> recebido = "pix";
+        }
 
-        // Ação do botão "Salvar"
-        botaoSalvar.addActionListener(e -> {
-            float totalRecebido = recebidoDin[0] + recebidoPix[0] + recebidoCredito[0] + recebidoDebito[0];
-            txtAntecipado.setText("R$ " + totalRecebido);
-            CacheDados cache = CacheDados.getInstancia();
-            int idLocacao = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
+        String consultaSQL = "SELECT * FROM antecipado WHERE idlocacao = ? AND tipo = ?";
+        Connection link = null;
 
-            // Chama a função salvaAntecipado para cada tipo de pagamento se o valor for > 0
-            if (recebidoDin[0] > 0) {
-                salvaAntecipado(idLocacao, "dinheiro", recebidoDin[0]);
-            }
-            if (recebidoPix[0] > 0) {
-                salvaAntecipado(idLocacao, "pix", recebidoPix[0]);
-            }
-            if (recebidoCredito[0] > 0) {
-                salvaAntecipado(idLocacao, "credito", recebidoCredito[0]);
-            }
-            if (recebidoDebito[0] > 0) {
-                salvaAntecipado(idLocacao, "debito", recebidoDebito[0]);
-            }
+        try {
+            link = new fazconexao().conectar();
+            PreparedStatement statement = link.prepareStatement(consultaSQL);
+            statement.setInt(1, idLocacao);
+            statement.setString(2, recebido);
 
-            dialog.dispose(); // Fecha o JDialog
-        });
-        dialog.setVisible(true);
-    }//GEN-LAST:event_bt_AntecipadoActionPerformed
-
+            ResultSet resultado = statement.executeQuery(); // Chame executeQuery() sem o SQL
+            if (resultado.next()) {
+                float valor = resultado.getFloat("valor"); // Supondo que a coluna se chame "valor"
+                return valor;
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+            return 0;
+        } finally {
+            try {
+                // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
+                if (link != null && !link.isClosed()) {
+                    link.close();
+                }
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(null, e);
+            }
+        }
+        return 0;
+    }
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         SwingUtilities.invokeLater(() -> {
             new ConectaArduino(888);
