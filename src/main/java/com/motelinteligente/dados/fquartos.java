@@ -335,7 +335,7 @@ public class fquartos {
                 int numero = resultado.getInt(1);
                 link.close();
                 resultado.close();
-                return 5;
+                return numero;
             }
         } catch (SQLException e) {
             logger.error("Erro : fquartos() : ", e);
