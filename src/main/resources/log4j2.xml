@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">
     <Properties>
-        <!-- Definir propriedades globais -->
-        <Property name="log.path">${sys:project.basedir}/logs</Property>
+        <!-- Definir o caminho dos logs na pasta Documentos -->
+        <Property name="log.path">${sys:user.home}/Documents/logs</Property>
     </Properties>
     <Appenders>
         <!-- Console appender para todos os logs -->

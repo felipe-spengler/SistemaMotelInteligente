@@ -97,10 +97,15 @@ public class AddAlarmDialog extends JDialog {
         try {
             Connection conn = new fazconexao().conectar();
             // Inserir o alarme no banco de dados
-            String sql = "INSERT INTO alarmes (hora_adicionado, hora_despertar, descricao) VALUES (NOW(), ?, ?)";
+        String sql = "INSERT INTO alarmes (hora_adicionado, hora_despertar, descricao) VALUES (?, ?, ?)";
             PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setTimestamp(1, Timestamp.valueOf(dateTime));  // Convertendo LocalDateTime para Timestamp
-            stmt.setString(2, note);  // Descrição do alarme
+            // Obtém o horário atual da máquina
+        LocalDateTime horaAtual = LocalDateTime.now();
+
+        // Define os parâmetros
+            stmt.setTimestamp(1, Timestamp.valueOf(horaAtual)); // hora_adicionado
+            stmt.setTimestamp(2, Timestamp.valueOf(dateTime));  // Convertendo LocalDateTime para Timestamp
+            stmt.setString(3, note);  // Descrição do alarme
             stmt.executeUpdate();
             
             // Atualiza o contador de alarmes ativos

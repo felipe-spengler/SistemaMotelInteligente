@@ -1,0 +1,534 @@
+2025-01-13 00:21:43 INFO  [AWT-EventQueue-0] com.motelinteligente.dados.fquartos - Operação bem-sucedida: UPDATE registralocado SET horafim='2025-01-13 00:21:02.776', horainicio='2025-01-12 23:58:23.0', valorquarto=60.0, valorconsumo=0.0, pagodinheiro=0.0, pagopix=0.0, pagocartao=60.0, idcaixaatual=283 WHERE idlocacao=4545
+2025-01-13 00:31:25 INFO  [Thread-182] c.m.dados.CheckSincronia - Verificando tabela: alarmes
+2025-01-13 00:31:25 INFO  [Thread-182] c.m.dados.CheckSincronia - Verificando tabela: antecipado
+2025-01-13 00:31:25 INFO  [Thread-182] c.m.dados.CheckSincronia - Verificando tabela: caixa
+2025-01-13 00:31:25 INFO  [Thread-182] c.m.dados.CheckSincronia - Verificando tabela: configuracoes
+2025-01-13 00:31:25 INFO  [Thread-182] c.m.dados.CheckSincronia - Verificando tabela: desistencia
+2025-01-13 00:31:25 INFO  [Thread-182] c.m.dados.CheckSincronia - Verificando tabela: funcionario
+2025-01-13 00:31:25 INFO  [Thread-182] c.m.dados.CheckSincronia - Verificando tabela: imagens
+2025-01-13 00:31:25 INFO  [Thread-182] c.m.dados.CheckSincronia - Verificando tabela: justificativa
+2025-01-13 00:31:25 INFO  [Thread-182] c.m.dados.CheckSincronia - Verificando tabela: prevendidos
+2025-01-13 00:31:25 INFO  [Thread-182] c.m.dados.CheckSincronia - Verificando tabela: produtos
+2025-01-13 00:31:25 INFO  [Thread-182] c.m.dados.CheckSincronia - Verificando tabela: quartos
+2025-01-13 00:31:25 INFO  [Thread-182] c.m.dados.CheckSincronia - Verificando tabela: registralimpeza
+2025-01-13 00:31:25 WARN  [Thread-182] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 00:31:26 INFO  [Thread-182] c.m.dados.CheckSincronia - Verificando tabela: registralocado
+2025-01-13 00:31:26 WARN  [Thread-182] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 00:31:27 INFO  [Thread-182] c.m.dados.CheckSincronia - Verificando tabela: registramanutencao
+2025-01-13 00:31:27 INFO  [Thread-182] c.m.dados.CheckSincronia - Verificando tabela: registrareserva
+2025-01-13 00:31:27 INFO  [Thread-182] c.m.dados.CheckSincronia - Verificando tabela: registravendido
+2025-01-13 00:31:27 INFO  [Thread-182] c.m.dados.CheckSincronia - Verificando tabela: status
+2025-01-13 00:31:27 WARN  [Thread-182] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 00:31:28 WARN  [Thread-182] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 00:31:29 WARN  [Thread-182] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 00:31:30 INFO  [Thread-182] c.m.dados.CheckSincronia - Os bancos de dados não estão sincronizados e foram corrigidos.
+2025-01-13 01:20:22 INFO  [http-nio-0.0.0.0-1521-exec-4] c.m.d.MotelInteligenteApplication - Recebeu requisição com corpo: locar 4
+2025-01-13 01:20:22 INFO  [http-nio-0.0.0.0-1521-exec-4] com.motelinteligente.dados.fquartos - Registro inserido com sucesso: ID = 4546, Quarto = 4
+2025-01-13 01:21:07 INFO  [http-nio-0.0.0.0-1521-exec-6] c.m.d.MotelInteligenteApplication - Recebeu requisição com corpo: abrir entrada
+2025-01-13 01:21:11 INFO  [http-nio-0.0.0.0-1521-exec-8] c.m.d.MotelInteligenteApplication - Recebeu requisição com corpo: abrir 4
+2025-01-13 01:31:24 INFO  [Thread-184] c.m.dados.CheckSincronia - Verificando tabela: alarmes
+2025-01-13 01:31:24 INFO  [Thread-184] c.m.dados.CheckSincronia - Verificando tabela: antecipado
+2025-01-13 01:31:24 INFO  [Thread-184] c.m.dados.CheckSincronia - Verificando tabela: caixa
+2025-01-13 01:31:24 INFO  [Thread-184] c.m.dados.CheckSincronia - Verificando tabela: configuracoes
+2025-01-13 01:31:24 INFO  [Thread-184] c.m.dados.CheckSincronia - Verificando tabela: desistencia
+2025-01-13 01:31:24 INFO  [Thread-184] c.m.dados.CheckSincronia - Verificando tabela: funcionario
+2025-01-13 01:31:24 INFO  [Thread-184] c.m.dados.CheckSincronia - Verificando tabela: imagens
+2025-01-13 01:31:24 INFO  [Thread-184] c.m.dados.CheckSincronia - Verificando tabela: justificativa
+2025-01-13 01:31:24 INFO  [Thread-184] c.m.dados.CheckSincronia - Verificando tabela: prevendidos
+2025-01-13 01:31:24 INFO  [Thread-184] c.m.dados.CheckSincronia - Verificando tabela: produtos
+2025-01-13 01:31:24 INFO  [Thread-184] c.m.dados.CheckSincronia - Verificando tabela: quartos
+2025-01-13 01:31:24 INFO  [Thread-184] c.m.dados.CheckSincronia - Verificando tabela: registralimpeza
+2025-01-13 01:31:24 INFO  [Thread-184] c.m.dados.CheckSincronia - Verificando tabela: registralocado
+2025-01-13 01:31:24 WARN  [Thread-184] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 01:31:25 INFO  [Thread-184] c.m.dados.CheckSincronia - Verificando tabela: registramanutencao
+2025-01-13 01:31:25 INFO  [Thread-184] c.m.dados.CheckSincronia - Verificando tabela: registrareserva
+2025-01-13 01:31:25 INFO  [Thread-184] c.m.dados.CheckSincronia - Verificando tabela: registravendido
+2025-01-13 01:31:25 INFO  [Thread-184] c.m.dados.CheckSincronia - Verificando tabela: status
+2025-01-13 01:31:25 WARN  [Thread-184] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 01:31:26 INFO  [Thread-184] c.m.dados.CheckSincronia - Os bancos de dados não estão sincronizados e foram corrigidos.
+2025-01-13 02:30:35 INFO  [AWT-EventQueue-0] com.motelinteligente.dados.fquartos - Operação bem-sucedida: UPDATE registralocado SET horafim='2025-01-13 02:29:52.11', horainicio='2025-01-13 01:20:23.0', valorquarto=120.0, valorconsumo=0.0, pagodinheiro=0.0, pagopix=0.0, pagocartao=120.0, idcaixaatual=283 WHERE idlocacao=4546
+2025-01-13 02:31:24 INFO  [Thread-190] c.m.dados.CheckSincronia - Verificando tabela: alarmes
+2025-01-13 02:31:24 INFO  [Thread-190] c.m.dados.CheckSincronia - Verificando tabela: antecipado
+2025-01-13 02:31:24 INFO  [Thread-190] c.m.dados.CheckSincronia - Verificando tabela: caixa
+2025-01-13 02:31:24 INFO  [Thread-190] c.m.dados.CheckSincronia - Verificando tabela: configuracoes
+2025-01-13 02:31:24 INFO  [Thread-190] c.m.dados.CheckSincronia - Verificando tabela: desistencia
+2025-01-13 02:31:25 INFO  [Thread-190] c.m.dados.CheckSincronia - Verificando tabela: funcionario
+2025-01-13 02:31:25 INFO  [Thread-190] c.m.dados.CheckSincronia - Verificando tabela: imagens
+2025-01-13 02:31:25 INFO  [Thread-190] c.m.dados.CheckSincronia - Verificando tabela: justificativa
+2025-01-13 02:31:25 INFO  [Thread-190] c.m.dados.CheckSincronia - Verificando tabela: prevendidos
+2025-01-13 02:31:25 INFO  [Thread-190] c.m.dados.CheckSincronia - Verificando tabela: produtos
+2025-01-13 02:31:25 INFO  [Thread-190] c.m.dados.CheckSincronia - Verificando tabela: quartos
+2025-01-13 02:31:25 INFO  [Thread-190] c.m.dados.CheckSincronia - Verificando tabela: registralimpeza
+2025-01-13 02:31:25 INFO  [Thread-190] c.m.dados.CheckSincronia - Verificando tabela: registralocado
+2025-01-13 02:31:25 INFO  [Thread-190] c.m.dados.CheckSincronia - Verificando tabela: registramanutencao
+2025-01-13 02:31:25 INFO  [Thread-190] c.m.dados.CheckSincronia - Verificando tabela: registrareserva
+2025-01-13 02:31:25 INFO  [Thread-190] c.m.dados.CheckSincronia - Verificando tabela: registravendido
+2025-01-13 02:31:25 INFO  [Thread-190] c.m.dados.CheckSincronia - Verificando tabela: status
+2025-01-13 02:31:25 INFO  [Thread-190] c.m.dados.CheckSincronia - Sincronismo verificado com sucesso!
+2025-01-13 03:31:24 INFO  [Thread-191] c.m.dados.CheckSincronia - Verificando tabela: alarmes
+2025-01-13 03:31:24 INFO  [Thread-191] c.m.dados.CheckSincronia - Verificando tabela: antecipado
+2025-01-13 03:31:24 INFO  [Thread-191] c.m.dados.CheckSincronia - Verificando tabela: caixa
+2025-01-13 03:31:24 INFO  [Thread-191] c.m.dados.CheckSincronia - Verificando tabela: configuracoes
+2025-01-13 03:31:24 INFO  [Thread-191] c.m.dados.CheckSincronia - Verificando tabela: desistencia
+2025-01-13 03:31:24 INFO  [Thread-191] c.m.dados.CheckSincronia - Verificando tabela: funcionario
+2025-01-13 03:31:24 INFO  [Thread-191] c.m.dados.CheckSincronia - Verificando tabela: imagens
+2025-01-13 03:31:24 INFO  [Thread-191] c.m.dados.CheckSincronia - Verificando tabela: justificativa
+2025-01-13 03:31:24 INFO  [Thread-191] c.m.dados.CheckSincronia - Verificando tabela: prevendidos
+2025-01-13 03:31:24 INFO  [Thread-191] c.m.dados.CheckSincronia - Verificando tabela: produtos
+2025-01-13 03:31:24 INFO  [Thread-191] c.m.dados.CheckSincronia - Verificando tabela: quartos
+2025-01-13 03:31:24 INFO  [Thread-191] c.m.dados.CheckSincronia - Verificando tabela: registralimpeza
+2025-01-13 03:31:24 INFO  [Thread-191] c.m.dados.CheckSincronia - Verificando tabela: registralocado
+2025-01-13 03:31:24 INFO  [Thread-191] c.m.dados.CheckSincronia - Verificando tabela: registramanutencao
+2025-01-13 03:31:24 INFO  [Thread-191] c.m.dados.CheckSincronia - Verificando tabela: registrareserva
+2025-01-13 03:31:24 INFO  [Thread-191] c.m.dados.CheckSincronia - Verificando tabela: registravendido
+2025-01-13 03:31:24 INFO  [Thread-191] c.m.dados.CheckSincronia - Verificando tabela: status
+2025-01-13 03:31:24 INFO  [Thread-191] c.m.dados.CheckSincronia - Sincronismo verificado com sucesso!
+2025-01-13 04:31:24 INFO  [Thread-192] c.m.dados.CheckSincronia - Verificando tabela: alarmes
+2025-01-13 04:31:24 INFO  [Thread-192] c.m.dados.CheckSincronia - Verificando tabela: antecipado
+2025-01-13 04:31:24 INFO  [Thread-192] c.m.dados.CheckSincronia - Verificando tabela: caixa
+2025-01-13 04:31:24 INFO  [Thread-192] c.m.dados.CheckSincronia - Verificando tabela: configuracoes
+2025-01-13 04:31:24 INFO  [Thread-192] c.m.dados.CheckSincronia - Verificando tabela: desistencia
+2025-01-13 04:31:24 INFO  [Thread-192] c.m.dados.CheckSincronia - Verificando tabela: funcionario
+2025-01-13 04:31:24 INFO  [Thread-192] c.m.dados.CheckSincronia - Verificando tabela: imagens
+2025-01-13 04:31:24 INFO  [Thread-192] c.m.dados.CheckSincronia - Verificando tabela: justificativa
+2025-01-13 04:31:24 INFO  [Thread-192] c.m.dados.CheckSincronia - Verificando tabela: prevendidos
+2025-01-13 04:31:24 INFO  [Thread-192] c.m.dados.CheckSincronia - Verificando tabela: produtos
+2025-01-13 04:31:24 INFO  [Thread-192] c.m.dados.CheckSincronia - Verificando tabela: quartos
+2025-01-13 04:31:24 INFO  [Thread-192] c.m.dados.CheckSincronia - Verificando tabela: registralimpeza
+2025-01-13 04:31:24 INFO  [Thread-192] c.m.dados.CheckSincronia - Verificando tabela: registralocado
+2025-01-13 04:31:24 INFO  [Thread-192] c.m.dados.CheckSincronia - Verificando tabela: registramanutencao
+2025-01-13 04:31:24 INFO  [Thread-192] c.m.dados.CheckSincronia - Verificando tabela: registrareserva
+2025-01-13 04:31:24 INFO  [Thread-192] c.m.dados.CheckSincronia - Verificando tabela: registravendido
+2025-01-13 04:31:24 INFO  [Thread-192] c.m.dados.CheckSincronia - Verificando tabela: status
+2025-01-13 04:31:24 INFO  [Thread-192] c.m.dados.CheckSincronia - Sincronismo verificado com sucesso!
+2025-01-13 05:31:24 INFO  [Thread-193] c.m.dados.CheckSincronia - Verificando tabela: alarmes
+2025-01-13 05:31:24 INFO  [Thread-193] c.m.dados.CheckSincronia - Verificando tabela: antecipado
+2025-01-13 05:31:24 INFO  [Thread-193] c.m.dados.CheckSincronia - Verificando tabela: caixa
+2025-01-13 05:31:24 INFO  [Thread-193] c.m.dados.CheckSincronia - Verificando tabela: configuracoes
+2025-01-13 05:31:24 INFO  [Thread-193] c.m.dados.CheckSincronia - Verificando tabela: desistencia
+2025-01-13 05:31:24 INFO  [Thread-193] c.m.dados.CheckSincronia - Verificando tabela: funcionario
+2025-01-13 05:31:24 INFO  [Thread-193] c.m.dados.CheckSincronia - Verificando tabela: imagens
+2025-01-13 05:31:24 INFO  [Thread-193] c.m.dados.CheckSincronia - Verificando tabela: justificativa
+2025-01-13 05:31:24 INFO  [Thread-193] c.m.dados.CheckSincronia - Verificando tabela: prevendidos
+2025-01-13 05:31:24 INFO  [Thread-193] c.m.dados.CheckSincronia - Verificando tabela: produtos
+2025-01-13 05:31:24 INFO  [Thread-193] c.m.dados.CheckSincronia - Verificando tabela: quartos
+2025-01-13 05:31:24 INFO  [Thread-193] c.m.dados.CheckSincronia - Verificando tabela: registralimpeza
+2025-01-13 05:31:24 INFO  [Thread-193] c.m.dados.CheckSincronia - Verificando tabela: registralocado
+2025-01-13 05:31:24 INFO  [Thread-193] c.m.dados.CheckSincronia - Verificando tabela: registramanutencao
+2025-01-13 05:31:24 INFO  [Thread-193] c.m.dados.CheckSincronia - Verificando tabela: registrareserva
+2025-01-13 05:31:24 INFO  [Thread-193] c.m.dados.CheckSincronia - Verificando tabela: registravendido
+2025-01-13 05:31:24 INFO  [Thread-193] c.m.dados.CheckSincronia - Verificando tabela: status
+2025-01-13 05:31:24 INFO  [Thread-193] c.m.dados.CheckSincronia - Sincronismo verificado com sucesso!
+2025-01-13 06:30:12 INFO  [AWT-EventQueue-0] com.motelinteligente.dados.fquartos - Registro inserido com sucesso: ID = 4547, Quarto = 2
+2025-01-13 06:31:24 INFO  [Thread-196] c.m.dados.CheckSincronia - Verificando tabela: alarmes
+2025-01-13 06:31:24 INFO  [Thread-196] c.m.dados.CheckSincronia - Verificando tabela: antecipado
+2025-01-13 06:31:24 INFO  [Thread-196] c.m.dados.CheckSincronia - Verificando tabela: caixa
+2025-01-13 06:31:24 INFO  [Thread-196] c.m.dados.CheckSincronia - Verificando tabela: configuracoes
+2025-01-13 06:31:24 INFO  [Thread-196] c.m.dados.CheckSincronia - Verificando tabela: desistencia
+2025-01-13 06:31:24 INFO  [Thread-196] c.m.dados.CheckSincronia - Verificando tabela: funcionario
+2025-01-13 06:31:24 INFO  [Thread-196] c.m.dados.CheckSincronia - Verificando tabela: imagens
+2025-01-13 06:31:24 INFO  [Thread-196] c.m.dados.CheckSincronia - Verificando tabela: justificativa
+2025-01-13 06:31:24 INFO  [Thread-196] c.m.dados.CheckSincronia - Verificando tabela: prevendidos
+2025-01-13 06:31:24 INFO  [Thread-196] c.m.dados.CheckSincronia - Verificando tabela: produtos
+2025-01-13 06:31:24 INFO  [Thread-196] c.m.dados.CheckSincronia - Verificando tabela: quartos
+2025-01-13 06:31:24 INFO  [Thread-196] c.m.dados.CheckSincronia - Verificando tabela: registralimpeza
+2025-01-13 06:31:24 INFO  [Thread-196] c.m.dados.CheckSincronia - Verificando tabela: registralocado
+2025-01-13 06:31:24 INFO  [Thread-196] c.m.dados.CheckSincronia - Verificando tabela: registramanutencao
+2025-01-13 06:31:24 INFO  [Thread-196] c.m.dados.CheckSincronia - Verificando tabela: registrareserva
+2025-01-13 06:31:24 INFO  [Thread-196] c.m.dados.CheckSincronia - Verificando tabela: registravendido
+2025-01-13 06:31:24 INFO  [Thread-196] c.m.dados.CheckSincronia - Verificando tabela: status
+2025-01-13 06:31:25 INFO  [Thread-196] c.m.dados.CheckSincronia - Sincronismo verificado com sucesso!
+2025-01-13 07:04:48 INFO  [http-nio-0.0.0.0-1521-exec-10] c.m.d.MotelInteligenteApplication - Recebeu requisição com corpo: disponibilizar 9
+2025-01-13 07:04:51 INFO  [http-nio-0.0.0.0-1521-exec-2] c.m.d.MotelInteligenteApplication - Recebeu requisição com corpo: abrir 9
+2025-01-13 07:10:54 INFO  [AWT-EventQueue-0] com.motelinteligente.dados.fquartos - Operação bem-sucedida: UPDATE registralocado SET horafim='2025-01-13 07:09:45.269', horainicio='2025-01-13 06:30:12.0', valorquarto=60.0, valorconsumo=0.0, pagodinheiro=0.0, pagopix=0.0, pagocartao=60.0, idcaixaatual=283 WHERE idlocacao=4547
+2025-01-13 07:31:24 INFO  [Thread-200] c.m.dados.CheckSincronia - Verificando tabela: alarmes
+2025-01-13 07:31:24 INFO  [Thread-200] c.m.dados.CheckSincronia - Verificando tabela: antecipado
+2025-01-13 07:31:24 INFO  [Thread-200] c.m.dados.CheckSincronia - Verificando tabela: caixa
+2025-01-13 07:31:24 INFO  [Thread-200] c.m.dados.CheckSincronia - Verificando tabela: configuracoes
+2025-01-13 07:31:24 INFO  [Thread-200] c.m.dados.CheckSincronia - Verificando tabela: desistencia
+2025-01-13 07:31:24 INFO  [Thread-200] c.m.dados.CheckSincronia - Verificando tabela: funcionario
+2025-01-13 07:31:24 INFO  [Thread-200] c.m.dados.CheckSincronia - Verificando tabela: imagens
+2025-01-13 07:31:24 INFO  [Thread-200] c.m.dados.CheckSincronia - Verificando tabela: justificativa
+2025-01-13 07:31:24 INFO  [Thread-200] c.m.dados.CheckSincronia - Verificando tabela: prevendidos
+2025-01-13 07:31:24 INFO  [Thread-200] c.m.dados.CheckSincronia - Verificando tabela: produtos
+2025-01-13 07:31:24 INFO  [Thread-200] c.m.dados.CheckSincronia - Verificando tabela: quartos
+2025-01-13 07:31:24 INFO  [Thread-200] c.m.dados.CheckSincronia - Verificando tabela: registralimpeza
+2025-01-13 07:31:24 INFO  [Thread-200] c.m.dados.CheckSincronia - Verificando tabela: registralocado
+2025-01-13 07:31:24 INFO  [Thread-200] c.m.dados.CheckSincronia - Verificando tabela: registramanutencao
+2025-01-13 07:31:24 INFO  [Thread-200] c.m.dados.CheckSincronia - Verificando tabela: registrareserva
+2025-01-13 07:31:24 INFO  [Thread-200] c.m.dados.CheckSincronia - Verificando tabela: registravendido
+2025-01-13 07:31:24 INFO  [Thread-200] c.m.dados.CheckSincronia - Verificando tabela: status
+2025-01-13 07:31:24 WARN  [Thread-200] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 07:31:26 INFO  [Thread-200] c.m.dados.CheckSincronia - Os bancos de dados não estão sincronizados e foram corrigidos.
+2025-01-13 07:59:27 INFO  [http-nio-0.0.0.0-1521-exec-4] c.m.d.MotelInteligenteApplication - Recebeu requisição com corpo: locar 9
+2025-01-13 07:59:27 INFO  [http-nio-0.0.0.0-1521-exec-4] com.motelinteligente.dados.fquartos - Registro inserido com sucesso: ID = 4548, Quarto = 9
+2025-01-13 08:07:26 INFO  [AWT-EventQueue-0] com.motelinteligente.dados.fquartos - Operação bem-sucedida: UPDATE registralocado SET horafim='2025-01-13 08:05:20.952', horainicio='2025-01-12 21:08:32.0', valorquarto=120.0, valorconsumo=61.0, pagodinheiro=0.0, pagopix=181.0, pagocartao=0.0, idcaixaatual=283 WHERE idlocacao=4543
+2025-01-13 08:31:24 INFO  [Thread-205] c.m.dados.CheckSincronia - Verificando tabela: alarmes
+2025-01-13 08:31:24 INFO  [Thread-205] c.m.dados.CheckSincronia - Verificando tabela: antecipado
+2025-01-13 08:31:24 INFO  [Thread-205] c.m.dados.CheckSincronia - Verificando tabela: caixa
+2025-01-13 08:31:24 INFO  [Thread-205] c.m.dados.CheckSincronia - Verificando tabela: configuracoes
+2025-01-13 08:31:24 INFO  [Thread-205] c.m.dados.CheckSincronia - Verificando tabela: desistencia
+2025-01-13 08:31:24 INFO  [Thread-205] c.m.dados.CheckSincronia - Verificando tabela: funcionario
+2025-01-13 08:31:24 INFO  [Thread-205] c.m.dados.CheckSincronia - Verificando tabela: imagens
+2025-01-13 08:31:24 INFO  [Thread-205] c.m.dados.CheckSincronia - Verificando tabela: justificativa
+2025-01-13 08:31:24 INFO  [Thread-205] c.m.dados.CheckSincronia - Verificando tabela: prevendidos
+2025-01-13 08:31:24 INFO  [Thread-205] c.m.dados.CheckSincronia - Verificando tabela: produtos
+2025-01-13 08:31:24 INFO  [Thread-205] c.m.dados.CheckSincronia - Verificando tabela: quartos
+2025-01-13 08:31:24 INFO  [Thread-205] c.m.dados.CheckSincronia - Verificando tabela: registralimpeza
+2025-01-13 08:31:24 WARN  [Thread-205] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 08:31:25 INFO  [Thread-205] c.m.dados.CheckSincronia - Verificando tabela: registralocado
+2025-01-13 08:31:25 WARN  [Thread-205] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 08:31:26 INFO  [Thread-205] c.m.dados.CheckSincronia - Verificando tabela: registramanutencao
+2025-01-13 08:31:26 INFO  [Thread-205] c.m.dados.CheckSincronia - Verificando tabela: registrareserva
+2025-01-13 08:31:26 INFO  [Thread-205] c.m.dados.CheckSincronia - Verificando tabela: registravendido
+2025-01-13 08:31:27 INFO  [Thread-205] c.m.dados.CheckSincronia - Verificando tabela: status
+2025-01-13 08:31:27 WARN  [Thread-205] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 08:31:28 WARN  [Thread-205] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 08:31:29 INFO  [Thread-205] c.m.dados.CheckSincronia - Os bancos de dados não estão sincronizados e foram corrigidos.
+2025-01-13 08:35:27 INFO  [AWT-EventQueue-0] com.motelinteligente.dados.fquartos - Operação bem-sucedida: UPDATE registralocado SET horafim='2025-01-13 08:34:27.986', horainicio='2025-01-13 07:59:27.0', valorquarto=60.0, valorconsumo=0.0, pagodinheiro=60.0, pagopix=0.0, pagocartao=0.0, idcaixaatual=283 WHERE idlocacao=4534
+2025-01-13 09:03:15 INFO  [AWT-EventQueue-0] com.motelinteligente.dados.fquartos - Registro inserido com sucesso: ID = 4549, Quarto = 2
+2025-01-13 09:25:09 INFO  [http-nio-0.0.0.0-1521-exec-3] c.m.d.MotelInteligenteApplication - Recebeu requisição com corpo: locar 4
+2025-01-13 09:25:09 INFO  [http-nio-0.0.0.0-1521-exec-3] com.motelinteligente.dados.fquartos - Registro inserido com sucesso: ID = 4550, Quarto = 4
+2025-01-13 09:31:24 INFO  [Thread-214] c.m.dados.CheckSincronia - Verificando tabela: alarmes
+2025-01-13 09:31:24 INFO  [Thread-214] c.m.dados.CheckSincronia - Verificando tabela: antecipado
+2025-01-13 09:31:24 INFO  [Thread-214] c.m.dados.CheckSincronia - Verificando tabela: caixa
+2025-01-13 09:31:24 INFO  [Thread-214] c.m.dados.CheckSincronia - Verificando tabela: configuracoes
+2025-01-13 09:31:24 INFO  [Thread-214] c.m.dados.CheckSincronia - Verificando tabela: desistencia
+2025-01-13 09:31:24 INFO  [Thread-214] c.m.dados.CheckSincronia - Verificando tabela: funcionario
+2025-01-13 09:31:24 INFO  [Thread-214] c.m.dados.CheckSincronia - Verificando tabela: imagens
+2025-01-13 09:31:24 INFO  [Thread-214] c.m.dados.CheckSincronia - Verificando tabela: justificativa
+2025-01-13 09:31:24 INFO  [Thread-214] c.m.dados.CheckSincronia - Verificando tabela: prevendidos
+2025-01-13 09:31:24 INFO  [Thread-214] c.m.dados.CheckSincronia - Verificando tabela: produtos
+2025-01-13 09:31:24 INFO  [Thread-214] c.m.dados.CheckSincronia - Verificando tabela: quartos
+2025-01-13 09:31:24 INFO  [Thread-214] c.m.dados.CheckSincronia - Verificando tabela: registralimpeza
+2025-01-13 09:31:24 INFO  [Thread-214] c.m.dados.CheckSincronia - Verificando tabela: registralocado
+2025-01-13 09:31:24 WARN  [Thread-214] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 09:31:25 WARN  [Thread-214] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 09:31:26 INFO  [Thread-214] c.m.dados.CheckSincronia - Verificando tabela: registramanutencao
+2025-01-13 09:31:26 INFO  [Thread-214] c.m.dados.CheckSincronia - Verificando tabela: registrareserva
+2025-01-13 09:31:26 INFO  [Thread-214] c.m.dados.CheckSincronia - Verificando tabela: registravendido
+2025-01-13 09:31:26 INFO  [Thread-214] c.m.dados.CheckSincronia - Verificando tabela: status
+2025-01-13 09:31:26 WARN  [Thread-214] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 09:31:27 WARN  [Thread-214] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 09:31:28 WARN  [Thread-214] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 09:31:29 INFO  [Thread-214] c.m.dados.CheckSincronia - Os bancos de dados não estão sincronizados e foram corrigidos.
+2025-01-13 09:33:04 INFO  [AWT-EventQueue-0] com.motelinteligente.dados.fquartos - Operação bem-sucedida: UPDATE registralocado SET horafim='2025-01-13 09:30:34.022', horainicio='2025-01-12 23:37:44.0', valorquarto=120.0, valorconsumo=114.0, pagodinheiro=0.0, pagopix=0.0, pagocartao=234.0, idcaixaatual=283 WHERE idlocacao=4544
+2025-01-13 09:55:32 INFO  [AWT-EventQueue-0] com.motelinteligente.dados.fquartos - Operação bem-sucedida: UPDATE registralocado SET horafim='2025-01-13 09:54:42.322', horainicio='2025-01-13 09:03:15.0', valorquarto=60.0, valorconsumo=0.0, pagodinheiro=60.0, pagopix=0.0, pagocartao=0.0, idcaixaatual=283 WHERE idlocacao=4549
+2025-01-13 10:20:57 INFO  [AWT-EventQueue-0] com.motelinteligente.dados.fquartos - Operação bem-sucedida: UPDATE registralocado SET horafim='2025-01-13 10:20:00.921', horainicio='2025-01-13 09:25:10.0', valorquarto=60.0, valorconsumo=10.0, pagodinheiro=0.0, pagopix=0.0, pagocartao=70.0, idcaixaatual=283 WHERE idlocacao=4550
+2025-01-13 10:31:24 INFO  [Thread-222] c.m.dados.CheckSincronia - Verificando tabela: alarmes
+2025-01-13 10:31:24 INFO  [Thread-222] c.m.dados.CheckSincronia - Verificando tabela: antecipado
+2025-01-13 10:31:24 INFO  [Thread-222] c.m.dados.CheckSincronia - Verificando tabela: caixa
+2025-01-13 10:31:24 INFO  [Thread-222] c.m.dados.CheckSincronia - Verificando tabela: configuracoes
+2025-01-13 10:31:24 INFO  [Thread-222] c.m.dados.CheckSincronia - Verificando tabela: desistencia
+2025-01-13 10:31:24 INFO  [Thread-222] c.m.dados.CheckSincronia - Verificando tabela: funcionario
+2025-01-13 10:31:24 INFO  [Thread-222] c.m.dados.CheckSincronia - Verificando tabela: imagens
+2025-01-13 10:31:24 INFO  [Thread-222] c.m.dados.CheckSincronia - Verificando tabela: justificativa
+2025-01-13 10:31:24 INFO  [Thread-222] c.m.dados.CheckSincronia - Verificando tabela: prevendidos
+2025-01-13 10:31:24 INFO  [Thread-222] c.m.dados.CheckSincronia - Verificando tabela: produtos
+2025-01-13 10:31:24 INFO  [Thread-222] c.m.dados.CheckSincronia - Verificando tabela: quartos
+2025-01-13 10:31:24 INFO  [Thread-222] c.m.dados.CheckSincronia - Verificando tabela: registralimpeza
+2025-01-13 10:31:24 WARN  [Thread-222] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 10:31:25 INFO  [Thread-222] c.m.dados.CheckSincronia - Verificando tabela: registralocado
+2025-01-13 10:31:25 WARN  [Thread-222] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 10:31:26 INFO  [Thread-222] c.m.dados.CheckSincronia - Verificando tabela: registramanutencao
+2025-01-13 10:31:26 INFO  [Thread-222] c.m.dados.CheckSincronia - Verificando tabela: registrareserva
+2025-01-13 10:31:26 INFO  [Thread-222] c.m.dados.CheckSincronia - Verificando tabela: registravendido
+2025-01-13 10:31:29 INFO  [Thread-222] c.m.dados.CheckSincronia - Verificando tabela: status
+2025-01-13 10:31:29 WARN  [Thread-222] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 10:31:30 INFO  [Thread-222] c.m.dados.CheckSincronia - Os bancos de dados não estão sincronizados e foram corrigidos.
+2025-01-13 11:17:06 INFO  [AWT-EventQueue-0] com.motelinteligente.dados.fquartos - Registro inserido com sucesso: ID = 4551, Quarto = 3
+2025-01-13 11:31:24 INFO  [Thread-225] c.m.dados.CheckSincronia - Verificando tabela: alarmes
+2025-01-13 11:31:24 INFO  [Thread-225] c.m.dados.CheckSincronia - Verificando tabela: antecipado
+2025-01-13 11:31:24 INFO  [Thread-225] c.m.dados.CheckSincronia - Verificando tabela: caixa
+2025-01-13 11:31:24 INFO  [Thread-225] c.m.dados.CheckSincronia - Verificando tabela: configuracoes
+2025-01-13 11:31:24 INFO  [Thread-225] c.m.dados.CheckSincronia - Verificando tabela: desistencia
+2025-01-13 11:31:24 INFO  [Thread-225] c.m.dados.CheckSincronia - Verificando tabela: funcionario
+2025-01-13 11:31:24 INFO  [Thread-225] c.m.dados.CheckSincronia - Verificando tabela: imagens
+2025-01-13 11:31:24 INFO  [Thread-225] c.m.dados.CheckSincronia - Verificando tabela: justificativa
+2025-01-13 11:31:24 INFO  [Thread-225] c.m.dados.CheckSincronia - Verificando tabela: prevendidos
+2025-01-13 11:31:24 INFO  [Thread-225] c.m.dados.CheckSincronia - Verificando tabela: produtos
+2025-01-13 11:31:24 INFO  [Thread-225] c.m.dados.CheckSincronia - Verificando tabela: quartos
+2025-01-13 11:31:24 INFO  [Thread-225] c.m.dados.CheckSincronia - Verificando tabela: registralimpeza
+2025-01-13 11:31:24 INFO  [Thread-225] c.m.dados.CheckSincronia - Verificando tabela: registralocado
+2025-01-13 11:31:24 WARN  [Thread-225] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 11:31:25 INFO  [Thread-225] c.m.dados.CheckSincronia - Verificando tabela: registramanutencao
+2025-01-13 11:31:25 INFO  [Thread-225] c.m.dados.CheckSincronia - Verificando tabela: registrareserva
+2025-01-13 11:31:25 INFO  [Thread-225] c.m.dados.CheckSincronia - Verificando tabela: registravendido
+2025-01-13 11:31:25 INFO  [Thread-225] c.m.dados.CheckSincronia - Verificando tabela: status
+2025-01-13 11:31:25 WARN  [Thread-225] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 11:31:26 WARN  [Thread-225] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 11:31:27 WARN  [Thread-225] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 11:31:28 INFO  [Thread-225] c.m.dados.CheckSincronia - Os bancos de dados não estão sincronizados e foram corrigidos.
+2025-01-13 11:49:46 INFO  [http-nio-0.0.0.0-1521-exec-9] c.m.d.MotelInteligenteApplication - Recebeu requisição com corpo: abrir saida
+2025-01-13 12:13:39 INFO  [http-nio-0.0.0.0-1521-exec-1] c.m.d.MotelInteligenteApplication - Recebeu requisição com corpo: locar 10
+2025-01-13 12:13:39 INFO  [http-nio-0.0.0.0-1521-exec-1] com.motelinteligente.dados.fquartos - Registro inserido com sucesso: ID = 4552, Quarto = 10
+2025-01-13 12:14:07 INFO  [http-nio-0.0.0.0-1521-exec-3] c.m.d.MotelInteligenteApplication - Recebeu requisição com corpo: abrir entrada
+2025-01-13 12:14:11 INFO  [http-nio-0.0.0.0-1521-exec-5] c.m.d.MotelInteligenteApplication - Recebeu requisição com corpo: abrir saida
+2025-01-13 12:14:30 INFO  [http-nio-0.0.0.0-1521-exec-7] c.m.d.MotelInteligenteApplication - Recebeu requisição com corpo: abrir 10
+2025-01-13 12:31:24 INFO  [Thread-227] c.m.dados.CheckSincronia - Verificando tabela: alarmes
+2025-01-13 12:31:24 INFO  [Thread-227] c.m.dados.CheckSincronia - Verificando tabela: antecipado
+2025-01-13 12:31:24 INFO  [Thread-227] c.m.dados.CheckSincronia - Verificando tabela: caixa
+2025-01-13 12:31:24 INFO  [Thread-227] c.m.dados.CheckSincronia - Verificando tabela: configuracoes
+2025-01-13 12:31:24 INFO  [Thread-227] c.m.dados.CheckSincronia - Verificando tabela: desistencia
+2025-01-13 12:31:24 INFO  [Thread-227] c.m.dados.CheckSincronia - Verificando tabela: funcionario
+2025-01-13 12:31:24 INFO  [Thread-227] c.m.dados.CheckSincronia - Verificando tabela: imagens
+2025-01-13 12:31:24 INFO  [Thread-227] c.m.dados.CheckSincronia - Verificando tabela: justificativa
+2025-01-13 12:31:24 INFO  [Thread-227] c.m.dados.CheckSincronia - Verificando tabela: prevendidos
+2025-01-13 12:31:24 INFO  [Thread-227] c.m.dados.CheckSincronia - Verificando tabela: produtos
+2025-01-13 12:31:24 INFO  [Thread-227] c.m.dados.CheckSincronia - Verificando tabela: quartos
+2025-01-13 12:31:24 INFO  [Thread-227] c.m.dados.CheckSincronia - Verificando tabela: registralimpeza
+2025-01-13 12:31:24 INFO  [Thread-227] c.m.dados.CheckSincronia - Verificando tabela: registralocado
+2025-01-13 12:31:24 WARN  [Thread-227] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 12:31:25 INFO  [Thread-227] c.m.dados.CheckSincronia - Verificando tabela: registramanutencao
+2025-01-13 12:31:25 INFO  [Thread-227] c.m.dados.CheckSincronia - Verificando tabela: registrareserva
+2025-01-13 12:31:25 INFO  [Thread-227] c.m.dados.CheckSincronia - Verificando tabela: registravendido
+2025-01-13 12:31:25 INFO  [Thread-227] c.m.dados.CheckSincronia - Verificando tabela: status
+2025-01-13 12:31:25 WARN  [Thread-227] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 12:31:26 INFO  [Thread-227] c.m.dados.CheckSincronia - Os bancos de dados não estão sincronizados e foram corrigidos.
+2025-01-13 13:13:03 INFO  [AWT-EventQueue-0] com.motelinteligente.dados.fquartos - Operação bem-sucedida: UPDATE registralocado SET horafim='2025-01-13 13:11:34.168', horainicio='2025-01-13 12:13:40.0', valorquarto=60.0, valorconsumo=10.0, pagodinheiro=70.0, pagopix=0.0, pagocartao=0.0, idcaixaatual=283 WHERE idlocacao=4552
+2025-01-13 13:31:24 INFO  [Thread-231] c.m.dados.CheckSincronia - Verificando tabela: alarmes
+2025-01-13 13:31:24 INFO  [Thread-231] c.m.dados.CheckSincronia - Verificando tabela: antecipado
+2025-01-13 13:31:24 INFO  [Thread-231] c.m.dados.CheckSincronia - Verificando tabela: caixa
+2025-01-13 13:31:24 INFO  [Thread-231] c.m.dados.CheckSincronia - Verificando tabela: configuracoes
+2025-01-13 13:31:24 INFO  [Thread-231] c.m.dados.CheckSincronia - Verificando tabela: desistencia
+2025-01-13 13:31:24 INFO  [Thread-231] c.m.dados.CheckSincronia - Verificando tabela: funcionario
+2025-01-13 13:31:24 INFO  [Thread-231] c.m.dados.CheckSincronia - Verificando tabela: imagens
+2025-01-13 13:31:24 INFO  [Thread-231] c.m.dados.CheckSincronia - Verificando tabela: justificativa
+2025-01-13 13:31:24 INFO  [Thread-231] c.m.dados.CheckSincronia - Verificando tabela: prevendidos
+2025-01-13 13:31:24 INFO  [Thread-231] c.m.dados.CheckSincronia - Verificando tabela: produtos
+2025-01-13 13:31:24 INFO  [Thread-231] c.m.dados.CheckSincronia - Verificando tabela: quartos
+2025-01-13 13:31:24 INFO  [Thread-231] c.m.dados.CheckSincronia - Verificando tabela: registralimpeza
+2025-01-13 13:31:24 WARN  [Thread-231] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 13:31:25 INFO  [Thread-231] c.m.dados.CheckSincronia - Verificando tabela: registralocado
+2025-01-13 13:31:25 INFO  [Thread-231] c.m.dados.CheckSincronia - Verificando tabela: registramanutencao
+2025-01-13 13:31:25 INFO  [Thread-231] c.m.dados.CheckSincronia - Verificando tabela: registrareserva
+2025-01-13 13:31:25 INFO  [Thread-231] c.m.dados.CheckSincronia - Verificando tabela: registravendido
+2025-01-13 13:31:26 INFO  [Thread-231] c.m.dados.CheckSincronia - Verificando tabela: status
+2025-01-13 13:31:26 WARN  [Thread-231] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 13:31:27 INFO  [Thread-231] c.m.dados.CheckSincronia - Os bancos de dados não estão sincronizados e foram corrigidos.
+2025-01-13 13:43:40 INFO  [AWT-EventQueue-0] com.motelinteligente.dados.fquartos - Operação bem-sucedida: UPDATE registralocado SET horafim='2025-01-13 13:42:32.257', horainicio='2025-01-13 11:17:07.0', valorquarto=60.0, valorconsumo=0.0, pagodinheiro=0.0, pagopix=0.0, pagocartao=60.0, idcaixaatual=283 WHERE idlocacao=4551
+2025-01-13 14:14:34 INFO  [http-nio-0.0.0.0-1521-exec-9] c.m.d.MotelInteligenteApplication - Recebeu requisição com corpo: locar 9
+2025-01-13 14:14:34 INFO  [http-nio-0.0.0.0-1521-exec-9] com.motelinteligente.dados.fquartos - Registro inserido com sucesso: ID = 4553, Quarto = 9
+2025-01-13 14:31:24 INFO  [Thread-236] c.m.dados.CheckSincronia - Verificando tabela: alarmes
+2025-01-13 14:31:24 INFO  [Thread-236] c.m.dados.CheckSincronia - Verificando tabela: antecipado
+2025-01-13 14:31:24 INFO  [Thread-236] c.m.dados.CheckSincronia - Verificando tabela: caixa
+2025-01-13 14:31:24 INFO  [Thread-236] c.m.dados.CheckSincronia - Verificando tabela: configuracoes
+2025-01-13 14:31:24 INFO  [Thread-236] c.m.dados.CheckSincronia - Verificando tabela: desistencia
+2025-01-13 14:31:24 INFO  [Thread-236] c.m.dados.CheckSincronia - Verificando tabela: funcionario
+2025-01-13 14:31:24 INFO  [Thread-236] c.m.dados.CheckSincronia - Verificando tabela: imagens
+2025-01-13 14:31:24 INFO  [Thread-236] c.m.dados.CheckSincronia - Verificando tabela: justificativa
+2025-01-13 14:31:24 INFO  [Thread-236] c.m.dados.CheckSincronia - Verificando tabela: prevendidos
+2025-01-13 14:31:24 INFO  [Thread-236] c.m.dados.CheckSincronia - Verificando tabela: produtos
+2025-01-13 14:31:24 INFO  [Thread-236] c.m.dados.CheckSincronia - Verificando tabela: quartos
+2025-01-13 14:31:24 INFO  [Thread-236] c.m.dados.CheckSincronia - Verificando tabela: registralimpeza
+2025-01-13 14:31:24 WARN  [Thread-236] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 14:31:25 INFO  [Thread-236] c.m.dados.CheckSincronia - Verificando tabela: registralocado
+2025-01-13 14:31:25 INFO  [Thread-236] c.m.dados.CheckSincronia - Verificando tabela: registramanutencao
+2025-01-13 14:31:25 INFO  [Thread-236] c.m.dados.CheckSincronia - Verificando tabela: registrareserva
+2025-01-13 14:31:25 INFO  [Thread-236] c.m.dados.CheckSincronia - Verificando tabela: registravendido
+2025-01-13 14:31:25 INFO  [Thread-236] c.m.dados.CheckSincronia - Verificando tabela: status
+2025-01-13 14:31:25 WARN  [Thread-236] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 14:31:26 WARN  [Thread-236] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 14:31:27 INFO  [Thread-236] c.m.dados.CheckSincronia - Os bancos de dados não estão sincronizados e foram corrigidos.
+2025-01-13 15:04:11 INFO  [AWT-EventQueue-0] com.motelinteligente.dados.fquartos - Operação bem-sucedida: UPDATE registralocado SET horafim='2025-01-13 15:03:42.886', horainicio='2025-01-13 14:14:35.0', valorquarto=60.0, valorconsumo=5.0, pagodinheiro=65.0, pagopix=0.0, pagocartao=0.0, idcaixaatual=283 WHERE idlocacao=4548
+2025-01-13 15:31:24 INFO  [Thread-240] c.m.dados.CheckSincronia - Verificando tabela: alarmes
+2025-01-13 15:31:24 INFO  [Thread-240] c.m.dados.CheckSincronia - Verificando tabela: antecipado
+2025-01-13 15:31:24 INFO  [Thread-240] c.m.dados.CheckSincronia - Verificando tabela: caixa
+2025-01-13 15:31:24 INFO  [Thread-240] c.m.dados.CheckSincronia - Verificando tabela: configuracoes
+2025-01-13 15:31:24 INFO  [Thread-240] c.m.dados.CheckSincronia - Verificando tabela: desistencia
+2025-01-13 15:31:24 INFO  [Thread-240] c.m.dados.CheckSincronia - Verificando tabela: funcionario
+2025-01-13 15:31:24 INFO  [Thread-240] c.m.dados.CheckSincronia - Verificando tabela: imagens
+2025-01-13 15:31:24 INFO  [Thread-240] c.m.dados.CheckSincronia - Verificando tabela: justificativa
+2025-01-13 15:31:24 INFO  [Thread-240] c.m.dados.CheckSincronia - Verificando tabela: prevendidos
+2025-01-13 15:31:24 INFO  [Thread-240] c.m.dados.CheckSincronia - Verificando tabela: produtos
+2025-01-13 15:31:24 INFO  [Thread-240] c.m.dados.CheckSincronia - Verificando tabela: quartos
+2025-01-13 15:31:24 INFO  [Thread-240] c.m.dados.CheckSincronia - Verificando tabela: registralimpeza
+2025-01-13 15:31:24 WARN  [Thread-240] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 15:31:25 INFO  [Thread-240] c.m.dados.CheckSincronia - Verificando tabela: registralocado
+2025-01-13 15:31:25 WARN  [Thread-240] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 15:31:26 INFO  [Thread-240] c.m.dados.CheckSincronia - Verificando tabela: registramanutencao
+2025-01-13 15:31:26 INFO  [Thread-240] c.m.dados.CheckSincronia - Verificando tabela: registrareserva
+2025-01-13 15:31:26 INFO  [Thread-240] c.m.dados.CheckSincronia - Verificando tabela: registravendido
+2025-01-13 15:31:27 INFO  [Thread-240] c.m.dados.CheckSincronia - Verificando tabela: status
+2025-01-13 15:31:27 WARN  [Thread-240] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 15:31:27 INFO  [Thread-240] c.m.dados.CheckSincronia - Os bancos de dados não estão sincronizados e foram corrigidos.
+2025-01-13 15:43:19 INFO  [AWT-EventQueue-0] com.motelinteligente.dados.fquartos - Registro inserido com sucesso: ID = 4554, Quarto = 11
+2025-01-13 16:30:46 INFO  [http-nio-0.0.0.0-1521-exec-2] c.m.d.MotelInteligenteApplication - Recebeu requisição com corpo: abrir saida
+2025-01-13 16:31:24 INFO  [Thread-243] c.m.dados.CheckSincronia - Verificando tabela: alarmes
+2025-01-13 16:31:24 INFO  [Thread-243] c.m.dados.CheckSincronia - Verificando tabela: antecipado
+2025-01-13 16:31:24 INFO  [Thread-243] c.m.dados.CheckSincronia - Verificando tabela: caixa
+2025-01-13 16:31:24 INFO  [Thread-243] c.m.dados.CheckSincronia - Verificando tabela: configuracoes
+2025-01-13 16:31:24 INFO  [Thread-243] c.m.dados.CheckSincronia - Verificando tabela: desistencia
+2025-01-13 16:31:24 INFO  [Thread-243] c.m.dados.CheckSincronia - Verificando tabela: funcionario
+2025-01-13 16:31:24 INFO  [Thread-243] c.m.dados.CheckSincronia - Verificando tabela: imagens
+2025-01-13 16:31:24 INFO  [Thread-243] c.m.dados.CheckSincronia - Verificando tabela: justificativa
+2025-01-13 16:31:24 INFO  [Thread-243] c.m.dados.CheckSincronia - Verificando tabela: prevendidos
+2025-01-13 16:31:24 INFO  [Thread-243] c.m.dados.CheckSincronia - Verificando tabela: produtos
+2025-01-13 16:31:24 INFO  [Thread-243] c.m.dados.CheckSincronia - Verificando tabela: quartos
+2025-01-13 16:31:24 INFO  [Thread-243] c.m.dados.CheckSincronia - Verificando tabela: registralimpeza
+2025-01-13 16:31:24 INFO  [Thread-243] c.m.dados.CheckSincronia - Verificando tabela: registralocado
+2025-01-13 16:31:24 INFO  [Thread-243] c.m.dados.CheckSincronia - Verificando tabela: registramanutencao
+2025-01-13 16:31:24 INFO  [Thread-243] c.m.dados.CheckSincronia - Verificando tabela: registrareserva
+2025-01-13 16:31:24 INFO  [Thread-243] c.m.dados.CheckSincronia - Verificando tabela: registravendido
+2025-01-13 16:31:24 INFO  [Thread-243] c.m.dados.CheckSincronia - Verificando tabela: status
+2025-01-13 16:31:25 WARN  [Thread-243] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 16:31:25 WARN  [Thread-243] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 16:31:26 WARN  [Thread-243] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 16:31:27 INFO  [Thread-243] c.m.dados.CheckSincronia - Os bancos de dados não estão sincronizados e foram corrigidos.
+2025-01-13 16:42:47 INFO  [AWT-EventQueue-0] com.motelinteligente.dados.fquartos - Operação bem-sucedida: UPDATE registralocado SET horafim='2025-01-13 16:41:59.379', horainicio='2025-01-13 15:43:19.0', valorquarto=60.0, valorconsumo=0.0, pagodinheiro=60.0, pagopix=0.0, pagocartao=0.0, idcaixaatual=283 WHERE idlocacao=4554
+2025-01-13 17:24:09 INFO  [http-nio-0.0.0.0-1521-exec-4] c.m.d.MotelInteligenteApplication - Recebeu requisição com corpo: abrir saida
+2025-01-13 17:31:24 INFO  [Thread-247] c.m.dados.CheckSincronia - Verificando tabela: alarmes
+2025-01-13 17:31:24 INFO  [Thread-247] c.m.dados.CheckSincronia - Verificando tabela: antecipado
+2025-01-13 17:31:24 INFO  [Thread-247] c.m.dados.CheckSincronia - Verificando tabela: caixa
+2025-01-13 17:31:24 INFO  [Thread-247] c.m.dados.CheckSincronia - Verificando tabela: configuracoes
+2025-01-13 17:31:24 INFO  [Thread-247] c.m.dados.CheckSincronia - Verificando tabela: desistencia
+2025-01-13 17:31:24 INFO  [Thread-247] c.m.dados.CheckSincronia - Verificando tabela: funcionario
+2025-01-13 17:31:24 INFO  [Thread-247] c.m.dados.CheckSincronia - Verificando tabela: imagens
+2025-01-13 17:31:24 INFO  [Thread-247] c.m.dados.CheckSincronia - Verificando tabela: justificativa
+2025-01-13 17:31:24 INFO  [Thread-247] c.m.dados.CheckSincronia - Verificando tabela: prevendidos
+2025-01-13 17:31:24 INFO  [Thread-247] c.m.dados.CheckSincronia - Verificando tabela: produtos
+2025-01-13 17:31:24 INFO  [Thread-247] c.m.dados.CheckSincronia - Verificando tabela: quartos
+2025-01-13 17:31:24 INFO  [Thread-247] c.m.dados.CheckSincronia - Verificando tabela: registralimpeza
+2025-01-13 17:31:24 WARN  [Thread-247] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 17:31:25 INFO  [Thread-247] c.m.dados.CheckSincronia - Verificando tabela: registralocado
+2025-01-13 17:31:25 INFO  [Thread-247] c.m.dados.CheckSincronia - Verificando tabela: registramanutencao
+2025-01-13 17:31:25 INFO  [Thread-247] c.m.dados.CheckSincronia - Verificando tabela: registrareserva
+2025-01-13 17:31:25 INFO  [Thread-247] c.m.dados.CheckSincronia - Verificando tabela: registravendido
+2025-01-13 17:31:25 INFO  [Thread-247] c.m.dados.CheckSincronia - Verificando tabela: status
+2025-01-13 17:31:25 WARN  [Thread-247] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 17:31:26 INFO  [Thread-247] c.m.dados.CheckSincronia - Os bancos de dados não estão sincronizados e foram corrigidos.
+2025-01-13 18:30:08 INFO  [http-nio-0.0.0.0-1521-exec-6] c.m.d.MotelInteligenteApplication - Recebeu requisição com corpo: locar 10
+2025-01-13 18:30:08 INFO  [http-nio-0.0.0.0-1521-exec-6] com.motelinteligente.dados.fquartos - Registro inserido com sucesso: ID = 4555, Quarto = 10
+2025-01-13 18:31:25 INFO  [Thread-249] c.m.dados.CheckSincronia - Verificando tabela: alarmes
+2025-01-13 18:31:25 INFO  [Thread-249] c.m.dados.CheckSincronia - Verificando tabela: antecipado
+2025-01-13 18:31:25 INFO  [Thread-249] c.m.dados.CheckSincronia - Verificando tabela: caixa
+2025-01-13 18:31:25 INFO  [Thread-249] c.m.dados.CheckSincronia - Verificando tabela: configuracoes
+2025-01-13 18:31:25 INFO  [Thread-249] c.m.dados.CheckSincronia - Verificando tabela: desistencia
+2025-01-13 18:31:25 INFO  [Thread-249] c.m.dados.CheckSincronia - Verificando tabela: funcionario
+2025-01-13 18:31:25 INFO  [Thread-249] c.m.dados.CheckSincronia - Verificando tabela: imagens
+2025-01-13 18:31:25 INFO  [Thread-249] c.m.dados.CheckSincronia - Verificando tabela: justificativa
+2025-01-13 18:31:25 INFO  [Thread-249] c.m.dados.CheckSincronia - Verificando tabela: prevendidos
+2025-01-13 18:31:25 INFO  [Thread-249] c.m.dados.CheckSincronia - Verificando tabela: produtos
+2025-01-13 18:31:25 INFO  [Thread-249] c.m.dados.CheckSincronia - Verificando tabela: quartos
+2025-01-13 18:31:25 INFO  [Thread-249] c.m.dados.CheckSincronia - Verificando tabela: registralimpeza
+2025-01-13 18:31:25 INFO  [Thread-249] c.m.dados.CheckSincronia - Verificando tabela: registralocado
+2025-01-13 18:31:25 WARN  [Thread-249] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 18:31:25 INFO  [Thread-249] c.m.dados.CheckSincronia - Verificando tabela: registramanutencao
+2025-01-13 18:31:25 INFO  [Thread-249] c.m.dados.CheckSincronia - Verificando tabela: registrareserva
+2025-01-13 18:31:25 INFO  [Thread-249] c.m.dados.CheckSincronia - Verificando tabela: registravendido
+2025-01-13 18:31:25 INFO  [Thread-249] c.m.dados.CheckSincronia - Verificando tabela: status
+2025-01-13 18:31:25 WARN  [Thread-249] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 18:31:26 INFO  [Thread-249] c.m.dados.CheckSincronia - Os bancos de dados não estão sincronizados e foram corrigidos.
+2025-01-13 19:26:08 INFO  [AWT-EventQueue-0] com.motelinteligente.dados.fquartos - Operação bem-sucedida: UPDATE registralocado SET horafim='2025-01-13 19:25:30.694', horainicio='2025-01-13 18:30:09.0', valorquarto=60.0, valorconsumo=0.0, pagodinheiro=60.0, pagopix=0.0, pagocartao=0.0, idcaixaatual=283 WHERE idlocacao=4555
+2025-01-13 19:31:24 INFO  [Thread-253] c.m.dados.CheckSincronia - Verificando tabela: alarmes
+2025-01-13 19:31:24 INFO  [Thread-253] c.m.dados.CheckSincronia - Verificando tabela: antecipado
+2025-01-13 19:31:24 INFO  [Thread-253] c.m.dados.CheckSincronia - Verificando tabela: caixa
+2025-01-13 19:31:24 INFO  [Thread-253] c.m.dados.CheckSincronia - Verificando tabela: configuracoes
+2025-01-13 19:31:24 INFO  [Thread-253] c.m.dados.CheckSincronia - Verificando tabela: desistencia
+2025-01-13 19:31:24 INFO  [Thread-253] c.m.dados.CheckSincronia - Verificando tabela: funcionario
+2025-01-13 19:31:24 INFO  [Thread-253] c.m.dados.CheckSincronia - Verificando tabela: imagens
+2025-01-13 19:31:24 INFO  [Thread-253] c.m.dados.CheckSincronia - Verificando tabela: justificativa
+2025-01-13 19:31:24 INFO  [Thread-253] c.m.dados.CheckSincronia - Verificando tabela: prevendidos
+2025-01-13 19:31:24 INFO  [Thread-253] c.m.dados.CheckSincronia - Verificando tabela: produtos
+2025-01-13 19:31:24 INFO  [Thread-253] c.m.dados.CheckSincronia - Verificando tabela: quartos
+2025-01-13 19:31:24 INFO  [Thread-253] c.m.dados.CheckSincronia - Verificando tabela: registralimpeza
+2025-01-13 19:31:24 WARN  [Thread-253] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 19:31:25 INFO  [Thread-253] c.m.dados.CheckSincronia - Verificando tabela: registralocado
+2025-01-13 19:31:25 WARN  [Thread-253] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 19:31:26 INFO  [Thread-253] c.m.dados.CheckSincronia - Verificando tabela: registramanutencao
+2025-01-13 19:31:26 INFO  [Thread-253] c.m.dados.CheckSincronia - Verificando tabela: registrareserva
+2025-01-13 19:31:26 INFO  [Thread-253] c.m.dados.CheckSincronia - Verificando tabela: registravendido
+2025-01-13 19:31:26 INFO  [Thread-253] c.m.dados.CheckSincronia - Verificando tabela: status
+2025-01-13 19:31:26 WARN  [Thread-253] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 19:31:27 INFO  [Thread-253] c.m.dados.CheckSincronia - Os bancos de dados não estão sincronizados e foram corrigidos.
+2025-01-13 20:01:58 INFO  [AWT-EventQueue-0] com.motelinteligente.dados.fquartos - Registro inserido com sucesso: ID = 4556, Quarto = 8
+2025-01-13 20:12:00 INFO  [AWT-EventQueue-0] com.motelinteligente.dados.fquartos - Registro inserido com sucesso: ID = 4557, Quarto = 9
+2025-01-13 20:31:24 INFO  [Thread-258] c.m.dados.CheckSincronia - Verificando tabela: alarmes
+2025-01-13 20:31:24 INFO  [Thread-258] c.m.dados.CheckSincronia - Verificando tabela: antecipado
+2025-01-13 20:31:24 INFO  [Thread-258] c.m.dados.CheckSincronia - Verificando tabela: caixa
+2025-01-13 20:31:24 INFO  [Thread-258] c.m.dados.CheckSincronia - Verificando tabela: configuracoes
+2025-01-13 20:31:24 INFO  [Thread-258] c.m.dados.CheckSincronia - Verificando tabela: desistencia
+2025-01-13 20:31:24 INFO  [Thread-258] c.m.dados.CheckSincronia - Verificando tabela: funcionario
+2025-01-13 20:31:24 INFO  [Thread-258] c.m.dados.CheckSincronia - Verificando tabela: imagens
+2025-01-13 20:31:24 INFO  [Thread-258] c.m.dados.CheckSincronia - Verificando tabela: justificativa
+2025-01-13 20:31:24 INFO  [Thread-258] c.m.dados.CheckSincronia - Verificando tabela: prevendidos
+2025-01-13 20:31:24 INFO  [Thread-258] c.m.dados.CheckSincronia - Verificando tabela: produtos
+2025-01-13 20:31:24 INFO  [Thread-258] c.m.dados.CheckSincronia - Verificando tabela: quartos
+2025-01-13 20:31:24 INFO  [Thread-258] c.m.dados.CheckSincronia - Verificando tabela: registralimpeza
+2025-01-13 20:31:24 INFO  [Thread-258] c.m.dados.CheckSincronia - Verificando tabela: registralocado
+2025-01-13 20:31:24 WARN  [Thread-258] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 20:31:25 WARN  [Thread-258] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 20:31:26 INFO  [Thread-258] c.m.dados.CheckSincronia - Verificando tabela: registramanutencao
+2025-01-13 20:31:26 INFO  [Thread-258] c.m.dados.CheckSincronia - Verificando tabela: registrareserva
+2025-01-13 20:31:26 INFO  [Thread-258] c.m.dados.CheckSincronia - Verificando tabela: registravendido
+2025-01-13 20:31:26 INFO  [Thread-258] c.m.dados.CheckSincronia - Verificando tabela: status
+2025-01-13 20:31:26 WARN  [Thread-258] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 20:31:27 WARN  [Thread-258] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 20:31:27 INFO  [Thread-258] c.m.dados.CheckSincronia - Os bancos de dados não estão sincronizados e foram corrigidos.
+2025-01-13 20:44:35 INFO  [http-nio-0.0.0.0-1521-exec-8] c.m.d.MotelInteligenteApplication - Recebeu requisição com corpo: locar 4
+2025-01-13 20:44:35 INFO  [http-nio-0.0.0.0-1521-exec-8] com.motelinteligente.dados.fquartos - Registro inserido com sucesso: ID = 4558, Quarto = 4
+2025-01-13 21:26:06 INFO  [http-nio-0.0.0.0-1521-exec-10] c.m.d.MotelInteligenteApplication - Recebeu requisição com corpo: locar 2
+2025-01-13 21:26:06 INFO  [http-nio-0.0.0.0-1521-exec-10] com.motelinteligente.dados.fquartos - Registro inserido com sucesso: ID = 4559, Quarto = 2
+2025-01-13 21:31:24 INFO  [Thread-261] c.m.dados.CheckSincronia - Verificando tabela: alarmes
+2025-01-13 21:31:24 INFO  [Thread-261] c.m.dados.CheckSincronia - Verificando tabela: antecipado
+2025-01-13 21:31:24 INFO  [Thread-261] c.m.dados.CheckSincronia - Verificando tabela: caixa
+2025-01-13 21:31:25 INFO  [Thread-261] c.m.dados.CheckSincronia - Verificando tabela: configuracoes
+2025-01-13 21:31:25 INFO  [Thread-261] c.m.dados.CheckSincronia - Verificando tabela: desistencia
+2025-01-13 21:31:25 INFO  [Thread-261] c.m.dados.CheckSincronia - Verificando tabela: funcionario
+2025-01-13 21:31:25 INFO  [Thread-261] c.m.dados.CheckSincronia - Verificando tabela: imagens
+2025-01-13 21:31:25 INFO  [Thread-261] c.m.dados.CheckSincronia - Verificando tabela: justificativa
+2025-01-13 21:31:25 INFO  [Thread-261] c.m.dados.CheckSincronia - Verificando tabela: prevendidos
+2025-01-13 21:31:25 INFO  [Thread-261] c.m.dados.CheckSincronia - Verificando tabela: produtos
+2025-01-13 21:31:25 INFO  [Thread-261] c.m.dados.CheckSincronia - Verificando tabela: quartos
+2025-01-13 21:31:25 INFO  [Thread-261] c.m.dados.CheckSincronia - Verificando tabela: registralimpeza
+2025-01-13 21:31:25 INFO  [Thread-261] c.m.dados.CheckSincronia - Verificando tabela: registralocado
+2025-01-13 21:31:25 WARN  [Thread-261] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 21:31:26 INFO  [Thread-261] c.m.dados.CheckSincronia - Verificando tabela: registramanutencao
+2025-01-13 21:31:26 INFO  [Thread-261] c.m.dados.CheckSincronia - Verificando tabela: registrareserva
+2025-01-13 21:31:26 INFO  [Thread-261] c.m.dados.CheckSincronia - Verificando tabela: registravendido
+2025-01-13 21:31:26 INFO  [Thread-261] c.m.dados.CheckSincronia - Verificando tabela: status
+2025-01-13 21:31:26 WARN  [Thread-261] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 21:31:26 INFO  [Thread-261] c.m.dados.CheckSincronia - Os bancos de dados não estão sincronizados e foram corrigidos.
+2025-01-13 22:13:37 INFO  [AWT-EventQueue-0] com.motelinteligente.dados.fquartos - Operação bem-sucedida: UPDATE registralocado SET horafim='2025-01-13 22:10:54.028', horainicio='2025-01-13 21:26:07.0', valorquarto=60.0, valorconsumo=50.0, pagodinheiro=0.0, pagopix=110.0, pagocartao=0.0, idcaixaatual=284 WHERE idlocacao=4559
+2025-01-13 22:19:29 INFO  [AWT-EventQueue-0] com.motelinteligente.dados.fquartos - Operação bem-sucedida: UPDATE registralocado SET horafim='2025-01-13 22:17:27.712', horainicio='2025-01-13 20:44:35.0', valorquarto=60.0, valorconsumo=10.0, pagodinheiro=0.0, pagopix=70.0, pagocartao=0.0, idcaixaatual=284 WHERE idlocacao=4558
+2025-01-13 22:31:24 INFO  [Thread-268] c.m.dados.CheckSincronia - Verificando tabela: alarmes
+2025-01-13 22:31:24 INFO  [Thread-268] c.m.dados.CheckSincronia - Verificando tabela: antecipado
+2025-01-13 22:31:24 INFO  [Thread-268] c.m.dados.CheckSincronia - Verificando tabela: caixa
+2025-01-13 22:31:24 INFO  [Thread-268] c.m.dados.CheckSincronia - Verificando tabela: configuracoes
+2025-01-13 22:31:24 INFO  [Thread-268] c.m.dados.CheckSincronia - Verificando tabela: desistencia
+2025-01-13 22:31:24 INFO  [Thread-268] c.m.dados.CheckSincronia - Verificando tabela: funcionario
+2025-01-13 22:31:24 INFO  [Thread-268] c.m.dados.CheckSincronia - Verificando tabela: imagens
+2025-01-13 22:31:24 INFO  [Thread-268] c.m.dados.CheckSincronia - Verificando tabela: justificativa
+2025-01-13 22:31:24 INFO  [Thread-268] c.m.dados.CheckSincronia - Verificando tabela: prevendidos
+2025-01-13 22:31:24 INFO  [Thread-268] c.m.dados.CheckSincronia - Verificando tabela: produtos
+2025-01-13 22:31:24 INFO  [Thread-268] c.m.dados.CheckSincronia - Verificando tabela: quartos
+2025-01-13 22:31:24 INFO  [Thread-268] c.m.dados.CheckSincronia - Verificando tabela: registralimpeza
+2025-01-13 22:31:24 WARN  [Thread-268] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 22:31:25 INFO  [Thread-268] c.m.dados.CheckSincronia - Verificando tabela: registralocado
+2025-01-13 22:31:25 WARN  [Thread-268] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 22:31:26 INFO  [Thread-268] c.m.dados.CheckSincronia - Verificando tabela: registramanutencao
+2025-01-13 22:31:26 INFO  [Thread-268] c.m.dados.CheckSincronia - Verificando tabela: registrareserva
+2025-01-13 22:31:26 INFO  [Thread-268] c.m.dados.CheckSincronia - Verificando tabela: registravendido
+2025-01-13 22:31:28 INFO  [Thread-268] c.m.dados.CheckSincronia - Verificando tabela: status
+2025-01-13 22:31:28 WARN  [Thread-268] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 22:31:29 WARN  [Thread-268] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 22:31:29 WARN  [Thread-268] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-13 22:31:30 INFO  [Thread-268] c.m.dados.CheckSincronia - Os bancos de dados não estão sincronizados e foram corrigidos.
+2025-01-13 23:31:24 INFO  [Thread-269] c.m.dados.CheckSincronia - Verificando tabela: alarmes
+2025-01-13 23:31:24 INFO  [Thread-269] c.m.dados.CheckSincronia - Verificando tabela: antecipado
+2025-01-13 23:31:24 INFO  [Thread-269] c.m.dados.CheckSincronia - Verificando tabela: caixa
+2025-01-13 23:31:24 INFO  [Thread-269] c.m.dados.CheckSincronia - Verificando tabela: configuracoes
+2025-01-13 23:31:24 INFO  [Thread-269] c.m.dados.CheckSincronia - Verificando tabela: desistencia
+2025-01-13 23:31:24 INFO  [Thread-269] c.m.dados.CheckSincronia - Verificando tabela: funcionario
+2025-01-13 23:31:24 INFO  [Thread-269] c.m.dados.CheckSincronia - Verificando tabela: imagens
+2025-01-13 23:31:24 INFO  [Thread-269] c.m.dados.CheckSincronia - Verificando tabela: justificativa
+2025-01-13 23:31:24 INFO  [Thread-269] c.m.dados.CheckSincronia - Verificando tabela: prevendidos
+2025-01-13 23:31:24 INFO  [Thread-269] c.m.dados.CheckSincronia - Verificando tabela: produtos
+2025-01-13 23:31:24 INFO  [Thread-269] c.m.dados.CheckSincronia - Verificando tabela: quartos
+2025-01-13 23:31:24 INFO  [Thread-269] c.m.dados.CheckSincronia - Verificando tabela: registralimpeza
+2025-01-13 23:31:24 INFO  [Thread-269] c.m.dados.CheckSincronia - Verificando tabela: registralocado
+2025-01-13 23:31:24 INFO  [Thread-269] c.m.dados.CheckSincronia - Verificando tabela: registramanutencao
+2025-01-13 23:31:24 INFO  [Thread-269] c.m.dados.CheckSincronia - Verificando tabela: registrareserva
+2025-01-13 23:31:24 INFO  [Thread-269] c.m.dados.CheckSincronia - Verificando tabela: registravendido
+2025-01-13 23:31:24 INFO  [Thread-269] c.m.dados.CheckSincronia - Verificando tabela: status
+2025-01-13 23:31:24 INFO  [Thread-269] c.m.dados.CheckSincronia - Sincronismo verificado com sucesso!

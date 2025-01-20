@@ -2080,7 +2080,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
     // Iniciar gravação
 
     private void startRecording(int numeroQuarto) {
-        if (!recording) {
+        /*if (!recording) {
             CacheDados cache = CacheDados.getInstancia();
             if (idLocacao == 0) {
                 idLocacao = cache.getCacheOcupado().get(numeroDoQuarto).getIdLoca();
@@ -2108,7 +2108,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
             mediaPlayer.media().play(mediaUrl, mediaOptions);
             recording = true;  // Marca que a gravação está em andamento
             System.out.println("Gravação iniciada.");
-        }
+        }*/
     }
 
     // Parar gravação

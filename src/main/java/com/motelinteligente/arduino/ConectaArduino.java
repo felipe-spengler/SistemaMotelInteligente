@@ -4,7 +4,7 @@ import com.motelinteligente.dados.CacheDados;
 
 
 public class ConectaArduino {
-    private static final int MAX_TENTATIVAS = 3;
+    private static final int MAX_TENTATIVAS = 2;
     private static final int TEMPO_ESPERA_MS = 2000; // Tempo de espera entre tentativas
 
     public ConectaArduino(int valorPortao) {

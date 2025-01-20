@@ -242,9 +242,7 @@ public class MotelInteligenteApplication {
             quarto.setHoraStatus(String.valueOf(timestamp));
             // Atualiza o quarto na cache
             dados.getCacheQuarto().put(quartoMudar, quarto);
-            if (statusColocar.contains("ocupado")) {
-                dados.carregarOcupado(quartoMudar);
-            }
+            
             if (statusColocar.equals("limpeza")) {
                 dados.getCacheOcupado().remove(quartoMudar);
             }

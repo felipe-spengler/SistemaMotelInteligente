@@ -190,7 +190,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         configGlobal config = configGlobal.getInstance();
 
         if (config.getAlarmesAtivos() > 0) {
-            try ( Connection conn = new fazconexao().conectar();  Statement stmt = conn.createStatement();  ResultSet rs = stmt.executeQuery("SELECT id, hora_despertar, descricao FROM alarmes WHERE ativo = TRUE")) {
+            try (Connection conn = new fazconexao().conectar(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery("SELECT id, hora_despertar, descricao FROM alarmes WHERE ativo = TRUE")) {
 
                 while (rs.next()) {
                     int idAlarme = rs.getInt("id");
@@ -232,12 +232,17 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                                 || (anoAtual == anoAlarme && mesAtual == mesAlarme && diaAtual == diaAlarme && horaAtual > horaAlarme)
                                 || (anoAtual == anoAlarme && mesAtual == mesAlarme && diaAtual == diaAlarme && horaAtual == horaAlarme && minutoAtual > minutoAlarme)) {
 
-                            // Verificar se passou mais de 15 minutos
+                            // Verificar se passou mais de 5 minutos
                             long diferencaMillis = agora.getTimeInMillis() - alarmeCalendar.getTimeInMillis();
-                            long quinzeMinutosMillis = 15 * 60 * 1000; // 15 minutos em milissegundos
-
+                            long quinzeMinutosMillis = 5 * 60 * 1000; // 15 minutos em milissegundos
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            String horarioAtual = sdf.format(agora.getTime());
+                            String horarioAlarme = sdf.format(alarmeCalendar.getTime());
                             if (!(diferencaMillis <= quinzeMinutosMillis)) {
-                                System.out.println("Alarme ID: " + idAlarme + " já passou mais de 15 minutos - deve remover.");
+                                System.out.println("Alarme ID: " + idAlarme
+                                        + " já passou mais de 5 minutos - deve remover. "
+                                        + "Horário atual: " + horarioAtual
+                                        + ", Horário do alarme: " + horarioAlarme);
                                 new FAlarmes().removeAlarmFromDatabase(idAlarme);
                             }
                         }
@@ -326,8 +331,14 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             jTabbedPane1.setEnabledAt(1, true);
             botaoStatus.setEnabled(true);
             txtPessoas.setEnabled(true);
-            txtPessoas.setText(String.valueOf(cache.getCacheOcupado().get(quartoEmFoco).getNumeroPessoas()));
-            System.out.println("setou pessoas = " + String.valueOf(cache.getCacheOcupado().get(quartoEmFoco).getNumeroPessoas()));
+            if (cache.getCacheOcupado().get(quartoEmFoco).getNumeroPessoas() == 0) {
+                cache.getCacheOcupado().get(quartoEmFoco).setNumeroPessoas(2);
+                txtPessoas.setText(String.valueOf(2));
+
+            } else {
+                txtPessoas.setText(String.valueOf(cache.getCacheOcupado().get(quartoEmFoco).getNumeroPessoas()));
+
+            }
             String[] partes = status.split("-");
             int idLoca = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
             if (idLoca == 0) {
@@ -1626,7 +1637,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         }
 
         // carrega o numero de alarmes ativos ao iniciar o sistema
-        try ( Connection conn = new fazconexao().conectar();  Statement stmt = conn.createStatement();  ResultSet rs = stmt.executeQuery(" SELECT COUNT(*) AS total FROM alarmes ")) {
+        try (Connection conn = new fazconexao().conectar(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(" SELECT COUNT(*) AS total FROM alarmes ")) {
             if (rs.next()) {
                 int alarmesAtivos = rs.getInt("total");
                 config.setAlarmesAtivos(alarmesAtivos);
@@ -1977,6 +1988,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
             }
         }
+        System.out.println("finalizou inicialização do quarto " + quartoEmFoco);
     }
     private void menuVerProdutosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuVerProdutosActionPerformed
         new Produto().setVisible(true);
@@ -2375,7 +2387,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         //lidar com problema de duplo clique
         if (isClickable) {
             isClickable = false;
-
+            System.out.println("está clicavel");
             executaIniciar();
             // Iniciar uma thread para desbloquear o botão após um segundo
             new Thread(() -> {
@@ -2385,8 +2397,12 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                     ex.printStackTrace();
                 } finally {
                     isClickable = true; // Desbloquear o botão
+                    System.out.println("setou is clickable true de novo");
                 }
             }).start();
+        }else{
+            System.out.println("não está clicavel");
+            isClickable = true;
         }
 
     }//GEN-LAST:event_botaoIniciarActionPerformed

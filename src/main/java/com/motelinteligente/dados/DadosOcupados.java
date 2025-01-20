@@ -3,7 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.motelinteligente.dados;
-import java.security.Timestamp;
+import java.sql.Timestamp;
 
 /**
  *
@@ -16,11 +16,18 @@ public class DadosOcupados {
     private int numeroPessoas;
     private float valorAdicional;
     private String periodoQuarto;
+    private java.sql.Timestamp horaEntrada;
 
+    
     public float getValorPeriodo() {
         return valorPeriodo;
     }
-
+    public Timestamp getHoraEntrada() {
+        return horaEntrada;
+    }
+    public void setHoraEntrada(Timestamp recebido) {
+        this.horaEntrada = recebido;
+    }
     public void setValorPeriodo(float valorPeriodo) {
         this.valorPeriodo = valorPeriodo;
     }
@@ -62,7 +69,8 @@ public class DadosOcupados {
     public void setIdLoca(int idLoca) {
         this.idLoca = idLoca;
     }
-    public DadosOcupados(int idLocacao, float valorPeriodo, float valorPernoite, int numeroPessoas, float valorAdicional, String tempo) {
+    public DadosOcupados(java.sql.Timestamp entrada, int idLocacao, float valorPeriodo, float valorPernoite, int numeroPessoas, float valorAdicional, String tempo) {
+        this.horaEntrada = entrada;
         this.idLoca = idLocacao;
         this.valorPeriodo = valorPeriodo;
         this.valorPernoite = valorPernoite;

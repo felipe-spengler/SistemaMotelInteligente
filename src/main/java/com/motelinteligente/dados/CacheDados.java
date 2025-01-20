@@ -14,7 +14,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 /**
  *
@@ -102,8 +105,9 @@ public class CacheDados {
         valAdicional = quartodao.getAdicional(numeroQuarto);
         pessoas = quartodao.getPessoas(numeroQuarto);
         String tempo = quartodao.getPeriodo(numeroQuarto);
-        int idLoca = new fquartos().getIdLocacao(numeroQuarto);
-        DadosOcupados ocupado = new DadosOcupados(idLoca, valPeriodo, valPernoite, pessoas, valAdicional, tempo);
+        int idLoca = quartodao.getIdLocacao(numeroQuarto);
+        Timestamp entrada = quartodao.getHoraInicio(idLoca);
+        DadosOcupados ocupado = new DadosOcupados(entrada, idLoca, valPeriodo, valPernoite, pessoas, valAdicional, tempo);
         cacheOcupado.put(numeroQuarto, ocupado);
         carregaProdutosNegociadosCache(idLoca);
     }
@@ -247,48 +251,82 @@ public class CacheDados {
     }
 
     public void mostrarCacheQuarto() {
+        // Cria o JFrame para exibir os dados
+        JFrame frame = new JFrame("Cache de Quartos");
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setSize(600, 400);
+
+        // Cria um JTextArea para exibir o conteúdo
+        JTextArea textArea = new JTextArea();
+        textArea.setEditable(false);
+
+        // Adiciona os dados da cacheQuarto
         if (cacheQuarto.isEmpty()) {
-            System.out.println("A cache de quartos está vazia.");
+            textArea.append("A cache de quartos está vazia.\n");
         } else {
-            System.out.println("Conteúdo da cache de quartos:");
+            textArea.append("Conteúdo da cache de quartos:\n");
             for (Map.Entry<Integer, CarregaQuarto> entry : cacheQuarto.entrySet()) {
                 int numeroQuarto = entry.getKey();
                 CarregaQuarto quarto = entry.getValue();
-                System.out.println("Número do Quarto: " + numeroQuarto + " Tipo de Quarto: " + quarto.getTipoQuarto());
-                System.out.println("Status do Quarto: " + quarto.getStatusQuarto() + " Hora do Status: " + quarto.getHoraStatus());
-                System.out.println("--------------------------------------");
+                textArea.append("Número do Quarto: " + numeroQuarto + ", Tipo de Quarto: " + quarto.getTipoQuarto() + "\n");
+                textArea.append("Status do Quarto: " + quarto.getStatusQuarto() + ", Hora do Status: " + quarto.getHoraStatus() + "\n");
+                textArea.append("--------------------------------------\n");
             }
         }
+
+        // Adiciona os dados da cacheOcupado
         if (cacheOcupado.isEmpty()) {
-            System.out.println("A cache de quartos está vazia.");
+            textArea.append("\nA cache de quartos OCUPADOS está vazia.\n");
         } else {
-            System.out.println("Conteúdo da cache de OCUPADOS:");
+            textArea.append("\nConteúdo da cache de OCUPADOS:\n");
             for (Map.Entry<Integer, DadosOcupados> entry : cacheOcupado.entrySet()) {
                 int numeroQuarto = entry.getKey();
-                DadosOcupados quarto = entry.getValue();
-                System.out.println("Número do Quarto: " + numeroQuarto);
-                System.out.println("--------------------------------------");
+                textArea.append("Número do Quarto Ocupado: " + numeroQuarto + "\n");
+                textArea.append("--------------------------------------\n");
             }
         }
+
+        // Adiciona o JTextArea a um JScrollPane para suporte a rolagem
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        frame.add(scrollPane);
+
+        // Torna a janela visível
+        frame.setVisible(true);
     }
 
     public void mostrarCacheProdutosVendidos() {
+        // Cria o JFrame para exibir os dados
+        JFrame frame = new JFrame("Cache de Produtos Vendidos");
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setSize(600, 400);
+
+        // Cria um JTextArea para exibir o conteúdo
+        JTextArea textArea = new JTextArea();
+        textArea.setEditable(false);
+
+        // Adiciona os dados da cacheProdutosVendidos
         if (cacheProdutosVendidos.isEmpty()) {
-            System.out.println("A cache de produtos vendidos está vazia.");
+            textArea.append("A cache de produtos vendidos está vazia.\n");
         } else {
-            System.out.println("Conteúdo da cache de produtos vendidos:");
+            textArea.append("Conteúdo da cache de produtos vendidos:\n");
             for (Map.Entry<Integer, List<DadosVendidos>> entry : cacheProdutosVendidos.entrySet()) {
                 int idLocacao = entry.getKey();
                 List<DadosVendidos> produtosVendidos = entry.getValue();
-                System.out.println("ID da Locação: " + idLocacao);
+                textArea.append("ID da Locação: " + idLocacao + "\n");
                 for (DadosVendidos dadosVendidos : produtosVendidos) {
-                    System.out.println("ID do Produto: " + dadosVendidos.idProduto
-                            + ", Quantidade Vendida: " + dadosVendidos.quantidadeVendida);
+                    textArea.append("ID do Produto: " + dadosVendidos.idProduto
+                            + ", Quantidade Vendida: " + dadosVendidos.quantidadeVendida + "\n");
                 }
-                System.out.println("--------------------------------------");
+                textArea.append("--------------------------------------\n");
             }
         }
-        
+
+        // Adiciona o JTextArea a um JScrollPane para suporte a rolagem
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        frame.add(scrollPane);
+
+        // Torna a janela visível
+        frame.setVisible(true);
     }
 
     public static class DadosVendidos {

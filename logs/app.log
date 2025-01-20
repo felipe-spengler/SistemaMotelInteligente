@@ -1,42 +1,96 @@
-2024-12-14 10:39:13 INFO  [Thread-0] c.m.d.MotelInteligenteApplication - Starting MotelInteligenteApplication using Java 21.0.5 with PID 3148 (C:\Users\usuario\Desktop\SistemaMotelInteligente\target\classes started by usuario in C:\Users\usuario\Desktop\SistemaMotelInteligente)
-2024-12-14 10:39:13 DEBUG [Thread-0] c.m.d.MotelInteligenteApplication - Running with Spring Boot v3.3.4, Spring v6.1.13
-2024-12-14 10:39:13 INFO  [Thread-0] c.m.d.MotelInteligenteApplication - No active profile set, falling back to 1 default profile: "default"
-2024-12-14 10:39:15 INFO  [Thread-0] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-0.0.0.0-1521"]
-2024-12-14 10:39:15 INFO  [Thread-0] o.a.catalina.core.StandardService - Starting service [Tomcat]
-2024-12-14 10:39:15 INFO  [Thread-0] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.30]
-2024-12-14 10:39:15 INFO  [Thread-0] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
-2024-12-14 10:39:16 INFO  [Thread-0] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-0.0.0.0-1521"]
-2024-12-14 10:39:16 INFO  [Thread-0] c.m.d.MotelInteligenteApplication - Started MotelInteligenteApplication in 5.69 seconds (process running for 21.167)
-2024-12-14 10:46:02 INFO  [http-nio-0.0.0.0-1521-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
-2024-12-14 10:46:02 INFO  [http-nio-0.0.0.0-1521-exec-1] o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
-2024-12-14 10:46:02 INFO  [http-nio-0.0.0.0-1521-exec-1] o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms
-2024-12-14 10:47:43 INFO  [Thread-0] c.m.d.MotelInteligenteApplication - Starting MotelInteligenteApplication using Java 21.0.5 with PID 10836 (C:\Users\usuario\Desktop\SistemaMotelInteligente\target\classes started by usuario in C:\Users\usuario\Desktop\SistemaMotelInteligente)
-2024-12-14 10:47:43 DEBUG [Thread-0] c.m.d.MotelInteligenteApplication - Running with Spring Boot v3.3.4, Spring v6.1.13
-2024-12-14 10:47:43 INFO  [Thread-0] c.m.d.MotelInteligenteApplication - No active profile set, falling back to 1 default profile: "default"
-2024-12-14 10:47:45 INFO  [Thread-0] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-0.0.0.0-1521"]
-2024-12-14 10:47:45 INFO  [Thread-0] o.a.catalina.core.StandardService - Starting service [Tomcat]
-2024-12-14 10:47:45 INFO  [Thread-0] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.30]
-2024-12-14 10:47:46 INFO  [Thread-0] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
-2024-12-14 10:47:47 INFO  [Thread-0] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-0.0.0.0-1521"]
-2024-12-14 10:47:47 INFO  [Thread-0] c.m.d.MotelInteligenteApplication - Started MotelInteligenteApplication in 6.02 seconds (process running for 15.294)
-2024-12-14 10:54:04 INFO  [Thread-0] c.m.d.MotelInteligenteApplication - Starting MotelInteligenteApplication using Java 21.0.5 with PID 10300 (C:\Users\usuario\Desktop\SistemaMotelInteligente\target\classes started by usuario in C:\Users\usuario\Desktop\SistemaMotelInteligente)
-2024-12-14 10:54:04 DEBUG [Thread-0] c.m.d.MotelInteligenteApplication - Running with Spring Boot v3.3.4, Spring v6.1.13
-2024-12-14 10:54:04 INFO  [Thread-0] c.m.d.MotelInteligenteApplication - No active profile set, falling back to 1 default profile: "default"
-2024-12-14 10:54:07 INFO  [Thread-0] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-0.0.0.0-1521"]
-2024-12-14 10:54:07 INFO  [Thread-0] o.a.catalina.core.StandardService - Starting service [Tomcat]
-2024-12-14 10:54:07 INFO  [Thread-0] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.30]
-2024-12-14 10:54:07 INFO  [Thread-0] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
-2024-12-14 10:54:08 INFO  [Thread-0] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-0.0.0.0-1521"]
-2024-12-14 10:54:08 INFO  [Thread-0] c.m.d.MotelInteligenteApplication - Started MotelInteligenteApplication in 5.804 seconds (process running for 65.428)
-2024-12-14 11:01:27 INFO  [http-nio-0.0.0.0-1521-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
-2024-12-14 11:01:27 INFO  [http-nio-0.0.0.0-1521-exec-2] o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
-2024-12-14 11:01:27 INFO  [http-nio-0.0.0.0-1521-exec-2] o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms
-2024-12-14 11:05:29 INFO  [Thread-0] c.m.d.MotelInteligenteApplication - Starting MotelInteligenteApplication using Java 21.0.5 with PID 9424 (C:\Users\usuario\Desktop\SistemaMotelInteligente\target\classes started by usuario in C:\Users\usuario\Desktop\SistemaMotelInteligente)
-2024-12-14 11:05:29 DEBUG [Thread-0] c.m.d.MotelInteligenteApplication - Running with Spring Boot v3.3.4, Spring v6.1.13
-2024-12-14 11:05:29 INFO  [Thread-0] c.m.d.MotelInteligenteApplication - No active profile set, falling back to 1 default profile: "default"
-2024-12-14 11:05:31 INFO  [Thread-0] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-0.0.0.0-1521"]
-2024-12-14 11:05:31 INFO  [Thread-0] o.a.catalina.core.StandardService - Starting service [Tomcat]
-2024-12-14 11:05:31 INFO  [Thread-0] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.30]
-2024-12-14 11:05:32 INFO  [Thread-0] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
-2024-12-14 11:05:33 INFO  [Thread-0] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-0.0.0.0-1521"]
-2024-12-14 11:05:33 INFO  [Thread-0] c.m.d.MotelInteligenteApplication - Started MotelInteligenteApplication in 5.872 seconds (process running for 22.396)
+2025-01-15 00:31:25 INFO  [Thread-373] c.m.dados.CheckSincronia - Verificando tabela: alarmes
+2025-01-15 00:31:25 INFO  [Thread-373] c.m.dados.CheckSincronia - Verificando tabela: antecipado
+2025-01-15 00:31:25 INFO  [Thread-373] c.m.dados.CheckSincronia - Verificando tabela: caixa
+2025-01-15 00:31:25 INFO  [Thread-373] c.m.dados.CheckSincronia - Verificando tabela: configuracoes
+2025-01-15 00:31:25 INFO  [Thread-373] c.m.dados.CheckSincronia - Verificando tabela: desistencia
+2025-01-15 00:31:25 INFO  [Thread-373] c.m.dados.CheckSincronia - Verificando tabela: funcionario
+2025-01-15 00:31:25 INFO  [Thread-373] c.m.dados.CheckSincronia - Verificando tabela: imagens
+2025-01-15 00:31:25 INFO  [Thread-373] c.m.dados.CheckSincronia - Verificando tabela: justificativa
+2025-01-15 00:31:25 INFO  [Thread-373] c.m.dados.CheckSincronia - Verificando tabela: prevendidos
+2025-01-15 00:31:25 INFO  [Thread-373] c.m.dados.CheckSincronia - Verificando tabela: produtos
+2025-01-15 00:31:25 INFO  [Thread-373] c.m.dados.CheckSincronia - Verificando tabela: quartos
+2025-01-15 00:31:25 INFO  [Thread-373] c.m.dados.CheckSincronia - Verificando tabela: registralimpeza
+2025-01-15 00:31:25 INFO  [Thread-373] c.m.dados.CheckSincronia - Verificando tabela: registralocado
+2025-01-15 00:31:25 INFO  [Thread-373] c.m.dados.CheckSincronia - Verificando tabela: registramanutencao
+2025-01-15 00:31:25 INFO  [Thread-373] c.m.dados.CheckSincronia - Verificando tabela: registrareserva
+2025-01-15 00:31:25 INFO  [Thread-373] c.m.dados.CheckSincronia - Verificando tabela: registravendido
+2025-01-15 00:31:25 INFO  [Thread-373] c.m.dados.CheckSincronia - Verificando tabela: status
+2025-01-15 00:31:25 INFO  [Thread-373] c.m.dados.CheckSincronia - Sincronismo verificado com sucesso!
+2025-01-15 00:46:52 INFO  [http-nio-0.0.0.0-1521-exec-10] c.m.d.MotelInteligenteApplication - Recebeu requisição com corpo: locar 3
+2025-01-15 00:46:52 INFO  [http-nio-0.0.0.0-1521-exec-10] com.motelinteligente.dados.fquartos - Registro inserido com sucesso: ID = 4575, Quarto = 3
+2025-01-15 01:31:24 INFO  [Thread-375] c.m.dados.CheckSincronia - Verificando tabela: alarmes
+2025-01-15 01:31:24 INFO  [Thread-375] c.m.dados.CheckSincronia - Verificando tabela: antecipado
+2025-01-15 01:31:24 INFO  [Thread-375] c.m.dados.CheckSincronia - Verificando tabela: caixa
+2025-01-15 01:31:24 INFO  [Thread-375] c.m.dados.CheckSincronia - Verificando tabela: configuracoes
+2025-01-15 01:31:24 INFO  [Thread-375] c.m.dados.CheckSincronia - Verificando tabela: desistencia
+2025-01-15 01:31:24 INFO  [Thread-375] c.m.dados.CheckSincronia - Verificando tabela: funcionario
+2025-01-15 01:31:24 INFO  [Thread-375] c.m.dados.CheckSincronia - Verificando tabela: imagens
+2025-01-15 01:31:24 INFO  [Thread-375] c.m.dados.CheckSincronia - Verificando tabela: justificativa
+2025-01-15 01:31:24 INFO  [Thread-375] c.m.dados.CheckSincronia - Verificando tabela: prevendidos
+2025-01-15 01:31:24 INFO  [Thread-375] c.m.dados.CheckSincronia - Verificando tabela: produtos
+2025-01-15 01:31:24 INFO  [Thread-375] c.m.dados.CheckSincronia - Verificando tabela: quartos
+2025-01-15 01:31:24 INFO  [Thread-375] c.m.dados.CheckSincronia - Verificando tabela: registralimpeza
+2025-01-15 01:31:24 INFO  [Thread-375] c.m.dados.CheckSincronia - Verificando tabela: registralocado
+2025-01-15 01:31:24 WARN  [Thread-375] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-15 01:31:25 INFO  [Thread-375] c.m.dados.CheckSincronia - Verificando tabela: registramanutencao
+2025-01-15 01:31:25 INFO  [Thread-375] c.m.dados.CheckSincronia - Verificando tabela: registrareserva
+2025-01-15 01:31:25 INFO  [Thread-375] c.m.dados.CheckSincronia - Verificando tabela: registravendido
+2025-01-15 01:31:25 INFO  [Thread-375] c.m.dados.CheckSincronia - Verificando tabela: status
+2025-01-15 01:31:25 WARN  [Thread-375] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-15 01:31:26 INFO  [Thread-375] c.m.dados.CheckSincronia - Os bancos de dados não estão sincronizados e foram corrigidos.
+2025-01-15 02:31:24 INFO  [Thread-376] c.m.dados.CheckSincronia - Verificando tabela: alarmes
+2025-01-15 02:31:24 INFO  [Thread-376] c.m.dados.CheckSincronia - Verificando tabela: antecipado
+2025-01-15 02:31:24 INFO  [Thread-376] c.m.dados.CheckSincronia - Verificando tabela: caixa
+2025-01-15 02:31:24 INFO  [Thread-376] c.m.dados.CheckSincronia - Verificando tabela: configuracoes
+2025-01-15 02:31:24 INFO  [Thread-376] c.m.dados.CheckSincronia - Verificando tabela: desistencia
+2025-01-15 02:31:24 INFO  [Thread-376] c.m.dados.CheckSincronia - Verificando tabela: funcionario
+2025-01-15 02:31:24 INFO  [Thread-376] c.m.dados.CheckSincronia - Verificando tabela: imagens
+2025-01-15 02:31:24 INFO  [Thread-376] c.m.dados.CheckSincronia - Verificando tabela: justificativa
+2025-01-15 02:31:24 INFO  [Thread-376] c.m.dados.CheckSincronia - Verificando tabela: prevendidos
+2025-01-15 02:31:24 INFO  [Thread-376] c.m.dados.CheckSincronia - Verificando tabela: produtos
+2025-01-15 02:31:24 INFO  [Thread-376] c.m.dados.CheckSincronia - Verificando tabela: quartos
+2025-01-15 02:31:24 INFO  [Thread-376] c.m.dados.CheckSincronia - Verificando tabela: registralimpeza
+2025-01-15 02:31:24 INFO  [Thread-376] c.m.dados.CheckSincronia - Verificando tabela: registralocado
+2025-01-15 02:31:24 INFO  [Thread-376] c.m.dados.CheckSincronia - Verificando tabela: registramanutencao
+2025-01-15 02:31:24 INFO  [Thread-376] c.m.dados.CheckSincronia - Verificando tabela: registrareserva
+2025-01-15 02:31:24 INFO  [Thread-376] c.m.dados.CheckSincronia - Verificando tabela: registravendido
+2025-01-15 02:31:24 INFO  [Thread-376] c.m.dados.CheckSincronia - Verificando tabela: status
+2025-01-15 02:31:24 INFO  [Thread-376] c.m.dados.CheckSincronia - Sincronismo verificado com sucesso!
+2025-01-15 03:31:24 INFO  [Thread-377] c.m.dados.CheckSincronia - Verificando tabela: alarmes
+2025-01-15 03:31:24 INFO  [Thread-377] c.m.dados.CheckSincronia - Verificando tabela: antecipado
+2025-01-15 03:31:24 INFO  [Thread-377] c.m.dados.CheckSincronia - Verificando tabela: caixa
+2025-01-15 03:31:24 INFO  [Thread-377] c.m.dados.CheckSincronia - Verificando tabela: configuracoes
+2025-01-15 03:31:24 INFO  [Thread-377] c.m.dados.CheckSincronia - Verificando tabela: desistencia
+2025-01-15 03:31:24 INFO  [Thread-377] c.m.dados.CheckSincronia - Verificando tabela: funcionario
+2025-01-15 03:31:24 INFO  [Thread-377] c.m.dados.CheckSincronia - Verificando tabela: imagens
+2025-01-15 03:31:24 INFO  [Thread-377] c.m.dados.CheckSincronia - Verificando tabela: justificativa
+2025-01-15 03:31:24 INFO  [Thread-377] c.m.dados.CheckSincronia - Verificando tabela: prevendidos
+2025-01-15 03:31:24 INFO  [Thread-377] c.m.dados.CheckSincronia - Verificando tabela: produtos
+2025-01-15 03:31:24 INFO  [Thread-377] c.m.dados.CheckSincronia - Verificando tabela: quartos
+2025-01-15 03:31:24 INFO  [Thread-377] c.m.dados.CheckSincronia - Verificando tabela: registralimpeza
+2025-01-15 03:31:24 INFO  [Thread-377] c.m.dados.CheckSincronia - Verificando tabela: registralocado
+2025-01-15 03:31:24 INFO  [Thread-377] c.m.dados.CheckSincronia - Verificando tabela: registramanutencao
+2025-01-15 03:31:24 INFO  [Thread-377] c.m.dados.CheckSincronia - Verificando tabela: registrareserva
+2025-01-15 03:31:24 INFO  [Thread-377] c.m.dados.CheckSincronia - Verificando tabela: registravendido
+2025-01-15 03:31:24 INFO  [Thread-377] c.m.dados.CheckSincronia - Verificando tabela: status
+2025-01-15 03:31:24 INFO  [Thread-377] c.m.dados.CheckSincronia - Sincronismo verificado com sucesso!
+2025-01-15 03:49:16 INFO  [AWT-EventQueue-0] com.motelinteligente.dados.fquartos - Operação bem-sucedida: UPDATE registralocado SET horafim='2025-01-15 03:48:01.625', horainicio='2025-01-15 00:46:53.0', valorquarto=80.0, valorconsumo=0.0, pagodinheiro=0.0, pagopix=0.0, pagocartao=80.0, idcaixaatual=285 WHERE idlocacao=4575
+2025-01-15 04:31:25 INFO  [Thread-381] c.m.dados.CheckSincronia - Verificando tabela: alarmes
+2025-01-15 04:31:25 INFO  [Thread-381] c.m.dados.CheckSincronia - Verificando tabela: antecipado
+2025-01-15 04:31:25 INFO  [Thread-381] c.m.dados.CheckSincronia - Verificando tabela: caixa
+2025-01-15 04:31:25 INFO  [Thread-381] c.m.dados.CheckSincronia - Verificando tabela: configuracoes
+2025-01-15 04:31:25 INFO  [Thread-381] c.m.dados.CheckSincronia - Verificando tabela: desistencia
+2025-01-15 04:31:25 INFO  [Thread-381] c.m.dados.CheckSincronia - Verificando tabela: funcionario
+2025-01-15 04:31:25 INFO  [Thread-381] c.m.dados.CheckSincronia - Verificando tabela: imagens
+2025-01-15 04:31:25 INFO  [Thread-381] c.m.dados.CheckSincronia - Verificando tabela: justificativa
+2025-01-15 04:31:25 INFO  [Thread-381] c.m.dados.CheckSincronia - Verificando tabela: prevendidos
+2025-01-15 04:31:25 INFO  [Thread-381] c.m.dados.CheckSincronia - Verificando tabela: produtos
+2025-01-15 04:31:25 INFO  [Thread-381] c.m.dados.CheckSincronia - Verificando tabela: quartos
+2025-01-15 04:31:25 INFO  [Thread-381] c.m.dados.CheckSincronia - Verificando tabela: registralimpeza
+2025-01-15 04:31:25 INFO  [Thread-381] c.m.dados.CheckSincronia - Verificando tabela: registralocado
+2025-01-15 04:31:25 WARN  [Thread-381] c.m.dados.CheckSincronia - Discrepância encontrada na tabela %s para ID %s%n
+2025-01-15 04:31:26 INFO  [Thread-381] c.m.dados.CheckSincronia - Verificando tabela: registramanutencao
+2025-01-15 04:31:26 INFO  [Thread-381] c.m.dados.CheckSincronia - Verificando tabela: registrareserva
+2025-01-15 04:31:26 INFO  [Thread-381] c.m.dados.CheckSincronia - Verificando tabela: registravendido
+2025-01-15 04:31:26 INFO  [Thread-381] c.m.dados.CheckSincronia - Verificando tabela: status
+2025-01-15 04:31:26 INFO  [Thread-381] c.m.dados.CheckSincronia - Os bancos de dados não estão sincronizados e foram corrigidos.
