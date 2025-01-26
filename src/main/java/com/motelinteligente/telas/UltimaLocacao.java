@@ -63,8 +63,7 @@ public class UltimaLocacao extends javax.swing.JFrame {
         tabela.getColumn(tabela.getColumnName(4)).setPreferredWidth(120);
 
         // Campos que nunca mudam
-        txtValorQuarto.setEditable(false);
-        txtConsumo.setEditable(false);
+        
         txtTipo.setEditable(false);
         txtNumero.setEditable(false);
         txtValorTotal.setEditable(false);
@@ -73,6 +72,8 @@ public class UltimaLocacao extends javax.swing.JFrame {
         txtNumPessoas.setEditable(false);
 
         // Campos que variam conforme editable
+        txtValorQuarto.setEditable(editable);
+        txtConsumo.setEditable(editable);
         txtAcrescimo.setEditable(editable);
         txtJustificativa.setEditable(editable);
         txtDesconto.setEditable(editable);
@@ -108,13 +109,13 @@ public class UltimaLocacao extends javax.swing.JFrame {
 
                 // Calculando a diferença
                 Duration duracao = Duration.between(inicio, fim);
-                
+
                 // Exibindo a diferença em horas e minutos
                 long horas = duracao.toHours();
                 long minutos = duracao.toMinutes() % 60;
 
                 jLabel2.setText("Permanencia:");
-                txtTipo.setText(horas +":"+ minutos);
+                txtTipo.setText(horas + ":" + minutos);
 
                 tipoQuarto = quartodao.getTipo(numeroQuarto);
                 numPessoas = resultado.getInt("numpessoas");
@@ -392,7 +393,11 @@ public class UltimaLocacao extends javax.swing.JFrame {
                 bt_apagarProdutoActionPerformed(evt);
             }
         });
-
+        txtConsumo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtValorConsumoActionPerformed(evt);
+            }
+        });
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -623,7 +628,14 @@ public class UltimaLocacao extends javax.swing.JFrame {
 
             }
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, e);
+            Throwable cause = e.getCause();
+            if (cause != null) {
+                JOptionPane.showMessageDialog(null, "Erro_SalvarAction: " + cause.getMessage());
+                cause.printStackTrace();
+            } else {
+                JOptionPane.showMessageDialog(null, "Erro_SalvarAction desconhecido: " + e.getMessage());
+                e.printStackTrace();
+            }
         }
     }//GEN-LAST:event_bt_salvarActionPerformed
 
@@ -695,7 +707,7 @@ public class UltimaLocacao extends javax.swing.JFrame {
             link = new fazconexao().conectar();
             String deleteSQL = "DELETE FROM registravendido WHERE idlocacao = ?";
             PreparedStatement deleteStatement = link.prepareStatement(deleteSQL);
-            deleteStatement.setInt(1, idLocacao); // Substitua idLocacao pelo valor correto da sua lógica
+            deleteStatement.setInt(1, idLocacao); 
             int rowsAffected = deleteStatement.executeUpdate();
             link.close();
             deleteStatement.close();
@@ -965,7 +977,9 @@ public class UltimaLocacao extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Somente Desconto ou Acréscimo! Arrume essa bagunça.");
         }
     }
-
+    private void txtValorConsumoActionPerformed(java.awt.event.ActionEvent evt) {
+        atualizaTotal();
+    }
     private void txtNumPessoasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNumPessoasActionPerformed
 
     }//GEN-LAST:event_txtNumPessoasActionPerformed

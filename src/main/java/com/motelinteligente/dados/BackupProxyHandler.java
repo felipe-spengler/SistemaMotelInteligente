@@ -104,7 +104,7 @@ class PreparedStatementProxyHandler implements InvocationHandler {
                 completeSql.append(ch);
             }
         }
-
+        
         return completeSql.toString();
     }
 

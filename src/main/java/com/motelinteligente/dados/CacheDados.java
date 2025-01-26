@@ -18,6 +18,8 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -31,6 +33,7 @@ public class CacheDados {
     public Map<Integer, List<DadosVendidos>> cacheProdutosVendidos = new HashMap<>();
     public Map<Integer, Timestamp> despertador = new HashMap<>();
     public static SerialPort arduinoPort;
+    private static final Logger logger = LoggerFactory.getLogger(fquartos.class);
 
     private CacheDados() {
         // Construtor privado para impedir instâncias diretas
@@ -254,7 +257,7 @@ public class CacheDados {
         // Cria o JFrame para exibir os dados
         JFrame frame = new JFrame("Cache de Quartos");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setSize(600, 400);
+        frame.setSize(800, 600);
 
         // Cria um JTextArea para exibir o conteúdo
         JTextArea textArea = new JTextArea();
@@ -298,7 +301,7 @@ public class CacheDados {
         // Cria o JFrame para exibir os dados
         JFrame frame = new JFrame("Cache de Produtos Vendidos");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setSize(600, 400);
+        frame.setSize(800, 600);
 
         // Cria um JTextArea para exibir o conteúdo
         JTextArea textArea = new JTextArea();
