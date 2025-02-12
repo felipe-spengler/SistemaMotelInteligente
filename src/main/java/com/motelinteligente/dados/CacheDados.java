@@ -115,32 +115,7 @@ public class CacheDados {
         carregaProdutosNegociadosCache(idLoca);
     }
 
-    public void alteraRunning(boolean setar) {
-        Connection link = null;
-        String query = "UPDATE configuracoes SET isRunning = ?";
-
-        try {
-            // Estabelecendo a conexão
-            link = new fazconexao().conectar();
-            // Preparando e executando a consulta
-            try ( PreparedStatement stmt = link.prepareStatement(query)) {
-                stmt.setBoolean(1, setar);
-                stmt.executeUpdate();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            // Fechando a conexão
-            if (link != null) {
-                try {
-                    link.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
+    
     public void carregaProdutosNegociadosCache(int idLoca) {
 
         // Consulta produtos prevendidos no banco de dados e adiciona à cache

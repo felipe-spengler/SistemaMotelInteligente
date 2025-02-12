@@ -1785,16 +1785,44 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 valD = recebidoDin[0];
                 valC = recebidoCredito[0] + recebidoDebito[0];
                 valP = recebidoPix[0];
+                if(valC > 0){
+                    salvaCartao(idLocacao, recebidoCredito[0] , recebidoDebito[0]);
+                }
                 sucesso[0] = true; // Indica que o pagamento foi bem-sucedido
                 dialog.dispose(); // Fecha o JDialog
             } else {
-                JOptionPane.showMessageDialog(null, "Valores divergentes! Total recebido: " + totalRecebido);
+                if(totalRecebido > valorDivida){
+                    //devolver troco
+                    
+                }else{
+                    JOptionPane.showMessageDialog(null, "Valores divergentes! Total recebido: " + totalRecebido);
+
+                }
             }
         });
         dialog.setVisible(true);
 
         return sucesso[0]; // Retorna o status de sucesso do pagamento
     }
+    public void salvaCartao(int idLocacao, float recebidoCredito, float recebidoDebito) {
+    String consultaSQL = "INSERT INTO valorcartao (idlocacao, valorcredito, valordebito) VALUES (?, ?, ?)";
+    
+    try (Connection link = new fazconexao().conectar();
+         PreparedStatement statement = link.prepareStatement(consultaSQL)) {
+        
+        statement.setInt(1, idLocacao);
+        statement.setFloat(2, recebidoCredito);
+        statement.setFloat(3, recebidoDebito);
+
+        int n = statement.executeUpdate();
+        if (n == 0) {
+            JOptionPane.showMessageDialog(null, "Nenhum registro foi inserido.", "Erro", JOptionPane.ERROR_MESSAGE);
+        }
+
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(null, "Erro ao salvar o cartão: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+    }
+}
 
     private void resetarBotoes(JButton... botoes) {
         Dimension buttonSize = new Dimension(120, 40);

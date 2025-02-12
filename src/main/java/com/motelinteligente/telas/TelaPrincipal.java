@@ -39,8 +39,10 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.MouseInfo;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -75,8 +77,6 @@ import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
-import javax.swing.JRootPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
@@ -120,14 +120,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     public TelaPrincipal() {
         initComponents();
         inicializarPopupMenu();
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            try {
-                CacheDados cache = CacheDados.getInstancia();
-                cache.alteraRunning(false);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }));
+
         // Inicializa o BackupExecutor
         new BackupExecutor().start();
         CheckSincronia checkSincronia = new CheckSincronia();
@@ -2161,7 +2154,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         if (confirmed == JOptionPane.YES_OPTION) {
             CacheDados cache = CacheDados.getInstancia();
-            cache.alteraRunning(false);
             setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             dispose();  // Fecha a janela e chama windowClosed
             System.exit(0);
@@ -2400,9 +2392,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                     System.out.println("setou is clickable true de novo");
                 }
             }).start();
-        }else{
-            System.out.println("não está clicavel");
+        } else {
             isClickable = true;
+            System.out.println("setou is clickable true de novo");
         }
 
     }//GEN-LAST:event_botaoIniciarActionPerformed
@@ -2420,8 +2412,12 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                     ex.printStackTrace();
                 } finally {
                     isClickable = true; // Desbloquear o botão
+                    System.out.println("setou is clickable true de novo");
                 }
             }).start();
+        } else {
+            isClickable = true;
+            System.out.println("setou is clickable true de novo");
         }
     }//GEN-LAST:event_botaoEncerrarActionPerformed
 
@@ -2505,13 +2501,20 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
     }//GEN-LAST:event_bt_AntecipadoActionPerformed
     private void criarTelaSelecaoPagamento(int idLocacao) {
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(5, 1));
+        JDialog dialog = new JDialog();
+        dialog.setTitle("Selecione o Tipo de Pagamento");
+        dialog.setModal(true);
+        dialog.setSize(300, 300);
+        dialog.setResizable(false);
+        dialog.setLocationRelativeTo(null);
 
-        JButton botaoCredito = new JButton("Crédito (C)");
-        JButton botaoDebito = new JButton("Débito (D)");
-        JButton botaoDinheiro = new JButton("Dinheiro (O)");
-        JButton botaoPix = new JButton("Pix (P)");
+        JPanel panel = new JPanel(new GridLayout(4, 1, 10, 10));
+        panel.setBackground(Color.DARK_GRAY);
+
+        JButton botaoCredito = criarBotao("Crédito (C)", 'C');
+        JButton botaoDebito = criarBotao("Débito (D)", 'D');
+        JButton botaoDinheiro = criarBotao("Dinheiro (O)", 'O');
+        JButton botaoPix = criarBotao("Pix (P)", 'P');
 
         panel.add(botaoCredito);
         panel.add(botaoDebito);
@@ -2521,8 +2524,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         ActionListener selecionarMetodo = e -> {
             JButton source = (JButton) e.getSource();
             String tipoPagamentoEscolhido = source.getText().substring(source.getText().indexOf("(") + 1, source.getText().indexOf(")"));
-            float valorRecebido = carregarValorRecebido(tipoPagamentoEscolhido, idLocacao); // Carrega o valor do banco
+            float valorRecebido = carregarValorRecebido(tipoPagamentoEscolhido, idLocacao);
             criarTelaEntradaValor(valorRecebido, tipoPagamentoEscolhido, idLocacao);
+            dialog.dispose(); // Fecha a tela após a seleção
         };
 
         botaoCredito.addActionListener(selecionarMetodo);
@@ -2530,41 +2534,135 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         botaoDinheiro.addActionListener(selecionarMetodo);
         botaoPix.addActionListener(selecionarMetodo);
 
-        JOptionPane.showMessageDialog(null, panel, "Selecione o Tipo de Pagamento", JOptionPane.PLAIN_MESSAGE);
+        // Adicionar atalhos de teclado
+        configurarAtalho(panel, "O", botaoDinheiro);
+        configurarAtalho(panel, "P", botaoPix);
+        configurarAtalho(panel, "C", botaoCredito);
+        configurarAtalho(panel, "D", botaoDebito);
+
+        InputMap inputMap = panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap actionMap = panel.getActionMap();
+
+        inputMap.put(KeyStroke.getKeyStroke("ESCAPE"), "fecharTela");
+        actionMap.put("fecharTela", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dialog.dispose(); // Fecha a tela quando ESC é pressionado
+            }
+        });
+        dialog.add(panel);
+        dialog.setVisible(true);
     }
+
+    private JButton criarBotao(String texto, char mnemonic) {
+        JButton botao = new JButton(texto);
+        botao.setMnemonic(mnemonic);
+        botao.setPreferredSize(new Dimension(80, 40)); // Largura 80, altura 40
+        botao.setBackground(Color.BLACK); // Fundo preto
+        botao.setForeground(Color.WHITE); // Texto branco
+        botao.setFocusPainted(false);
+        return botao;
+    }
+
+    private void configurarAtalho(JComponent component, String tecla, JButton botao) {
+        InputMap inputMap = component.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap actionMap = component.getActionMap();
+        inputMap.put(KeyStroke.getKeyStroke(tecla), tecla);
+        actionMap.put(tecla, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                botao.doClick(); // Simula o clique no botão
+            }
+        });
+    }
+
     private void criarTelaEntradaValor(float valorRecebido, String tipoPago, int idLocacao) {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
-        String recebido = null;
-        // Determina o tipo de pagamento correspondente
-        switch (tipoPago) {
-            case "C" -> recebido = "credito";
-            case "D" -> recebido = "debito";
-            case "O" -> recebido = "dinheiro";
-            case "P" -> recebido = "pix";
-        }
-        
-        JLabel label = new JLabel(String.format("Havia recebido: R$ %.2f em %s\nDigite o valor total já recebido em %s:", valorRecebido, recebido, recebido));
+        JDialog dialog = new JDialog();
+        dialog.setTitle("Entrada de Valor");
+        dialog.setModal(true);
+        dialog.setSize(450, 300);
+        dialog.setResizable(false);
+        dialog.setLocationRelativeTo(null);
+
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+
+        String recebido = switch (tipoPago) {
+            case "C" ->
+                "credito";
+            case "D" ->
+                "debito";
+            case "O" ->
+                "dinheiro";
+            case "P" ->
+                "pix";
+            default ->
+                "desconhecido";
+        };
+
+        JLabel label = new JLabel("<html><center><b>Havia recebido:</b> R$ " + String.format("%.2f", valorRecebido)
+                + " em " + recebido + "<br><br>Digite o valor total já recebido em " + recebido + ":</center></html>");
+        label.setFont(new Font("Arial", Font.PLAIN, 14));
+
         JTextField valorField = new JTextField(10);
+        valorField.setFont(new Font("Arial", Font.BOLD, 16));
+
         JButton botaoSalvar = new JButton("Salvar");
+        botaoSalvar.setPreferredSize(new Dimension(100, 40));
+        botaoSalvar.setBackground(new Color(30, 144, 255)); // Azul forte
+        botaoSalvar.setForeground(Color.WHITE);
+        botaoSalvar.setFocusPainted(false);
+        botaoSalvar.setFont(new Font("Arial", Font.BOLD, 14));
 
-        panel.add(label, BorderLayout.NORTH);
-        panel.add(valorField, BorderLayout.CENTER);
-        panel.add(botaoSalvar, BorderLayout.SOUTH);
+        botaoSalvar.addActionListener(e -> salvarValor(valorField, tipoPago, idLocacao, dialog));
 
-        botaoSalvar.addActionListener(e -> {
-            String valorInserido = valorField.getText().replace(",", ".");
-            try {
-                float valor = Float.parseFloat(valorInserido);
-                // Salvar no banco
-                salvaAntecipado(idLocacao, tipoPago, valor);
-                JOptionPane.showMessageDialog(null, "Valor salvo com sucesso!");
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(null, "Valor inválido. Insira um número válido.");
+        // Mapeando Enter para o botão salvar
+        InputMap inputMap = valorField.getInputMap(JComponent.WHEN_FOCUSED);
+        ActionMap actionMap = valorField.getActionMap();
+        inputMap.put(KeyStroke.getKeyStroke("ENTER"), "salvar");
+        actionMap.put("salvar", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                botaoSalvar.doClick();
+            }
+        });
+        // Mapeando ESC para fechar a tela mesmo com o campo focado
+        inputMap.put(KeyStroke.getKeyStroke("ESCAPE"), "fechar");
+        actionMap.put("fechar", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dialog.dispose(); // Fecha a tela
             }
         });
 
-        JOptionPane.showMessageDialog(null, panel, "Entrada de Valor", JOptionPane.PLAIN_MESSAGE);
+        panel.add(label, gbc);
+        gbc.gridy++;
+        panel.add(valorField, gbc);
+        gbc.gridy++;
+        panel.add(botaoSalvar, gbc);
+
+        dialog.add(panel);
+        dialog.setVisible(true);
+
+        // Definir o foco no campo de texto ao abrir a tela
+        SwingUtilities.invokeLater(valorField::requestFocusInWindow);
+        valorField.setText(null);
+    }
+
+    private void salvarValor(JTextField valorField, String tipoPagamento, int idLocacao, JDialog dialog) {
+        String valorInserido = valorField.getText().replace(",", ".");
+        try {
+            float valor = Float.parseFloat(valorInserido);
+            salvaAntecipado(idLocacao, tipoPagamento, valor);
+            JOptionPane.showMessageDialog(dialog, "Valor salvo com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+            dialog.dispose();
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(dialog, "Valor inválido. Insira um número válido.", "Erro", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private static float carregarValorRecebido(String tipoPagamento, int idLocacao) {
@@ -2572,10 +2670,14 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         // Determina o tipo de pagamento correspondente
         switch (tipoPagamento) {
-            case "C" -> recebido = "credito";
-            case "D" -> recebido = "debito";
-            case "O" -> recebido = "dinheiro";
-            case "P" -> recebido = "pix";
+            case "C" ->
+                recebido = "credito";
+            case "D" ->
+                recebido = "debito";
+            case "O" ->
+                recebido = "dinheiro";
+            case "P" ->
+                recebido = "pix";
         }
 
         String consultaSQL = "SELECT * FROM antecipado WHERE idlocacao = ? AND tipo = ?";
@@ -2704,6 +2806,19 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     }
 
     public void salvaAntecipado(int idLocacao, String tipo, float valor) {
+        tipo = switch (tipo) {
+            case "C" ->
+                "credito";
+            case "D" ->
+                "debito";
+            case "O" ->
+                "dinheiro";
+            case "P" ->
+                "pix";
+            default ->
+                "desconhecido";
+        };
+
         Connection link = null;
         try {
             link = new fazconexao().conectar();

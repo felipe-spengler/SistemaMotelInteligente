@@ -617,7 +617,6 @@ public class UltimaLocacao extends javax.swing.JFrame {
             } else {
                 JOptionPane.showMessageDialog(null, "Valor recebido é diferente do valor da conta!");
             }
-
             // Salvar os dados se todos os critérios forem atendidos
             if (valores && recebido && positivos) {
                 if (valorDesconto >= 0 && valorAcrescimo == 0 || (valorAcrescimo >= 0 && valorDesconto == 0)) {
@@ -630,10 +629,10 @@ public class UltimaLocacao extends javax.swing.JFrame {
         } catch (Exception e) {
             Throwable cause = e.getCause();
             if (cause != null) {
-                JOptionPane.showMessageDialog(null, "Erro_SalvarAction: " + cause.getMessage());
+                JOptionPane.showMessageDialog(null, "Erro_Salvar Action: " + cause.getMessage());
                 cause.printStackTrace();
             } else {
-                JOptionPane.showMessageDialog(null, "Erro_SalvarAction desconhecido: " + e.getMessage());
+                JOptionPane.showMessageDialog(null, "Erro_Salvar Action desconhecido: " + e.getMessage());
                 e.printStackTrace();
             }
         }
@@ -680,14 +679,13 @@ public class UltimaLocacao extends javax.swing.JFrame {
                     PreparedStatement statementInsertJustificativa = link.prepareStatement(insertJustificativaSQL);
                     statementInsertJustificativa.setInt(1, idLocacao); // Substitua idLocacao pelo valor correto da sua lógica
                     statementInsertJustificativa.setString(2, tipo);
-                    statementInsertJustificativa.setFloat(3, Float.parseFloat(txtDesconto.getText().replace(',', '.')));
-                    statementInsertJustificativa.setFloat(4, Float.parseFloat(txtAcrescimo.getText().replace(',', '.')));
-                    statementInsertJustificativa.setString(5, txtJustificativa.getText());
+                    statementInsertJustificativa.setFloat(3, valorSetar);
+                    statementInsertJustificativa.setString(4, txtJustificativa.getText());
                     statementInsertJustificativa.executeUpdate();
                 }
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "SalvaDados: " + e);
+            JOptionPane.showMessageDialog(null, "Erro SalvaDados: " + e);
         } finally {
             if (link != null) {
                 try {
