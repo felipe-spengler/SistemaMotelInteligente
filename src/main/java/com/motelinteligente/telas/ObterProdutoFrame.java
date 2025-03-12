@@ -1,4 +1,5 @@
 package com.motelinteligente.telas;
+
 import com.motelinteligente.dados.CacheDados;
 import com.motelinteligente.dados.CacheDados.DadosVendidos;
 import com.motelinteligente.dados.DadosOcupados;
@@ -21,11 +22,12 @@ public class ObterProdutoFrame extends JFrame {
     private JSpinner spinnerQuantidade;
     private DefaultTableModel modelo;
     private int numeroQuarto;
+    private Runnable callback; // Função que será chamada após inserir o produto
 
-    public ObterProdutoFrame(DefaultTableModel modelo, int numeroQuarto) {
+    public ObterProdutoFrame(DefaultTableModel modelo, int numeroQuarto, Runnable callback) {
         this.modelo = modelo;
         this.numeroQuarto = numeroQuarto;
-
+        this.callback = callback;
         setTitle("Inserir Produto");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(400, 150);
@@ -36,12 +38,12 @@ public class ObterProdutoFrame extends JFrame {
         JLabel lblCodProduto = new JLabel("Cód Produto:");
         lblCodProduto.setForeground(Color.WHITE);
         lblCodProduto.setFont(new Font("Arial", Font.PLAIN, 14));
-        
+
         txtCodProduto = new JTextField(8);
         txtCodProduto.setFont(new Font("Arial", Font.PLAIN, 14));
         txtCodProduto.setMargin(new Insets(2, 2, 2, 2)); // Reduzir as margens internas
         txtCodProduto.setPreferredSize(new Dimension(txtCodProduto.getPreferredSize().width, 25)); // Definir a altura
-        
+
         lblDigitado = new JLabel();
         lblDigitado.setForeground(Color.WHITE);
         lblDigitado.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -49,18 +51,21 @@ public class ObterProdutoFrame extends JFrame {
         txtCodProduto.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                if(!txtCodProduto.getText().isEmpty())
-                atualizarDescricaoProduto();
+                if (!txtCodProduto.getText().isEmpty()) {
+                    atualizarDescricaoProduto();
+                }
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                if(!txtCodProduto.getText().isEmpty())
-                atualizarDescricaoProduto();
+                if (!txtCodProduto.getText().isEmpty()) {
+                    atualizarDescricaoProduto();
+                }
             }
 
             @Override
-            public void changedUpdate(DocumentEvent e) {}
+            public void changedUpdate(DocumentEvent e) {
+            }
 
             private void atualizarDescricaoProduto() {
                 String descricao = new fprodutos().getDescicao(txtCodProduto.getText());
@@ -77,13 +82,13 @@ public class ObterProdutoFrame extends JFrame {
         JLabel lblQuantidade = new JLabel("Quantidade:");
         lblQuantidade.setForeground(Color.WHITE);
         lblQuantidade.setFont(new Font("Arial", Font.PLAIN, 14));
-        
+
         spinnerQuantidade = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1));
         spinnerQuantidade.setFont(new Font("Arial", Font.PLAIN, 14));
         JSpinner.DefaultEditor spinnerEditor = (JSpinner.DefaultEditor) spinnerQuantidade.getEditor();
         spinnerEditor.getTextField().setMargin(new Insets(2, 2, 2, 2)); // Reduzir as margens internas do campo de texto
         spinnerQuantidade.setPreferredSize(new Dimension(spinnerQuantidade.getPreferredSize().width, 25)); // Definir a altura
-        
+
         add(lblQuantidade);
         add(spinnerQuantidade);
 
@@ -101,7 +106,7 @@ public class ObterProdutoFrame extends JFrame {
 
         add(btnVoltar);
         add(btnInserir);
-        
+
         txtCodProduto.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -122,12 +127,11 @@ public class ObterProdutoFrame extends JFrame {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    inserirProduto(); 
+                    inserirProduto();
                 }
             }
         });
-        
-        
+
         setLocationRelativeTo(null); // Centralizar a tela
         setVisible(true);
     }
@@ -141,32 +145,46 @@ public class ObterProdutoFrame extends JFrame {
             String texto = produtodao.getDescicao(idProdutoStr);
             if (texto != null) {
                 if (quantidade != 0) {
+                    boolean inseriu = false;
                     float valor = produtodao.getValorProduto(Integer.parseInt(idProdutoStr));
                     float valorSoma = valor * quantidade;
-                    CacheDados cache = CacheDados.getInstancia();
-                    int idLoca = cache.getCacheOcupado().get(numeroQuarto).getIdLoca();
-                    if (idLoca == 0) {
-                        DadosOcupados quartoOcupado = cache.getCacheOcupado().get(numeroQuarto);
-                        int novoID = new fquartos().getIdLocacao(numeroQuarto);
-                        quartoOcupado.setIdLoca(novoID);
-                        cache.getCacheOcupado().put(numeroQuarto, quartoOcupado);
 
-                        cache.carregaProdutosNegociadosCache(novoID);
-                    }
-                    modelo.addRow(new Object[]{
-                        quantidade,
-                        texto,
-                        valor,
-                        valorSoma
-                    });
-                    List<DadosVendidos> produtosVendidos = new ArrayList<>();
-                    if (cache.cacheProdutosVendidos.containsKey(idLoca)) {
-                        produtosVendidos = cache.cacheProdutosVendidos.get(idLoca);
-                    }
-                    produtosVendidos.add(new DadosVendidos(Integer.valueOf(idProdutoStr), Integer.valueOf(quantidade)));
-                    cache.cacheProdutosVendidos.put(idLoca, produtosVendidos);
+                    if (numeroQuarto != 0) {
+                        CacheDados cache = CacheDados.getInstancia();
+                        int idLoca = cache.getCacheOcupado().get(numeroQuarto).getIdLoca();
+                        if (idLoca == 0) {
+                            DadosOcupados quartoOcupado = cache.getCacheOcupado().get(numeroQuarto);
+                            int novoID = new fquartos().getIdLocacao(numeroQuarto);
+                            quartoOcupado.setIdLoca(novoID);
+                            if (numeroQuarto != 0) {
+                                cache.getCacheOcupado().put(numeroQuarto, quartoOcupado);
+                            }
 
-                    produtodao.inserirPrevendido(idLoca, Integer.valueOf(idProdutoStr), Integer.valueOf(quantidade));
+                            cache.carregaProdutosNegociadosCache(novoID);
+                        }
+                        List<DadosVendidos> produtosVendidos = new ArrayList<>();
+                        if (cache.cacheProdutosVendidos.containsKey(idLoca)) {
+                            produtosVendidos = cache.cacheProdutosVendidos.get(idLoca);
+                        }
+                        produtosVendidos.add(new DadosVendidos(Integer.valueOf(idProdutoStr), Integer.valueOf(quantidade)));
+                        cache.cacheProdutosVendidos.put(idLoca, produtosVendidos);
+
+                        
+                        produtodao.inserirPrevendido(idLoca, Integer.valueOf(idProdutoStr), Integer.valueOf(quantidade));
+                        
+                        inseriu = true;
+                    } else {
+                        modelo.addRow(new Object[]{
+                            idProdutoStr,
+                            quantidade,
+                            texto,
+                            valor,
+                            valorSoma
+                        });
+                        inseriu = true;
+                        System.out.println("produto inserido");
+                    }
+                    if(inseriu) callback.run(); 
                     this.dispose();
                 } else {
                     JOptionPane.showMessageDialog(rootPane, "Quantidade inválida!");
@@ -187,8 +205,6 @@ public class ObterProdutoFrame extends JFrame {
             return false;
         }
     }
-    public static void main(String args[]){
-        DefaultTableModel modelo = null;
-        new ObterProdutoFrame( modelo, 2);
-    }
+
+    
 }

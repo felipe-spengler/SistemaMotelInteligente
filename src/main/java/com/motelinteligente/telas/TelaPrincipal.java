@@ -79,6 +79,7 @@ import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -93,6 +94,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private boolean isClickable = true;
     private Timer alarmTimer; // Timer para verificar os alarmes
     private long lastUpdate = 0;
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(TelaPrincipal.class);
     // Intervalo mínimo entre execuções em milissegundos
     private static final long UPDATE_INTERVAL = 1000; // 1 segundo
 
@@ -212,6 +214,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
                         // Comparar hora e minuto
                         if (horaAtual == horaAlarme && minutoAtual == minutoAlarme) {
+                            logger.warn("Alarme ID: " + idAlarme + " disparando agora. "
+                                        + " Horário atual: " + alarmeCalendar);
                             showAlarmAlert(idAlarme, descricao); // Chama a função para mostrar o alerta
                         }
 
@@ -232,7 +236,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                             String horarioAtual = sdf.format(agora.getTime());
                             String horarioAlarme = sdf.format(alarmeCalendar.getTime());
                             if (!(diferencaMillis <= quinzeMinutosMillis)) {
-                                System.out.println("Alarme ID: " + idAlarme
+                                logger.warn("Alarme ID: " + idAlarme
                                         + " já passou mais de 5 minutos - deve remover. "
                                         + "Horário atual: " + horarioAtual
                                         + ", Horário do alarme: " + horarioAlarme);
@@ -262,6 +266,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 "Atenção!",
                 JOptionPane.WARNING_MESSAGE
         );
+        
         soundPlayer.stopSound(); // Para o som quando o alerta é fechado
         new FAlarmes().removeAlarmFromDatabase(idAlarme);
     }
@@ -342,8 +347,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 cache.carregaProdutosNegociadosCache(novoID);
             }
             //insere prevendidos tabela
-            populaPrevendidos(idLoca, modelo);
-            populaAntecipado(idLoca);
+            populaPrevendidos();
+            atualizaAntecipado(idLoca);
             if (partes[1].equals("pernoite")) {
                 this.painelSecundario.setBackground(Color.MAGENTA);
             } else if (partes[1].equals("periodo")) {
@@ -362,56 +367,12 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         painelSecundario.repaint();
     }
 
-    public void populaAntecipado(int locacao) {
-        List<Antecipado> antecipados = new ArrayList<>();
-        Connection link = null;
-        float jaRecebeu = 0;
-        try {
-            link = new fazconexao().conectar();
-            // Consulta SQL para buscar registros da tabela "antecipado" para a locação especificada
-            String selectSQL = "SELECT tipo, valor, hora FROM antecipado WHERE idlocacao = ?";
-            PreparedStatement preparedStatement = link.prepareStatement(selectSQL);
-            preparedStatement.setInt(1, locacao);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            // Itera sobre os resultados da consulta
-            while (resultSet.next()) {
-
-                String tipo = resultSet.getString("tipo");
-                float valor = resultSet.getFloat("valor");
-                Timestamp hora = resultSet.getTimestamp("hora");
-
-                // Cria o objeto Antecipado para cada registro retornado
-                if (tipo.equals("desconto")) {
-                    txtDescontoNegociado.setText("R$ " + valor);
-                } else {
-                    jaRecebeu += valor;
-                }
-
-            }
-            txtAntecipado.setText("R$ " + jaRecebeu);
-            // Fecha os recursos
-            resultSet.close();
-            preparedStatement.close();
-            link.close();
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Erro ao buscar dados antecipados: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
-        } finally {
-            try {
-                if (link != null && !link.isClosed()) {
-                    link.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-
-        // Retorna a lista de pagamentos antecipados
-    }
-
-    public void populaPrevendidos(int locacao, DefaultTableModel modelo) {
+    
+    public void populaPrevendidos( ) {
+        DefaultTableModel modelo = (DefaultTableModel) tabela1.getModel();
         CacheDados cache = CacheDados.getInstancia();
+        modelo.setNumRows(0);
+        int locacao = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
         float totalVendido = 0;
         // Verifica se a cache contém produtos vendidos para essa locação
         if (cache.cacheProdutosVendidos.containsKey(locacao)) {
@@ -2126,12 +2087,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         }
     }
 
-    private void obterProduto() {
-        new ObterProdutoFrame((DefaultTableModel) tabela1.getModel(), quartoEmFoco);
-        tabela1.repaint();
-        focoQuarto();
-
-    }
+   
     private void menuResBackupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuResBackupActionPerformed
         CacheDados cache = CacheDados.getInstancia();
         cache.mostrarCacheQuarto();
@@ -2182,7 +2138,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     }//GEN-LAST:event_txtAntecipadoActionPerformed
 
     private void bt_inserirProdutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_inserirProdutoActionPerformed
-        obterProduto();
+        new ObterProdutoFrame((DefaultTableModel) tabela1.getModel(), quartoEmFoco, this::populaPrevendidos);
     }//GEN-LAST:event_bt_inserirProdutoActionPerformed
 
     private void bt_apagarProdutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_apagarProdutoActionPerformed
@@ -2192,7 +2148,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             String desc = modelo.getValueAt(linhaSelecionada, 1).toString();
             int qntVendida = Integer.valueOf(modelo.getValueAt(linhaSelecionada, 0).toString());
             modelo.removeRow(linhaSelecionada);
-            new fprodutos().removePreVendido(quartoEmFoco, desc);
+            new fprodutos().removePreVendido(quartoEmFoco, desc, qntVendida);
             JOptionPane.showMessageDialog(null, "Excluido com sucesso");
 
             //remove da cache tbm
@@ -2207,23 +2163,29 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
                 cache.carregaProdutosNegociadosCache(novoID);
             }
-            List<DadosVendidos> produtosVendidos = new ArrayList<>();
             int limitador = 0;
+            float valorProdutos = 0;
             if (cache.cacheProdutosVendidos.containsKey(idLoca)) {
+                List<DadosVendidos> produtosVendidos = new ArrayList<>(cache.cacheProdutosVendidos.get(idLoca)); // Obtem a lista da cache
                 // Itera sobre a lista usando um índice para poder remover um item
                 for (int i = 0; i < produtosVendidos.size(); i++) {
                     DadosVendidos dados = produtosVendidos.get(i);
-                    if (dados.idProduto == idProduto && dados.quantidadeVendida == qntVendida) {
+                    if (dados.idProduto == idProduto && dados.quantidadeVendida == qntVendida && limitador == 0) {
                         produtosVendidos.remove(i); // Remove o item da lista
+                        System.out.println("removendo produto " + idProduto);
                         limitador++;
-                        break; // Sai do loop após remover o item desejado
+                        
+                    }else{
+                        valorProdutos+= dados.quantidadeVendida + new fprodutos().getValorProduto(idProduto);
                     }
                 }
-
+                lblValorConsumo.setText(String.valueOf(valorProdutos));
+                System.out.println("saiu do for");
                 // Verifica se a lista ficou vazia
                 if (produtosVendidos.isEmpty()) {
                     // Remove a entrada correspondente da cache
                     cache.cacheProdutosVendidos.remove(idLoca);
+                    System.out.println("lista é vazia");
                 } else {
                     // Atualiza a lista na cache
                     cache.cacheProdutosVendidos.put(idLoca, produtosVendidos);
@@ -2498,8 +2460,53 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         CacheDados cache = CacheDados.getInstancia();
         int idLocacao = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
         criarTelaSelecaoPagamento(idLocacao);
+        // aqui atualiza o valor do txtAntecipado
+        atualizaAntecipado(idLocacao);
 
     }//GEN-LAST:event_bt_AntecipadoActionPerformed
+    public void atualizaAntecipado(int locacao) {
+        List<Antecipado> antecipados = new ArrayList<>();
+        Connection link = null;
+        float jaRecebeu = 0;
+        float valorDesconto = 0;
+        try {
+            link = new fazconexao().conectar();
+            // Consulta SQL para buscar registros da tabela "antecipado" para a locação especificada
+            String selectSQL = "SELECT tipo, valor, hora FROM antecipado WHERE idlocacao = ?";
+            PreparedStatement preparedStatement = link.prepareStatement(selectSQL);
+            preparedStatement.setInt(1, locacao);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            // Itera sobre os resultados da consulta
+            while (resultSet.next()) {
+                String tipo = resultSet.getString("tipo");
+                float valor = resultSet.getFloat("valor");
+                // Cria o objeto Antecipado para cada registro retornado
+                if (tipo.equals("desconto")) {
+                    valorDesconto += valor;
+                } else {
+                    jaRecebeu += valor;
+                }
+            }
+            txtAntecipado.setText(String.format("R$ %.2f", jaRecebeu));
+            txtDescontoNegociado.setText(String.format("R$ %.2f", valorDesconto));
+            // Fecha os recursos
+            resultSet.close();
+            preparedStatement.close();
+            link.close();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao buscar dados antecipados: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        } finally {
+            try {
+                if (link != null && !link.isClosed()) {
+                    link.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
     private void criarTelaSelecaoPagamento(int idLocacao) {
         JDialog dialog = new JDialog();
         dialog.setTitle("Selecione o Tipo de Pagamento");
@@ -2598,10 +2605,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 "debito";
             case "O" ->
                 "dinheiro";
-            case "P" ->
-                "pix";
             default ->
-                "desconhecido";
+                "pix";
+            
         };
 
         JLabel label = new JLabel("<html><center><b>Havia recebido:</b> R$ " + String.format("%.2f", valorRecebido)
@@ -2816,33 +2822,38 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             case "P" ->
                 "pix";
             default ->
-                "desconhecido";
+                "desconto";
         };
-
+        configGlobal config = configGlobal.getInstance();
+        int idCaixaatual = config.getCaixa();
+                
         Connection link = null;
         try {
             link = new fazconexao().conectar();
             String currentTime = new java.sql.Timestamp(System.currentTimeMillis()).toString();
 
             // Primeiro, tenta atualizar um registro existente
-            String updateSQL = "UPDATE antecipado SET valor = ?, hora = ? WHERE idlocacao = ? AND tipo = ?";
+            String updateSQL = "UPDATE antecipado SET valor = ?, hora = ?, idcaixaatual = ?  WHERE idlocacao = ? AND tipo = ?";
             PreparedStatement updateStatement = link.prepareStatement(updateSQL);
             updateStatement.setFloat(1, valor);
             updateStatement.setString(2, currentTime); // Adiciona a hora atual
-            updateStatement.setInt(3, idLocacao);
-            updateStatement.setString(4, tipo);
+            updateStatement.setInt(3, idCaixaatual);
+            updateStatement.setInt(4, idLocacao);
+            updateStatement.setString(5, tipo);
+            
 
             int rowsUpdated = updateStatement.executeUpdate();
             updateStatement.close();
 
             // Se nenhum registro foi atualizado, faz a inserção
             if (rowsUpdated == 0) {
-                String insertSQL = "INSERT INTO antecipado (idlocacao, tipo, valor, hora) VALUES (?, ?, ?, ?)";
+                String insertSQL = "INSERT INTO antecipado (idlocacao, tipo, valor, hora , idcaixaatual) VALUES (?, ?, ?, ?, ?)";
                 PreparedStatement insertStatement = link.prepareStatement(insertSQL);
                 insertStatement.setInt(1, idLocacao);
                 insertStatement.setString(2, tipo);
                 insertStatement.setFloat(3, valor);
                 insertStatement.setString(4, currentTime); // Adiciona a hora atual
+                insertStatement.setInt(5, idCaixaatual);
                 insertStatement.executeUpdate();
                 insertStatement.close();
             }

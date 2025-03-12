@@ -531,11 +531,9 @@ public class fquartos {
 
         // Consulta para verificar o horainicio atual no banco
         String verificaSQL = "SELECT horainicio FROM registralocado WHERE idlocacao = ?";
-
         Connection link = null;
         PreparedStatement statement = null;
         ResultSet resultSet = null;
-
         try {
             // Conectar ao banco
             link = new fazconexao().conectar();
@@ -545,19 +543,8 @@ public class fquartos {
             statement.setInt(1, idPassado);
             resultSet = statement.executeQuery();
 
-            boolean horarioDivergente = false;
-            Timestamp horainicioBanco = null;
-
-            if (resultSet.next()) {
-                horainicioBanco = resultSet.getTimestamp("horainicio");
-
-                // Verifica se o horainicio passado é diferente do registrado
-                if (!horaInicio.equals(horainicioBanco)) {
-                    horarioDivergente = true;
-                    logger.error("ERRO: HORAINICIO DIVERGENTE DETECTADO! BANCO = " + horainicioBanco + ", RECEBIDO = " + horaInicio);
-                }
-            } else {
-                logger.warn("AVISO: ID DE LOCAÇÃO NÃO ENCONTRADO NO BANCO: " + idPassado);
+            if (!resultSet.next()) {
+                logger.warn("ERROR: ID DE LOCAÇÃO NÃO ENCONTRADO NO BANCO: " + idPassado);
             }
 
             // Atualiza o registro, independente da divergência
@@ -575,12 +562,7 @@ public class fquartos {
 
             int n = statement.executeUpdate();
 
-            if (n != 0) {
-                if (horarioDivergente) {
-                    logger.error("ATUALIZAÇÃO REALIZADA COM HORAINICIO DIVERGENTE PARA O ID: " + idPassado);
-                }
-                logger.info("Operação bem-sucedida: " + consultaSQL);
-            } else {
+            if (n == 0) {
                 logger.warn("Nenhuma linha foi atualizada: " + consultaSQL);
             }
         } catch (Exception e) {
@@ -624,7 +606,7 @@ public class fquartos {
             if (rs.next() && rs.getInt(1) > 0) {
                 // Registro duplicado encontrado
                 String mensagemErro = "Tentativa de inserir registro duplicado: Quarto = " + numeroQuarto + ", Horário = " + timestamp;
-                logger.error(mensagemErro);
+                logger.error( "Erro: Registro duplicado encontrado.\n" + mensagemErro);
                 JOptionPane.showMessageDialog(null, "Erro: Registro duplicado encontrado.\n" + mensagemErro);
                 return false;
             }
@@ -658,7 +640,7 @@ public class fquartos {
                     DadosOcupados ocupado = new DadosOcupados(timestamp, idLocacaoGerado, valPeriodo, valPernoite, pessoas, valAdicional, tempo);
                     CacheDados cache = CacheDados.getInstancia();
                     cache.getCacheOcupado().put(numeroQuarto, ocupado);
-                    
+
                     generatedKeys.close();
                 } else {
                     logger.warn("Registro inserido, mas nenhum ID foi retornado. Quarto = " + numeroQuarto + ", Horário = " + timestamp);
@@ -783,6 +765,7 @@ public class fquartos {
         }
         return 0;
     }
+
     public Timestamp getHoraInicio(int idLoca) {
         Connection link = null;
         String consultaSQL = "SELECT horainicio FROM registralocado WHERE idlocacao = " + idLoca + " AND horafim IS NULL";
@@ -812,6 +795,7 @@ public class fquartos {
         }
         return null;
     }
+
     public int getIdLocacao(int idPassado) {
         Connection link = null;
         String consultaSQL = "SELECT idlocacao FROM registralocado WHERE numquarto = " + idPassado + " AND horafim IS NULL";

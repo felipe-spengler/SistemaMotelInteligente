@@ -28,6 +28,7 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 
 /**
  *
@@ -63,7 +64,6 @@ public class UltimaLocacao extends javax.swing.JFrame {
         tabela.getColumn(tabela.getColumnName(4)).setPreferredWidth(120);
 
         // Campos que nunca mudam
-        
         txtTipo.setEditable(false);
         txtNumero.setEditable(false);
         txtValorTotal.setEditable(false);
@@ -72,8 +72,8 @@ public class UltimaLocacao extends javax.swing.JFrame {
         txtNumPessoas.setEditable(false);
 
         // Campos que variam conforme editable
-        txtValorQuarto.setEditable(editable);
-        txtConsumo.setEditable(editable);
+        txtValorQuarto.setEditable(false);
+        txtConsumo.setEditable(false);
         txtAcrescimo.setEditable(editable);
         txtJustificativa.setEditable(editable);
         txtDesconto.setEditable(editable);
@@ -658,11 +658,9 @@ public class UltimaLocacao extends javax.swing.JFrame {
             float valorSetar = 0;
             if (Float.parseFloat(txtDesconto.getText().replace(',', '.')) > 0) {
                 tipo = "desconto";
-                System.out.println("caiu desconto");
                 valorSetar = Float.parseFloat(txtDesconto.getText().replace(',', '.'));
             } else if (Float.parseFloat(txtAcrescimo.getText().replace(',', '.')) > 0) {
                 tipo = "acrescimo";
-                System.out.println("caiu acrescimo");
                 valorSetar = Float.parseFloat(txtAcrescimo.getText().replace(',', '.'));
             }
             if (valorSetar > 0) {
@@ -705,7 +703,7 @@ public class UltimaLocacao extends javax.swing.JFrame {
             link = new fazconexao().conectar();
             String deleteSQL = "DELETE FROM registravendido WHERE idlocacao = ?";
             PreparedStatement deleteStatement = link.prepareStatement(deleteSQL);
-            deleteStatement.setInt(1, idLocacao); 
+            deleteStatement.setInt(1, idLocacao);
             int rowsAffected = deleteStatement.executeUpdate();
             link.close();
             deleteStatement.close();
@@ -770,101 +768,51 @@ public class UltimaLocacao extends javax.swing.JFrame {
     }
 
     private void bt_inserirProdutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_inserirProdutoActionPerformed
-        obterProduto();
+        getProduto();
     }//GEN-LAST:event_bt_inserirProdutoActionPerformed
 
-    private void obterProduto() {
-        // Criação do campo de texto para o ID do produto
-        JTextField txtIdProduto = new JTextField();
-        txtIdProduto.setColumns(10);
+    private void getProduto() {
+        new ObterProdutoFrame((DefaultTableModel) tabela.getModel(), 0, this::somarConsumo);
+        //tabela.repaint();
+        
+    }
 
-        // Criação do campo de texto para a quantidade
-        JTextField txtQuantidade = new JTextField();
-        txtQuantidade.setColumns(10);
+    private void somarConsumo() {
+        produtos.clear();
+        TableModel modelo = tabela.getModel();
+        float soma = 0;
 
-        // Label para exibir a descrição do produto
-        JLabel lblDescricaoProduto = new JLabel();
-        lblDescricaoProduto.setPreferredSize(new Dimension(200, 20));
+        for (int i = 0; i < modelo.getRowCount(); i++) {
+            Object id = modelo.getValueAt(i, 0);
+            Object qnt = modelo.getValueAt(i, 1);
+            Object desc = modelo.getValueAt(i, 2);
+            Object val = modelo.getValueAt(i, 3);
+            Object valorSoma = modelo.getValueAt(i, 4);
 
-        // Adiciona um DocumentListener ao campo de texto para monitorar as mudanças no texto
-        txtIdProduto.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                atualizarDescricaoProduto();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                if (isInteger(txtIdProduto.getText())) {
-                    atualizarDescricaoProduto();
-                }
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-            }
-
-            // Método para atualizar a descrição do produto com base no ID do produto
-            private void atualizarDescricaoProduto() {
-                String descricao = new fprodutos().getDescicao(txtIdProduto.getText());
-                lblDescricaoProduto.setText(descricao);
-            }
-        });
-
-        // Cria um painel para organizar os componentes
-        JPanel panel = new JPanel(new GridLayout(3, 2));
-        panel.add(new JLabel("ID do Produto:"));
-        panel.add(txtIdProduto);
-        panel.add(new JLabel("Quantidade:"));
-        panel.add(txtQuantidade);
-        panel.add(new JLabel("Descrição do Produto:"));
-        panel.add(lblDescricaoProduto);
-
-        int result = JOptionPane.showConfirmDialog(null, panel, "Obter Produto", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-        txtIdProduto.grabFocus();
-        if (result == JOptionPane.OK_OPTION) {
-            // Aqui você pode usar os valores inseridos pelo usuário, por exemplo:
-            String idProdutoStr = txtIdProduto.getText();
-            String quantidadeStr = txtQuantidade.getText();
-            DefaultTableModel modelo = (DefaultTableModel) tabela.getModel();
-
-            if (isInteger(idProdutoStr)) {
-                fprodutos produtodao = new fprodutos();
-                String texto = produtodao.getDescicao(idProdutoStr);
-                if (texto != null) {
-                    if (quantidadeStr != null) {
-                        float valor = produtodao.getValorProduto(Integer.parseInt(idProdutoStr));
-                        float valorSoma = valor * Integer.parseInt(quantidadeStr);
-                        modelo.addRow(new Object[]{
-                            idProdutoStr,
-                            quantidadeStr,
-                            texto,
-                            valor,
-                            valorSoma
-                        });
-                        vendaProdutos vendido = new vendaProdutos(Integer.valueOf(idProdutoStr), Integer.valueOf(quantidadeStr), valor, valorSoma);
-                        produtos.add(vendido);
-                        float valorConsumo = 0;
-                        //atualiza valor consumo
-                        if (!(txtConsumo.getText().isEmpty()) && isNumeroFloat(txtConsumo.getText())) {
-                            valorConsumo = Float.parseFloat(txtConsumo.getText().replace(',', '.'));
-                        }
-                        valorConsumo += valorSoma;
-                        txtConsumo.setText(String.valueOf(valorConsumo));
-
-                        //atualiza valor total
-                        atualizaTotal();
-                    } else {
-                        JOptionPane.showMessageDialog(rootPane, "Quantidade inválida!");
-
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(rootPane, "Código inserido invalido!");
-                }
+            if (valorSoma instanceof Number) {
+                soma += ((Number) valorSoma).floatValue();
             } else {
-                JOptionPane.showMessageDialog(rootPane, "Digite um valor válido!");
+                try {
+                    float valorConvertido = Float.parseFloat(valorSoma.toString()); // Conversão segura
+                    soma += valorConvertido;
+
+                    vendaProdutos vendido = new vendaProdutos(
+                            Integer.parseInt(id.toString()),
+                            Integer.parseInt(qnt.toString()),
+                            Float.parseFloat(val.toString()),
+                            valorConvertido
+                    );
+                    produtos.add(vendido);
+                } catch (NumberFormatException e) {
+                    // Ignora valores inválidos
+                    e.printStackTrace(); // Opcional: pode ajudar a debugar erros de conversão
+                }
             }
         }
+        System.out.println("mudando consumo para " + soma);
+        txtConsumo.setText(String.valueOf(soma));
+        atualizaTotal();
+        System.out.println("att total");
     }
 
     public void atualizaTotal() {
@@ -886,9 +834,9 @@ public class UltimaLocacao extends javax.swing.JFrame {
 
     }
 
-    private void bt_voltarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_voltarActionPerformed
+    private void bt_voltarActionPerformed(java.awt.event.ActionEvent evt) {
         dispose();
-    }//GEN-LAST:event_bt_voltarActionPerformed
+    }
 
     private void bt_apagarProdutoActionPerformed(java.awt.event.ActionEvent evt) {
         DefaultTableModel modelo = (DefaultTableModel) tabela.getModel();
@@ -913,7 +861,6 @@ public class UltimaLocacao extends javax.swing.JFrame {
                 vendaProdutos produto = iterator.next();
                 if (produto.idProduto == idProduto && produto.quantidade == quantidade && produto.valorTotal == valorProduto) {
                     iterator.remove();
-                    System.out.println("retirou da lista");
                     break; // Assume que estamos removendo apenas uma ocorrência do produto
                 }
             }
@@ -975,9 +922,11 @@ public class UltimaLocacao extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Somente Desconto ou Acréscimo! Arrume essa bagunça.");
         }
     }
+
     private void txtValorConsumoActionPerformed(java.awt.event.ActionEvent evt) {
         atualizaTotal();
     }
+
     private void txtNumPessoasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNumPessoasActionPerformed
 
     }//GEN-LAST:event_txtNumPessoasActionPerformed

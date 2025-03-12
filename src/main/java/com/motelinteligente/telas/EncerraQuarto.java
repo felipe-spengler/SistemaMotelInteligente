@@ -1930,10 +1930,11 @@ public class EncerraQuarto extends javax.swing.JFrame {
         // clicou falar débito
         String valorDebito;
         float valor = (valorDivida - valoreRecebido);
-        String falar = "SuaConta " + NumeroPorExtenso.NumeroPorExtenso(valor) + " reais";
+        String falar = "SuaConta " + NumeroPorExtenso.NumeroPorExtenso(valor);
+
         String[] palavras = falar.split(" ");
 
-        // Itere pelo array de palavras e imprima cada uma
+        
         reproduzirSonsEmSequencia(palavras, 0);
 
     }//GEN-LAST:event_btDebitoActionPerformed
@@ -2094,7 +2095,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         if (selectedRow != -1) {
             float coluna5 = (float) modelo.getValueAt(selectedRow, 4);
             modelo.removeRow(selectedRow);
-
+            outraTela.removerRow(selectedRow);
             atualizaConsumo();
             setValorDivida();
 

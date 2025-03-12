@@ -13,6 +13,7 @@ import com.motelinteligente.dados.vendaProdutos;
 import java.security.Timestamp;
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -81,6 +82,8 @@ public class CaixaFrame extends javax.swing.JFrame {
         jLabel17 = new javax.swing.JLabel();
         txtDescontos = new javax.swing.JTextField();
         jLabel18 = new javax.swing.JLabel();
+        txtAntecipadoAgora = new javax.swing.JLabel();
+        txtAntecipadoCaixa = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         tabelaProdutos = new javax.swing.JTable();
@@ -367,54 +370,70 @@ public class CaixaFrame extends javax.swing.JFrame {
         jLabel18.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel18.setText("Valor Descontos");
 
+        txtAntecipadoAgora.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        txtAntecipadoAgora.setText(" ");
+
+        txtAntecipadoCaixa.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        txtAntecipadoCaixa.setText(" ");
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGap(28, 28, 28)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel12)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(138, 138, 138)
-                        .addComponent(txtCaixaTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addComponent(jLabel18)
-                                .addGap(18, 18, 18)
-                                .addComponent(txtDescontos))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                                .addComponent(jLabel11)
-                                .addGap(18, 18, 18)
-                                .addComponent(txtEntradaTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel6)
-                                    .addComponent(jLabel5)
-                                    .addComponent(jLabel10))
-                                .addGap(18, 18, 18)
-                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(txtSaldoInicial, javax.swing.GroupLayout.DEFAULT_SIZE, 152, Short.MAX_VALUE)
-                                    .addComponent(txtLocacoes)
-                                    .addComponent(txtVendas))))
-                        .addGap(31, 31, 31)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
+                        .addGap(28, 28, 28)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel8)
-                                    .addComponent(jLabel9)
-                                    .addComponent(jLabel7))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(txtDinheiro)
-                                    .addComponent(txtCartao)
-                                    .addComponent(txtPix, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addGroup(jPanel3Layout.createSequentialGroup()
+                                        .addComponent(jLabel18)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(txtDescontos))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                                        .addComponent(jLabel11)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(txtEntradaTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(jPanel3Layout.createSequentialGroup()
+                                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jLabel6)
+                                            .addComponent(jLabel5)
+                                            .addComponent(jLabel10))
+                                        .addGap(18, 18, 18)
+                                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                            .addComponent(txtSaldoInicial, javax.swing.GroupLayout.DEFAULT_SIZE, 152, Short.MAX_VALUE)
+                                            .addComponent(txtLocacoes)
+                                            .addComponent(txtVendas))))
+                                .addGap(31, 31, 31)
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel3Layout.createSequentialGroup()
+                                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jLabel8)
+                                            .addComponent(jLabel9)
+                                            .addComponent(jLabel7))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                            .addComponent(txtDinheiro)
+                                            .addComponent(txtCartao)
+                                            .addComponent(txtPix, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addGroup(jPanel3Layout.createSequentialGroup()
+                                        .addComponent(jLabel17)
+                                        .addGap(27, 27, 27)
+                                        .addComponent(txtAcrescimos, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(0, 144, Short.MAX_VALUE))
                             .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addComponent(jLabel17)
-                                .addGap(27, 27, 27)
-                                .addComponent(txtAcrescimos, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addGap(0, 204, Short.MAX_VALUE))
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel12)
+                                    .addGroup(jPanel3Layout.createSequentialGroup()
+                                        .addGap(138, 138, 138)
+                                        .addComponent(txtCaixaTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(92, 92, 92)
+                                .addComponent(txtAntecipadoCaixa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(txtAntecipadoAgora, javax.swing.GroupLayout.PREFERRED_SIZE, 385, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(60, 60, 60))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -447,11 +466,14 @@ public class CaixaFrame extends javax.swing.JFrame {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel11)
                     .addComponent(txtEntradaTotal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(34, 34, 34)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtAntecipadoAgora)
+                .addGap(10, 10, 10)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel12)
-                    .addComponent(txtCaixaTotal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(44, Short.MAX_VALUE))
+                    .addComponent(txtCaixaTotal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtAntecipadoCaixa))
+                .addContainerGap(38, Short.MAX_VALUE))
         );
 
         tabPanel.addTab("Informações do Caixa", jPanel3);
@@ -776,6 +798,78 @@ public class CaixaFrame extends javax.swing.JFrame {
         carregaTabelaProdutosVendidos();
         carregaTabelaQuartosLocados();
 
+        //aqui carrega valores recebidos antecipados agora
+        String sql = "SELECT  a.valor, a.tipo FROM registralocado rl "
+                + "JOIN antecipado a ON rl.idlocacao = a.idlocacao "
+                + "WHERE rl.horafim IS NULL AND a.idcaixaatual = ?";
+        float valorAntecipado = 0;
+        Connection link = null;
+        PreparedStatement statement = null;
+        ResultSet resultado = null;
+        
+        try {
+            link = new fazconexao().conectar();
+            statement = link.prepareStatement(sql);
+            statement.setInt(1, idCaixaAtual);
+            resultado = statement.executeQuery();
+
+            while (resultado.next()) {
+                if (!resultado.getString("tipo").equals("desconto")) {
+                    valorAntecipado += resultado.getFloat("valor");
+                }
+            }
+            if (valorAntecipado > 0) {
+                txtAntecipadoAgora.setText("Tem R$" + valorAntecipado + " no caixa de recebimento antecipado");
+            } else {
+                txtAntecipadoAgora.setText("");
+            }
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao inserir/atualizar: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        } finally {
+            try {
+                if (resultado != null) {
+                    resultado.close();
+                }
+                if (statement != null) {
+                    statement.close();
+                }
+                if (link != null) {
+                    link.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        float valorCaixasPassados = 0;
+//aqui verifica se tem valores desse caixa recebidos caixa passado
+        String sql2 = "SELECT rl.idlocacao, a.valor, a.tipo FROM registralocado rl "
+                + "JOIN antecipado a ON rl.idlocacao = a.idlocacao "
+                + "WHERE rl.idcaixaatual = ? AND rl.horafim IS NOT NULL AND a.idcaixaatual != ?";
+
+        try (Connection conexao = new fazconexao().conectar(); PreparedStatement statement2 = conexao.prepareStatement(sql2);) {
+
+            statement2.setInt(1, idCaixaAtual);
+            statement2.setInt(2, idCaixaAtual);
+
+            try (ResultSet resultado2 = statement2.executeQuery()) {
+                while (resultado2.next()) {
+                    if (!resultado2.getString("tipo").equals("desconto")) {
+                        valorCaixasPassados += resultado2.getFloat("valor");
+                    }
+                }
+                if (valorCaixasPassados > 0) {
+                    txtAntecipadoCaixa.setText("Recebeu R$" + valorCaixasPassados + " em outros caixas! ");
+                } else {
+                    txtAntecipadoCaixa.setText("");
+                }
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao consultar: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+
     }
 
     private void carregaDescontoAcrescimo(List<Integer> idsLocacao) {
@@ -1094,6 +1188,8 @@ public class CaixaFrame extends javax.swing.JFrame {
     private javax.swing.JTable tabelaLocacoes;
     private javax.swing.JTable tabelaProdutos;
     private javax.swing.JTextField txtAcrescimos;
+    private javax.swing.JLabel txtAntecipadoAgora;
+    private javax.swing.JLabel txtAntecipadoCaixa;
     private javax.swing.JTextField txtCaixaTotal;
     private javax.swing.JTextField txtCartao;
     private javax.swing.JTextField txtCodigoCaixa;

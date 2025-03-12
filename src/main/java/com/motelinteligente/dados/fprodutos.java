@@ -362,7 +362,6 @@ public class fprodutos {
             ResultSet resultado = statement.executeQuery();
             if (resultado.next()) {
                 idProduto = resultado.getInt("idproduto");
-                System.out.println("id do " + desc + " é " + idProduto);
             }
 
             resultado.close();
@@ -384,7 +383,7 @@ public class fprodutos {
         return idProduto;
     }
 
-    public void removePreVendido(int numeroQuarto, String descricao) {
+    public void removePreVendido(int numeroQuarto, String descricao, int qntd) {
         Connection link = null;
         try {
             // Obter o idLocacao e idProduto
@@ -398,10 +397,11 @@ public class fprodutos {
 
             link = new fazconexao().conectar();
             // Consulta SQL para deletar registros da tabela prevendidos
-            String consultaSQL = "DELETE FROM prevendidos WHERE idlocacao = ? AND idproduto = ?";
+            String consultaSQL = "DELETE FROM prevendidos WHERE idlocacao = ? AND idproduto = ? AND quantidade = ? LIMIT 1; ";
             PreparedStatement statement = link.prepareStatement(consultaSQL);
             statement.setInt(1, idLocacao);
             statement.setInt(2, idProduto);
+            statement.setInt(3, qntd);
             statement.executeUpdate();
             statement.close();
             link.close();

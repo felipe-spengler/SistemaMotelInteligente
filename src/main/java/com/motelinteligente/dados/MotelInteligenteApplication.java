@@ -69,9 +69,7 @@ public class MotelInteligenteApplication {
                         } catch (SQLException e) {
                             e.printStackTrace();
                         }
-                    } else {
-                        System.out.println(" o ip do servidor e do banco sao iguais");
-                    }
+                    } 
                 }
 
                 // Fechar recursos
@@ -91,7 +89,7 @@ public class MotelInteligenteApplication {
 
         @PostMapping(value = "/receberNumeroQuarto", consumes = "text/plain", produces = "text/plain")
         public ResponseEntity<String> receberNumeroQuarto(@RequestBody String numeroQuarto) {
-            logger.info("Recebeu requisição com corpo: {}", numeroQuarto);
+            //logger.info("Recebeu requisição com corpo: {}", numeroQuarto);
             String[] partes = numeroQuarto.split(" ");
 
             if (partes.length != 2) {

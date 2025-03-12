@@ -87,6 +87,10 @@ public class ClienteEncerra extends javax.swing.JFrame {
         //setar tempo locado
         lblTempoLocado.setText(tempoTotalLocado);
     }
+    public void removerRow(int selected){
+        DefaultTableModel modelo = (DefaultTableModel) tabela.getModel();
+        modelo.removeRow(selected);
+    }
     public static String formatarData(String dataOriginal) {
         // Definindo o formato da string de data original
         SimpleDateFormat formatoOriginal = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
