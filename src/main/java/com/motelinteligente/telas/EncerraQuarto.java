@@ -128,7 +128,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
     /**
      * Creates new form EncerraQuarto
      */
-    public EncerraQuarto(int numeroQuarto) {
+    public EncerraQuarto(TelaPrincipal parent, int numeroQuarto) {
 
         initComponents();
         numeroDoQuarto = numeroQuarto;

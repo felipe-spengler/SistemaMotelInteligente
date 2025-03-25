@@ -75,10 +75,12 @@ import java.util.TimerTask;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
+import javax.swing.Icon;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.UIManager;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -95,6 +97,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private Timer alarmTimer; // Timer para verificar os alarmes
     private long lastUpdate = 0;
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(TelaPrincipal.class);
+    private EncerraQuarto encerraQuarto;
     // Intervalo mínimo entre execuções em milissegundos
     private static final long UPDATE_INTERVAL = 1000; // 1 segundo
 
@@ -215,7 +218,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                         // Comparar hora e minuto
                         if (horaAtual == horaAlarme && minutoAtual == minutoAlarme) {
                             logger.warn("Alarme ID: " + idAlarme + " disparando agora. "
-                                        + " Horário atual: " + alarmeCalendar);
+                                    + " Horário atual: " + alarmeCalendar);
                             showAlarmAlert(idAlarme, descricao); // Chama a função para mostrar o alerta
                         }
 
@@ -266,7 +269,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 "Atenção!",
                 JOptionPane.WARNING_MESSAGE
         );
-        
+
         soundPlayer.stopSound(); // Para o som quando o alerta é fechado
         new FAlarmes().removeAlarmFromDatabase(idAlarme);
     }
@@ -367,8 +370,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         painelSecundario.repaint();
     }
 
-    
-    public void populaPrevendidos( ) {
+    public void populaPrevendidos() {
         DefaultTableModel modelo = (DefaultTableModel) tabela1.getModel();
         CacheDados cache = CacheDados.getInstancia();
         modelo.setNumRows(0);
@@ -1883,8 +1885,33 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             // Abre uma caixa de diálogo de confirmação
             int confirmacao = JOptionPane.showConfirmDialog(null, "Deseja encerrar o quarto " + quartoEmFoco + "?", "Confirmação", JOptionPane.YES_NO_OPTION);
             if (confirmacao == JOptionPane.YES_OPTION) {
-                new EncerraQuarto(quartoEmFoco);
+                abrirEncerraQuarto(quartoEmFoco);
+
             }
+        }
+    }
+
+    private void abrirEncerraQuarto(int quartoEmFoco) {
+        if (encerraQuarto == null || !encerraQuarto.isVisible()) {
+            // Criar nova instância se não houver tela aberta
+            encerraQuarto = new EncerraQuarto(this, quartoEmFoco);
+            encerraQuarto.setVisible(true);
+        } else {
+             Icon iconeAlerta = UIManager.getIcon("OptionPane.warningIcon");
+
+// Mensagem formatada com HTML
+            String mensagem = "<html><body style='text-align: center; font-size: 12px;'>"
+                    + "<b>Uma tela de encerramento já está aberta!</b><br>"
+                    + "Se precisar, finalize a tela atual antes de abrir outra.</body></html>";
+
+// Exibe a JOptionPane com ícone e mensagem estilizada
+            JOptionPane.showMessageDialog(this, mensagem, "Atenção!", JOptionPane.WARNING_MESSAGE, iconeAlerta);
+            encerraQuarto.setExtendedState(JFrame.NORMAL); // Caso esteja minimizada, restaurar
+            encerraQuarto.setAlwaysOnTop(true); // Coloca na frente de todas as janelas
+            encerraQuarto.toFront(); // Traz para frente
+            encerraQuarto.requestFocus(); // Dá foco na janela
+            encerraQuarto.setAlwaysOnTop(false); // Remove o "always on top" depois
+
         }
     }
 
@@ -2087,7 +2114,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         }
     }
 
-   
+
     private void menuResBackupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuResBackupActionPerformed
         CacheDados cache = CacheDados.getInstancia();
         cache.mostrarCacheQuarto();
@@ -2174,9 +2201,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                         produtosVendidos.remove(i); // Remove o item da lista
                         System.out.println("removendo produto " + idProduto);
                         limitador++;
-                        
-                    }else{
-                        valorProdutos+= dados.quantidadeVendida + new fprodutos().getValorProduto(idProduto);
+
+                    } else {
+                        valorProdutos += dados.quantidadeVendida + new fprodutos().getValorProduto(idProduto);
                     }
                 }
                 lblValorConsumo.setText(String.valueOf(valorProdutos));
@@ -2507,6 +2534,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             }
         }
     }
+
     private void criarTelaSelecaoPagamento(int idLocacao) {
         JDialog dialog = new JDialog();
         dialog.setTitle("Selecione o Tipo de Pagamento");
@@ -2607,7 +2635,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 "dinheiro";
             default ->
                 "pix";
-            
+
         };
 
         JLabel label = new JLabel("<html><center><b>Havia recebido:</b> R$ " + String.format("%.2f", valorRecebido)
@@ -2826,7 +2854,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         };
         configGlobal config = configGlobal.getInstance();
         int idCaixaatual = config.getCaixa();
-                
+
         Connection link = null;
         try {
             link = new fazconexao().conectar();
@@ -2840,7 +2868,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             updateStatement.setInt(3, idCaixaatual);
             updateStatement.setInt(4, idLocacao);
             updateStatement.setString(5, tipo);
-            
 
             int rowsUpdated = updateStatement.executeUpdate();
             updateStatement.close();
