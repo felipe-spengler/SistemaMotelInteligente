@@ -5,18 +5,23 @@
 package com.motelinteligente.telas;
 
 import com.motelinteligente.dados.fazconexao;
+import com.motelinteligente.dados.fquartos;
 import com.motelinteligente.pdf.Relatorio;
 import com.motelinteligente.pdf.RelatorioCaixaPDF;
+import com.motelinteligente.pdf.RelatorioLocacoesPDF;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import com.toedter.calendar.JDateChooser;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -24,25 +29,26 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
 
-public class ConfereCaixa extends JFrame {
+public class ConfereLocacoes extends JFrame {
 
     private JTable table;
     private DefaultTableModel tableModel;
     private JDateChooser dateChooserInicio;
     private JDateChooser dateChooserFim;
-    private JLabel labelMostraResultado;
     private JButton buscarButton, btnGerarPDF, btnMaisDetalhes;
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+    private int contaResultados;
+    private JLabel contaLabel;
 
-    public ConfereCaixa() {
-        setTitle("Consulta de Caixas");
+    public ConfereLocacoes() {
+        setTitle("Consulta de Locações");
         setSize(1050, 730);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
         Font labelFont = new Font("Arial", Font.BOLD, 14);
-
 // Painel superior para filtros
         JPanel topPanel = new JPanel(new FlowLayout());
         topPanel.setBackground(new Color(60, 60, 60)); // Define o background do painel superior
@@ -92,30 +98,47 @@ public class ConfereCaixa extends JFrame {
         topPanel.add(buscarButton);
 
         // Tabela para exibir os resultados
-        tableModel = new DefaultTableModel(new Object[]{"ID", "Data Abertura", "Usuário Abertura", "Valor Abertura", "Data Fechamento", "Usuário Fechamento", "Valor Fechamento"}, 0);
+        tableModel = new DefaultTableModel(new Object[]{"Inicio", "Fim", "N° Quarto", "Valor Quarto", "Valor Consumo", "Valor Total"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // nenhuma célula será editável
+            }
+        };
         table = new JTable(tableModel);
-        table.setCellSelectionEnabled(true);
+        table.setCellSelectionEnabled(false);
         table.setRowHeight(25);
         table.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
         table.getTableHeader().setBackground(new Color(255, 255, 255));
         table.getTableHeader().setForeground(Color.BLACK);
         table.setFont(new Font("Arial", Font.PLAIN, 14));
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // apenas uma linha de cada vez
+        table.setRowSelectionAllowed(true); // permite seleção de linhas
+        table.setColumnSelectionAllowed(false); // impede seleção de colunas
         // Adicionando componentes à janela
         add(topPanel, BorderLayout.NORTH);
         add(new JScrollPane(table), BorderLayout.CENTER);
 
-        // Painel inferior para botões
-        JPanel bottomPanel = new JPanel(new FlowLayout());
+        // Painel inferior com BorderLayout para separar esquerda e direita
+        JPanel bottomPanel = new JPanel(new BorderLayout());
 
-        // Botão Gerar PDF
+// Painel para os botões à esquerda
+        JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         btnGerarPDF = new JButton("Gerar PDF");
         btnGerarPDF.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/pdf_icon.png")));
-        bottomPanel.add(btnGerarPDF);
-
-        // Botão Mais Detalhes
         btnMaisDetalhes = new JButton("Mais Detalhes");
         btnMaisDetalhes.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/search_locate_find_6278.png")));
-        bottomPanel.add(btnMaisDetalhes);
+
+        leftPanel.add(btnGerarPDF);
+        leftPanel.add(btnMaisDetalhes);
+
+// Painel para o label à direita
+        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        contaLabel = new JLabel("Nenhum resultado");
+        rightPanel.add(contaLabel);
+
+// Adiciona os dois subpainéis no painel principal
+        bottomPanel.add(leftPanel, BorderLayout.WEST);
+        bottomPanel.add(rightPanel, BorderLayout.EAST);
 
         add(bottomPanel, BorderLayout.SOUTH);
 
@@ -123,7 +146,7 @@ public class ConfereCaixa extends JFrame {
         buscarButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                carregarCaixas();
+                carregarLocacoes();
             }
         });
 
@@ -145,20 +168,34 @@ public class ConfereCaixa extends JFrame {
                 int linhaSelecionada = table.getSelectedRow();
                 if (linhaSelecionada != -1) {
                     Object id = table.getValueAt(linhaSelecionada, 0);
-                    int idSelecionado = Integer.valueOf(id.toString());
-                    mostraDetalhes(idSelecionado);
+                    Timestamp horaInicio = Timestamp.valueOf(id.toString());
+                    String consultaSQL = "SELECT idlocacao FROM registralocado WHERE horainicio = ?";
+
+                    try (
+                            java.sql.Connection link = new fazconexao().conectar(); PreparedStatement stmt = link.prepareStatement(consultaSQL)) {
+                        stmt.setTimestamp(1, horaInicio);
+                        try (ResultSet resultSet = stmt.executeQuery()) {
+                            while (resultSet.next()) {
+                                int idSelecionado = resultSet.getInt("idlocacao");
+                                new VerDadosLocacao(idSelecionado).setVisible(true);
+                            }
+                        }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(null, "Erro ao consultar locação: " + ex.getMessage());
+                    }
                 } else {
-                    JOptionPane.showMessageDialog(null, "Nenhum CAIXA Selecionado!");
+                    JOptionPane.showMessageDialog(null, "Nenhuma locação selecionada!");
                 }
             }
         });
     }
 
-    // Método para carregar os caixas abertos entre as datas fornecidas
-    private void carregarCaixas() {
+    private void carregarLocacoes() {
+        // pegar os textos dos campos
+        ArrayList<Integer> idList = new ArrayList<>();
         Date dataInicio = dateChooserInicio.getDate();
         Date dataFim = dateChooserFim.getDate();
-        // Ajustar dataFim para o fim do dia (23:59:59.999)
         Calendar cal = Calendar.getInstance();
         cal.setTime(dataFim);
         cal.set(Calendar.HOUR_OF_DAY, 23);
@@ -166,55 +203,101 @@ public class ConfereCaixa extends JFrame {
         cal.set(Calendar.SECOND, 59);
         cal.set(Calendar.MILLISECOND, 999);
         dataFim = cal.getTime();
-        if (dataInicio == null || dataFim == null) {
-            JOptionPane.showMessageDialog(this, "Por favor, selecione as datas de início e fim", "Aviso", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        Connection link = new fazconexao().conectar();
+        
         try {
-            tableModel.setRowCount(0); // Limpar tabela antes de carregar novos dados
 
-            String query = "SELECT * FROM caixa "
-                    + "WHERE horaabre >= ? AND horaabre <= ?";
-
-            PreparedStatement statement = link.prepareStatement(query);
-            statement.setTimestamp(1, new Timestamp(dataInicio.getTime()));
-            statement.setTimestamp(2, new Timestamp(dataFim.getTime()));
-            System.out.println("QUERY => SELECT * FROM caixa WHERE horaabre >= '"
-                    + new Timestamp(dataInicio.getTime()) + "' AND horaabre <= '"
-                    + new Timestamp(dataFim.getTime()) + "'");
-            ResultSet resultSet = statement.executeQuery();
+            String consultaSQL = "SELECT idlocacao FROM registralocado WHERE horainicio >= ? AND horainicio <= ?";
+            consultaSQL += " AND valorquarto IS NOT NULL order by idcaixaatual";
+            java.sql.Connection link = new fazconexao().conectar();
+            PreparedStatement stmt = link.prepareStatement(consultaSQL);
+            stmt.setTimestamp(1, new Timestamp(dataInicio.getTime()));
+            stmt.setTimestamp(2, new Timestamp(dataFim.getTime()));
+            ResultSet resultSet = stmt.executeQuery();
 
             while (resultSet.next()) {
-                int id = resultSet.getInt("id");
-                Timestamp horaAbre = resultSet.getTimestamp("horaabre");
-                String usuarioAbre = resultSet.getString("usuarioabre");
-                float saldoAbre = resultSet.getFloat("saldoabre");
-                Timestamp horaFecha = resultSet.getTimestamp("horafecha");
-                String usuarioFecha = resultSet.getString("usuariofecha");
-                float saldoFecha = resultSet.getFloat("saldofecha");
-
-                // Formatar as datas
-                String horaAbreFormatted = dateFormat.format(horaAbre);
-                String horaFechaFormatted = (horaFecha != null) ? dateFormat.format(horaFecha) : "";
-
-                tableModel.addRow(new Object[]{id, horaAbreFormatted, usuarioAbre, saldoAbre, horaFechaFormatted, usuarioFecha, saldoFecha});
+                int id = resultSet.getInt("idlocacao");
+                idList.add(id);
             }
-            // Centralizando o texto nas colunas
-            DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-            centerRenderer.setHorizontalAlignment(JLabel.CENTER);
-            table.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
-            table.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
-            table.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
-            table.getColumnModel().getColumn(4).setCellRenderer(centerRenderer);
-            table.getColumnModel().getColumn(5).setCellRenderer(centerRenderer);
-            table.getColumnModel().getColumn(6).setCellRenderer(centerRenderer);
-            table.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Erro ao carregar dados dos caixas", "Erro", JOptionPane.ERROR_MESSAGE);
+
+            // chama a funcao para carregar a tabela
+            carregaTabela(idList);
+        } catch (Exception e) {
+            JOptionPane.showConfirmDialog(null, e);
         }
+    }
+
+    public void carregaTabela(ArrayList<Integer> idList) {
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+
+        table.setRowHeight(30);
+        table.getColumn(table.getColumnName(0)).setPreferredWidth(200);
+        table.getColumn(table.getColumnName(1)).setPreferredWidth(200);
+        table.getColumn(table.getColumnName(2)).setPreferredWidth(80);
+        table.getColumn(table.getColumnName(3)).setPreferredWidth(100);
+        table.getColumn(table.getColumnName(4)).setPreferredWidth(100);
+        table.getColumn(table.getColumnName(5)).setPreferredWidth(120);
+
+        int caixaAtual = 0;
+        model.setNumRows(0);
+        fquartos quartosdao = new fquartos();
+        //carregar os dados
+        contaResultados = 0;
+        for (int id : idList) {
+            if (quartosdao.getIdCaixa(id) != caixaAtual) {
+                model.addRow(new Object[]{
+                    "Caixa " + quartosdao.getIdCaixa(id)});
+                caixaAtual = quartosdao.getIdCaixa(id);
+            }
+            String consultaSQL = "SELECT * FROM registralocado WHERE idlocacao = " + id + " AND valorquarto IS NOT NULL";
+            Connection link = null;
+            float valQ = 0, valC = 0;
+            try {
+                link = new fazconexao().conectar();
+                Statement statement = link.createStatement();
+                ResultSet resultado = statement.executeQuery(consultaSQL);
+                if (resultado.next()) {
+                    contaResultados++;
+                    int idlocacao = resultado.getInt("idlocacao");
+                    valQ = resultado.getFloat("valorquarto");
+                    valC = resultado.getFloat("valorconsumo");
+                    model.addRow(new Object[]{
+                        resultado.getTimestamp("horainicio"),
+                        resultado.getTimestamp("horafim"),
+                        resultado.getInt("numquarto"),
+                        resultado.getFloat("valorquarto"),
+                        resultado.getFloat("valorconsumo"),
+                        resultado.getFloat("valorquarto") + resultado.getFloat("valorconsumo"),});
+                }
+            } catch (Exception e) {
+                JOptionPane.showConfirmDialog(null, e);
+            } finally {
+                try {
+                    if (link != null && !link.isClosed()) {
+                        link.close();
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            contaLabel.setText(String.format("Mostrando %d resultados", contaResultados));
+        }
+
+        //mostraResultados
+        table.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) { // Verifica se foi um clique duplo
+                    int row = table.getSelectedRow(); // Obtém a linha selecionada
+                    // Faça algo com a linha selecionada, por exemplo:
+                    System.out.println("Clique duplo na linha: " + row);
+                }
+            }
+        });
+
+// Associe o renderizador personalizado à coluna que você deseja
+        int columnIndex = 0; // Índice da coluna que deseja aplicar o renderizador (por exemplo, a primeira coluna)
+
+        table.getColumnModel().getColumn(columnIndex).setCellRenderer(new ConfereLocacoes.CustomCellRenderer());
+
     }
 
     public void prepararPDF() {
@@ -223,14 +306,20 @@ public class ConfereCaixa extends JFrame {
         // Obtém as datas do JDateChooser
         Date dataInicio = dateChooserInicio.getDate();
         Date dataFim = dateChooserFim.getDate();
-
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(dataFim);
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        cal.set(Calendar.MILLISECOND, 999);
+        dataFim = cal.getTime();
         // Formata as datas
         SimpleDateFormat formatador = new SimpleDateFormat("dd/MM/yyyy");
         String dataA1 = (dataInicio != null) ? formatador.format(dataInicio) : "Data de Início Não Selecionada";
         String data2 = (dataFim != null) ? formatador.format(dataFim) : "Data de Fim Não Selecionada";
 
         // Cria o texto do cabeçalho com as datas
-        String dataPasssar = "Caixas Abertos de " + dataA1 + " até " + data2;
+        String dataPasssar = "Locações de " + dataA1 + " até " + data2;
 
         // Coleta os dados das colunas da tabela
         List<List<Object>> dadosDasColunas = new ArrayList<>();
@@ -244,7 +333,7 @@ public class ConfereCaixa extends JFrame {
             Object dadoColuna4 = model.getValueAt(i, 3); // 4ª coluna
             Object dadoColuna5 = model.getValueAt(i, 4); // 5ª coluna
             Object dadoColuna6 = model.getValueAt(i, 5); // 6ª coluna
-            Object dadoColuna7 = model.getValueAt(i, 6); // 7ª coluna
+            
 
             // Adiciona os dados da linha à lista
             dadosLinha.add(dadoColuna1);
@@ -253,18 +342,35 @@ public class ConfereCaixa extends JFrame {
             dadosLinha.add(dadoColuna4);
             dadosLinha.add(dadoColuna5);
             dadosLinha.add(dadoColuna6);
-            dadosLinha.add(dadoColuna7);
 
             // Adiciona os dados da linha à lista principal
             dadosDasColunas.add(dadosLinha);
         }
 
         // Gera o relatório PDF
-        Relatorio relatorioPdfSimples = new RelatorioCaixaPDF();
+        Relatorio relatorioPdfSimples = new RelatorioLocacoesPDF();
         relatorioPdfSimples.gerarCabecalho(dataPasssar);
         relatorioPdfSimples.gerarCorpo(dadosDasColunas);
         relatorioPdfSimples.gerarRodape();
         relatorioPdfSimples.imprimir();
+    }
+
+    class CustomCellRenderer extends DefaultTableCellRenderer implements TableCellRenderer {
+
+        public CustomCellRenderer() {
+            setHorizontalAlignment(SwingConstants.CENTER);
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+
+            if (value != null && value.toString().startsWith("Caixa")) {
+                setText("<html><b style='font-size: 14px; background-color: yellow;'>" + value + "</b></html>");
+            }
+
+            return c;
+        }
     }
 
     public void mostraDetalhes(int idCaixa) {
@@ -335,6 +441,6 @@ public class ConfereCaixa extends JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new ConfereCaixa().setVisible(true));
+        SwingUtilities.invokeLater(() -> new ConfereLocacoes().setVisible(true));
     }
 }

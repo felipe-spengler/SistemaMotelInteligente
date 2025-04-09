@@ -1,25 +1,21 @@
 package com.motelinteligente.pdf;
 
-
 import java.awt.Color;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-
 import javax.swing.JOptionPane;
-import javax.swing.GroupLayout.Alignment;
-
 import com.lowagie.text.Chunk;
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Element;
 import com.lowagie.text.Font;
+import com.lowagie.text.FontFactory;
 import com.lowagie.text.HeaderFooter;
 import com.lowagie.text.Image;
 import com.lowagie.text.PageSize;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.Phrase;
 import com.lowagie.text.Rectangle;
-import com.lowagie.text.pdf.PdfCell;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
@@ -34,18 +30,28 @@ public class RelatorioLocacoesPDF implements Relatorio {
     private Document documentoPDF;
     int count = 0;
     float totalQuarto = 0, totalConsumo = 0, totalTotal = 0;
+    SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yy HH:mm");
 
     public RelatorioLocacoesPDF() {
+        try {
+            javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Salvar PDF"); // Título da caixa de diálogo
 
         int userSelection = fileChooser.showSaveDialog(null); // Exibe a caixa de diálogo de salvamento
 
         if (userSelection == JFileChooser.APPROVE_OPTION) {
-            // Se o usuário selecionou um local e confirmou o salvamento
-            File fileToSave = fileChooser.getSelectedFile(); // Obtém o arquivo selecionado
+            File fileToSave = fileChooser.getSelectedFile();
 
+            // Garante que o nome do arquivo termine com ".pdf"
             String filePath = fileToSave.getAbsolutePath();
+            if (!filePath.toLowerCase().endsWith(".pdf")) {
+                filePath += ".pdf";
+            }
+
             this.documentoPDF = new Document(PageSize.A4, 50, 50, 50, 50);
             try {
                 PdfWriter.getInstance(this.documentoPDF, new FileOutputStream(filePath));
@@ -56,7 +62,7 @@ public class RelatorioLocacoesPDF implements Relatorio {
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
-        } else if (userSelection == JFileChooser.CANCEL_OPTION) {
+        } else {
             // Se o usuário cancelou a operação de salvamento
             System.out.println("Operação de salvamento cancelada.");
         }
@@ -65,7 +71,7 @@ public class RelatorioLocacoesPDF implements Relatorio {
 
     @Override
     public void gerarCabecalho(String data) {
-        this.adicionarImagem("src/imagens/iconeMI.jpg");
+        this.adicionarImagem("src/main/resources/imagens/iconeMI.jpg");
         this.pularLinha();
         this.adicionarParagrafoTitulo();
         this.pularLinha();
@@ -74,6 +80,7 @@ public class RelatorioLocacoesPDF implements Relatorio {
         this.datar(data);
         this.pularLinha();
         this.adicionarQuebraDeSessao();
+        System.out.println("cabeçalho do relatorio ok");
     }
 
     @Override
@@ -87,6 +94,7 @@ public class RelatorioLocacoesPDF implements Relatorio {
         this.pularLinha();
         this.pularLinha();
         this.adicionarTotalDaVenda();
+        System.out.println("corpo do relatorio ok");
     }
 
     @Override
@@ -94,6 +102,7 @@ public class RelatorioLocacoesPDF implements Relatorio {
         this.adicionarQuebraDeSessao();
         this.pularLinha();
         this.adicionarRodaPe();
+        System.out.println("rodape do relatorio ok");
     }
 
     @Override
@@ -101,6 +110,7 @@ public class RelatorioLocacoesPDF implements Relatorio {
         if (this.documentoPDF != null && this.documentoPDF.isOpen()) {
             documentoPDF.close();
         }
+        JOptionPane.showMessageDialog(null, "Relatorio gerado com sucesso!");
     }
 
     private void adicionarPaginacao() {
@@ -182,7 +192,7 @@ public class RelatorioLocacoesPDF implements Relatorio {
         celulaTitulo.setHorizontalAlignment(Element.ALIGN_CENTER);
         celulaTitulo.setBackgroundColor(Color.LIGHT_GRAY);
         tableProdutos.addCell(celulaTitulo);
-        
+
         celulaTitulo = new PdfPCell(new Phrase("VALOR TOTAL"));
         celulaTitulo.setHorizontalAlignment(Element.ALIGN_CENTER);
         celulaTitulo.setBackgroundColor(Color.LIGHT_GRAY);
@@ -193,15 +203,45 @@ public class RelatorioLocacoesPDF implements Relatorio {
 
     private void adicionarProdutosATabela(PdfPTable tableProdutos, List<List<Object>> dadosDasColunas) {
         int contador = 1;
+
         for (List<Object> linha : dadosDasColunas) {
-            count++;
-            PdfPCell celulaInicio = new PdfPCell(new Phrase(String.valueOf(linha.get(0))));
-            PdfPCell celulaFim = new PdfPCell(new Phrase(String.valueOf(linha.get(1))));
+
+            // Se for uma linha de "Caixa", tratar separadamente
+            if (String.valueOf(linha.get(0)).startsWith("Caixa")) {
+                System.out.println("Deu if aqui");
+                Font fonteCaixa = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, Color.RED);
+                PdfPCell celulaCaixa = new PdfPCell(new Phrase(String.valueOf(linha.get(0)), fonteCaixa));
+                celulaCaixa.setColspan(6);
+                celulaCaixa.setHorizontalAlignment(Element.ALIGN_CENTER);
+                celulaCaixa.setBackgroundColor(Color.YELLOW);
+                celulaCaixa.setBorder(Rectangle.NO_BORDER); // opcional: sem borda
+                tableProdutos.addCell(celulaCaixa);
+                contador = 0; // zera para recomeçar a alternância de cor, se quiser
+                continue;
+            } else {
+                count++;
+            }
+
+            // Processamento normal das linhas com dados
+            Object objDataInicio = linha.get(0);
+            Object objDataFim = linha.get(1);
+
+            String dataInicioFormatada = objDataInicio instanceof Date
+                    ? formato.format((Date) objDataInicio)
+                    : String.valueOf(objDataInicio);
+
+            String dataFimFormatada = objDataFim instanceof Date
+                    ? formato.format((Date) objDataFim)
+                    : String.valueOf(objDataFim);
+
+            PdfPCell celulaInicio = new PdfPCell(new Phrase(dataInicioFormatada));
+            PdfPCell celulaFim = new PdfPCell(new Phrase(dataFimFormatada));
             PdfPCell celulaQuarto = new PdfPCell(new Phrase(String.valueOf(linha.get(2))));
             PdfPCell celulaValorQ = new PdfPCell(new Phrase("R$ " + String.valueOf(linha.get(3))));
             PdfPCell celulaValorC = new PdfPCell(new Phrase("R$ " + String.valueOf(linha.get(4))));
             PdfPCell celulaValorT = new PdfPCell(new Phrase("R$ " + String.valueOf(linha.get(5))));
 
+            // Alterna a cor de fundo
             if (contador % 2 == 0) {
                 celulaInicio.setBackgroundColor(Color.LIGHT_GRAY);
                 celulaFim.setBackgroundColor(Color.LIGHT_GRAY);
@@ -210,17 +250,31 @@ public class RelatorioLocacoesPDF implements Relatorio {
                 celulaValorC.setBackgroundColor(Color.LIGHT_GRAY);
                 celulaValorT.setBackgroundColor(Color.LIGHT_GRAY);
             }
+
             tableProdutos.addCell(celulaInicio);
             tableProdutos.addCell(celulaFim);
             tableProdutos.addCell(celulaQuarto);
             tableProdutos.addCell(celulaValorQ);
             tableProdutos.addCell(celulaValorC);
             tableProdutos.addCell(celulaValorT);
-            totalQuarto += Float.valueOf(String.valueOf(linha.get(3)));
-            totalConsumo += Float.valueOf(String.valueOf(linha.get(4)));
-            totalTotal += Float.valueOf(String.valueOf(linha.get(5)));
+
+            totalQuarto += parseFloatSafe(linha.get(3));
+            totalConsumo += parseFloatSafe(linha.get(4));
+            totalTotal += parseFloatSafe(linha.get(5));
 
             contador++;
+        }
+
+    }
+
+    private float parseFloatSafe(Object valor) {
+        try {
+            if (valor == null || String.valueOf(valor).equalsIgnoreCase("null")) {
+                return 0f;
+            }
+            return Float.parseFloat(String.valueOf(valor));
+        } catch (NumberFormatException e) {
+            return 0f;
         }
     }
 
@@ -228,8 +282,36 @@ public class RelatorioLocacoesPDF implements Relatorio {
 
         Paragraph pTotal = new Paragraph();
         pTotal.setAlignment(Element.ALIGN_RIGHT);
-        pTotal.add(new Chunk(count + " locações.      Valor Consumo: R$" + totalConsumo +  " Valor Quarto: R$" + totalQuarto + " Soma Total: R$" + totalTotal ,
-                new Font(Font.TIMES_ROMAN, 16)));
+        Font tituloFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14);
+        Font labelFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12);
+        Font valorFont = FontFactory.getFont(FontFactory.HELVETICA, 12);
+
+        
+        pTotal.setSpacingBefore(10f);  // Espaçamento antes do parágrafo
+        pTotal.setSpacingAfter(10f);   // Espaçamento depois
+
+// Título centralizado
+        Paragraph titulo = new Paragraph("Resumo do Caixa", tituloFont);
+        titulo.setAlignment(Element.ALIGN_CENTER);
+        this.documentoPDF.add(titulo);
+
+// Locações
+        pTotal.add(new Chunk("Locações: ", labelFont));
+        pTotal.add(new Chunk(count + "\n", valorFont));
+
+// Valor Consumo
+        pTotal.add(new Chunk("Valor Consumo: ", labelFont));
+        pTotal.add(new Chunk("R$ " + totalConsumo + "\n", valorFont));
+
+// Valor Quarto
+        pTotal.add(new Chunk("Valor Quarto: ", labelFont));
+        pTotal.add(new Chunk("R$ " + totalQuarto + "\n", valorFont));
+
+// Soma Total
+        pTotal.add(new Chunk("Soma Total: ", labelFont));
+        pTotal.add(new Chunk("R$ " + totalTotal + "\n", valorFont));
+
+// Adiciona ao documento
         this.documentoPDF.add(pTotal);
     }
 

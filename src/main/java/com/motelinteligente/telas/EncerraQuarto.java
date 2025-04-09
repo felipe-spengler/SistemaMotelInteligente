@@ -1356,7 +1356,6 @@ public class EncerraQuarto extends javax.swing.JFrame {
             if (n != 0) {
                 link.close();
                 statement.close();
-                JOptionPane.showMessageDialog(null, "Desconto/Acrescimo salvo! ");
 
             } else {
                 link.close();
@@ -1973,6 +1972,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
     private void btConferenciaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btConferenciaActionPerformed
         // TODO add your handling code here:
         new playSound().playSound("som/mensagem conferencia.wav");
+        txtIdProduto.grabFocus();
     }//GEN-LAST:event_btConferenciaActionPerformed
 
     private void btDesistenciaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btDesistenciaActionPerformed
@@ -2098,7 +2098,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
             outraTela.removerRow(selectedRow);
             atualizaConsumo();
             setValorDivida();
-
+            txtIdProduto.grabFocus();
         } else {
             JOptionPane.showMessageDialog(null, "Nenhum produto selecionado!");
         }

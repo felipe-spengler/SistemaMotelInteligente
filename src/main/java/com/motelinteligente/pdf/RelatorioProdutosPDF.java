@@ -64,7 +64,7 @@ public class RelatorioProdutosPDF implements Relatorio {
 
     @Override
     public void gerarCabecalho(String data) {
-        this.adicionarImagem("src/imagens/iconeMI.jpg");
+        this.adicionarImagem("src/main/resources/imagens/iconeMI.jpg");
         this.adicionarParagrafoTitulo();
         this.pularLinha();
         this.pularLinha();

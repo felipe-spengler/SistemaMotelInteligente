@@ -2018,6 +2018,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private void btConfereCaixaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btConfereCaixaActionPerformed
         //abre a conferencia de caixas
         new ConfereCaixa().setVisible(true);
+        
     }//GEN-LAST:event_btConfereCaixaActionPerformed
 
     private void btConfereLocacaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btConfereLocacaoActionPerformed

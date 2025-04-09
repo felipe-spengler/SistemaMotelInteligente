@@ -459,7 +459,7 @@ public class fquartos {
                 return resultado.getInt("idcaixaatual");
             }
         } catch (Exception e) {
-            JOptionPane.showConfirmDialog(null, e);
+            JOptionPane.showConfirmDialog(null, "Erro GetIDCaixa " + e);
         } finally {
             try {
                 // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
@@ -563,7 +563,8 @@ public class fquartos {
             int n = statement.executeUpdate();
 
             if (n == 0) {
-                logger.warn("Nenhuma linha foi atualizada: " + consultaSQL);
+                JOptionPane.showMessageDialog(null, "Contacte o suporte: Erro locação " + idPassado);
+                logger.error("Nenhuma linha foi atualizada: " + consultaSQL);
             }
         } catch (Exception e) {
             logger.error("Erro ao executar salvaLocacao: ", e);
@@ -605,7 +606,7 @@ public class fquartos {
 
             if (rs.next() && rs.getInt(1) > 0) {
                 // Registro duplicado encontrado
-                String mensagemErro = "Tentativa de inserir registro duplicado: Quarto = " + numeroQuarto + ", Horário = " + timestamp;
+                String mensagemErro = "registro duplicado: Quarto = " + numeroQuarto + ", Horário = " + timestamp;
                 logger.error( "Erro: Registro duplicado encontrado.\n" + mensagemErro);
                 JOptionPane.showMessageDialog(null, "Erro: Registro duplicado encontrado.\n" + mensagemErro);
                 return false;
@@ -625,7 +626,7 @@ public class fquartos {
                 ResultSet generatedKeys = statement.getGeneratedKeys();
                 if (generatedKeys.next()) {
                     int idLocacaoGerado = generatedKeys.getInt(1);
-                    logger.info("Registro inserido com sucesso: ID = " + idLocacaoGerado + ", Quarto = " + numeroQuarto);
+                    //logger.info("Registro inserido com sucesso: ID = " + idLocacaoGerado + ", Quarto = " + numeroQuarto);
 
                     //insere na cache ocupado
                     float valPeriodo = 0, valPernoite = 0, valAdicional = 0;
@@ -842,7 +843,6 @@ public class fquartos {
         }
 
         if (nomeTabela == null) {
-            JOptionPane.showMessageDialog(null, "Tipo inválido: " + tipoSet);
             return false;
         }
 
@@ -884,10 +884,7 @@ public class fquartos {
 
             statement.setString(1, diferencaFormatada);
             statement.setTimestamp(2, horaBanco);
-            statement.setInt(3, numeroQuarto);
-
-            System.out.println("Consulta SQL: " + consultaSQL);
-
+            statement.setInt(3, numeroQuarto);       
             int n = statement.executeUpdate();
             return n != 0;
 
