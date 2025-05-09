@@ -1624,6 +1624,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                         focoQuarto();
                         config.setMudanca(false);
                         painelSecundario.repaint();
+                        focoQuarto();
                     });
                 }
             }
@@ -1740,6 +1741,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         }
         srPane.revalidate();
         srPane.repaint();
+        
+        painelSecundario.repaint();
     }
 
     public String calculaData(String dataBanco) {

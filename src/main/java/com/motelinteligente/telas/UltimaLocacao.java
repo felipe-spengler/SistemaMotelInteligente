@@ -9,8 +9,6 @@ import com.motelinteligente.dados.fprodutos;
 import com.motelinteligente.dados.fquartos;
 import com.motelinteligente.dados.vendaProdutos;
 import com.motelinteligente.dados.vendaProdutos.gerenciaVenda;
-import static com.motelinteligente.telas.EncerraQuarto.isInteger;
-import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.sql.Timestamp;
 import java.sql.Connection;
@@ -21,12 +19,12 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.List;
+import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
+import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
@@ -619,13 +617,96 @@ public class UltimaLocacao extends javax.swing.JFrame {
             }
             // Salvar os dados se todos os critérios forem atendidos
             if (valores && recebido && positivos) {
-                if (valorDesconto >= 0 && valorAcrescimo == 0 || (valorAcrescimo >= 0 && valorDesconto == 0)) {
+                if ((valorDesconto >= 0 && valorAcrescimo == 0) || (valorAcrescimo >= 0 && valorDesconto == 0)) {
                     salvaDados();
+                    if (recC > 0) {
+                        float valCred = 0;
+                        float valDeb = 0;
+                        Connection link = new fazconexao().conectar();
+
+                        String sql = "SELECT * FROM valorcartao WHERE idlocacao = ?";
+                        PreparedStatement stmt = link.prepareStatement(sql);
+                        stmt.setInt(1, idLocacao);
+                        ResultSet resultStmt = stmt.executeQuery();
+
+                        if (resultStmt.next()) {
+                            valCred = resultStmt.getFloat("valorcredito");
+                            valDeb = resultStmt.getFloat("valordebito");
+
+                            if ((valCred + valDeb) != recC) {
+                                // Interface para entrada dos valores
+                                JPanel painel = new JPanel(new GridLayout(3, 2, 10, 10));
+                                painel.setBorder(BorderFactory.createTitledBorder(
+                                        BorderFactory.createEtchedBorder(),
+                                        "Detalhar Pagamento Cartão",
+                                        TitledBorder.CENTER,
+                                        TitledBorder.TOP
+                                ));
+
+                                JTextField txtCredito = new JTextField(String.format("%.2f", valCred));
+                                JTextField txtDebito = new JTextField(String.format("%.2f", valDeb));
+
+                                painel.add(new JLabel("Valor Crédito:"));
+                                painel.add(txtCredito);
+                                painel.add(new JLabel("Valor Débito:"));
+                                painel.add(txtDebito);
+
+                                // Teclas Enter e Tab
+                                txtCredito.addKeyListener(new java.awt.event.KeyAdapter() {
+                                    public void keyPressed(java.awt.event.KeyEvent evt) {
+                                        if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER || evt.getKeyCode() == java.awt.event.KeyEvent.VK_TAB) {
+                                            txtDebito.requestFocus();
+                                        }
+                                    }
+                                });
+                                txtDebito.addKeyListener(new java.awt.event.KeyAdapter() {
+                                    public void keyPressed(java.awt.event.KeyEvent evt) {
+                                        if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+                                            txtDebito.transferFocus();
+                                        }
+                                    }
+                                });
+
+                                boolean valoresCorretos = false;
+                                while (!valoresCorretos) {
+                                    int result = JOptionPane.showConfirmDialog(null, painel, "Informe os valores de cartão", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+                                    if (result == JOptionPane.OK_OPTION) {
+                                        try {
+                                            float novoCredito = Float.parseFloat(txtCredito.getText().replace(",", "."));
+                                            float novoDebito = Float.parseFloat(txtDebito.getText().replace(",", "."));
+                                            if ((novoCredito + novoDebito) == recC) {
+                                                PreparedStatement updateStmt = link.prepareStatement("UPDATE valorcartao SET valorcredito = ?, valordebito = ? WHERE idlocacao = ?");
+                                                updateStmt.setFloat(1, novoCredito);
+                                                updateStmt.setFloat(2, novoDebito);
+                                                updateStmt.setInt(3, idLocacao);
+                                                updateStmt.executeUpdate();
+                                                updateStmt.close();
+                                                valoresCorretos = true;
+                                            } else {
+                                                JOptionPane.showMessageDialog(null, "A soma dos valores não bate com o total do cartão (" + recC + "). Tente novamente.");
+                                            }
+                                        } catch (NumberFormatException ex) {
+                                            JOptionPane.showMessageDialog(null, "Digite apenas números válidos.");
+                                        }
+                                    } else {
+                                        JOptionPane.showMessageDialog(null, "Operação cancelada. Valores não atualizados.");
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        stmt.close();
+                        resultStmt.close();
+                        link.close();
+                    }
                 } else {
                     JOptionPane.showMessageDialog(null, "Somente Desconto ou Acréscimo! Arrume essa bagunça.");
                 }
-
+                JOptionPane.showMessageDialog(null, " Registro Alterado Com Sucesso");
+                
             }
+
         } catch (Exception e) {
             Throwable cause = e.getCause();
             if (cause != null) {
@@ -709,7 +790,7 @@ public class UltimaLocacao extends javax.swing.JFrame {
             deleteStatement.close();
 
             reinsereProdutos();
-            JOptionPane.showMessageDialog(null, " Registro Alterado Com Sucesso");
+            
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, "SalvaVendidos:" + e);
             e.printStackTrace();
@@ -774,7 +855,7 @@ public class UltimaLocacao extends javax.swing.JFrame {
     private void getProduto() {
         new ObterProdutoFrame((DefaultTableModel) tabela.getModel(), 0, this::somarConsumo);
         //tabela.repaint();
-        
+
     }
 
     private void somarConsumo() {
