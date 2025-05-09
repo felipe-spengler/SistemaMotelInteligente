@@ -1628,7 +1628,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                     });
                 }
             }
-        }, 0, 1000);  // Atualiza a cada 1 segundo
+        }, 0, 500);  // Atualiza a cada 1/2 segundo
 
         Timer alarmeTimer = new Timer();
         alarmeTimer.scheduleAtFixedRate(new TimerTask() {
@@ -1651,6 +1651,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             public void run() {
                 srPane.removeAll();
                 mostraQuartos();
+                focoQuarto();
             }
         }, 0, 20000);  // Atualiza a cada 20 segundos
 
