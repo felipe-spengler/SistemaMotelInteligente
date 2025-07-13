@@ -74,7 +74,7 @@ public class AddAlarmDialog extends JDialog {
         // Obtendo a data selecionada no dateSpinner
         LocalDate date = ((SpinnerDateModel) dateSpinner.getModel()).getDate().toInstant()
                 .atZone(ZoneId.systemDefault()).toLocalDate();
-
+        System.out.println("Data selecionada: " + date);
         // Obtendo a hora e minutos do hourSpinner e minuteSpinner
         int hour = (int) hourSpinner.getValue();
         int minute = (int) minuteSpinner.getValue();
@@ -84,7 +84,7 @@ public class AddAlarmDialog extends JDialog {
 
         // Combinando LocalDate e LocalTime em LocalDateTime
         LocalDateTime dateTime = LocalDateTime.of(date, time);
-
+        System.out.println("Data e Hora combinadas: " + dateTime);
         // Obtendo o texto da nota (descrição do alarme)
         String note = noteField.getText();
 

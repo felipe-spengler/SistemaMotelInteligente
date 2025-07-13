@@ -108,7 +108,7 @@ public class AlarmApp extends JFrame {
 
             // Query the database to find the ID
             try ( Connection conn = new fazconexao().conectar();  PreparedStatement stmt = conn.prepareStatement(
-                    "SELECT id FROM alarmes WHERE CONCAT(DATE(hora_adicionado), ' ', TIME(hora_despertar)) = ?")) {
+                    "SELECT id FROM alarmes WHERE CONCAT(DATE(hora_despertar), ' ', TIME(hora_despertar)) = ?")) {
 
                 stmt.setString(1, datetime);
                 ResultSet rs = stmt.executeQuery();
@@ -140,7 +140,7 @@ public class AlarmApp extends JFrame {
         try ( Connection conn = new fazconexao().conectar();  Statement stmt = conn.createStatement();  ResultSet rs = stmt.executeQuery("SELECT id, hora_adicionado, hora_despertar, descricao FROM alarmes")) {
 
             while (rs.next()) {
-                String data = rs.getTimestamp("hora_adicionado").toLocalDateTime().toLocalDate().toString();
+                String data = rs.getTimestamp("hora_despertar").toLocalDateTime().toLocalDate().toString();
                 String horario = rs.getTime("hora_despertar").toString();
                 String descricao = rs.getString("descricao");
 

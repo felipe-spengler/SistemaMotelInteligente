@@ -98,7 +98,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
     private boolean jopAberto = false;
     String dataInicio, dataFim, tempoTotalLocado;
     float valorAcrescimo = 0, valorDesconto = 0;
-    float valoreRecebido = 0, valorDivida = 0;
+    float valoreRecebido = 0, valorDivida = 0, valorRecebidoAgora = 0;
     float valorConsumo = 0, valorQuarto = 0, valorAdicionalPeriodo = 0, valorAdicionalPessoa = 0;
     float valD = 0, valP = 0, valC = 0;
     ClienteEncerra outraTela = new ClienteEncerra();
@@ -286,7 +286,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         String status = quarto.getStatusQuarto();
         String horarioQuarto = quarto.getHoraStatus();
         String[] partes = status.split("-");
-        
+
         txtPessoas.setText(String.valueOf(ocupado.getNumeroPessoas()));
         valorAdicionalPessoa = calculaAdicionalPessoa(ocupado.getNumeroPessoas());
         if (partes[1].equals("pernoite")) {
@@ -1289,12 +1289,12 @@ public class EncerraQuarto extends javax.swing.JFrame {
         float valorSomar = valorAcrescimo + valorQuarto + valorConsumo + valorAdicionalPeriodo + valorAdicionalPessoa;
         valorDivida = valorSomar - valorDesconto;
         txtValorDivida.setText(String.valueOf(valorDivida));
-        txtRecebidoAntecipado.setText(String.valueOf(valoreRecebido));
+        txtRecebidoAntecipado.setText(String.valueOf(valorRecebidoAgora));
         lblValorQuarto.setText(String.valueOf(valorAdicionalPessoa + valorQuarto));
         lblValorConsumo.setText(String.valueOf(valorConsumo));
-        lblAReceber.setText(String.valueOf(valorDivida - valoreRecebido));
+        lblAReceber.setText(String.valueOf(valorDivida - valoreRecebido - valorRecebidoAgora));
         outraTela.setarValores(valorAdicionalPessoa + valorQuarto, valorAdicionalPeriodo);
-        outraTela.setValorTotal(valorDivida);
+        outraTela.setValorTotal(valorDivida - valoreRecebido - valorRecebidoAgora);
         outraTela.setConsumo(valorConsumo);
     }
     private void btSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btSalvarActionPerformed
@@ -1455,7 +1455,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
             int n = statement.executeUpdate();
 
             if (n != 0) {
-                JOptionPane.showMessageDialog(null, "Locação Excluida!");
+
             } else {
                 JOptionPane.showMessageDialog(null, "Nenhum registro encontrado para exclusão na tabela registralocado!");
             }
@@ -1784,16 +1784,16 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 valD = recebidoDin[0];
                 valC = recebidoCredito[0] + recebidoDebito[0];
                 valP = recebidoPix[0];
-                if(valC > 0){
-                    salvaCartao(idLocacao, recebidoCredito[0] , recebidoDebito[0]);
+                if (valC > 0) {
+                    salvaCartao(idLocacao, recebidoCredito[0], recebidoDebito[0]);
                 }
                 sucesso[0] = true; // Indica que o pagamento foi bem-sucedido
                 dialog.dispose(); // Fecha o JDialog
             } else {
-                if(totalRecebido > valorDivida){
+                if (totalRecebido > valorDivida) {
                     //devolver troco
-                    
-                }else{
+
+                } else {
                     JOptionPane.showMessageDialog(null, "Valores divergentes! Total recebido: " + totalRecebido);
 
                 }
@@ -1803,25 +1803,25 @@ public class EncerraQuarto extends javax.swing.JFrame {
 
         return sucesso[0]; // Retorna o status de sucesso do pagamento
     }
+
     public void salvaCartao(int idLocacao, float recebidoCredito, float recebidoDebito) {
-    String consultaSQL = "INSERT INTO valorcartao (idlocacao, valorcredito, valordebito) VALUES (?, ?, ?)";
-    
-    try (Connection link = new fazconexao().conectar();
-         PreparedStatement statement = link.prepareStatement(consultaSQL)) {
-        
-        statement.setInt(1, idLocacao);
-        statement.setFloat(2, recebidoCredito);
-        statement.setFloat(3, recebidoDebito);
+        String consultaSQL = "INSERT INTO valorcartao (idlocacao, valorcredito, valordebito) VALUES (?, ?, ?)";
 
-        int n = statement.executeUpdate();
-        if (n == 0) {
-            JOptionPane.showMessageDialog(null, "Nenhum registro foi inserido.", "Erro", JOptionPane.ERROR_MESSAGE);
+        try (Connection link = new fazconexao().conectar(); PreparedStatement statement = link.prepareStatement(consultaSQL)) {
+
+            statement.setInt(1, idLocacao);
+            statement.setFloat(2, recebidoCredito);
+            statement.setFloat(3, recebidoDebito);
+
+            int n = statement.executeUpdate();
+            if (n == 0) {
+                JOptionPane.showMessageDialog(null, "Nenhum registro foi inserido.", "Erro", JOptionPane.ERROR_MESSAGE);
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Erro ao salvar o cartão: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
         }
-
-    } catch (Exception e) {
-        JOptionPane.showMessageDialog(null, "Erro ao salvar o cartão: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
     }
-}
 
     private void resetarBotoes(JButton... botoes) {
         Dimension buttonSize = new Dimension(120, 40);
@@ -1864,9 +1864,9 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 DadosOcupados quartoOcupado = cache.getCacheOcupado().get(numeroDoQuarto);
                 int novoID = new fquartos().getIdLocacao(numeroDoQuarto);
                 idLocacao = novoID;
-
             }
         }
+
         DefaultTableModel model = (DefaultTableModel) tabela.getModel();
         int rowCount = model.getRowCount();
         for (int i = 0; i < rowCount; i++) {
@@ -1878,7 +1878,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
             quartodao.salvaProduto(idLocacao, idProduto, quantidade, valUnd, valtotal);
             new com.motelinteligente.dados.fprodutos().diminuiEstoque(idProduto, quantidade);
         }
-        //salvalocacao
+
         float valorDoQuarto = valorQuarto + valorAdicionalPeriodo + valorAdicionalPessoa;
         String horaFim = lblFimLocacao.getText();
         String horaInicio = lblInicioLocacao.getText();
@@ -1886,12 +1886,9 @@ public class EncerraQuarto extends javax.swing.JFrame {
         new playSound().playSound("som/agradecemosPreferencia.wav");
         new ConectaArduino(999);
 
-        // altera o status do quarto para limpeza
         mudaStatusNaCache(numeroDoQuarto, "limpeza");
-        //retira da cache ocupados
         cache.getCacheOcupado().remove(numeroDoQuarto);
 
-        //se tiver prevendidos ou negociados retira tambem
         if (cache.cacheProdutosVendidos.containsKey(idLocacao)) {
             cache.cacheProdutosVendidos.remove(idLocacao);
         }
@@ -1901,7 +1898,53 @@ public class EncerraQuarto extends javax.swing.JFrame {
         config.setMudanca(true);
         outraTela.dispose();
         this.dispose();
-        JOptionPane.showMessageDialog(null, "Registro Salvo com sucesso!");
+
+        // Exibe mensagem com Timer e contagem no console
+        JOptionPane optionPane = new JOptionPane("Registro salvo com sucesso!", JOptionPane.INFORMATION_MESSAGE);
+        JDialog dialog = optionPane.createDialog((java.awt.Frame) null, "Mensagem");
+
+        final boolean[] fechadoPorTempo = {false};
+        final int tempoTotal = 15; // segundos
+        final int[] tempoRestante = {tempoTotal};
+
+        // Timer para fechar o diálogo após 15 segundos
+        Timer timerFechar = new Timer(tempoTotal * 1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (dialog.isShowing()) {
+                    fechadoPorTempo[0] = true;
+                    dialog.dispose();
+                    System.out.println("⏱ Fechado automaticamente após 15 segundos.");
+                }
+            }
+        });
+        timerFechar.setRepeats(false);
+        timerFechar.start();
+
+        // Timer para imprimir contagem regressiva
+        Timer timerContagem = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                tempoRestante[0]--;
+                if (tempoRestante[0] > 0) {
+                    System.out.println("⏳ Tempo restante: " + tempoRestante[0] + "s");
+                }
+            }
+        });
+        timerContagem.setRepeats(true);
+        timerContagem.start();
+
+        dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosed(java.awt.event.WindowEvent e) {
+                timerContagem.stop(); // Para o contador
+                if (!fechadoPorTempo[0]) {
+                    System.out.println("✅ Fechado manualmente pelo botão OK.");
+                }
+            }
+        });
+
+        dialog.setVisible(true);
     }
 
     public boolean mudaStatusNaCache(int quartoMudar, String statusColocar) {
@@ -1933,7 +1976,6 @@ public class EncerraQuarto extends javax.swing.JFrame {
 
         String[] palavras = falar.split(" ");
 
-        
         reproduzirSonsEmSequencia(palavras, 0);
 
     }//GEN-LAST:event_btDebitoActionPerformed
@@ -2078,7 +2120,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
             recebido = recebido.replace(",", ".");
             if (recebido != null) {
                 float valorRecebido = Float.valueOf(recebido);
-                valoreRecebido = valorRecebido;
+                valorRecebidoAgora = valorRecebido;
                 setValorDivida();
             }
 

@@ -115,22 +115,19 @@ public class ObterProdutoFrame extends JFrame {
                 }
             }
         });
-        spinnerQuantidade.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    btnInserir.requestFocus(); // Mover o foco para o botão "Inserir"
+        JComponent editor = spinnerQuantidade.getEditor();
+        if (editor instanceof JSpinner.DefaultEditor) {
+            JTextField spinnerTextField = ((JSpinner.DefaultEditor) editor).getTextField();
+            spinnerTextField.addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyPressed(KeyEvent e) {
+                    if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                        btnInserir.requestFocus(); // Mover o foco para o botão "Inserir"
+                    }
                 }
-            }
-        });
-        btnInserir.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    inserirProduto();
-                }
-            }
-        });
+            });
+        }
+        
 
         setLocationRelativeTo(null); // Centralizar a tela
         setVisible(true);
@@ -169,9 +166,8 @@ public class ObterProdutoFrame extends JFrame {
                         produtosVendidos.add(new DadosVendidos(Integer.valueOf(idProdutoStr), Integer.valueOf(quantidade)));
                         cache.cacheProdutosVendidos.put(idLoca, produtosVendidos);
 
-                        
                         produtodao.inserirPrevendido(idLoca, Integer.valueOf(idProdutoStr), Integer.valueOf(quantidade));
-                        
+
                         inseriu = true;
                     } else {
                         modelo.addRow(new Object[]{
@@ -184,7 +180,9 @@ public class ObterProdutoFrame extends JFrame {
                         inseriu = true;
                         System.out.println("produto inserido");
                     }
-                    if(inseriu) callback.run(); 
+                    if (inseriu) {
+                        callback.run();
+                    }
                     this.dispose();
                 } else {
                     JOptionPane.showMessageDialog(rootPane, "Quantidade inválida!");
@@ -206,5 +204,4 @@ public class ObterProdutoFrame extends JFrame {
         }
     }
 
-    
 }

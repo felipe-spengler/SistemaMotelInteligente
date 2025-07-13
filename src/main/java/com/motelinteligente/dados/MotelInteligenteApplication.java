@@ -204,7 +204,7 @@ public class MotelInteligenteApplication {
                                         try {
                                             Thread.sleep(500); // Pausa por 0,5s
                                             new ConectaArduino(quartoEmFoco);
-                                            Thread.sleep(500); // Pausa por 0,5s
+                                            Thread.sleep(800); // Pausa por 0,8s
                                         } catch (InterruptedException ex) {
                                             ex.printStackTrace();
                                         }

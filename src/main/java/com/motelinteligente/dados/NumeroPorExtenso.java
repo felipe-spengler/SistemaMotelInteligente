@@ -15,7 +15,7 @@ public class NumeroPorExtenso {
     };
 
     private static final String[] CENTENAS = {
-            "", "cento", "duzentos", "trezentos", "quatrocentos", "quinhentos", "seiscentos", "setecentos", "oitocentos", "novecentos"
+            "", "cento e", "duzentos", "trezentos", "quatrocentos", "quinhentos", "seiscentos", "setecentos", "oitocentos", "novecentos"
     };
 
     public static String NumeroPorExtenso(float valor) {
@@ -89,7 +89,7 @@ public class NumeroPorExtenso {
     }
 
     public static void main(String[] args) {
-        float[] valores = {0.00f, 1.00f, 3.00f, 10.00f, 11.00f, 12.00f, 15.00f, 20.00f, 21.00f, 30.00f, 100.00f, 101.00f, 110.00f, 111.00f, 999.99f, 1000.00f, 1001.00f, 1100.00f, 1111.00f, 9999.99f};
+        float[] valores = {0.00f, 1.00f, 3.00f, 10.00f, 11.00f, 12.00f, 15.00f, 20.00f, 21.00f, 71.00f, 30.00f, 100.00f, 101.00f, 110.00f, 111.00f, 999.99f, 1000.00f, 1001.00f, 1100.00f, 1111.00f, 9999.99f};
         for (float valor : valores) {
             System.out.println(valor + " = " + NumeroPorExtenso(valor));
         }

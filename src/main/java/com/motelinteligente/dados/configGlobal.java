@@ -21,6 +21,7 @@ public class configGlobal {
     private boolean flagSistemaSpring;
     private boolean flagArduino;
     private boolean flagMesmoUserCaixa;
+    private boolean portoesRF;
     private int limiteDesconto;
     private BackupQueueManager backupQueueManager; 
     private static int contadorExecucoes = 0;
@@ -32,11 +33,13 @@ public class configGlobal {
         usuario = null;
         cargoUsuario = "Visitante";
         caixaAberto = 0;
+        portoesRF = true;
         mudanca = false;
         logoffecharcaixa = false;
         controlaEstoque = false;
         flagSistemaSpring = flagArduino = false;
         telaMostrar = null;
+        
         
     }
      public int getAlarmesAtivos() {
@@ -58,7 +61,7 @@ public class configGlobal {
     }
     public static void incrementarContadorExecucoes() {
         contadorExecucoes++;
-        System.out.println("Total de execuções no banco online: " + contadorExecucoes);
+        //System.out.println("Total de execuções no banco online: " + contadorExecucoes);
     }
     
     public static int getContadorExecucoes() {
@@ -81,7 +84,12 @@ public class configGlobal {
     public boolean isFlagMesmoUserCaixa() {
         return flagMesmoUserCaixa;
     }
-
+     public boolean getPortoesRF() {
+        return portoesRF;
+    }
+    public void setPortoesRF(boolean portoes) {
+        this.portoesRF = portoes;
+    }
     public void setFlagMesmoUserCaixa(boolean flagMesmoUserCaixa) {
         this.flagMesmoUserCaixa = flagMesmoUserCaixa;
     }
@@ -125,6 +133,7 @@ public class configGlobal {
                 this.flagMesmoUserCaixa = resultado.getBoolean("flagMesmoUserCaixa");
                 this.limiteDesconto = resultado.getInt("limitadesconto");
                 this.telaMostrar = resultado.getString("telaMostrar");
+                this.portoesRF = resultado.getBoolean("portoesrf");
             } else {
                 JOptionPane.showMessageDialog(null, "Erro ao carregar Informações Adicionais.");
                 link.close();

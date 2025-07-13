@@ -806,7 +806,7 @@ public class CaixaFrame extends javax.swing.JFrame {
         Connection link = null;
         PreparedStatement statement = null;
         ResultSet resultado = null;
-        
+
         try {
             link = new fazconexao().conectar();
             statement = link.prepareStatement(sql);
@@ -1045,6 +1045,21 @@ public class CaixaFrame extends javax.swing.JFrame {
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
         // TODO add your handling code here:
+        atualizarTela() ;
+        this.addWindowFocusListener(new java.awt.event.WindowFocusListener() {
+        @Override
+        public void windowGainedFocus(java.awt.event.WindowEvent e) {
+            atualizarTela(); // ou chame carregaInfo() direto, se preferir
+        }
+
+        @Override
+        public void windowLostFocus(java.awt.event.WindowEvent e) {
+            // opcional
+        }
+    });
+    }//GEN-LAST:event_formWindowOpened
+    private void atualizarTela() {
+        System.out.println("Janela voltou ao foco. Atualizando...");
         configGlobal config = configGlobal.getInstance();
         int idCaixaAtual = config.getCaixa();
         System.out.println(idCaixaAtual);
@@ -1059,9 +1074,7 @@ public class CaixaFrame extends javax.swing.JFrame {
             carregaInfo();
 
         }
-
-    }//GEN-LAST:event_formWindowOpened
-
+    }
     private void btFecharActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btFecharActionPerformed
         // fechar o caixa
         float valCaixa = 0;

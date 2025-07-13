@@ -1,5 +1,6 @@
 package com.motelinteligente.telas;
 
+import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.motelinteligente.alarme.AlarmApp;
 import com.motelinteligente.alarme.FAlarmes;
 import com.motelinteligente.arduino.ConectaArduino;
@@ -72,6 +73,9 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
@@ -98,6 +102,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private long lastUpdate = 0;
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(TelaPrincipal.class);
     private EncerraQuarto encerraQuarto;
+    private CaixaFrame caixaFrame;
     // Intervalo mínimo entre execuções em milissegundos
     private static final long UPDATE_INTERVAL = 1000; // 1 segundo
 
@@ -125,7 +130,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     public TelaPrincipal() {
         initComponents();
         inicializarPopupMenu();
-
+         
         // Inicializa o BackupExecutor
         new BackupExecutor().start();
         CheckSincronia checkSincronia = new CheckSincronia();
@@ -140,6 +145,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         tabela1.getColumn(tabela1.getColumnName(3)).setPreferredWidth(70);
         numeroQuartos = new fquartos().numeroQuartos();
         txtPessoas.setDocument(new NumOnly());
+        
         this.setVisible(true);
         int idCaixaAtual = new fazconexao().verificaCaixa();
 
@@ -400,9 +406,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             }
             lblValorConsumo.setText("R$ " + totalVendido);
             lblValorConsumo.repaint();
-        } else {
-            System.out.println("Não há produtos vendidos para a locação " + locacao + " na cache.");
-        }
+        } 
 
     }
 
@@ -546,11 +550,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         radioPernoite = new javax.swing.JRadioButtonMenuItem();
         radioPeriodo = new javax.swing.JRadioButtonMenuItem();
         jTextField2 = new javax.swing.JTextField();
-        jPanel1 = new javax.swing.JPanel();
-        jSeparator1 = new javax.swing.JSeparator();
-        labelData = new javax.swing.JLabel();
-        labelHora = new javax.swing.JLabel();
-        lblAlarmeAtivo = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jPanel2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
@@ -599,6 +598,12 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         painelQuartos = new javax.swing.JPanel();
         tabela = new javax.swing.JPanel();
         srPane = new javax.swing.JDesktopPane();
+        painelBotton = new javax.swing.JPanel();
+        labelHora = new javax.swing.JLabel();
+        labelData = new javax.swing.JLabel();
+        lblAlarmeAtivo = new javax.swing.JLabel();
+        painelReservasProximas = new javax.swing.JPanel();
+        labelReservas = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         btCadastros = new javax.swing.JMenu();
         btQuartos = new javax.swing.JMenu();
@@ -621,7 +626,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         menuConfigAd = new javax.swing.JMenu();
         menuSobSistema = new javax.swing.JMenuItem();
         btDespertador = new javax.swing.JMenu();
-        menuSair = new javax.swing.JMenu();
+        menuReservas = new javax.swing.JMenu();
+        btMenuSair = new javax.swing.JMenu();
 
         javax.swing.GroupLayout jFrame1Layout = new javax.swing.GroupLayout(jFrame1.getContentPane());
         jFrame1.getContentPane().setLayout(jFrame1Layout);
@@ -731,50 +737,12 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             }
         });
 
-        labelData.setText("data data data");
-
-        labelHora.setText("hora hora hora");
-
-        lblAlarmeAtivo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/bell.png"))); // NOI18N
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(269, 269, 269)
-                .addComponent(labelData)
-                .addGap(40, 40, 40)
-                .addComponent(labelHora)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(lblAlarmeAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, 322, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(252, 252, 252))
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jSeparator1)
-                .addContainerGap())
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(29, 29, 29)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(labelData)
-                            .addComponent(labelHora)))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(18, 18, 18)
-                        .addComponent(lblAlarmeAtivo)))
-                .addContainerGap(17, Short.MAX_VALUE))
-        );
-
         jScrollPane1.setBorder(null);
         jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel2.setMaximumSize(new java.awt.Dimension(473, 643));
+        jPanel2.setRequestFocusEnabled(false);
 
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/logo_peq.png"))); // NOI18N
 
@@ -1003,7 +971,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 .addComponent(botaoIniciar)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(botaoTroca)
-                .addContainerGap(34, Short.MAX_VALUE))
+                .addGap(5, 5, 5))
         );
 
         jTabbedPane1.addTab("Principal", painelSecundario);
@@ -1284,11 +1252,80 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         srPane.setLayout(srPaneLayout);
         srPaneLayout.setHorizontalGroup(
             srPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1100, Short.MAX_VALUE)
+            .addGap(0, 1053, Short.MAX_VALUE)
         );
         srPaneLayout.setVerticalGroup(
             srPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 591, Short.MAX_VALUE)
+        );
+
+        painelBotton.setBackground(new java.awt.Color(255, 255, 255));
+        painelBotton.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        painelBotton.setMaximumSize(new java.awt.Dimension(990, 80));
+        painelBotton.setMinimumSize(new java.awt.Dimension(990, 80));
+
+        labelHora.setText("hora hora hora");
+
+        labelData.setText("data data data");
+
+        lblAlarmeAtivo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/bell.png"))); // NOI18N
+
+        painelReservasProximas.setBackground(new java.awt.Color(255, 255, 255));
+        painelReservasProximas.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        painelReservasProximas.setMaximumSize(new java.awt.Dimension(600, 80));
+        painelReservasProximas.setMinimumSize(new java.awt.Dimension(500, 66));
+        painelReservasProximas.setPreferredSize(new java.awt.Dimension(568, 80));
+
+        labelReservas.setText("txt");
+
+        javax.swing.GroupLayout painelReservasProximasLayout = new javax.swing.GroupLayout(painelReservasProximas);
+        painelReservasProximas.setLayout(painelReservasProximasLayout);
+        painelReservasProximasLayout.setHorizontalGroup(
+            painelReservasProximasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(painelReservasProximasLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(labelReservas, javax.swing.GroupLayout.PREFERRED_SIZE, 554, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        painelReservasProximasLayout.setVerticalGroup(
+            painelReservasProximasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(painelReservasProximasLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(labelReservas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        javax.swing.GroupLayout painelBottonLayout = new javax.swing.GroupLayout(painelBotton);
+        painelBotton.setLayout(painelBottonLayout);
+        painelBottonLayout.setHorizontalGroup(
+            painelBottonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelBottonLayout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addComponent(painelReservasProximas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lblAlarmeAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(labelData)
+                .addGap(18, 18, 18)
+                .addComponent(labelHora)
+                .addGap(236, 236, 236))
+        );
+        painelBottonLayout.setVerticalGroup(
+            painelBottonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelBottonLayout.createSequentialGroup()
+                .addContainerGap(27, Short.MAX_VALUE)
+                .addGroup(painelBottonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblAlarmeAtivo)
+                    .addGroup(painelBottonLayout.createSequentialGroup()
+                        .addGap(8, 8, 8)
+                        .addGroup(painelBottonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(labelData)
+                            .addComponent(labelHora))))
+                .addGap(20, 20, 20))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelBottonLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(painelReservasProximas, javax.swing.GroupLayout.DEFAULT_SIZE, 67, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         btCadastros.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/cadastro.png"))); // NOI18N
@@ -1508,20 +1545,35 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         });
         jMenuBar1.add(btDespertador);
 
-        menuSair.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/sair.png"))); // NOI18N
-        menuSair.setText("Sair");
-        menuSair.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        menuSair.addMouseListener(new java.awt.event.MouseAdapter() {
+        menuReservas.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/reservas.png"))); // NOI18N
+        menuReservas.setText("Reservas");
+        menuReservas.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        menuReservas.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                menuSairMouseClicked(evt);
+                menuReservasMouseClicked(evt);
             }
         });
-        menuSair.addActionListener(new java.awt.event.ActionListener() {
+        menuReservas.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuSairActionPerformed(evt);
+                menuReservasActionPerformed(evt);
             }
         });
-        jMenuBar1.add(menuSair);
+        jMenuBar1.add(menuReservas);
+
+        btMenuSair.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/sair.png"))); // NOI18N
+        btMenuSair.setText("Sair");
+        btMenuSair.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btMenuSair.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btMenuSairMouseClicked(evt);
+            }
+        });
+        btMenuSair.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btMenuSairActionPerformed(evt);
+            }
+        });
+        jMenuBar1.add(btMenuSair);
 
         setJMenuBar(jMenuBar1);
 
@@ -1529,36 +1581,38 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(srPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
-                .addComponent(painelQuartos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(tabela, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 434, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(srPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 23, Short.MAX_VALUE)
+                        .addComponent(painelQuartos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, 0)
+                        .addComponent(tabela, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 434, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(painelBotton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 605, Short.MAX_VALUE)
+                    .addComponent(tabela, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(tabela, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(139, 139, 139)
-                                .addComponent(painelQuartos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(srPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(139, 139, 139)
+                        .addComponent(painelQuartos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(srPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(painelBotton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
+
+        painelBotton.getAccessibleContext().setAccessibleName("");
 
         getAccessibleContext().setAccessibleDescription("");
 
@@ -1566,15 +1620,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void menuSairMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menuSairMouseClicked
-        // TODO add your handling code here:
-        this.dispose();
-        try {
-            new TelaLogin().setVisible(true);
-        } catch (IOException ex) {
-            Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }//GEN-LAST:event_menuSairMouseClicked
+    private void menuReservasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menuReservasMouseClicked
+        new GerenciarReservas().setVisible(true);
+    }//GEN-LAST:event_menuReservasMouseClicked
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
         configGlobal config = configGlobal.getInstance();
@@ -1614,8 +1662,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             public void run() {
                 // A ação para atualizar a hora, equivalente à classe `hora`
                 Calendar now = Calendar.getInstance();
-                labelHora.setText(String.format("%1$tH:%1$tM:%1$tS", now));
-
+                SwingUtilities.invokeLater(() -> {
+                    labelHora.setText(String.format("%1$tH:%1$tM:%1$tS", now));
+                });
                 configGlobal config = configGlobal.getInstance();
 
                 if (config.getMudanca()) {
@@ -1628,7 +1677,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                     });
                 }
             }
-        }, 0, 500);  // Atualiza a cada 1/2 segundo
+        }, 0, 750);  // Atualiza a cada 1/2 segundo
 
         Timer alarmeTimer = new Timer();
         alarmeTimer.scheduleAtFixedRate(new TimerTask() {
@@ -1644,7 +1693,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             }
         }, 0, 60 * 1000); // Verifica a cada 1 minuto
 
-        // Utiliza outro java.util.Timer para verificar os quartos a cada 30 segundos
+        // Utiliza outro java.util.Timer para verificar os quartos a cada 20 segundos
         Timer outroTimer = new Timer();
         outroTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -1654,9 +1703,88 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 focoQuarto();
             }
         }, 0, 20000);  // Atualiza a cada 20 segundos
-
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.scheduleAtFixedRate(() -> {
+            verificarReservasProximas();
+        }, 0, 1, TimeUnit.HOURS);
     }
 
+    private void verificarReservasProximas() {
+        
+    try (Connection conn = new fazconexao().conectar(); PreparedStatement stmt = conn.prepareStatement(
+            "SELECT * FROM reservas "
+            + "WHERE TIMESTAMP(data_entrada, horario_entrada) BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 12 HOUR)"
+    ); ResultSet rs = stmt.executeQuery()) {
+
+        CacheDados cache = CacheDados.getInstancia();
+        StringBuilder textoHTML = new StringBuilder("<html>");
+        boolean temReservas = false;
+
+        while (rs.next()) {
+            temReservas = true; // Indica que há pelo menos uma reserva
+
+            String numero = rs.getString("numero_quarto");
+            String hora = rs.getString("horario_entrada");
+            String data = rs.getString("data_entrada");
+            String valorPago = rs.getString("valor_pago");
+            String nome = rs.getString("observacao");
+            
+            //verifica qual o status do quarto > se possível reserva ele
+            CarregaQuarto quarto = cache.getCacheQuarto().get(Integer.parseInt(numero));
+            System.out.println("quarto de num " + numero + " está reservado");
+            if(!quarto.getStatusQuarto().contains("ocupado") || quarto.getStatusQuarto().equals("limpeza")){
+                mudaStatusNaCache(Integer.parseInt(numero), "reservado", null);
+                
+                
+                // a seguir acontece em background
+            SwingWorker<Void, Void> worker;
+            worker = new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() throws Exception {
+                    new fquartos().setStatus(Integer.parseInt(numero),  "reservado");
+                    return null;
+                }
+
+            };
+            worker.execute();
+                
+            }
+           
+            
+            // Formatação da data e horário
+            String dataHora = hora + "/" + data;
+
+            // Adicionando a bolinha azul e o texto formatado
+            textoHTML.append("<div style='font-size: 14px;'>")
+                    .append("<span style='color: blue;'>&#9679;</span> Reserva: Nº <b style='color: red;'>")
+                    .append(numero)
+                    .append("</b> - <b style='color: red;'>")
+                    .append(dataHora)
+                    .append("</b> - pago <b style='color: red;'>")
+                    .append(valorPago)
+                    .append("</b> - <span style='color: black;'>")
+                    .append(nome)
+                    .append("</span></div><br>");
+
+            
+        }
+
+        // Se não houver reservas, deve deixar o texto vazio
+        if (!temReservas) {
+            textoHTML.append("Nenhuma reserva nas proximas 24h.");
+        }
+
+        textoHTML.append("</html>");
+
+        SwingUtilities.invokeLater(() -> {
+            labelReservas.setText(textoHTML.toString());
+            
+        });
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
     private void mostraQuartos() {
         String status = null, data = null;
         long currentTime = System.currentTimeMillis();
@@ -1742,7 +1870,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         }
         srPane.revalidate();
         srPane.repaint();
-        
+
         painelSecundario.repaint();
     }
 
@@ -1815,16 +1943,10 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         this.dispose();
         new TelaLogin().setVisible(true);
     }
-    private void menuSairActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSairActionPerformed
-        try {
-            CacheDados cacheDados = CacheDados.getInstancia();
-            cacheDados.limparCaches();
-            fecharTela();
-        } catch (IOException ex) {
-            Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    private void menuReservasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuReservasActionPerformed
+        //DEPOIS IMPLEMENTAR A PARTE DE RESERVAS AQUI
 
-    }//GEN-LAST:event_menuSairActionPerformed
+    }//GEN-LAST:event_menuReservasActionPerformed
 
     private void lblUsuarioPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_lblUsuarioPropertyChange
         // TODO add your handling code here:
@@ -1901,7 +2023,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             encerraQuarto = new EncerraQuarto(this, quartoEmFoco);
             encerraQuarto.setVisible(true);
         } else {
-             Icon iconeAlerta = UIManager.getIcon("OptionPane.warningIcon");
+            Icon iconeAlerta = UIManager.getIcon("OptionPane.warningIcon");
 
 // Mensagem formatada com HTML
             String mensagem = "<html><body style='text-align: center; font-size: 12px;'>"
@@ -1961,7 +2083,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                         try {
                             Thread.sleep(300); // Pausa por 0,3s
                             new ConectaArduino(quartoEmFoco);
-                            Thread.sleep(300); // Pausa por 0,3s
+                            Thread.sleep(800); // Pausa por 0,3s
                         } catch (InterruptedException ex) {
                             JOptionPane.showMessageDialog(null, ex);
                         }
@@ -2022,7 +2144,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private void btConfereCaixaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btConfereCaixaActionPerformed
         //abre a conferencia de caixas
         new ConfereCaixa().setVisible(true);
-        
+
     }//GEN-LAST:event_btConfereCaixaActionPerformed
 
     private void btConfereLocacaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btConfereLocacaoActionPerformed
@@ -2792,16 +2914,51 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     }//GEN-LAST:event_btQuartosMouseClicked
 
     private void menuCaixaBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuCaixaBtActionPerformed
-        System.out.println("click botao caixaaa");
-        new CaixaFrame().setVisible(true);
-        System.out.println("abriu caixaFrame");
-    }//GEN-LAST:event_menuCaixaBtActionPerformed
+        abrirCaixaFrame();
+        //new CaixaFrame().setVisible(true);
 
+    }//GEN-LAST:event_menuCaixaBtActionPerformed
+    private void abrirCaixaFrame() {
+        if (caixaFrame == null || !caixaFrame.isVisible()) {
+            // Criar nova instância se não houver tela aberta
+            caixaFrame = new CaixaFrame();
+            caixaFrame.setVisible(true);
+        } else {
+            Icon iconeAlerta = UIManager.getIcon("OptionPane.warningIcon");
+
+// Mensagem formatada com HTML
+            String mensagem = "<html><body style='text-align: center; font-size: 12px;'>"
+                    + "<b>Uma tela de caixa já está aberta!</b><br>"
+                    + "</body></html>";
+
+// Exibe a JOptionPane com ícone e mensagem estilizada
+            JOptionPane.showMessageDialog(this, mensagem, "Atenção!", JOptionPane.WARNING_MESSAGE, iconeAlerta);
+            caixaFrame.setExtendedState(JFrame.NORMAL); // Caso esteja minimizada, restaurar
+            caixaFrame.setAlwaysOnTop(true); // Coloca na frente de todas as janelas
+            caixaFrame.toFront(); // Traz para frente
+            caixaFrame.requestFocus(); // Dá foco na janela
+            caixaFrame.setAlwaysOnTop(false); // Remove o "always on top" depois
+
+        }
+    }
     private void menuCaixaBtMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menuCaixaBtMouseClicked
-        System.out.println("click botao caixaaa");
-        new CaixaFrame().setVisible(true);
-        System.out.println("abriu caixaFrame");
+        abrirCaixaFrame();
     }//GEN-LAST:event_menuCaixaBtMouseClicked
+
+    private void btMenuSairMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btMenuSairMouseClicked
+        // CODIGO PARA LOGGOF
+        try {
+            CacheDados cacheDados = CacheDados.getInstancia();
+            cacheDados.limparCaches();
+            fecharTela();
+        } catch (IOException ex) {
+            Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_btMenuSairMouseClicked
+
+    private void btMenuSairActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btMenuSairActionPerformed
+
+    }//GEN-LAST:event_btMenuSairActionPerformed
     private void trocaQuarto(int idLocacao, int numeroNovoQuarto) {
         fquartos quarto = new fquartos();
         String horaStatus = quarto.getDataInicio(quartoEmFoco);
@@ -2956,6 +3113,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private javax.swing.JMenu btDespertador;
     private javax.swing.JMenu btFerramentas;
     private javax.swing.JMenu btFuncionario;
+    private javax.swing.JMenu btMenuSair;
     private javax.swing.JButton btNegociar;
     private javax.swing.JMenu btQuartos;
     private javax.swing.JButton bt_Antecipado;
@@ -2988,14 +3146,12 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private javax.swing.JMenu jMenu6;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem2;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator5;
@@ -3003,6 +3159,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private javax.swing.JTextField jTextField2;
     private javax.swing.JLabel labelData;
     private javax.swing.JLabel labelHora;
+    private javax.swing.JLabel labelReservas;
     private javax.swing.JLabel lblAlarmeAtivo;
     private javax.swing.JLabel lblCargo;
     private javax.swing.JLabel lblEntrada;
@@ -3021,11 +3178,13 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private javax.swing.JPopupMenu menuOcupado;
     private javax.swing.JMenuItem menuRelaVenProdutos;
     private javax.swing.JMenuItem menuResBackup;
-    private javax.swing.JMenu menuSair;
+    private javax.swing.JMenu menuReservas;
     private javax.swing.JMenuItem menuSobSistema;
     private javax.swing.JPopupMenu menuStatus;
     private javax.swing.JMenuItem menuVerProdutos;
+    private javax.swing.JPanel painelBotton;
     private javax.swing.JPanel painelQuartos;
+    private javax.swing.JPanel painelReservasProximas;
     private javax.swing.JPanel painelSecundario;
     private javax.swing.JDesktopPane painelSecundario2;
     private javax.swing.JRadioButtonMenuItem radioPeriodo;

@@ -255,23 +255,22 @@ public class ClienteEncerra extends javax.swing.JFrame {
         painelRecebimentoLayout.setHorizontalGroup(
             painelRecebimentoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(painelRecebimentoLayout.createSequentialGroup()
+                .addGap(76, 76, 76)
                 .addGroup(painelRecebimentoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel12)
                     .addGroup(painelRecebimentoLayout.createSequentialGroup()
-                        .addGap(99, 99, 99)
-                        .addComponent(jLabel12))
-                    .addGroup(painelRecebimentoLayout.createSequentialGroup()
-                        .addGap(117, 117, 117)
+                        .addGap(18, 18, 18)
                         .addComponent(lblValorTotal)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         painelRecebimentoLayout.setVerticalGroup(
             painelRecebimentoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(painelRecebimentoLayout.createSequentialGroup()
-                .addContainerGap(134, Short.MAX_VALUE)
+                .addGap(71, 71, 71)
                 .addComponent(jLabel12)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblValorTotal)
-                .addGap(102, 102, 102))
+                .addContainerGap(165, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);

@@ -1,6 +1,6 @@
 package com.motelinteligente.telas;
 
-import com.motelinteligente.dados.BarraCarregar;
+import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.motelinteligente.dados.CacheDados;
 import com.motelinteligente.dados.MotelInteligenteApplication;
 import com.motelinteligente.dados.configGlobal;
@@ -32,7 +32,7 @@ public class TelaLogin extends javax.swing.JFrame {
 
     public TelaLogin() throws IOException {
         // Inicializa o contexto do Spring
-
+        FlatIntelliJLaf.setup();
         setVisible(true);
         initComponents();
         insereIcone(this);
