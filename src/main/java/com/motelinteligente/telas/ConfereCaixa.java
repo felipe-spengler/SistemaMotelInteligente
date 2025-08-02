@@ -156,34 +156,60 @@ public class ConfereCaixa extends JFrame {
 
     // Método para carregar os caixas abertos entre as datas fornecidas
     private void carregarCaixas() {
-        Date dataInicio = dateChooserInicio.getDate();
-        Date dataFim = dateChooserFim.getDate();
-        // Ajustar dataFim para o fim do dia (23:59:59.999)
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(dataFim);
-        cal.set(Calendar.HOUR_OF_DAY, 23);
-        cal.set(Calendar.MINUTE, 59);
-        cal.set(Calendar.SECOND, 59);
-        cal.set(Calendar.MILLISECOND, 999);
-        dataFim = cal.getTime();
-        if (dataInicio == null || dataFim == null) {
-            JOptionPane.showMessageDialog(this, "Por favor, selecione as datas de início e fim", "Aviso", JOptionPane.WARNING_MESSAGE);
+        // Verifica se os campos estão vazios ou nulos
+        String textoInicio = ((JTextField) dateChooserInicio.getDateEditor().getUiComponent()).getText().trim();
+        String textoFim = ((JTextField) dateChooserFim.getDateEditor().getUiComponent()).getText().trim();
+
+        if (textoInicio.isEmpty() && textoFim.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Por favor, selecione pelo menos uma das datas (início ou fim)", "Aviso", JOptionPane.WARNING_MESSAGE);
             return;
+        }
+
+        Date dataInicio = null;
+        Date dataFim = null;
+
+        if (!textoInicio.isEmpty()) {
+            dataInicio = dateChooserInicio.getDate();
+        }
+        if (!textoFim.isEmpty()) {
+            dataFim = dateChooserFim.getDate();
+
+            // Ajusta dataFim para 23:59:59.999
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(dataFim);
+            cal.set(Calendar.HOUR_OF_DAY, 23);
+            cal.set(Calendar.MINUTE, 59);
+            cal.set(Calendar.SECOND, 59);
+            cal.set(Calendar.MILLISECOND, 999);
+            dataFim = cal.getTime();
         }
 
         Connection link = new fazconexao().conectar();
         try {
             tableModel.setRowCount(0); // Limpar tabela antes de carregar novos dados
 
-            String query = "SELECT * FROM caixa "
-                    + "WHERE horaabre >= ? AND horaabre <= ?";
+            // Monta a query dinamicamente
+            StringBuilder query = new StringBuilder("SELECT * FROM caixa WHERE 1=1 ");
+            if (dataInicio != null) {
+                query.append("AND horaabre >= ? ");
+            }
+            if (dataFim != null) {
+                query.append("AND horaabre <= ? ");
+            }
 
-            PreparedStatement statement = link.prepareStatement(query);
-            statement.setTimestamp(1, new Timestamp(dataInicio.getTime()));
-            statement.setTimestamp(2, new Timestamp(dataFim.getTime()));
-            System.out.println("QUERY => SELECT * FROM caixa WHERE horaabre >= '"
-                    + new Timestamp(dataInicio.getTime()) + "' AND horaabre <= '"
-                    + new Timestamp(dataFim.getTime()) + "'");
+            PreparedStatement statement = link.prepareStatement(query.toString());
+
+            // Define os parâmetros dinamicamente
+            int paramIndex = 1;
+            if (dataInicio != null) {
+                statement.setTimestamp(paramIndex++, new Timestamp(dataInicio.getTime()));
+            }
+            if (dataFim != null) {
+                statement.setTimestamp(paramIndex++, new Timestamp(dataFim.getTime()));
+            }
+
+            System.out.println("QUERY => " + statement.toString());
+
             ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
@@ -201,16 +227,14 @@ public class ConfereCaixa extends JFrame {
 
                 tableModel.addRow(new Object[]{id, horaAbreFormatted, usuarioAbre, saldoAbre, horaFechaFormatted, usuarioFecha, saldoFecha});
             }
-            // Centralizando o texto nas colunas
+
+            // Centralizar colunas
             DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
             centerRenderer.setHorizontalAlignment(JLabel.CENTER);
-            table.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
-            table.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
-            table.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
-            table.getColumnModel().getColumn(4).setCellRenderer(centerRenderer);
-            table.getColumnModel().getColumn(5).setCellRenderer(centerRenderer);
-            table.getColumnModel().getColumn(6).setCellRenderer(centerRenderer);
-            table.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+            for (int i = 0; i < table.getColumnCount(); i++) {
+                table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, "Erro ao carregar dados dos caixas", "Erro", JOptionPane.ERROR_MESSAGE);
