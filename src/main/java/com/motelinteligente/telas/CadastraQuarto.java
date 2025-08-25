@@ -56,7 +56,7 @@ public class CadastraQuarto extends javax.swing.JFrame {
             }
         }
     }
-    
+
     public CadastraQuarto() {
         FlatIntelliJLaf.setup(); // aplica o tema FlatLaf
         periodo = null;
@@ -352,12 +352,13 @@ public class CadastraQuarto extends javax.swing.JFrame {
                     .addComponent(val_quarto, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel3))
                 .addGap(7, 7, 7)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(pernoite, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel8)
-                        .addComponent(horaAdicional, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(horaAdicional, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel4)
+                        .addComponent(pernoite, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -445,13 +446,18 @@ public class CadastraQuarto extends javax.swing.JFrame {
             }
             try {
                 int horas = Integer.parseInt(periodoHoras.getText());
-                int min = Integer.parseInt(periodoMin.getText());
-                periodo =  horas +":" + min;
+                int min;
+                if (periodoMin.getText().trim().isEmpty()) {
+                    min = 0; // se vazio define 0
+                } else {
+                    min = Integer.parseInt(periodoMin.getText());
+                }
+                periodo = horas + ":" + min;
                 cont++;
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(null, "Revise as inforções de Adicional");
-                horaAdicional.grabFocus();// foca o campo
-                horaAdicional.setText(""); //limpa o campo
+                JOptionPane.showMessageDialog(null, "Revise as inforções de Horário. ");
+                periodoMin.grabFocus();// foca o campo
+                periodoMin.setText(""); //limpa o campo
             }
             try {
                 valor_periodo = Float.parseFloat(val_quarto.getText());
@@ -473,37 +479,37 @@ public class CadastraQuarto extends javax.swing.JFrame {
             if (cont == 6) {
                 vquartos novo = new vquartos(0, tp_quarto, numero_quarto, valor_periodo, valor_pernoite);
 
-                if (excluir == true){
-                    
-                        //se cair aqui o quarto ja existe
-                        if(new fquartos().fazOUp(novo, hora_adicional, periodo)){
-                            JOptionPane.showMessageDialog(null, "Atualizado com Sucesso");
-                        }else{
-                            JOptionPane.showMessageDialog(null, "Erro ao fazer UPDATE quarto");
+                if (excluir == true) {
+
+                    //se cair aqui o quarto ja existe
+                    if (new fquartos().fazOUp(novo, hora_adicional, periodo)) {
+                        JOptionPane.showMessageDialog(null, "Atualizado com Sucesso");
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Erro ao fazer UPDATE quarto");
+                    }
+                    //verifica se está na cacheOcupados pra alterar la tbm
+                    CacheDados cache = CacheDados.getInstancia();
+                    Map<Integer, DadosOcupados> dadosOcupados = cache.getCacheOcupado();
+                    if (dadosOcupados.containsKey(numero_quarto)) {
+                        DadosOcupados quartoOcupado = dadosOcupados.get(numero_quarto);
+                        //verifica que dados mudou
+                        if (quartoOcupado.getValorAdicional() != hora_adicional) {
+                            quartoOcupado.setValorAdicional(hora_adicional);
                         }
-                        //verifica se está na cacheOcupados pra alterar la tbm
-                        CacheDados cache = CacheDados.getInstancia();
-                        Map<Integer, DadosOcupados> dadosOcupados = cache.getCacheOcupado();
-                        if (dadosOcupados.containsKey(numero_quarto)) {
-                            DadosOcupados quartoOcupado = dadosOcupados.get(numero_quarto);
-                            //verifica que dados mudou
-                            if(quartoOcupado.getValorAdicional() != hora_adicional){
-                                quartoOcupado.setValorAdicional(hora_adicional);
-                            }
-                            if(quartoOcupado.getValorPeriodo()!= valor_periodo){
-                                quartoOcupado.setValorPeriodo(valor_periodo);
-                            }
-                            if(quartoOcupado.getValorPernoite()!= valor_pernoite){
-                                quartoOcupado.setValorPernoite(valor_pernoite);
-                            }
-                            if(!quartoOcupado.getTempoPeriodo().equals(periodo)){
-                                quartoOcupado.setTempoPeriodo(periodo);
-                            }
-                            dadosOcupados.put(numero_quarto, quartoOcupado);
-                        }else{
-                            JOptionPane.showMessageDialog(null, "Quarto não está na Cache Ocupado!");
+                        if (quartoOcupado.getValorPeriodo() != valor_periodo) {
+                            quartoOcupado.setValorPeriodo(valor_periodo);
                         }
-                }else{
+                        if (quartoOcupado.getValorPernoite() != valor_pernoite) {
+                            quartoOcupado.setValorPernoite(valor_pernoite);
+                        }
+                        if (!quartoOcupado.getTempoPeriodo().equals(periodo)) {
+                            quartoOcupado.setTempoPeriodo(periodo);
+                        }
+                        dadosOcupados.put(numero_quarto, quartoOcupado);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Quarto não está na Cache Ocupado!");
+                    }
+                } else {
                     if (new fquartos().insercao(novo, hora_adicional, periodo) == true) {
                         JOptionPane.showMessageDialog(null, "Cadastrado com sucesso");
                         Date dataAtual = new Date();
@@ -517,8 +523,7 @@ public class CadastraQuarto extends javax.swing.JFrame {
                     val_quarto.setText("");
                     pernoite.setText(""); //limpa o campo
                     tipo_quarto.setText("");
-                    
-                    
+
                     num_quarto.setEditable(true);
                 }
             }

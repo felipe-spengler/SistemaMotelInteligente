@@ -627,6 +627,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         menuSobSistema = new javax.swing.JMenuItem();
         btDespertador = new javax.swing.JMenu();
         menuReservas = new javax.swing.JMenu();
+        menuSistema = new javax.swing.JMenu();
         btMenuSair = new javax.swing.JMenu();
 
         javax.swing.GroupLayout jFrame1Layout = new javax.swing.GroupLayout(jFrame1.getContentPane());
@@ -1330,11 +1331,11 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         btCadastros.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/cadastro.png"))); // NOI18N
         btCadastros.setText("Cadastros    |");
-        btCadastros.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btCadastros.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
         btQuartos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_quarto.png"))); // NOI18N
         btQuartos.setText("Quartos");
-        btQuartos.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btQuartos.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         btQuartos.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btQuartosMouseClicked(evt);
@@ -1349,7 +1350,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         btFuncionario.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_funcionario.png"))); // NOI18N
         btFuncionario.setText("Funcionários");
-        btFuncionario.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btFuncionario.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         btFuncionario.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btFuncionarioMouseClicked(evt);
@@ -1366,7 +1367,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         jMenu2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/businesspackage_additionalpackage_box_add_insert_negoci_2335.png"))); // NOI18N
         jMenu2.setText("Produtos");
-        jMenu2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jMenu2.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jMenu2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenu2ActionPerformed(evt);
@@ -1375,7 +1376,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         menuCadastraProduto.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_bot_editar.png"))); // NOI18N
         menuCadastraProduto.setText("Cadastro Produtos");
-        menuCadastraProduto.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        menuCadastraProduto.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         menuCadastraProduto.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 menuCadastraProdutoActionPerformed(evt);
@@ -1385,7 +1386,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         menuVerProdutos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_produtos.png"))); // NOI18N
         menuVerProdutos.setText("Ver Produtos");
-        menuVerProdutos.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        menuVerProdutos.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         menuVerProdutos.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 menuVerProdutosActionPerformed(evt);
@@ -1397,7 +1398,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         menuCaixaBt.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/financeiro.png"))); // NOI18N
         menuCaixaBt.setText("Caixa");
-        menuCaixaBt.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        menuCaixaBt.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         menuCaixaBt.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 menuCaixaBtMouseClicked(evt);
@@ -1412,15 +1413,15 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         jMenu5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/relatorios.png"))); // NOI18N
         jMenu5.setText("Relatórios   |");
-        jMenu5.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jMenu5.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
         jMenu16.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_rela_financeiro.png"))); // NOI18N
         jMenu16.setText("Financeiro");
-        jMenu16.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jMenu16.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
         btConfereCaixa.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_rela_financeiro.png"))); // NOI18N
         btConfereCaixa.setText("Conferencia de Caixas");
-        btConfereCaixa.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btConfereCaixa.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         btConfereCaixa.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btConfereCaixaActionPerformed(evt);
@@ -1430,7 +1431,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         btConfereLocacao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_hospede.png"))); // NOI18N
         btConfereLocacao.setText("Relatório de Locações");
-        btConfereLocacao.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btConfereLocacao.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         btConfereLocacao.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btConfereLocacaoActionPerformed(evt);
@@ -1442,11 +1443,11 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         jMenu18.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_vender.png"))); // NOI18N
         jMenu18.setText("Produtos");
-        jMenu18.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jMenu18.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
         menuRelaVenProdutos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_rela_produto.png"))); // NOI18N
         menuRelaVenProdutos.setText("Relatório Produtos Vendidos");
-        menuRelaVenProdutos.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        menuRelaVenProdutos.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         menuRelaVenProdutos.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 menuRelaVenProdutosActionPerformed(evt);
@@ -1460,7 +1461,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         btConferencia.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/musica.png"))); // NOI18N
         btConferencia.setText("Conferência (F2)");
-        btConferencia.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btConferencia.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         btConferencia.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btConferenciaMouseClicked(evt);
@@ -1470,7 +1471,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         jMenu6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/seguranca.png"))); // NOI18N
         jMenu6.setText("Segurança   |");
-        jMenu6.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jMenu6.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jMenu6.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenu6ActionPerformed(evt);
@@ -1479,7 +1480,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         menuFazBackup.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_backup.png"))); // NOI18N
         menuFazBackup.setText("Mostra Cache ProdutosV");
-        menuFazBackup.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        menuFazBackup.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         menuFazBackup.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 menuFazBackupActionPerformed(evt);
@@ -1489,7 +1490,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         menuResBackup.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_restaura.png"))); // NOI18N
         menuResBackup.setText("Testa Som");
-        menuResBackup.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        menuResBackup.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         menuResBackup.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 menuResBackupActionPerformed(evt);
@@ -1501,11 +1502,11 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         btFerramentas.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/ferramentas.png"))); // NOI18N
         btFerramentas.setText("Ferramentas   |");
-        btFerramentas.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btFerramentas.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
         menuConfigAd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_editar.png"))); // NOI18N
         menuConfigAd.setText("Configurações Adicionais");
-        menuConfigAd.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        menuConfigAd.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         menuConfigAd.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 menuConfigAdMouseClicked(evt);
@@ -1520,7 +1521,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         menuSobSistema.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_entrar.png"))); // NOI18N
         menuSobSistema.setText("Auto Atendimento");
-        menuSobSistema.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        menuSobSistema.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         menuSobSistema.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 menuSobSistemaMouseClicked(evt);
@@ -1537,7 +1538,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         btDespertador.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/alarme.png"))); // NOI18N
         btDespertador.setText("Despertador");
-        btDespertador.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btDespertador.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         btDespertador.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btDespertadorMouseClicked(evt);
@@ -1547,7 +1548,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         menuReservas.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/reservas.png"))); // NOI18N
         menuReservas.setText("Reservas");
-        menuReservas.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        menuReservas.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         menuReservas.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 menuReservasMouseClicked(evt);
@@ -1560,9 +1561,24 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         });
         jMenuBar1.add(menuReservas);
 
+        menuSistema.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/seguranca.png"))); // NOI18N
+        menuSistema.setText("Sistema");
+        menuSistema.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        menuSistema.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                menuSistemaMouseClicked(evt);
+            }
+        });
+        menuSistema.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuSistemaActionPerformed(evt);
+            }
+        });
+        jMenuBar1.add(menuSistema);
+
         btMenuSair.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/sair.png"))); // NOI18N
         btMenuSair.setText("Sair");
-        btMenuSair.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btMenuSair.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         btMenuSair.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btMenuSairMouseClicked(evt);
@@ -2959,6 +2975,15 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private void btMenuSairActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btMenuSairActionPerformed
 
     }//GEN-LAST:event_btMenuSairActionPerformed
+
+    private void menuSistemaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menuSistemaMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_menuSistemaMouseClicked
+
+    private void menuSistemaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSistemaActionPerformed
+        // TODO add your handling code here:
+        new TelaSistema();
+    }//GEN-LAST:event_menuSistemaActionPerformed
     private void trocaQuarto(int idLocacao, int numeroNovoQuarto) {
         fquartos quarto = new fquartos();
         String horaStatus = quarto.getDataInicio(quartoEmFoco);
@@ -3179,6 +3204,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private javax.swing.JMenuItem menuRelaVenProdutos;
     private javax.swing.JMenuItem menuResBackup;
     private javax.swing.JMenu menuReservas;
+    private javax.swing.JMenu menuSistema;
     private javax.swing.JMenuItem menuSobSistema;
     private javax.swing.JPopupMenu menuStatus;
     private javax.swing.JMenuItem menuVerProdutos;
