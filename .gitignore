@@ -38,3 +38,4 @@ src/main/java/Telas/MinhaClasse.java
 src/main/java/com/motelinteligente/dados/CheckSincronia.java
 src/main/java/com/motelinteligente/dados/BackupExecutor.java
 nbactions.xml
+src/main/java/com/motelinteligente/telas/TelaSistema.java

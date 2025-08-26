@@ -21,7 +21,7 @@ public class ConectaArduino {
 
         if (portoesRF) {
             if (CacheDados.getArduinoPort() == null) {
-                JOptionPane.showMessageDialog(null, "Porta COM (conexão) não está aberta.");
+                JOptionPane.showMessageDialog(null, "Erro em enviar Codigo Portão ao Arduino. Arduino Nao Conectado");
                 return;
             }
 

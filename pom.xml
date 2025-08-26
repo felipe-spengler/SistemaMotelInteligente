@@ -1,29 +1,31 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.3.4</version>
-        <relativePath/> <!-- lookup parent from repository -->
-    </parent>
+        <relativePath/> </parent>
     <groupId>com.motelinteligente</groupId>
     <artifactId>MotelInteligente</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>MotelInteligente</name>
     <properties>
         <java.version>17</java.version>
+        <maven.build.timestamp.format>yyyyMMdd-HHmmss</maven.build.timestamp.format>
     </properties>
     <dependencies>
-        <!-- Google Client Library -->
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.15.3</version>
+        </dependency>
         <dependency>
             <groupId>com.google.api-client</groupId>
             <artifactId>google-api-client</artifactId>
             <version>1.34.1</version>
         </dependency>
-
-        <!-- YouTube Data API -->
         <dependency>
             <groupId>com.google.apis</groupId>
             <artifactId>google-api-services-youtube</artifactId>
@@ -34,7 +36,6 @@
             <artifactId>google-http-client-jackson2</artifactId>
             <version>1.34.1</version>
         </dependency>
-        <!-- OAuth 2.0 -->
         <dependency>
             <groupId>com.google.oauth-client</groupId>
             <artifactId>google-oauth-client-jetty</artifactId>
@@ -47,7 +48,7 @@
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId> <!-- ou outra versão compatível -->
+            <artifactId>slf4j-api</artifactId>
         </dependency>
         <dependency>
             <groupId>uk.co.caprica</groupId>
@@ -87,7 +88,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.28</version> <!-- ou a versão mais recente -->
+            <version>8.0.28</version>
         </dependency>
         <dependency>
             <groupId>com.formdev</groupId>
@@ -109,8 +110,8 @@
             <artifactId>log4j-core</artifactId>
         </dependency>
     </dependencies>
-    
     <build>
+        <finalName>${project.artifactId}-${maven.build.timestamp}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -123,8 +124,6 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <!-- Plugin para garantir que o ponto de entrada seja a TelaLogin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -132,14 +131,16 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <!-- Defina aqui o ponto de entrada da aplicação -->
                             <mainClass>com.motelinteligente.telas.TelaLogin</mainClass>
                         </manifest>
+                        <manifestEntries>
+                            <Build-Date>${maven.build.timestamp}</Build-Date>
+                            <Build-Version>${project.version}</Build-Version>
+                        </manifestEntries>
                     </archive>
                 </configuration>
             </plugin>
         </plugins>
-    
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
