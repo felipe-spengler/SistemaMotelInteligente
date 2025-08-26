@@ -1,5 +1,6 @@
 package com.motelinteligente.telas;
 
+import com.motelinteligente.dados.TelaSistema;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.motelinteligente.alarme.AlarmApp;
 import com.motelinteligente.alarme.FAlarmes;

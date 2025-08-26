@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.motelinteligente.telas;
+package com.motelinteligente.dados;
 
 import javax.swing.*;
 import java.io.BufferedInputStream;
@@ -17,7 +17,7 @@ import org.jsoup.nodes.Element;
 
 public class TelaSistema {
 
-    private static final String REMOTE_JAR_URL = "http://motelinteligente.com/AbelardoJar/";
+    private static final String REMOTE_JAR_URL = "http://motelinteligente.com/ToledoJar/";
 
     public static void main(String[] args) {
         try {
