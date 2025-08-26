@@ -877,8 +877,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
 
         txtPessoas.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         txtPessoas.setText("2");
-        txtPessoas.setMinimumSize(new java.awt.Dimension(80, 22));
-        txtPessoas.setPreferredSize(new java.awt.Dimension(80, 22));
+        txtPessoas.setMinimumSize(new java.awt.Dimension(80, 26));
+        txtPessoas.setPreferredSize(new java.awt.Dimension(80, 26));
         txtPessoas.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtPessoasActionPerformed(evt);
@@ -1111,9 +1111,9 @@ public class EncerraQuarto extends javax.swing.JFrame {
                                 .addGap(32, 32, 32)
                                 .addGroup(painelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(lblValorQuarto)
-                                    .addComponent(txtPessoas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(lblHoraAdicional)
-                                    .addComponent(lblValorConsumo2)))))
+                                    .addComponent(lblValorConsumo2)
+                                    .addComponent(txtPessoas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                     .addGroup(painelInfoLayout.createSequentialGroup()
                         .addGap(59, 59, 59)
                         .addComponent(jLabel12)

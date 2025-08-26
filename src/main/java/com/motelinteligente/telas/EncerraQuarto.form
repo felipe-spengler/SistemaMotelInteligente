@@ -574,9 +574,9 @@
                                   <EmptySpace min="-2" pref="32" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="lblValorQuarto" min="-2" max="-2" attributes="0"/>
-                                      <Component id="txtPessoas" min="-2" max="-2" attributes="0"/>
                                       <Component id="lblHoraAdicional" min="-2" max="-2" attributes="0"/>
                                       <Component id="lblValorConsumo2" min="-2" max="-2" attributes="0"/>
+                                      <Component id="txtPessoas" alignment="0" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
                           </Group>
@@ -746,10 +746,10 @@
             </Property>
             <Property name="text" type="java.lang.String" value="2"/>
             <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-              <Dimension value="[80, 22]"/>
+              <Dimension value="[80, 26]"/>
             </Property>
             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-              <Dimension value="[80, 22]"/>
+              <Dimension value="[80, 26]"/>
             </Property>
           </Properties>
           <Events>

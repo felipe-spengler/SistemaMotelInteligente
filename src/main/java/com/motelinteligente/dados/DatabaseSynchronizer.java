@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import org.springframework.stereotype.Service; // Import the Service annotation
 
+@Service // Add this annotation
 public class DatabaseSynchronizer {
 
     private static final String LOCAL_DB_URL = "jdbc:mysql://localhost:3306/u876938716_motel";
