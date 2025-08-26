@@ -40,10 +40,10 @@ public class MotelInteligenteApplication {
             BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
             String externalIP = reader.readLine();
             //String externalIP = InetAddress.getLocalHost().getHostAddress();
-            //System.out.println("IP interno: " + externalIP);
+            System.out.println("IP externo é: " + externalIP);
             reader.close();
 
-            // Verifica o IP no banco de dados
+            
             try {
                 // Estabelecer a conexão com o banco de dados
                 Connection link = new fazconexao().conectar();
@@ -56,8 +56,10 @@ public class MotelInteligenteApplication {
                 // Processar o resultado
                 if (resultado.next()) {
                     String meuip = resultado.getString("meuip");
+                    System.out.println("IP do banco  é: " + meuip);
                     if ((meuip == null) || (!meuip.equals(externalIP))) {
                         // Declaração SQL para atualizar o campo 'meuip'
+                        JOptionPane.showMessageDialog(null, "atualizando ip do banco");
                         String sql = "UPDATE configuracoes SET meuip = ?";
                         try {
                             PreparedStatement statementUpdate = link.prepareStatement(sql);
@@ -69,6 +71,8 @@ public class MotelInteligenteApplication {
                         } catch (SQLException e) {
                             e.printStackTrace();
                         }
+                    }else{
+                    JOptionPane.showMessageDialog(null, "nao mudou ip, ja era igual");
                     } 
                 }
 
