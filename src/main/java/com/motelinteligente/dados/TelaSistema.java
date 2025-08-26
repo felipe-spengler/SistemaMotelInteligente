@@ -17,7 +17,7 @@ import org.jsoup.nodes.Element;
 
 public class TelaSistema {
 
-    private static final String REMOTE_JAR_URL = "http://motelinteligente.com/ToledoJar/";
+    
 
     public static void main(String[] args) {
         try {
@@ -48,7 +48,7 @@ public class TelaSistema {
 
     private static String getRemoteJarName() throws IOException {
         // Conectar-se à URL e obter o HTML
-        Document doc = Jsoup.connect(REMOTE_JAR_URL).get();
+        Document doc = Jsoup.connect(fazconexao.REMOTE_JAR_URL).get();
 
         // Encontrar o nome do JAR. Supondo que o link tenha a extensão ".jar"
         for (Element link : doc.select("a[href]")) {
@@ -58,11 +58,11 @@ public class TelaSistema {
             }
         }
 
-        throw new IOException("Nenhum arquivo JAR encontrado na URL: " + REMOTE_JAR_URL);
+        throw new IOException("Nenhum arquivo JAR encontrado na URL: " + fazconexao.REMOTE_JAR_URL);
     }
 
     private static void downloadNewJar(String jarName) throws IOException {
-        URL url = new URL(REMOTE_JAR_URL + jarName);
+        URL url = new URL(fazconexao.REMOTE_JAR_URL + jarName);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         connection.connect();
