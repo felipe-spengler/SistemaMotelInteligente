@@ -17,7 +17,7 @@ import org.jsoup.nodes.Element;
 
 public class TelaSistema {
 
-    private static final String REMOTE_JAR_URL = "http://motelinteligente.com/ToledoJar/";
+    private static final String REMOTE_JAR_URL = "http://motelinteligente.com/AbelardoJar/";
 
     public static void main(String[] args) {
         try {
