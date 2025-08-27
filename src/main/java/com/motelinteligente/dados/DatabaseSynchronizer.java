@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service; // Import the Service annotation
 @Service // Add this annotation
 public class DatabaseSynchronizer {
 
-    private static final String LOCAL_DB_URL = "jdbc:mysql://localhost:3306/u876938716_motel";
-    private static final String REMOTE_DB_URL = "jdbc:mysql://srv1196.hstgr.io/u876938716_motel";
-    private static final String USER = "u876938716_contato";
+    private static final String LOCAL_DB_URL = "jdbc:mysql://localhost:3306/u876938716_AbelardoLuz";
+    private static final String REMOTE_DB_URL = "jdbc:mysql://srv1196.hstgr.io/u876938716_AbelardoLuz";
+    private static final String USER = "u876938716_felipe";
     private static final String PASSWORD = "Felipe0110@";
 
     public void sincronizarBanco() throws SQLException {

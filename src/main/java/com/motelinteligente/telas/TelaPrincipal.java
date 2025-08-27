@@ -131,7 +131,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     public TelaPrincipal() {
         initComponents();
         inicializarPopupMenu();
-         
+
         // Inicializa o BackupExecutor
         new BackupExecutor().start();
         CheckSincronia checkSincronia = new CheckSincronia();
@@ -146,7 +146,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         tabela1.getColumn(tabela1.getColumnName(3)).setPreferredWidth(70);
         numeroQuartos = new fquartos().numeroQuartos();
         txtPessoas.setDocument(new NumOnly());
-        
+
         this.setVisible(true);
         int idCaixaAtual = new fazconexao().verificaCaixa();
 
@@ -407,7 +407,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             }
             lblValorConsumo.setText("R$ " + totalVendido);
             lblValorConsumo.repaint();
-        } 
+        }
 
     }
 
@@ -1727,81 +1727,79 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     }
 
     private void verificarReservasProximas() {
-        
-    try (Connection conn = new fazconexao().conectar(); PreparedStatement stmt = conn.prepareStatement(
-            "SELECT * FROM reservas "
-            + "WHERE TIMESTAMP(data_entrada, horario_entrada) BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 12 HOUR)"
-    ); ResultSet rs = stmt.executeQuery()) {
 
-        CacheDados cache = CacheDados.getInstancia();
-        StringBuilder textoHTML = new StringBuilder("<html>");
-        boolean temReservas = false;
+        try (Connection conn = new fazconexao().conectar(); PreparedStatement stmt = conn.prepareStatement(
+                "SELECT * FROM reservas "
+                + "WHERE TIMESTAMP(data_entrada, horario_entrada) BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 12 HOUR)"
+        ); ResultSet rs = stmt.executeQuery()) {
 
-        while (rs.next()) {
-            temReservas = true; // Indica que há pelo menos uma reserva
+            CacheDados cache = CacheDados.getInstancia();
+            StringBuilder textoHTML = new StringBuilder("<html>");
+            boolean temReservas = false;
 
-            String numero = rs.getString("numero_quarto");
-            String hora = rs.getString("horario_entrada");
-            String data = rs.getString("data_entrada");
-            String valorPago = rs.getString("valor_pago");
-            String nome = rs.getString("observacao");
-            
-            //verifica qual o status do quarto > se possível reserva ele
-            CarregaQuarto quarto = cache.getCacheQuarto().get(Integer.parseInt(numero));
-            System.out.println("quarto de num " + numero + " está reservado");
-            if(!quarto.getStatusQuarto().contains("ocupado") || quarto.getStatusQuarto().equals("limpeza")){
-                mudaStatusNaCache(Integer.parseInt(numero), "reservado", null);
-                
-                
-                // a seguir acontece em background
-            SwingWorker<Void, Void> worker;
-            worker = new SwingWorker<Void, Void>() {
-                @Override
-                protected Void doInBackground() throws Exception {
-                    new fquartos().setStatus(Integer.parseInt(numero),  "reservado");
-                    return null;
+            while (rs.next()) {
+                temReservas = true; // Indica que há pelo menos uma reserva
+
+                String numero = rs.getString("numero_quarto");
+                String hora = rs.getString("horario_entrada");
+                String data = rs.getString("data_entrada");
+                String valorPago = rs.getString("valor_pago");
+                String nome = rs.getString("observacao");
+
+                //verifica qual o status do quarto > se possível reserva ele
+                CarregaQuarto quarto = cache.getCacheQuarto().get(Integer.parseInt(numero));
+                System.out.println("quarto de num " + numero + " está reservado");
+                if (!quarto.getStatusQuarto().contains("ocupado") || quarto.getStatusQuarto().equals("limpeza")) {
+                    mudaStatusNaCache(Integer.parseInt(numero), "reservado", null);
+
+                    // a seguir acontece em background
+                    SwingWorker<Void, Void> worker;
+                    worker = new SwingWorker<Void, Void>() {
+                        @Override
+                        protected Void doInBackground() throws Exception {
+                            new fquartos().setStatus(Integer.parseInt(numero), "reservado");
+                            return null;
+                        }
+
+                    };
+                    worker.execute();
+
                 }
 
-            };
-            worker.execute();
-                
+                // Formatação da data e horário
+                String dataHora = hora + "/" + data;
+
+                // Adicionando a bolinha azul e o texto formatado
+                textoHTML.append("<div style='font-size: 14px;'>")
+                        .append("<span style='color: blue;'>&#9679;</span> Reserva: Nº <b style='color: red;'>")
+                        .append(numero)
+                        .append("</b> - <b style='color: red;'>")
+                        .append(dataHora)
+                        .append("</b> - pago <b style='color: red;'>")
+                        .append(valorPago)
+                        .append("</b> - <span style='color: black;'>")
+                        .append(nome)
+                        .append("</span></div><br>");
+
             }
-           
-            
-            // Formatação da data e horário
-            String dataHora = hora + "/" + data;
 
-            // Adicionando a bolinha azul e o texto formatado
-            textoHTML.append("<div style='font-size: 14px;'>")
-                    .append("<span style='color: blue;'>&#9679;</span> Reserva: Nº <b style='color: red;'>")
-                    .append(numero)
-                    .append("</b> - <b style='color: red;'>")
-                    .append(dataHora)
-                    .append("</b> - pago <b style='color: red;'>")
-                    .append(valorPago)
-                    .append("</b> - <span style='color: black;'>")
-                    .append(nome)
-                    .append("</span></div><br>");
+            // Se não houver reservas, deve deixar o texto vazio
+            if (!temReservas) {
+                textoHTML.append("Nenhuma reserva nas proximas 24h.");
+            }
 
-            
+            textoHTML.append("</html>");
+
+            SwingUtilities.invokeLater(() -> {
+                labelReservas.setText(textoHTML.toString());
+
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        // Se não houver reservas, deve deixar o texto vazio
-        if (!temReservas) {
-            textoHTML.append("Nenhuma reserva nas proximas 24h.");
-        }
-
-        textoHTML.append("</html>");
-
-        SwingUtilities.invokeLater(() -> {
-            labelReservas.setText(textoHTML.toString());
-            
-        });
-
-    } catch (Exception e) {
-        e.printStackTrace();
     }
-}
+
     private void mostraQuartos() {
         String status = null, data = null;
         long currentTime = System.currentTimeMillis();
@@ -2978,12 +2976,14 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     }//GEN-LAST:event_btMenuSairActionPerformed
 
     private void menuSistemaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menuSistemaMouseClicked
-        // TODO add your handling code here:
+        TelaSistema telaSistema = new TelaSistema();
+        // Torna a janela visível
+        telaSistema.setVisible(true);
     }//GEN-LAST:event_menuSistemaMouseClicked
 
     private void menuSistemaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSistemaActionPerformed
-        // TODO add your handling code here:
-        new TelaSistema();
+        // Cria a nova janela
+        
     }//GEN-LAST:event_menuSistemaActionPerformed
     private void trocaQuarto(int idLocacao, int numeroNovoQuarto) {
         fquartos quarto = new fquartos();

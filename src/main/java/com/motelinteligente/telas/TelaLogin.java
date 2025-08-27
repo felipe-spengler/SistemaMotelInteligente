@@ -64,7 +64,7 @@ public class TelaLogin extends javax.swing.JFrame {
         setBackground(new java.awt.Color(255, 255, 255));
         setResizable(false);
 
-        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel1.setBackground(new java.awt.Color(153, 255, 102));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/logo.png"))); // NOI18N
 
@@ -85,7 +85,7 @@ public class TelaLogin extends javax.swing.JFrame {
         });
 
         bt_entrar.setText("Entrar");
-        bt_entrar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        bt_entrar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         bt_entrar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bt_entrarActionPerformed(evt);
@@ -93,7 +93,7 @@ public class TelaLogin extends javax.swing.JFrame {
         });
 
         bt_sair.setText("Sair");
-        bt_sair.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        bt_sair.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         bt_sair.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bt_sairActionPerformed(evt);
