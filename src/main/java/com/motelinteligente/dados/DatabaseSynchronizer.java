@@ -60,13 +60,13 @@ public class DatabaseSynchronizer {
         sincronizarRegistros(tabela, pkColumnName, conexaoLocal, conexaoRemoto, "local");
 
         // Sincronizar registros do remoto para o local (Inserts/Updates)
-        sincronizarRegistros(tabela, pkColumnName, conexaoRemoto, conexaoLocal, "remoto");
+        //sincronizarRegistros(tabela, pkColumnName, conexaoRemoto, conexaoLocal, "remoto");
 
         // Sincronizar remoções do local para o remoto
         sincronizarRemocoes(tabela, pkColumnName, conexaoLocal, conexaoRemoto, "local");
 
         // Sincronizar remoções do remoto para o local
-        sincronizarRemocoes(tabela, pkColumnName, conexaoRemoto, conexaoLocal, "remoto");
+        //sincronizarRemocoes(tabela, pkColumnName, conexaoRemoto, conexaoLocal, "remoto");
 
         return true;
     }
