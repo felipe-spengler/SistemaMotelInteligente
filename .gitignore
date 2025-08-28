@@ -33,10 +33,7 @@ build/
 .vscode/
 
 # Ignorar arquivos específicos
-src/main/java/com/motelinteligente/dados/fazconexao.java
 src/main/java/Telas/MinhaClasse.java
-src/main/java/com/motelinteligente/dados/CheckSincronia.java
-src/main/java/com/motelinteligente/dados/BackupExecutor.java
 nbactions.xml
 src/main/java/com/motelinteligente/dados/TelaSistema.java
 src/main/java/com/motelinteligente/dados/DatabaseSynchronizer.java

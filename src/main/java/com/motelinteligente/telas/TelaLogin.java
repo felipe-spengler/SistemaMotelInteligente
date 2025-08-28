@@ -15,6 +15,11 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.JOptionPane;
 import java.awt.Toolkit;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import javax.swing.JFrame;
 import javax.swing.JProgressBar;
@@ -34,8 +39,10 @@ public class TelaLogin extends javax.swing.JFrame {
         // Inicializa o contexto do Spring
         FlatIntelliJLaf.setup();
         setVisible(true);
+
         initComponents();
         insereIcone(this);
+        
 
         txt_senha.addKeyListener(new KeyAdapter() {
             @Override
@@ -47,6 +54,7 @@ public class TelaLogin extends javax.swing.JFrame {
         });
     }
 
+    
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -64,7 +72,7 @@ public class TelaLogin extends javax.swing.JFrame {
         setBackground(new java.awt.Color(255, 255, 255));
         setResizable(false);
 
-        jPanel1.setBackground(new java.awt.Color(153, 255, 102));
+        jPanel1.setBackground(new java.awt.Color(255, 0, 51));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/logo.png"))); // NOI18N
 
@@ -277,6 +285,7 @@ public class TelaLogin extends javax.swing.JFrame {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(TelaLogin.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+
         new TelaLogin().setVisible(true);
 
         //}

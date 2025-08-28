@@ -10,12 +10,17 @@ import org.springframework.stereotype.Service; // Import the Service annotation
 @Service // Add this annotation
 public class DatabaseSynchronizer {
 
-    private static final String LOCAL_DB_URL = "jdbc:mysql://localhost:3306/u876938716_AbelardoLuz";
-    private static final String REMOTE_DB_URL = "jdbc:mysql://srv1196.hstgr.io/u876938716_AbelardoLuz";
-    private static final String USER = "u876938716_felipe";
-    private static final String PASSWORD = "Felipe0110@";
+    private String LOCAL_DB_URL;
+    private String REMOTE_DB_URL;
+    private String USER;
+    private String PASSWORD;
 
     public void sincronizarBanco() throws SQLException {
+        this.LOCAL_DB_URL = CarregarVariaveis.getLocalDbUrl();
+        this.REMOTE_DB_URL = CarregarVariaveis.getRemoteDbUrl();
+        this.USER = CarregarVariaveis.getUser();
+        this.PASSWORD = CarregarVariaveis.getPassword();
+        
         String[] tables = getTables();
         try (Connection conexaoLocal = DriverManager.getConnection(LOCAL_DB_URL, USER, PASSWORD);
              Connection conexaoRemoto = DriverManager.getConnection(REMOTE_DB_URL, USER, PASSWORD)) {
