@@ -875,7 +875,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         jLabel10.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jLabel10.setText("Pessoas no Quarto:");
 
-        txtPessoas.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        txtPessoas.setFont(new java.awt.Font("Segoe UI", 0, 17)); // NOI18N
         txtPessoas.setText("2");
         txtPessoas.setMinimumSize(new java.awt.Dimension(80, 26));
         txtPessoas.setPreferredSize(new java.awt.Dimension(80, 26));

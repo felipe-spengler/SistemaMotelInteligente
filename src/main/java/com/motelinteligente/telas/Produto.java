@@ -4,8 +4,6 @@
  */
 package com.motelinteligente.telas;
 
-
-
 import com.motelinteligente.dados.configGlobal;
 import com.motelinteligente.dados.fprodutos;
 import com.motelinteligente.dados.vprodutos;
@@ -156,7 +154,11 @@ public class Produto extends javax.swing.JFrame {
 
     private void bt_novoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_novoActionPerformed
         // TODO add your handling code here:
-        new CadastraProduto().setVisible(true);
+        // Cria uma nova instância do diálogo de cadastro de produtos
+        CadastraProduto dialog = new CadastraProduto(this, 0);
+        dialog.setLocationRelativeTo(this); // Centraliza em relação à tela atual
+        dialog.setVisible(true); // Torna visível o diálogo
+        // Aqui você pode adicionar lógica para atualizar a tela atual, se necessário
     }//GEN-LAST:event_bt_novoActionPerformed
 
     private void btEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btEditarActionPerformed
@@ -164,7 +166,7 @@ public class Produto extends javax.swing.JFrame {
         if (linhaSelecionada != -1) {
             Object id = tabela.getValueAt(linhaSelecionada, 0); // 0 é o índice da coluna do ID
             int idProduto = Integer.parseInt(id.toString());
-            new CadastraProduto(idProduto, true).setVisible(true);
+            new CadastraProduto(this, idProduto).setVisible(true);
             this.dispose();
 
         }    }//GEN-LAST:event_btEditarActionPerformed
@@ -184,12 +186,20 @@ public class Produto extends javax.swing.JFrame {
         }
 
     }//GEN-LAST:event_bt_apagarActionPerformed
-
+    public void atualizarTela() {
+        mostraJTableProduto();
+        configGlobal config = configGlobal.getInstance();
+        if (config.getCargoUsuario().equals("comum")) {
+            btEditar.setEnabled(false);
+            bt_apagar.setEnabled(false);
+            bt_novo.setEnabled(false);
+        }
+    }
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
         // TODO add your handling code here:
         mostraJTableProduto();
         configGlobal config = configGlobal.getInstance();
-        if(config.getCargoUsuario().equals("comum")){
+        if (config.getCargoUsuario().equals("comum")) {
             btEditar.setEnabled(false);
             bt_apagar.setEnabled(false);
             bt_novo.setEnabled(false);
@@ -242,13 +252,13 @@ public class Produto extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     private void mostraJTableProduto() {
-                
+
         DefaultTableModel modelo = (DefaultTableModel) tabela.getModel();
         modelo.setNumRows(0);
         fprodutos prod = new fprodutos();
-        
-        for(vprodutos q: prod.mostrarProduto()){
-            
+
+        for (vprodutos q : prod.mostrarProduto()) {
+
             modelo.addRow(new Object[]{
                 q.getIdProduto(),
                 q.getDescricao(),
@@ -258,5 +268,5 @@ public class Produto extends javax.swing.JFrame {
             });
         }
     }
-    
+
 }

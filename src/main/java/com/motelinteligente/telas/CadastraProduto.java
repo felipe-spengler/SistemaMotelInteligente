@@ -4,10 +4,11 @@
  */
 package com.motelinteligente.telas;
 
-
 import com.motelinteligente.dados.fprodutos;
 import com.motelinteligente.dados.vprodutos;
-import java.security.Timestamp;
+import java.awt.Frame;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Date;
 import javax.swing.JOptionPane;
 
@@ -15,24 +16,34 @@ import javax.swing.JOptionPane;
  *
  * @author MOTEL
  */
-public class CadastraProduto extends javax.swing.JFrame {
-    boolean atualizar =false;
+public class CadastraProduto extends javax.swing.JDialog {
+
+    boolean atualizar = false;
+
     /**
      * Creates new form CadastraProduto
      */
-    public CadastraProduto() {
-        initComponents();
-    }
-    public CadastraProduto(int idPassado,boolean statusAtualizar) {
+
+    public CadastraProduto(Frame parent, int idPassado) {
+        super(parent);
         System.out.println("abriu aqui");
         initComponents();
-        vprodutos produto = new vprodutos();
-        produto = new fprodutos().getProduto(idPassado);
+        // Adiciona um listener para o fechamento do diálogo
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                if (parent instanceof Produto) {
+                    ((Produto) parent).atualizarTela(); // Atualiza a tela pai
+                }
+            }
+        });
+        vprodutos produto = new fprodutos().getProduto(idPassado);
         campoId.setText(String.valueOf(idPassado));
-        desc.setText(String.valueOf(produto.getDescricao()));
+        desc.setText(produto.getDescricao());
         valor.setText(String.valueOf(produto.getValor()));
         estoque.setText(String.valueOf(produto.getEstoque()));
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -57,12 +68,15 @@ public class CadastraProduto extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
+        desc.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         desc.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 descActionPerformed(evt);
             }
         });
 
+        estoque.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        estoque.setText("-");
         estoque.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 estoqueActionPerformed(evt);
@@ -77,6 +91,7 @@ public class CadastraProduto extends javax.swing.JFrame {
             }
         });
 
+        valor.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         valor.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 valorActionPerformed(evt);
@@ -94,65 +109,74 @@ public class CadastraProduto extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel1.setText("Cadastro de Produtos:");
 
+        jLabel4.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel4.setText("idProduto (1-999)");
 
+        campoId.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+
+        jLabel5.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel5.setText("Descrição");
 
+        jLabel6.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel6.setText("Valor R$");
 
+        jLabel7.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel7.setText("Estoque ");
 
-        jLabel2.setText("Dica: Para produtos onde não é controlado estoque colocar: - ");
+        jLabel2.setFont(new java.awt.Font("Sitka Banner", 1, 18)); // NOI18N
+        jLabel2.setText("Dica: Para produtos onde não é controlado estoque colocar:   - ");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 125, Short.MAX_VALUE)
-                .addComponent(jLabel1)
-                .addGap(161, 161, 161))
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(52, 52, 52)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel1)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel5)
                                 .addGap(29, 29, 29)
                                 .addComponent(desc, javax.swing.GroupLayout.PREFERRED_SIZE, 272, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                 .addComponent(jLabel4)
-                                .addGap(20, 20, 20)
-                                .addComponent(campoId, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jLabel2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(campoId, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(53, 53, 53))
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel6)
-                                    .addComponent(jLabel7))
-                                .addGap(48, 48, 48)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(estoque, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(valor, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(bt_voltar, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(50, 50, 50)
+                                        .addComponent(bt_salvar, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jLabel6)
+                                            .addComponent(jLabel7))
+                                        .addGap(48, 48, 48)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                            .addComponent(valor, javax.swing.GroupLayout.DEFAULT_SIZE, 198, Short.MAX_VALUE)
+                                            .addComponent(estoque))))
+                                .addGap(60, 60, 60))))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(43, 43, 43)
-                        .addComponent(bt_voltar, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(32, 32, 32)
-                        .addComponent(bt_salvar, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(19, 19, 19)
+                        .addComponent(jLabel2)))
+                .addContainerGap(34, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(44, 44, 44)
+                .addGap(20, 20, 20)
                 .addComponent(jLabel1)
-                .addGap(42, 42, 42)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 43, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(campoId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel4))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(desc, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(desc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -160,15 +184,15 @@ public class CadastraProduto extends javax.swing.JFrame {
                     .addComponent(jLabel6))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(estoque, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(estoque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel7))
-                .addGap(29, 29, 29)
-                .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 49, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(bt_voltar)
-                    .addComponent(bt_salvar))
-                .addGap(25, 25, 25))
+                    .addComponent(bt_voltar, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(bt_salvar, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(62, 62, 62)
+                .addComponent(jLabel2)
+                .addGap(21, 21, 21))
         );
 
         pack();
@@ -199,14 +223,14 @@ public class CadastraProduto extends javax.swing.JFrame {
         String descricao = null;
         float val = 0;
         String estoq = null;
-        int  ok=0;
-        if(desc.getText() != null){
+        int ok = 0;
+        if (desc.getText() != null) {
             ok++;
-            descricao = desc.getText() ;
+            descricao = desc.getText();
             desc.grabFocus();// foca o campo
             desc.setText(""); //limpa o campo
-        }else{
-            JOptionPane.showMessageDialog(null,"Revise as inforções da Descrição!");
+        } else {
+            JOptionPane.showMessageDialog(null, "Revise as inforções da Descrição!");
         }
         try {
             idProduto = Integer.parseInt(campoId.getText());
@@ -218,21 +242,21 @@ public class CadastraProduto extends javax.swing.JFrame {
         }
 
         // verificar se ja tem  cadastrado
-        boolean continuar =false;
-        if(new fprodutos().verExiste(idProduto) == true){
+        boolean continuar = false;
+        if (new fprodutos().verExiste(idProduto) == true) {
             int resposta = JOptionPane.showConfirmDialog(null, "Esse id ja está cadastrado!  Deseja sobrescrever?");
             if (resposta == JOptionPane.YES_OPTION) {
                 continuar = true;
-            }else{
+            } else {
                 campoId.grabFocus();// foca o campo
                 campoId.setText(""); //limpa o campo
             }
-            
-        }else{
+
+        } else {
             continuar = true;
         }
-        if(continuar){
-        
+        if (continuar) {
+
             try {
                 val = Float.parseFloat(this.valor.getText());
                 ok++;
@@ -250,56 +274,26 @@ public class CadastraProduto extends javax.swing.JFrame {
                 this.estoque.grabFocus();// foca o campo
                 this.estoque.setText(""); //limpa o campo
             }
-                Date dataAtual = new Date();
-                java.sql.Timestamp data = new java.sql.Timestamp(dataAtual.getTime());   
-                
-                
-            if(ok == 4){
-                if(atualizar){
+            Date dataAtual = new Date();
+            java.sql.Timestamp data = new java.sql.Timestamp(dataAtual.getTime());
+
+            if (ok == 4) {
+                if (atualizar) {
                     new fprodutos().exclui(idProduto);
                 }
-                vprodutos novo = new vprodutos (idProduto, descricao,val,estoq,data);
+                vprodutos novo = new vprodutos(idProduto, descricao, val, estoq, data);
                 new fprodutos().exclusao(idProduto);
-                if(new fprodutos().insercao(novo) == true){
+                if (new fprodutos().insercao(novo) == true) {
                     JOptionPane.showMessageDialog(null, "Cadastrado com sucesso");
                 }
             }
-        }       
-                
+        }
+
     }//GEN-LAST:event_bt_salvarActionPerformed
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(CadastraProduto.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(CadastraProduto.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(CadastraProduto.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(CadastraProduto.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> {
-            new CadastraProduto().setVisible(true);
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bt_salvar;

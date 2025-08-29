@@ -596,6 +596,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         btNegociar = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
+        lblNumero1 = new javax.swing.JLabel();
         painelQuartos = new javax.swing.JPanel();
         tabela = new javax.swing.JPanel();
         srPane = new javax.swing.JDesktopPane();
@@ -780,7 +781,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         jPanel3.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jPanel3.setOpaque(false);
 
-        lblNumero.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        lblNumero.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         lblNumero.setText("1");
 
         botaoStatus.setFont(new java.awt.Font("Segoe UI", 2, 14)); // NOI18N
@@ -801,7 +802,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 .addComponent(lblNumero)
                 .addGap(18, 18, 18)
                 .addComponent(botaoStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 337, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(10, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -935,7 +936,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         painelSecundarioLayout.setVerticalGroup(
             painelSecundarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(painelSecundarioLayout.createSequentialGroup()
-                .addGap(43, 43, 43)
+                .addGap(5, 5, 5)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(painelSecundarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -1176,6 +1177,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             }
         });
 
+        lblNumero1.setFont(new java.awt.Font("Segoe UI", 1, 60)); // NOI18N
+        lblNumero1.setText("1");
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -1187,21 +1191,24 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jSeparator5, javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
-                                        .addGap(0, 0, Short.MAX_VALUE)
-                                        .addComponent(jLabel2)
-                                        .addGap(0, 0, Short.MAX_VALUE))
-                                    .addComponent(jSeparator3)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
-                                        .addGap(132, 132, 132)
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jSeparator3, javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addGroup(jPanel2Layout.createSequentialGroup()
                                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jLabel5)
-                                            .addComponent(lblPermissao))
-                                        .addGap(32, 32, 32)
-                                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(lblCargo)
-                                            .addComponent(lblUsuario))
+                                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                                .addGap(132, 132, 132)
+                                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                    .addComponent(jLabel5)
+                                                    .addComponent(lblPermissao))
+                                                .addGap(32, 32, 32)
+                                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                    .addComponent(lblCargo)
+                                                    .addComponent(lblUsuario)))
+                                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                                .addGap(31, 31, 31)
+                                                .addComponent(lblNumero1)
+                                                .addGap(99, 99, 99)
+                                                .addComponent(jLabel2)))
                                         .addGap(0, 0, Short.MAX_VALUE)))
                                 .addGap(35, 35, 35)))
                         .addGap(17, 17, 17))
@@ -1218,8 +1225,10 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addComponent(jLabel2)
-                .addGap(10, 10, 10)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel2)
+                    .addComponent(lblNumero1))
+                .addGap(27, 27, 27)
                 .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -2117,7 +2126,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     }//GEN-LAST:event_menuVerProdutosActionPerformed
 
     private void menuCadastraProdutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuCadastraProdutoActionPerformed
-        new CadastraProduto().setVisible(true);
+        new CadastraProduto(null, 0).setVisible(true);
     }//GEN-LAST:event_menuCadastraProdutoActionPerformed
 
     private void limpezaDisponivelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_limpezaDisponivelActionPerformed
@@ -3191,6 +3200,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private javax.swing.JLabel lblEntrada;
     private javax.swing.JLabel lblHoraAdicional;
     private javax.swing.JLabel lblNumero;
+    private javax.swing.JLabel lblNumero1;
     private javax.swing.JLabel lblPermissao;
     private javax.swing.JLabel lblUsuario;
     private javax.swing.JLabel lblValorConsumo;
