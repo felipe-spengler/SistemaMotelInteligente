@@ -16,7 +16,7 @@ public class DatabaseSynchronizer {
     private String PASSWORD;
 
     public void sincronizarBanco() throws SQLException {
-        this.LOCAL_DB_URL = CarregarVariaveis.getLocalDbUrl();
+        this.LOCAL_DB_URL = CarregarVariaveis.getLocalDbUrl().replace("localhost", "127.0.0.1");
         this.REMOTE_DB_URL = CarregarVariaveis.getRemoteDbUrl();
         this.USER = CarregarVariaveis.getUser();
         this.PASSWORD = CarregarVariaveis.getPassword();
