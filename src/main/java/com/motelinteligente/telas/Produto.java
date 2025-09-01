@@ -157,8 +157,7 @@ public class Produto extends javax.swing.JFrame {
         // Cria uma nova instância do diálogo de cadastro de produtos
         CadastraProduto dialog = new CadastraProduto(this, 0);
         dialog.setLocationRelativeTo(this); // Centraliza em relação à tela atual
-        dialog.setVisible(true); // Torna visível o diálogo
-        // Aqui você pode adicionar lógica para atualizar a tela atual, se necessário
+        dialog.setVisible(true); 
     }//GEN-LAST:event_bt_novoActionPerformed
 
     private void btEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btEditarActionPerformed
@@ -167,7 +166,7 @@ public class Produto extends javax.swing.JFrame {
             Object id = tabela.getValueAt(linhaSelecionada, 0); // 0 é o índice da coluna do ID
             int idProduto = Integer.parseInt(id.toString());
             new CadastraProduto(this, idProduto).setVisible(true);
-            this.dispose();
+            
 
         }    }//GEN-LAST:event_btEditarActionPerformed
 

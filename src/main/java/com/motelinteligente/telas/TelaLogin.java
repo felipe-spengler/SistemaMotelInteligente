@@ -15,12 +15,6 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.JOptionPane;
 import java.awt.Toolkit;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Optional;
-import java.util.stream.Stream;
-
 import javax.swing.JFrame;
 import javax.swing.JProgressBar;
 
@@ -72,7 +66,7 @@ public class TelaLogin extends javax.swing.JFrame {
         setBackground(new java.awt.Color(255, 255, 255));
         setResizable(false);
 
-        jPanel1.setBackground(new java.awt.Color(255, 0, 51));
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/logo.png"))); // NOI18N
 
@@ -166,6 +160,7 @@ public class TelaLogin extends javax.swing.JFrame {
     public void insereIcone(JFrame frame) {
         try {
             frame.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/imagens/iconeMotel.png")));
+            txt_login.grabFocus();
         } catch (Exception e) {
         }
     }

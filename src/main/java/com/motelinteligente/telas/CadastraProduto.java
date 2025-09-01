@@ -23,11 +23,11 @@ public class CadastraProduto extends javax.swing.JDialog {
     /**
      * Creates new form CadastraProduto
      */
-
     public CadastraProduto(Frame parent, int idPassado) {
         super(parent);
         System.out.println("abriu aqui");
         initComponents();
+        this.setVisible(true);
         // Adiciona um listener para o fechamento do diálogo
         addWindowListener(new WindowAdapter() {
             @Override
@@ -37,11 +37,16 @@ public class CadastraProduto extends javax.swing.JDialog {
                 }
             }
         });
-        vprodutos produto = new fprodutos().getProduto(idPassado);
-        campoId.setText(String.valueOf(idPassado));
-        desc.setText(produto.getDescricao());
-        valor.setText(String.valueOf(produto.getValor()));
-        estoque.setText(String.valueOf(produto.getEstoque()));
+        if (idPassado != 0) {
+            System.out.println("carregando os valores na tela");
+            vprodutos produto = new fprodutos().getProduto(idPassado);
+            campoId.setText(String.valueOf(idPassado));
+            desc.setText(produto.getDescricao());
+            valor.setText(String.valueOf(produto.getValor()));
+            estoque.setText(String.valueOf(produto.getEstoque()));
+            desc.grabFocus();
+        }
+
     }
 
     /**
@@ -285,12 +290,13 @@ public class CadastraProduto extends javax.swing.JDialog {
                 new fprodutos().exclusao(idProduto);
                 if (new fprodutos().insercao(novo) == true) {
                     JOptionPane.showMessageDialog(null, "Cadastrado com sucesso");
+                    this.dispose();
                 }
             }
         }
 
     }//GEN-LAST:event_bt_salvarActionPerformed
-
+    
     /**
      * @param args the command line arguments
      */

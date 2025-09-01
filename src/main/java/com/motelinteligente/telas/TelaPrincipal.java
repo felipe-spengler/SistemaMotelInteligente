@@ -185,7 +185,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     public void focoQuarto() {
         SwingUtilities.invokeLater(() -> {
             if (quartoEmFoco == 0) {
-                quartoEmFoco = 1;
+                quartoEmFoco = 0;
             }
             alteraPainel();
         });
@@ -296,85 +296,88 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     }
 
     public void alteraPainel() {
+
         txtPessoas.setText("2");
         CacheDados cache = CacheDados.getInstancia();
         CarregaQuarto quarto = cache.getCacheQuarto().get(quartoEmFoco);
+        if(quartoEmFoco > 0){
 
-        String status = quarto.getStatusQuarto();
-        DefaultTableModel modelo = (DefaultTableModel) tabela1.getModel();
-        modelo.setNumRows(0);
-        txtDescontoNegociado.setText("0,00");
-        txtAntecipado.setText("0,00");
-        fquartos quartodao = new fquartos();
-        if (!status.equals("ocupado")) {
-            setaLabel();
-            botaoTroca.setVisible(false);
-        }
+            String status = quarto.getStatusQuarto();
+            DefaultTableModel modelo = (DefaultTableModel) tabela1.getModel();
+            modelo.setNumRows(0);
+            txtDescontoNegociado.setText("0,00");
+            txtAntecipado.setText("0,00");
+            fquartos quartodao = new fquartos();
+            if (!status.equals("ocupado")) {
+                setaLabel();
+                botaoTroca.setVisible(false);
+            }
 
-        txtPessoas.setEnabled(false);
-        if (status.equals("livre")) {
-            botaoStatus.setEnabled(true);
-            jTabbedPane1.setEnabledAt(1, false);
-            this.painelSecundario.setBackground(Color.green);
-            // troca os botoes
-            iniciar();
-
-        }
-        if (status.equals("manutencao")) {
-            botaoStatus.setEnabled(true);
-            jTabbedPane1.setEnabledAt(1, false);
-            this.painelSecundario.setBackground(Color.gray);
-            iniciar();
-        }
-        if (status.equals("reservado")) {
-            botaoStatus.setEnabled(true);
-            jTabbedPane1.setEnabledAt(1, false);
-            this.painelSecundario.setBackground(Color.cyan);
-            iniciar();
-        }
-        if (status.contains("ocupado")) {
-            finalizar();
-            botaoTroca.setVisible(true);
-
-            jTabbedPane1.setEnabledAt(1, true);
-            botaoStatus.setEnabled(true);
-            txtPessoas.setEnabled(true);
-            if (cache.getCacheOcupado().get(quartoEmFoco).getNumeroPessoas() == 0) {
-                cache.getCacheOcupado().get(quartoEmFoco).setNumeroPessoas(2);
-                txtPessoas.setText(String.valueOf(2));
-
-            } else {
-                txtPessoas.setText(String.valueOf(cache.getCacheOcupado().get(quartoEmFoco).getNumeroPessoas()));
+            txtPessoas.setEnabled(false);
+            if (status.equals("livre")) {
+                botaoStatus.setEnabled(true);
+                jTabbedPane1.setEnabledAt(1, false);
+                this.painelSecundario.setBackground(Color.green);
+                // troca os botoes
+                iniciar();
 
             }
-            String[] partes = status.split("-");
-            int idLoca = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
-            if (idLoca == 0) {
-                DadosOcupados quartoOcupado = cache.getCacheOcupado().get(quartoEmFoco);
-                int novoID = new fquartos().getIdLocacao(quartoEmFoco);
-                quartoOcupado.setIdLoca(novoID);
-                cache.getCacheOcupado().put(quartoEmFoco, quartoOcupado);
-                cache.carregaProdutosNegociadosCache(novoID);
+            if (status.equals("manutencao")) {
+                botaoStatus.setEnabled(true);
+                jTabbedPane1.setEnabledAt(1, false);
+                this.painelSecundario.setBackground(Color.gray);
+                iniciar();
             }
-            //insere prevendidos tabela
-            populaPrevendidos();
-            atualizaAntecipado(idLoca);
-            if (partes[1].equals("pernoite")) {
-                this.painelSecundario.setBackground(Color.MAGENTA);
-            } else if (partes[1].equals("periodo")) {
-                this.painelSecundario.setBackground(Color.red);
+            if (status.equals("reservado")) {
+                botaoStatus.setEnabled(true);
+                jTabbedPane1.setEnabledAt(1, false);
+                this.painelSecundario.setBackground(Color.cyan);
+                iniciar();
             }
-            setValorQuarto();
-        }
-        if (status.equals("limpeza")) {
-            botaoStatus.setEnabled(true);
-            jTabbedPane1.setEnabledAt(1, false);
-            this.painelSecundario.setBackground(Color.yellow);
-            iniciar();
-        }
+            if (status.contains("ocupado")) {
+                finalizar();
+                botaoTroca.setVisible(true);
 
-        lblNumero.setText(String.valueOf(quartoEmFoco));
-        painelSecundario.repaint();
+                jTabbedPane1.setEnabledAt(1, true);
+                botaoStatus.setEnabled(true);
+                txtPessoas.setEnabled(true);
+                if (cache.getCacheOcupado().get(quartoEmFoco).getNumeroPessoas() == 0) {
+                    cache.getCacheOcupado().get(quartoEmFoco).setNumeroPessoas(2);
+                    txtPessoas.setText(String.valueOf(2));
+
+                } else {
+                    txtPessoas.setText(String.valueOf(cache.getCacheOcupado().get(quartoEmFoco).getNumeroPessoas()));
+
+                }
+                String[] partes = status.split("-");
+                int idLoca = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
+                if (idLoca == 0) {
+                    DadosOcupados quartoOcupado = cache.getCacheOcupado().get(quartoEmFoco);
+                    int novoID = new fquartos().getIdLocacao(quartoEmFoco);
+                    quartoOcupado.setIdLoca(novoID);
+                    cache.getCacheOcupado().put(quartoEmFoco, quartoOcupado);
+                    cache.carregaProdutosNegociadosCache(novoID);
+                }
+                //insere prevendidos tabela
+                populaPrevendidos();
+                atualizaAntecipado(idLoca);
+                if (partes[1].equals("pernoite")) {
+                    this.painelSecundario.setBackground(Color.MAGENTA);
+                } else if (partes[1].equals("periodo")) {
+                    this.painelSecundario.setBackground(Color.red);
+                }
+                setValorQuarto();
+            }
+            if (status.equals("limpeza")) {
+                botaoStatus.setEnabled(true);
+                jTabbedPane1.setEnabledAt(1, false);
+                this.painelSecundario.setBackground(Color.yellow);
+                iniciar();
+            }
+
+            lblNumero.setText(String.valueOf(quartoEmFoco));
+            painelSecundario.repaint();
+        }
     }
 
     public void populaPrevendidos() {
@@ -596,7 +599,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         btNegociar = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
-        lblNumero1 = new javax.swing.JLabel();
         painelQuartos = new javax.swing.JPanel();
         tabela = new javax.swing.JPanel();
         srPane = new javax.swing.JDesktopPane();
@@ -747,7 +749,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         jPanel2.setMaximumSize(new java.awt.Dimension(473, 643));
         jPanel2.setRequestFocusEnabled(false);
 
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/logo_peq.png"))); // NOI18N
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/iconeMI.jpg"))); // NOI18N
 
         jLabel5.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         jLabel5.setText("Usuário:");
@@ -782,7 +784,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         jPanel3.setOpaque(false);
 
         lblNumero.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
-        lblNumero.setText("1");
+        lblNumero.setText(" ");
 
         botaoStatus.setFont(new java.awt.Font("Segoe UI", 2, 14)); // NOI18N
         botaoStatus.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/flat-style-circle-edit_icon-icons.com_66939.png"))); // NOI18N
@@ -1177,9 +1179,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             }
         });
 
-        lblNumero1.setFont(new java.awt.Font("Segoe UI", 1, 60)); // NOI18N
-        lblNumero1.setText("1");
-
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -1194,21 +1193,14 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jSeparator3, javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addGroup(jPanel2Layout.createSequentialGroup()
+                                        .addGap(132, 132, 132)
                                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                                .addGap(132, 132, 132)
-                                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                    .addComponent(jLabel5)
-                                                    .addComponent(lblPermissao))
-                                                .addGap(32, 32, 32)
-                                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                    .addComponent(lblCargo)
-                                                    .addComponent(lblUsuario)))
-                                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                                .addGap(31, 31, 31)
-                                                .addComponent(lblNumero1)
-                                                .addGap(99, 99, 99)
-                                                .addComponent(jLabel2)))
+                                            .addComponent(jLabel5)
+                                            .addComponent(lblPermissao))
+                                        .addGap(32, 32, 32)
+                                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(lblCargo)
+                                            .addComponent(lblUsuario))
                                         .addGap(0, 0, Short.MAX_VALUE)))
                                 .addGap(35, 35, 35)))
                         .addGap(17, 17, 17))
@@ -1221,14 +1213,17 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                                 .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(painelSecundario2))
                         .addGap(35, 35, 35))))
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(195, 195, 195)
+                .addComponent(jLabel2)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel2)
-                    .addComponent(lblNumero1))
-                .addGap(27, 27, 27)
+                .addGap(9, 9, 9)
+                .addComponent(jLabel2)
+                .addGap(18, 18, 18)
                 .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -1324,7 +1319,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         painelBottonLayout.setVerticalGroup(
             painelBottonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelBottonLayout.createSequentialGroup()
-                .addContainerGap(27, Short.MAX_VALUE)
+                .addContainerGap(62, Short.MAX_VALUE)
                 .addGroup(painelBottonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblAlarmeAtivo)
                     .addGroup(painelBottonLayout.createSequentialGroup()
@@ -1335,7 +1330,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 .addGap(20, 20, 20))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelBottonLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(painelReservasProximas, javax.swing.GroupLayout.DEFAULT_SIZE, 67, Short.MAX_VALUE)
+                .addComponent(painelReservasProximas, javax.swing.GroupLayout.DEFAULT_SIZE, 102, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -3200,7 +3195,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private javax.swing.JLabel lblEntrada;
     private javax.swing.JLabel lblHoraAdicional;
     private javax.swing.JLabel lblNumero;
-    private javax.swing.JLabel lblNumero1;
     private javax.swing.JLabel lblPermissao;
     private javax.swing.JLabel lblUsuario;
     private javax.swing.JLabel lblValorConsumo;

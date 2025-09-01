@@ -103,7 +103,6 @@ public class EncerraQuarto extends javax.swing.JFrame {
     float valD = 0, valP = 0, valC = 0;
     ClienteEncerra outraTela = new ClienteEncerra();
     int numeroDoQuarto;
-    //int numeroDePessoas = 2;
     String motivo = null;
     private Timer timer;
     List<Antecipado> antecipados;
@@ -131,6 +130,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
     public EncerraQuarto(TelaPrincipal parent, int numeroQuarto) {
 
         initComponents();
+        setupKeyboardShortcuts();
         numeroDoQuarto = numeroQuarto;
         txtIdProduto.setDocument(new numOnly());
         txtQuantidade.setDocument(new numOnly());
@@ -142,8 +142,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
         System.setProperty("VLC_PLUGIN_PATH", "C:\\Program Files\\VideoLAN\\VLC\\plugins");
 
         // Inicializa a fábrica e o media player
-        mediaPlayerFactory = new MediaPlayerFactory();
-        mediaPlayer = mediaPlayerFactory.mediaPlayers().newMediaPlayer();
+        //mediaPlayerFactory = new MediaPlayerFactory();
+        //mediaPlayer = mediaPlayerFactory.mediaPlayers().newMediaPlayer();
         startRecording(numeroQuarto);
         tabela.getModel().addTableModelListener(new TableModelListener() {
             @Override
@@ -162,17 +162,16 @@ public class EncerraQuarto extends javax.swing.JFrame {
         });
 
         setValorDivida();
+        
 
-        setupKeyboardShortcuts();
-
-        txtIdProduto.grabFocus();
+        
 
         boolean found = new NativeDiscovery().discover();
         if (!found) {
             System.err.println("Não foi possível localizar as bibliotecas VLC. Certifique-se de que o VLC está instalado.");
             return;  // Sai do construtor se as bibliotecas não forem encontradas
         }
-
+        txtIdProduto.grabFocus();
     }
 
     private void setupKeyboardShortcuts() {
@@ -210,7 +209,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 btConferencia.doClick();  // Simula o clique no botão "Conferência"
             }
         });
-
+        
         // Mapeia a tecla F4 para débito
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F4, 0), "F4");
         actionMap.put("F4", new AbstractAction() {
@@ -228,6 +227,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 btDesistencia.doClick();  // Simula o clique no botão "Desistência"
             }
         });
+        JOptionPane.showMessageDialog(null, "mapeou as teclas");
     }
 
     public void setaLabelGeral(int numeroQuarto) {
@@ -1973,7 +1973,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         String valorDebito;
         float valor = (valorDivida - valoreRecebido);
         String falar = "SuaConta " + NumeroPorExtenso.NumeroPorExtenso(valor);
-
+        JOptionPane.showMessageDialog(null, falar);
         String[] palavras = falar.split(" ");
 
         reproduzirSonsEmSequencia(palavras, 0);

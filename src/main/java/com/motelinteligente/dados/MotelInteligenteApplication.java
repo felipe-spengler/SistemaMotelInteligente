@@ -17,13 +17,16 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javax.swing.SwingUtilities;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 @EnableScheduling // Habilita o agendamento de tarefas
 public class MotelInteligenteApplication {
+
     private static final Logger logger = LoggerFactory.getLogger(MotelInteligenteApplication.class);
 
     @Autowired
@@ -32,7 +35,7 @@ public class MotelInteligenteApplication {
     public static void main(String[] args) {
         SSLUtil.disableSSLCertificateChecking();
         SpringApplication.run(MotelInteligenteApplication.class, args);
-        
+
         try {
             URL url = new URL("http://checkip.amazonaws.com/");
             URLConnection con = url.openConnection();
@@ -41,9 +44,7 @@ public class MotelInteligenteApplication {
             System.out.println("IP externo é: " + externalIP);
             reader.close();
 
-            try (Connection link = new fazconexao().conectar();
-                 PreparedStatement statement = link.prepareStatement("SELECT meuip FROM configuracoes");
-                 ResultSet resultado = statement.executeQuery()) {
+            try (Connection link = new fazconexao().conectar(); PreparedStatement statement = link.prepareStatement("SELECT meuip FROM configuracoes"); ResultSet resultado = statement.executeQuery()) {
 
                 if (resultado.next()) {
                     String meuip = resultado.getString("meuip");
@@ -62,25 +63,49 @@ public class MotelInteligenteApplication {
             JOptionPane.showMessageDialog(null, "Erro de E/S: " + e.getMessage());
         }
     }
+}
 
-    /**
-     * Agenda a execução do método de sincronização para todos os dias às 3:00 da manhã.
-     * A expressão cron "0 0 3 * * ?" significa:
-     * - 0 segundos
-     * - 0 minutos
-     * - 3 horas
-     * - * (qualquer dia do mês)
-     * - * (qualquer mês)
-     * - ? (qualquer dia da semana)
-     */
+@Component
+class Agendamentos {
+
+    private static final Logger logger = LoggerFactory.getLogger(Agendamentos.class);
+
+    // 1. Injete a dependência da classe DatabaseSynchronizer
+    @Autowired
+    private DatabaseSynchronizer databaseSynchronizer;
+    @Autowired
+    private TelaSistema telaSistema;
+    // Agendar para as 03:00 da manhã
     @Scheduled(cron = "0 0 3 * * ?")
-    public void sincronizarBancoDeDados() {
-        logger.info("Executando a sincronização do banco de dados agendada para 03:00.");
+    public void agendarTresDaManha() {
+        logger.info("Executando a tarefa agendada para 03:00.");
         try {
-            databaseSynchronizer.sincronizarBanco();
+            // 2. Chame o método a partir da instância injetada
+            databaseSynchronizer.sincronizarBanco(null);
             logger.info("Sincronização agendada concluída com sucesso.");
         } catch (SQLException e) {
             logger.error("Erro durante a sincronização agendada: " + e.getMessage(), e);
         }
+    }
+
+    // Agendar para o meio-dia (12:00)
+    @Scheduled(cron = "0 0 12 * * ?")
+    public void agendarMeioDia() {
+        logger.info("Meio-dia: Acionando a tela de atualização...");
+
+        SwingUtilities.invokeLater(() -> {
+            JOptionPane.showMessageDialog(null, 
+                "Aguardando para Atualizar o Sistema", 
+                "Atualização Agendada", 
+                JOptionPane.INFORMATION_MESSAGE);
+            
+            // Use a instância injetada
+            telaSistema.setVisible(true);
+            
+            // Simula o clique no botão 'startButton'
+            telaSistema.getStartButton().doClick();
+            
+            logger.info("Tela de atualização exibida e botão 'Iniciar Verificação' clicado.");
+        });
     }
 }

@@ -7,10 +7,12 @@ import java.sql.Statement;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import javax.swing.JOptionPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class BackupExecutor {
+
     private String LOCAL_DB_URL;
     private String REMOTE_DB_URL;
     private String USER;
@@ -20,9 +22,14 @@ public class BackupExecutor {
     private static final Logger logger = LoggerFactory.getLogger(fquartos.class);
 
     public void start() {
-        scheduler.scheduleAtFixedRate(this::processQueue, 0, 1, TimeUnit.SECONDS);
-        
+        this.LOCAL_DB_URL = CarregarVariaveis.getLocalDbUrl();
+        this.REMOTE_DB_URL = CarregarVariaveis.getRemoteDbUrl();
+        this.USER = CarregarVariaveis.getUser();
+        this.PASSWORD = CarregarVariaveis.getPassword();
+        //scheduler.scheduleAtFixedRate(this::processQueue, 0, 1, TimeUnit.SECONDS);
+
     }
+
     private void processQueue() {
 
         if (BackupQueueManager.getInstance().isEmpty()) {
@@ -34,7 +41,6 @@ public class BackupExecutor {
         Statement stmt = null;
         try {
             linkOnline = DriverManager.getConnection(REMOTE_DB_URL, USER, PASSWORD);
-
 
             stmt = linkOnline.createStatement();
             BackupTask task;
@@ -49,10 +55,30 @@ public class BackupExecutor {
                     //logger.info("Backup executado para o comando SQL: " + task.getSqlCommand());
                 } catch (SQLException e) {
                     e.printStackTrace();
-                    // Recoloca a tarefa na fila para tentar novamente mais tarde
-                    BackupQueueManager.getInstance().addTask(task);
-                    logger.warn("Tarefa recolocada na fila devido a erro: " + task.getSqlCommand());
-                    // Interrompe a execução e mantém a tarefa na fila
+
+                    String mensagem = "Ocorreu um erro ao executar a tarefa:\n\n"
+                            + e.getMessage()
+                            + "\n\nDeseja recolocar a tarefa na fila?\n\n"
+                            + "⚠️ Avise o suporte sobre este erro.";
+
+                    int opcao = JOptionPane.showConfirmDialog(
+                            null,
+                            mensagem,
+                            "Erro de SQL",
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.ERROR_MESSAGE
+                    );
+
+                    if (opcao == JOptionPane.YES_OPTION) {
+                        // Recoloca na fila
+                        // BackupQueueManager.getInstance().addTask(task);
+                        logger.warn("Tarefa recolocada na fila devido a erro: " + task.getSqlCommand());
+                    } else {
+                        // Remove da fila
+                        logger.warn("Tarefa REMOVIDA da fila devido a erro: " + task.getSqlCommand());
+                    }
+
+                    // Interrompe a execução da fila atual
                     break;
                 }
             }

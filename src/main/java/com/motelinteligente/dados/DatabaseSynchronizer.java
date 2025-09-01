@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import javax.swing.JTextArea;
 import org.springframework.stereotype.Service; // Import the Service annotation
 
 @Service // Add this annotation
@@ -14,20 +15,35 @@ public class DatabaseSynchronizer {
     private String REMOTE_DB_URL;
     private String USER;
     private String PASSWORD;
+    private JTextArea exibirLogs;
 
-    public void sincronizarBanco() throws SQLException {
+    public void sincronizarBanco(JTextArea logs) throws SQLException {
         this.LOCAL_DB_URL = CarregarVariaveis.getLocalDbUrl();
         this.REMOTE_DB_URL = CarregarVariaveis.getRemoteDbUrl();
         this.USER = CarregarVariaveis.getUser();
         this.PASSWORD = CarregarVariaveis.getPassword();
-        
+        if (logs != null) {
+            exibirLogs = logs;
+        }
+        List<String> tabelasIgnoradas = List.of("login_acesso", "login_registros", "log_sincronizacao");
+
         String[] tables = getTables();
-        try (Connection conexaoLocal = DriverManager.getConnection(LOCAL_DB_URL, USER, PASSWORD);
-             Connection conexaoRemoto = DriverManager.getConnection(REMOTE_DB_URL, USER, PASSWORD)) {
+        try (Connection conexaoLocal = DriverManager.getConnection(LOCAL_DB_URL, USER, PASSWORD); Connection conexaoRemoto = DriverManager.getConnection(REMOTE_DB_URL, USER, PASSWORD)) {
 
             for (String tabela : tables) {
+                if (tabelasIgnoradas.contains(tabela)) {
+                    if (exibirLogs != null) {
+                        exibirLogs.append(String.format("Tabela %s ignorada na sincronização.%n", tabela));
+                    }
+                    System.out.printf("Tabela %s ignorada na sincronização.%n", tabela);
+                    continue; // pula para a próxima
+                }
+
                 if (!sincronizarTabela(tabela, conexaoLocal, conexaoRemoto)) {
                     System.out.printf("Tabela %s não sincronizada.%n", tabela);
+                    if (exibirLogs != null) {
+                        exibirLogs.append(String.format("Tabela %s não sincronizada.%n", tabela));
+                    }
                 }
             }
         }
@@ -49,7 +65,9 @@ public class DatabaseSynchronizer {
 
     private boolean sincronizarTabela(String tabela, Connection conexaoLocal, Connection conexaoRemoto) throws SQLException {
         System.out.printf("Iniciando sincronização para a tabela: %s%n", tabela);
-
+        if (exibirLogs != null) {
+            exibirLogs.append(String.format("Iniciando sincronização para a tabela: %s%n", tabela));
+        }
         if (!tableExists(tabela, conexaoLocal) || !tableExists(tabela, conexaoRemoto)) {
             System.out.printf("A tabela %s não existe em um dos bancos de dados.%n", tabela);
             return false;
@@ -57,6 +75,9 @@ public class DatabaseSynchronizer {
 
         String pkColumnName = getPrimaryKeyColumn(tabela, conexaoLocal);
         if (pkColumnName == null) {
+            if (exibirLogs != null) {
+                exibirLogs.append(String.format("Tabela %s não possui chave primária definida.%n", tabela));
+            }
             System.out.printf("Tabela %s não possui chave primária definida.%n", tabela);
             return false;
         }
@@ -64,14 +85,8 @@ public class DatabaseSynchronizer {
         // Sincronizar registros do local para o remoto (Inserts/Updates)
         sincronizarRegistros(tabela, pkColumnName, conexaoLocal, conexaoRemoto, "local");
 
-        // Sincronizar registros do remoto para o local (Inserts/Updates)
-        //sincronizarRegistros(tabela, pkColumnName, conexaoRemoto, conexaoLocal, "remoto");
-
         // Sincronizar remoções do local para o remoto
         sincronizarRemocoes(tabela, pkColumnName, conexaoLocal, conexaoRemoto, "local");
-
-        // Sincronizar remoções do remoto para o local
-        //sincronizarRemocoes(tabela, pkColumnName, conexaoRemoto, conexaoLocal, "remoto");
 
         return true;
     }
@@ -97,11 +112,8 @@ public class DatabaseSynchronizer {
         String selectQuery = "SELECT * FROM " + tabela;
         String insertQuery = buildInsertQuery(tabela, origem);
         String updateQuery = buildUpdateQuery(tabela, pkColumnName, origem);
-        
-        try (Statement stmtOrigem = origem.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-             ResultSet rsOrigem = stmtOrigem.executeQuery(selectQuery);
-             Statement stmtDestino = destino.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-             ResultSet rsDestino = stmtDestino.executeQuery(selectQuery)) {
+
+        try (Statement stmtOrigem = origem.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY); ResultSet rsOrigem = stmtOrigem.executeQuery(selectQuery); Statement stmtDestino = destino.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY); ResultSet rsDestino = stmtDestino.executeQuery(selectQuery)) {
 
             Map<Object, Map<String, Object>> destinoData = new HashMap<>();
             ResultSetMetaData metaDataDestino = rsDestino.getMetaData();
@@ -167,17 +179,13 @@ public class DatabaseSynchronizer {
             }
         }
     }
-    
+
     private void sincronizarRemocoes(String tabela, String pkColumnName, Connection origem, Connection destino, String tipoOrigem) throws SQLException {
         String selectOrigem = "SELECT " + pkColumnName + " FROM " + tabela;
         String selectDestino = "SELECT " + pkColumnName + " FROM " + tabela;
         String deleteQuery = "DELETE FROM " + tabela + " WHERE " + pkColumnName + " = ?";
 
-        try (PreparedStatement stmtOrigem = origem.prepareStatement(selectOrigem);
-             ResultSet rsOrigem = stmtOrigem.executeQuery();
-             PreparedStatement stmtDestino = destino.prepareStatement(selectDestino);
-             ResultSet rsDestino = stmtDestino.executeQuery();
-             PreparedStatement deleteStmt = destino.prepareStatement(deleteQuery)) {
+        try (PreparedStatement stmtOrigem = origem.prepareStatement(selectOrigem); ResultSet rsOrigem = stmtOrigem.executeQuery(); PreparedStatement stmtDestino = destino.prepareStatement(selectDestino); ResultSet rsDestino = stmtDestino.executeQuery(); PreparedStatement deleteStmt = destino.prepareStatement(deleteQuery)) {
 
             List<Object> pksOrigem = new ArrayList<>();
             while (rsOrigem.next()) {
@@ -224,13 +232,4 @@ public class DatabaseSynchronizer {
         return "UPDATE " + tabela + " SET " + updateSet + " WHERE " + pkColumnName + " = ?";
     }
 
-    public static void main(String[] args) {
-        DatabaseSynchronizer synchronizer = new DatabaseSynchronizer();
-        try {
-            synchronizer.sincronizarBanco();
-            System.out.println("Sincronização concluída.");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
 }
