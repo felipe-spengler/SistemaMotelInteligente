@@ -18,7 +18,7 @@ public class DatabaseSynchronizer {
     private JTextArea exibirLogs;
 
     public void sincronizarBanco(JTextArea logs) throws SQLException {
-        this.LOCAL_DB_URL = CarregarVariaveis.getLocalDbUrl().replace("localhost", "127.0.0.1");
+        this.LOCAL_DB_URL = CarregarVariaveis.getLocalDbUrl();
 
         this.REMOTE_DB_URL = CarregarVariaveis.getRemoteDbUrl();
         this.USER = CarregarVariaveis.getUser();
@@ -27,7 +27,6 @@ public class DatabaseSynchronizer {
             exibirLogs = logs;
         }
         List<String> tabelasIgnoradas = List.of("login_acesso", "login_registros", "log_sincronizacao");
-
         String[] tables = getTables();
         try (Connection conexaoLocal = DriverManager.getConnection(LOCAL_DB_URL, USER, PASSWORD); Connection conexaoRemoto = DriverManager.getConnection(REMOTE_DB_URL, USER, PASSWORD)) {
 
@@ -47,6 +46,10 @@ public class DatabaseSynchronizer {
                     }
                 }
             }
+        } catch (SQLException e) {
+            if (exibirLogs != null) exibirLogs.append(String.format("Erro na sincronização: %s%n", e.getMessage()));
+        } catch (Exception e) {
+            if (exibirLogs != null) exibirLogs.append(String.format("Erro inesperado: %s%n", e.getMessage()));
         }
     }
 
