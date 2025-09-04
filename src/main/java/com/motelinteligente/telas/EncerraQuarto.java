@@ -227,7 +227,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 btDesistencia.doClick();  // Simula o clique no botão "Desistência"
             }
         });
-        JOptionPane.showMessageDialog(null, "mapeou as teclas");
+        
     }
 
     public void setaLabelGeral(int numeroQuarto) {
@@ -1973,7 +1973,6 @@ public class EncerraQuarto extends javax.swing.JFrame {
         String valorDebito;
         float valor = (valorDivida - valoreRecebido);
         String falar = "SuaConta " + NumeroPorExtenso.NumeroPorExtenso(valor);
-        JOptionPane.showMessageDialog(null, falar);
         String[] palavras = falar.split(" ");
 
         reproduzirSonsEmSequencia(palavras, 0);
