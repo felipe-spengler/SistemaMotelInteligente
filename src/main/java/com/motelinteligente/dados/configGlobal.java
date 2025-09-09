@@ -5,9 +5,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.JOptionPane;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class configGlobal {
-
+    private static final Logger logger = LoggerFactory.getLogger(fquartos.class);
     private static configGlobal instancia;
     private String usuario;
     private String cargoUsuario;
@@ -26,7 +28,7 @@ public class configGlobal {
     private BackupQueueManager backupQueueManager; 
     private static int contadorExecucoes = 0;
     private int alarmesAtivos = 0;
-    
+    public static Connection globalConnection = null;
 
     // Construtor privado para evitar a criação de múltiplas instâncias
     public configGlobal() {
@@ -61,7 +63,7 @@ public class configGlobal {
     }
     public static void incrementarContadorExecucoes() {
         contadorExecucoes++;
-        //System.out.println("Total de execuções no banco online: " + contadorExecucoes);
+        logger.info("Total de execuções no banco online: " + contadorExecucoes);
     }
     
     public static int getContadorExecucoes() {
@@ -136,20 +138,11 @@ public class configGlobal {
                 this.portoesRF = resultado.getBoolean("portoesrf");
             } else {
                 JOptionPane.showMessageDialog(null, "Erro ao carregar Informações Adicionais.");
-                link.close();
                 statement.close();
             }
         } catch (Exception e) {
             JOptionPane.showConfirmDialog(null, e);
-        } finally {
-            try {
-                if (link != null && !link.isClosed()) {
-                    link.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
+        } 
     
     }
 

@@ -181,7 +181,46 @@ public class ffuncionario {
 
         return true;
     }
+    public int getIdFuncionario(String nome, String cargo, String login) {
+        int id = -1;
+        String sql = "SELECT idfuncionario FROM funcionario WHERE nomefuncionario = ? AND cargofuncionario = ? AND loginfuncionario = ?";
 
+        try (Connection conexao = new fazconexao().conectar();
+             PreparedStatement ps = conexao.prepareStatement(sql)) {
+
+            ps.setString(1, nome);
+            ps.setString(2, cargo);
+            ps.setString(3, login);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    id = rs.getInt("idfuncionario");
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return id;
+    }
+    public boolean excluirFuncionario(int idfuncionario) {
+    String sql = "DELETE FROM funcionario WHERE idfuncionario = ?";
+    boolean sucesso = false;
+
+    try (Connection conexao = new fazconexao().conectar();
+         PreparedStatement ps = conexao.prepareStatement(sql)) {
+
+        ps.setInt(1, idfuncionario);
+        int linhasAfetadas = ps.executeUpdate();
+        sucesso = linhasAfetadas > 0;
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+
+    return sucesso;
+}
     public String verificaLogin(String texto_login, String texto_senha) {
         String consulta = "SELECT * FROM funcionario WHERE loginfuncionario = ? AND senhafuncionario = ?";
         String cargo = null;

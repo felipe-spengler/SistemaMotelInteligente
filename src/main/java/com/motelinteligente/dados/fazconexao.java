@@ -1,38 +1,39 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.motelinteligente.dados;
 
-/**
- *
- * @author MOTEL
- */
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.lang.reflect.Proxy;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import javax.swing.JOptionPane;
 
 public class fazconexao {
 
+    private static fazconexao instance;
+    private Connection connection;
+
     private String LOCAL_DB_URL;
-    private String REMOTE_DB_URL;
     private String USER;
     private String PASSWORD;
 
-    public Connection conectar() {
+    public fazconexao() {
         this.LOCAL_DB_URL = CarregarVariaveis.getLocalDbUrl();
-        this.REMOTE_DB_URL = CarregarVariaveis.getRemoteDbUrl();
         this.USER = CarregarVariaveis.getUser();
         this.PASSWORD = CarregarVariaveis.getPassword();
+    }
+
+    public Connection conectar() {
         try {
-            Connection conn = DriverManager.getConnection(LOCAL_DB_URL, USER, PASSWORD);
-            return createConnectionProxy(conn);
+
+            if (configGlobal.globalConnection == null || configGlobal.globalConnection.isClosed()) {
+                configGlobal.globalConnection = DriverManager.getConnection(LOCAL_DB_URL, USER, PASSWORD);
+            }
+            // Retorna a conexão global
+            return createConnectionProxy(configGlobal.globalConnection);
         } catch (Exception e) {
-            JOptionPane.showConfirmDialog(null, e);
+            JOptionPane.showMessageDialog(null, "Erro ao conectar com o banco de dados: " + e.getMessage());
+            e.printStackTrace();
         }
         return null;
     }
@@ -45,17 +46,17 @@ public class fazconexao {
         );
     }
 
-    // Método para verificar caixa
+    // Remova o link.close() daqui!
     public int verificaCaixa() {
         String consultaSQL = "SELECT id FROM caixa WHERE saldofecha IS NULL";
+        Connection link = null;
         try {
-            Connection link = conectar();
+            // Agora, conectar() vai sempre pegar a mesma conexão
+            link = conectar();
             PreparedStatement statement = link.prepareStatement(consultaSQL);
             ResultSet resultado = statement.executeQuery();
             if (resultado.next()) {
                 int numero = resultado.getInt("id");
-                link.close();
-                resultado.close();
                 return numero;
             } else {
                 return 0;
@@ -65,4 +66,5 @@ public class fazconexao {
         }
         return 0;
     }
+
 }

@@ -41,7 +41,7 @@ public class BackupExecutor {
         Statement stmt = null;
         try {
             linkOnline = DriverManager.getConnection(REMOTE_DB_URL, USER, PASSWORD);
-
+            
             stmt = linkOnline.createStatement();
             BackupTask task;
             while ((task = BackupQueueManager.getInstance().peekTask()) != null) {

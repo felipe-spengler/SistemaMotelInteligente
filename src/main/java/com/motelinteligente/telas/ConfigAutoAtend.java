@@ -32,13 +32,12 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.table.DefaultTableModel;
 import java.sql.Statement;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
-import com.motelinteligente.telas.ConferenciaLocacoes.CustomCellRenderer;
+
 
 /**
  *

@@ -163,7 +163,7 @@
                                   <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
                                   <Component id="bt_atualizar" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace type="separate" max="-2" attributes="0"/>
-                                  <Component id="bt_novo1" min="-2" max="-2" attributes="0"/>
+                                  <Component id="bt_Excluir" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                           <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
@@ -181,7 +181,7 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="bt_atualizar" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="bt_novo1" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="bt_Excluir" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="jScrollPane1" min="-2" pref="189" max="-2" attributes="0"/>
@@ -199,7 +199,7 @@
             <Property name="text" type="java.lang.String" value="Lista de Funcion&#xe1;rios"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JButton" name="bt_novo1">
+        <Component class="javax.swing.JButton" name="bt_Excluir">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/imagens/icon_bot_excluir.png"/>
@@ -213,7 +213,7 @@
             </Property>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bt_novo1ActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bt_ExcluirActionPerformed"/>
           </Events>
         </Component>
         <Component class="javax.swing.JButton" name="bt_atualizar">

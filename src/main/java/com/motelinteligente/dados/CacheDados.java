@@ -117,61 +117,57 @@ public class CacheDados {
 
     
     public void carregaProdutosNegociadosCache(int idLoca) {
+    // 1. Obtenha a conexão UMA VEZ.
+    Connection link = new fazconexao().conectar();
+    
+    // Certifique-se de que a conexão não é nula antes de continuar
+    if (link == null) {
+        System.err.println("Falha ao obter a conexão com o banco de dados.");
+        return;
+    }
 
-        // Consulta produtos prevendidos no banco de dados e adiciona à cache
+    try {
+        // 2. Use a mesma conexão para a primeira consulta.
         String consultaProdutosSQL = "SELECT idproduto, quantidade FROM prevendidos WHERE idlocacao = ?";
-        try ( Connection link = new fazconexao().conectar();  PreparedStatement statementProdutos = link.prepareStatement(consultaProdutosSQL, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
+        try (PreparedStatement statementProdutos = link.prepareStatement(consultaProdutosSQL, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
             statementProdutos.setInt(1, idLoca);
-            try ( ResultSet resultadoProdutos = statementProdutos.executeQuery()) {
-                // Verifica se há produtos prevendidos para essa locação no banco de dados
+            try (ResultSet resultadoProdutos = statementProdutos.executeQuery()) {
                 if (resultadoProdutos.next()) {
-                    // Cria uma lista para armazenar os produtos prevendidos
                     List<DadosVendidos> produtosVendidos = new ArrayList<>();
-
-                    // Adiciona os produtos prevendidos do banco de dados à lista
-                    do {
+                    resultadoProdutos.beforeFirst();
+                    while (resultadoProdutos.next()) {
                         int idProdutoBD = resultadoProdutos.getInt("idproduto");
                         int quantidadeBD = resultadoProdutos.getInt("quantidade");
                         produtosVendidos.add(new DadosVendidos(idProdutoBD, quantidadeBD));
-                    } while (resultadoProdutos.next());
-
-                    // Adiciona a lista de produtos prevendidos à cache
+                    }
                     cacheProdutosVendidos.put(idLoca, produtosVendidos);
-
                 }
             }
-        } catch (SQLException e) {
-            // Tratamento de erro
-            e.printStackTrace();
         }
-
-        // Consulta negociações antecipadas no banco de dados e adiciona à cacheNegociados
+        
+        // 3. Use a mesma conexão para a segunda consulta.
         String consultaNegociacoesSQL = "SELECT * FROM antecipado WHERE idlocacao = ?";
-        try ( Connection link = new fazconexao().conectar();  PreparedStatement statementNegociacoes = link.prepareStatement(consultaNegociacoesSQL, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
+        try (PreparedStatement statementNegociacoes = link.prepareStatement(consultaNegociacoesSQL, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
             statementNegociacoes.setInt(1, idLoca);
-            try ( ResultSet resultadoNegociacoes = statementNegociacoes.executeQuery()) {
+            try (ResultSet resultadoNegociacoes = statementNegociacoes.executeQuery()) {
                 if (resultadoNegociacoes.next()) {
-                    // Reinicia o cursor do ResultSet
                     resultadoNegociacoes.beforeFirst();
                     List<Negociados> negociacoes = new ArrayList<>();
                     while (resultadoNegociacoes.next()) {
                         String tipo = resultadoNegociacoes.getString("tipo");
                         float valor = resultadoNegociacoes.getFloat("valor");
                         System.out.println("Negociado add - locacao " + idLoca + " tipo " + tipo + " valor " + valor);
-                        // Cria um objeto Negociado com os valores do ResultSet
                         Negociados negociado = new Negociados(tipo, valor);
-                        // Adiciona o objeto Negociado à cacheNegociados
                         negociacoes.add(negociado);
                     }
-
                 }
             }
-        } catch (SQLException e) {
-            // Tratamento de erro
-            e.printStackTrace();
         }
-    }
-
+        
+    } catch (SQLException e) {
+        e.printStackTrace();
+    } 
+}
     public CarregaQuarto carregarDadosQuarto() {
         int numeroQuarto = 0;
         String data;
@@ -204,19 +200,9 @@ public class CacheDados {
             // Fechar os recursos
             resultado.close();
             statement.close();
-            link.close();
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            try {
-                // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
-                if (link != null && !link.isClosed()) {
-                    link.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
+        } 
         return null;
     }
 

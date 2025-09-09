@@ -2169,7 +2169,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private void btConfereLocacaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btConfereLocacaoActionPerformed
         if (cargo != null) {
             if (cargo.equals("admin") || cargo.equals("gerente")) {
-                new ConferenciaLocacoes().setVisible(true);
+                new ConfereLocacoes().setVisible(true);
 
             } else {
                 JOptionPane.showMessageDialog(null, "Você não tem permissão! Somente gerencia ou acima");
@@ -2666,18 +2666,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             // Fecha os recursos
             resultSet.close();
             preparedStatement.close();
-            link.close();
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, "Erro ao buscar dados antecipados: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
-        } finally {
-            try {
-                if (link != null && !link.isClosed()) {
-                    link.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -2877,16 +2868,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e);
             return 0;
-        } finally {
-            try {
-                // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
-                if (link != null && !link.isClosed()) {
-                    link.close();
-                }
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(null, e);
-            }
-        }
+        } 
         return 0;
     }
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -3017,15 +2999,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, "Erro ao trocar o quarto: " + e.getMessage());
             e.printStackTrace();
-        } finally {
-            if (link != null) {
-                try {
-                    link.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+        } 
         focoQuarto();
         mostraQuartos();
 
@@ -3078,18 +3052,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             }
 
             // Fecha a conexão
-            link.close();
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, "Erro ao inserir/atualizar: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
-        } finally {
-            try {
-                if (link != null && !link.isClosed()) {
-                    link.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -3111,22 +3076,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-
-        /* Create and display the form */
+        
         new TelaPrincipal();
 
     }

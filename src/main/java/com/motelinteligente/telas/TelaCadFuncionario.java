@@ -4,6 +4,7 @@
  */
 package com.motelinteligente.telas;
 
+import com.motelinteligente.dados.fazconexao;
 import com.motelinteligente.dados.ffuncionario;
 import com.motelinteligente.dados.vfuncionario;
 import javax.swing.JOptionPane;
@@ -48,7 +49,7 @@ public class TelaCadFuncionario extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
-        bt_novo1 = new javax.swing.JButton();
+        bt_Excluir = new javax.swing.JButton();
         bt_atualizar = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabelaFunc = new javax.swing.JTable();
@@ -74,13 +75,13 @@ public class TelaCadFuncionario extends javax.swing.JFrame {
         jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel6.setText("Lista de Funcionários");
 
-        bt_novo1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_bot_excluir.png"))); // NOI18N
-        bt_novo1.setText("Apagar");
-        bt_novo1.setMaximumSize(new java.awt.Dimension(87, 27));
-        bt_novo1.setMinimumSize(new java.awt.Dimension(87, 27));
-        bt_novo1.addActionListener(new java.awt.event.ActionListener() {
+        bt_Excluir.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_bot_excluir.png"))); // NOI18N
+        bt_Excluir.setText("Apagar");
+        bt_Excluir.setMaximumSize(new java.awt.Dimension(87, 27));
+        bt_Excluir.setMinimumSize(new java.awt.Dimension(87, 27));
+        bt_Excluir.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bt_novo1ActionPerformed(evt);
+                bt_ExcluirActionPerformed(evt);
             }
         });
 
@@ -123,7 +124,7 @@ public class TelaCadFuncionario extends javax.swing.JFrame {
                                 .addGap(20, 20, 20)
                                 .addComponent(bt_atualizar)
                                 .addGap(18, 18, 18)
-                                .addComponent(bt_novo1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(bt_Excluir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addGap(10, 10, 10))
         );
@@ -135,7 +136,7 @@ public class TelaCadFuncionario extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(bt_atualizar)
-                    .addComponent(bt_novo1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(bt_Excluir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(42, Short.MAX_VALUE))
@@ -269,9 +270,47 @@ public class TelaCadFuncionario extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void bt_novo1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_novo1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_bt_novo1ActionPerformed
+    private void bt_ExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_ExcluirActionPerformed
+        int linhaSelecionada = tabelaFunc.getSelectedRow();
+
+        if (linhaSelecionada != -1) {
+            Object nomeObj = tabelaFunc.getValueAt(linhaSelecionada, 0);
+            Object cargoObj = tabelaFunc.getValueAt(linhaSelecionada, 1);
+            Object loginObj = tabelaFunc.getValueAt(linhaSelecionada, 2);
+
+            if (nomeObj != null && cargoObj != null && loginObj != null) {
+                String nome = nomeObj.toString();
+                String cargo = cargoObj.toString();
+                String login = loginObj.toString();
+
+                ffuncionario funcionario = new ffuncionario();
+                int id = funcionario.getIdFuncionario(nome, cargo, login);
+
+                if (id != -1) {
+                    int confirmar = JOptionPane.showConfirmDialog(
+                            null,
+                            "Deseja realmente excluir o funcionário " + nome + "?",
+                            "Confirmação",
+                            JOptionPane.YES_NO_OPTION
+                    );
+
+                    if (confirmar == JOptionPane.YES_OPTION) {
+                        if (funcionario.excluirFuncionario(id)) {
+                            JOptionPane.showMessageDialog(null, "Funcionário excluído com sucesso!");
+                            carregaTabela();
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Erro ao excluir funcionário!");
+                        }
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(null, "Funcionário não encontrado no banco!");
+                }
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(null, "Nenhum funcionário selecionado!");
+        }
+    }//GEN-LAST:event_bt_ExcluirActionPerformed
 
     private void bt_atualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_atualizarActionPerformed
         // TODO add your handling code here:
@@ -362,11 +401,11 @@ public class TelaCadFuncionario extends javax.swing.JFrame {
         // verificar as senhas digitadas
         if (senha1.equals(senha2) == true) {
             if (botaoAtualizarClick && mudando.equals(login)) {
-                String sqlUpdate = "UPDATE funcionario SET nomefuncionario='" + nome + "', cargofuncionario='" + cargo +
-                   "', loginfuncionario='" + login + "', senhafuncionario='" + senha1 + "' WHERE loginfuncionario='" + login + "'";
-                if(new ffuncionario().fazUpdate(sqlUpdate)){
+                String sqlUpdate = "UPDATE funcionario SET nomefuncionario='" + nome + "', cargofuncionario='" + cargo
+                        + "', loginfuncionario='" + login + "', senhafuncionario='" + senha1 + "' WHERE loginfuncionario='" + login + "'";
+                if (new ffuncionario().fazUpdate(sqlUpdate)) {
                     JOptionPane.showMessageDialog(null, "Alterado com sucesso");
-                }else{
+                } else {
                     JOptionPane.showMessageDialog(null, "Erro ao atualizar");
                 }
             } else {
@@ -431,8 +470,8 @@ public class TelaCadFuncionario extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton bt_Excluir;
     private javax.swing.JButton bt_atualizar;
-    private javax.swing.JButton bt_novo1;
     private javax.swing.JButton bt_salvar;
     private javax.swing.JButton bt_voltar;
     private javax.swing.JComboBox<String> cargo_func;

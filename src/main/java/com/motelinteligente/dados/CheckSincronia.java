@@ -44,7 +44,7 @@ public class CheckSincronia {
                     }
                 }).start();
             }
-        }, 0, 60 * 1000); // Executa a cada 1 min
+        }, 0, 60 * 2); // Executa a cada 2 seg
     }
 
     private void checkDatabaseSync() throws UnsupportedEncodingException, IOException {

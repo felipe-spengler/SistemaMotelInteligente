@@ -435,7 +435,7 @@ public class ConfiguracoesAdicionais extends javax.swing.JFrame {
     }//GEN-LAST:event_botaoBotoeiraActionPerformed
 
     private void botaoCodigosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoCodigosActionPerformed
-        // TODO add your handling code here:
+        new CodigosPortoes().setVisible(true);
     }//GEN-LAST:event_botaoCodigosActionPerformed
     public void funcaoSet(String campo, boolean flag) {
         String consultaSQL = "UPDATE configuracoes SET " + campo + " = ?";
