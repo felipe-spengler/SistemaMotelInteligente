@@ -28,7 +28,6 @@ public class configGlobal {
     private BackupQueueManager backupQueueManager; 
     private static int contadorConexoes = 0;
     private int alarmesAtivos = 0;
-    public static Connection globalConnection = null;
     public static Connection conexaoRemota = null;
 
     // Construtor privado para evitar a criação de múltiplas instâncias

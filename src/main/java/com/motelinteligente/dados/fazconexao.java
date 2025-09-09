@@ -26,11 +26,9 @@ public class fazconexao {
     public Connection conectar() {
         try {
 
-            if (configGlobal.globalConnection == null || configGlobal.globalConnection.isClosed()) {
-                configGlobal.globalConnection = DriverManager.getConnection(LOCAL_DB_URL, USER, PASSWORD);
-            }
+            Connection conn = DriverManager.getConnection(LOCAL_DB_URL, USER, PASSWORD);
             // Retorna a conexão global
-            return createConnectionProxy(configGlobal.globalConnection);
+            return createConnectionProxy(conn);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Erro ao conectar com o banco de dados: " + e.getMessage());
             e.printStackTrace();
