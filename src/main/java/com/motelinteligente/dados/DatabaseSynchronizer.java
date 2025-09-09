@@ -26,10 +26,18 @@ public class DatabaseSynchronizer {
         if (logs != null) {
             exibirLogs = logs;
         }
+        Connection conexaoRemoto = null;
+        if (configGlobal.conexaoRemota == null || configGlobal.conexaoRemota.isClosed()) {
+                conexaoRemoto = DriverManager.getConnection(REMOTE_DB_URL, USER, PASSWORD);
+                configGlobal.conexaoRemota = conexaoRemoto; // Armazena a nova conexão
+                configGlobal.incrementarContadorExecucoes();
+            } else {
+                conexaoRemoto = configGlobal.conexaoRemota;
+            }
         List<String> tabelasIgnoradas = List.of("login_acesso", "login_registros", "log_sincronizacao");
         String[] tables = getTables();
-        try (Connection conexaoLocal = DriverManager.getConnection(LOCAL_DB_URL, USER, PASSWORD); Connection conexaoRemoto = DriverManager.getConnection(REMOTE_DB_URL, USER, PASSWORD)) {
-
+        try (Connection conexaoLocal = DriverManager.getConnection(LOCAL_DB_URL, USER, PASSWORD); ) {
+            
             for (String tabela : tables) {
                 if (tabelasIgnoradas.contains(tabela)) {
                     if (exibirLogs != null) {

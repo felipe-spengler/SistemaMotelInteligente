@@ -1,12 +1,10 @@
 package com.motelinteligente.dados;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -60,7 +58,15 @@ public class CheckSincronia {
 
         try {
             localConn = DriverManager.getConnection(LOCAL_DB_URL, USER, PASSWORD);
-            remoteConn = DriverManager.getConnection(REMOTE_DB_URL, USER, PASSWORD);
+            if (configGlobal.conexaoRemota == null || configGlobal.conexaoRemota.isClosed()) {
+                remoteConn = DriverManager.getConnection(REMOTE_DB_URL, USER, PASSWORD);
+                configGlobal.conexaoRemota = remoteConn; // Armazena a nova conexão
+                configGlobal.incrementarContadorExecucoes();
+            } else {
+
+                remoteConn = configGlobal.conexaoRemota;
+
+            }
 
             boolean isSynced = true;
 
@@ -71,24 +77,7 @@ public class CheckSincronia {
 
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            if (localConn != null) {
-                try {
-                    localConn.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                    logger.error("Erro ao fechar a conexão local: " + e.getMessage());
-                }
-            }
-            if (remoteConn != null) {
-                try {
-                    remoteConn.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                    logger.error("Erro ao fechar a conexão remota: " + e.getMessage());
-                }
-            }
-        }
+        } 
     }
 
     private boolean sincronizarTabela(String tabela, Connection conexaoLocal, Connection conexaoRemoto) throws SQLException, IOException {
@@ -221,12 +210,10 @@ public class CheckSincronia {
                 if (!rsRemoto.next()) {
                     copyRowToPreparedStatement(rsLocal, stmtInsertRemoto, tabela, campoId, true); // Para INSERT
                     stmtInsertRemoto.executeUpdate();
-                    config.incrementarContadorExecucoes();
                 } else {
                     copyRowToPreparedStatement(rsLocal, stmtUpdateRemoto, tabela, campoId, false); // Para UPDATE
                     stmtUpdateRemoto.setObject(getColumnCount(tabela, conexaoRemoto), id);
                     stmtUpdateRemoto.executeUpdate();
-                    config.incrementarContadorExecucoes();
                 }
             } else {
                 if (rsRemoto.next()) {
@@ -234,7 +221,6 @@ public class CheckSincronia {
                     try (PreparedStatement stmtDeleteRemoto = conexaoRemoto.prepareStatement(queryDeleteRemoto)) {
                         stmtDeleteRemoto.setObject(1, id);
                         stmtDeleteRemoto.executeUpdate();
-                        config.incrementarContadorExecucoes();
                     }
                 }
             }

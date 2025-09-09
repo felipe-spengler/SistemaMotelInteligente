@@ -26,9 +26,10 @@ public class configGlobal {
     private boolean portoesRF;
     private int limiteDesconto;
     private BackupQueueManager backupQueueManager; 
-    private static int contadorExecucoes = 0;
+    private static int contadorConexoes = 0;
     private int alarmesAtivos = 0;
     public static Connection globalConnection = null;
+    public static Connection conexaoRemota = null;
 
     // Construtor privado para evitar a criação de múltiplas instâncias
     public configGlobal() {
@@ -62,12 +63,12 @@ public class configGlobal {
         }
     }
     public static void incrementarContadorExecucoes() {
-        contadorExecucoes++;
-        logger.info("Total de execuções no banco online: " + contadorExecucoes);
+        contadorConexoes++;
+        logger.info("Total de conexoes: " + contadorConexoes);
     }
     
     public static int getContadorExecucoes() {
-        return contadorExecucoes;
+        return contadorConexoes;
     }
      public BackupQueueManager getBackupQueueManager() {
         return backupQueueManager;
