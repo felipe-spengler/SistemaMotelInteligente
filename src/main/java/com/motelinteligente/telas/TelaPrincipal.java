@@ -104,7 +104,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(TelaPrincipal.class);
     private EncerraQuarto encerraQuarto;
     private CaixaFrame caixaFrame;
-    // Intervalo mínimo entre execuções em milissegundos
     private static final long UPDATE_INTERVAL = 1000; // 1 segundo
 
     private class NumOnly extends PlainDocument {
@@ -2181,7 +2180,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     }//GEN-LAST:event_btConfereLocacaoActionPerformed
 
     private void menuRelaVenProdutosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuRelaVenProdutosActionPerformed
-        new ConferenciaProdutos().setVisible(true);
+        new ConfereProdutos().setVisible(true);
     }//GEN-LAST:event_menuRelaVenProdutosActionPerformed
 
     private void menuConfigAdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuConfigAdActionPerformed
@@ -2231,7 +2230,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             worker = new SwingWorker<Void, Void>() {
                 @Override
                 protected Void doInBackground() throws Exception {
-                    new fquartos().alteraOcupado(quartoEmFoco, "ocupado-periodo");
+                    new fquartos().setStatus(quartoEmFoco, "ocupado-periodo");
                     //quarto.setStatus(quartoEmFoco, "ocupado-periodo");
                     //quarto.alteraRegistro(quartoEmFoco, status);
                     focoQuarto();
@@ -2282,8 +2281,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 JOptionPane.YES_NO_OPTION);
 
         if (confirmed == JOptionPane.YES_OPTION) {
-            CacheDados cache = CacheDados.getInstancia();
             setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            fazconexao.fecharPool();
             dispose();  // Fecha a janela e chama windowClosed
             System.exit(0);
         } else {
@@ -2639,11 +2638,10 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     }//GEN-LAST:event_bt_AntecipadoActionPerformed
     public void atualizaAntecipado(int locacao) {
         List<Antecipado> antecipados = new ArrayList<>();
-        Connection link = null;
         float jaRecebeu = 0;
         float valorDesconto = 0;
-        try {
-            link = new fazconexao().conectar();
+        try(Connection link = new fazconexao().conectar()) {
+            
             // Consulta SQL para buscar registros da tabela "antecipado" para a locação especificada
             String selectSQL = "SELECT tipo, valor, hora FROM antecipado WHERE idlocacao = ?";
             PreparedStatement preparedStatement = link.prepareStatement(selectSQL);
@@ -2852,10 +2850,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         }
 
         String consultaSQL = "SELECT * FROM antecipado WHERE idlocacao = ? AND tipo = ?";
-        Connection link = null;
 
-        try {
-            link = new fazconexao().conectar();
+        try (Connection link = new fazconexao().conectar()){
+            
             PreparedStatement statement = link.prepareStatement(consultaSQL);
             statement.setInt(1, idLocacao);
             statement.setString(2, recebido);
@@ -2985,12 +2982,10 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         mudaStatusNaCache(numeroNovoQuarto, "ocupado-periodo", hStatus);
 
         quarto.adicionaRegistro(quartoEmFoco, "limpeza");
-        quarto.setStatusHorario(quartoEmFoco, "limpeza", hStatus);
-        quarto.setStatusHorario(numeroNovoQuarto, "ocupado-periodo", hStatus);
+        quarto.setStatus(quartoEmFoco, "limpeza", hStatus);
+        quarto.setStatus(numeroNovoQuarto, "ocupado-periodo", hStatus);
         String SQL = "UPDATE registralocado set numquarto=" + numeroNovoQuarto + " where idlocacao = " + idLocacao;
-        Connection link = null;
-        try {
-            link = new fazconexao().conectar();
+        try (Connection link = new fazconexao().conectar()) {
             PreparedStatement statement = link.prepareStatement(SQL);
             int linhasAfetadas = statement.executeUpdate();
             if (linhasAfetadas == 1) {
@@ -3021,9 +3016,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         configGlobal config = configGlobal.getInstance();
         int idCaixaatual = config.getCaixa();
 
-        Connection link = null;
-        try {
-            link = new fazconexao().conectar();
+        try(Connection link = new fazconexao().conectar()) {
             String currentTime = new java.sql.Timestamp(System.currentTimeMillis()).toString();
 
             // Primeiro, tenta atualizar um registro existente

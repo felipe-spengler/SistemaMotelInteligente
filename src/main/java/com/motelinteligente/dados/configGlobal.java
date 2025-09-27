@@ -2,7 +2,6 @@ package com.motelinteligente.dados;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.JOptionPane;
 import org.slf4j.Logger;
@@ -28,7 +27,6 @@ public class configGlobal {
     private BackupQueueManager backupQueueManager; 
     private static int contadorConexoes = 0;
     private int alarmesAtivos = 0;
-    public static Connection conexaoRemota = null;
 
     // Construtor privado para evitar a criação de múltiplas instâncias
     public configGlobal() {
@@ -63,7 +61,7 @@ public class configGlobal {
     }
     public static void incrementarContadorExecucoes() {
         contadorConexoes++;
-        logger.info("Total de conexoes: " + contadorConexoes);
+        logger.warn(" Total de conexoes remotas estabelecidas: " + contadorConexoes);
     }
     
     public static int getContadorExecucoes() {
@@ -118,33 +116,32 @@ public class configGlobal {
         
         carregarConfiguracoesAdicionais();
     }
-    public void carregarConfiguracoesAdicionais(){
- 
-        String consultaSQL = "SELECT * FROM configuracoes";
-        Connection link = null;
-
-        try {
-            link = new fazconexao().conectar();
-            Statement statement = link.createStatement();
-
-            ResultSet resultado = statement.executeQuery(consultaSQL);
-            if (resultado.next()) {
-                //carrega as configurações do banco de dados
-                this.logoffecharcaixa = resultado.getBoolean("logoffcaixa");
-                this.controlaEstoque = resultado.getBoolean("estoque");
-                this.flagMesmoUserCaixa = resultado.getBoolean("flagMesmoUserCaixa");
-                this.limiteDesconto = resultado.getInt("limitadesconto");
-                this.telaMostrar = resultado.getString("telaMostrar");
-                this.portoesRF = resultado.getBoolean("portoesrf");
-            } else {
-                JOptionPane.showMessageDialog(null, "Erro ao carregar Informações Adicionais.");
-                statement.close();
-            }
-        } catch (Exception e) {
-            JOptionPane.showConfirmDialog(null, e);
-        } 
+    public void carregarConfiguracoesAdicionais() {
+    String consultaSQL = "SELECT * FROM configuracoes";
     
+    // O try-with-resources garante que todos os recursos entre parênteses
+    // (Connection, Statement, e ResultSet) serão fechados automaticamente.
+    try (Connection link = new fazconexao().conectar();
+         Statement statement = link.createStatement();
+         ResultSet resultado = statement.executeQuery(consultaSQL)) {
+
+        if (resultado.next()) {
+            // Carrega as configurações do banco de dados
+            this.logoffecharcaixa = resultado.getBoolean("logoffcaixa");
+            this.controlaEstoque = resultado.getBoolean("estoque");
+            this.flagMesmoUserCaixa = resultado.getBoolean("flagMesmoUserCaixa");
+            this.limiteDesconto = resultado.getInt("limitadesconto");
+            this.telaMostrar = resultado.getString("telaMostrar");
+            this.portoesRF = resultado.getBoolean("portoesrf");
+        } else {
+            JOptionPane.showMessageDialog(null, "Erro ao carregar Informações Adicionais. Nenhuma configuração encontrada.");
+        }
+        
+    } catch (Exception e) {
+        // Use showMessageDialog para exibir o erro, é mais comum
+        JOptionPane.showMessageDialog(null, "Erro ao conectar e carregar informações: " + e.getMessage(), "Erro de Conexão", JOptionPane.ERROR_MESSAGE);
     }
+}
 
 
 

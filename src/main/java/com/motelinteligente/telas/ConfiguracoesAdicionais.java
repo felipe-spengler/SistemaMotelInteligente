@@ -54,9 +54,7 @@ public class ConfiguracoesAdicionais extends javax.swing.JFrame {
         if (config.getControlaEstoque()) {
             checkEstoque.setSelected(true);
         }
-        if (config.isFlagMesmoUserCaixa()) {
-            fechaCaixaUser.setSelected(true);
-        }
+        
         if(config.getPortoesRF()){
             botaoRF.setSelected(true);
             botaoBotoeira.setSelected(false);
@@ -105,7 +103,6 @@ public class ConfiguracoesAdicionais extends javax.swing.JFrame {
         checkEstoque = new javax.swing.JCheckBox();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        fechaCaixaUser = new javax.swing.JCheckBox();
         jLabel2 = new javax.swing.JLabel();
         txtLimiteDesconto = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
@@ -164,14 +161,6 @@ public class ConfiguracoesAdicionais extends javax.swing.JFrame {
                 .addComponent(jLabel1)
                 .addContainerGap())
         );
-
-        fechaCaixaUser.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        fechaCaixaUser.setText("Fechamento caixa usuário abriu");
-        fechaCaixaUser.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                fechaCaixaUserActionPerformed(evt);
-            }
-        });
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel2.setText("Limita Desconto Colaborador: ");
@@ -284,7 +273,6 @@ public class ConfiguracoesAdicionais extends javax.swing.JFrame {
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(checkEstoque)
-                                    .addComponent(fechaCaixaUser)
                                     .addGroup(jPanel1Layout.createSequentialGroup()
                                         .addGap(10, 10, 10)
                                         .addComponent(jComboBoxTelas, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -307,9 +295,7 @@ public class ConfiguracoesAdicionais extends javax.swing.JFrame {
                     .addComponent(jLabel6))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(checkEstoque)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(fechaCaixaUser)
-                .addGap(39, 39, 39)
+                .addGap(69, 69, 69)
                 .addComponent(jComboBoxTelas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 65, Short.MAX_VALUE)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -359,17 +345,6 @@ public class ConfiguracoesAdicionais extends javax.swing.JFrame {
             config.setControlaEstoque(false);
         }
     }//GEN-LAST:event_checkEstoqueActionPerformed
-
-    private void fechaCaixaUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fechaCaixaUserActionPerformed
-        configGlobal config = configGlobal.getInstance();
-        if (fechaCaixaUser.isSelected()) {
-            funcaoSet("fechaUserCaixa", true);
-            config.setFlagMesmoUserCaixa(true);
-        } else {
-            funcaoSet("fechaUserCaixa", false);
-            config.setFlagMesmoUserCaixa(false);
-        }
-    }//GEN-LAST:event_fechaCaixaUserActionPerformed
 
     private void txtLimiteDescontoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtLimiteDescontoActionPerformed
         String consultaSQL = "UPDATE configuracoes SET limitadesconto = ?";
@@ -540,7 +515,6 @@ public class ConfiguracoesAdicionais extends javax.swing.JFrame {
     private javax.swing.JRadioButton botaoRF;
     private javax.swing.JCheckBox checkEstoque;
     private javax.swing.JCheckBox checkLogoff;
-    private javax.swing.JCheckBox fechaCaixaUser;
     private javax.swing.JComboBox<String> jComboBoxTelas;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

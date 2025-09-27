@@ -11,40 +11,25 @@ import org.springframework.stereotype.Service; // Import the Service annotation
 @Service // Add this annotation
 public class DatabaseSynchronizer {
 
-    private String LOCAL_DB_URL;
-    private String REMOTE_DB_URL;
-    private String USER;
-    private String PASSWORD;
     private JTextArea exibirLogs;
 
     public void sincronizarBanco(JTextArea logs) throws SQLException {
-        this.LOCAL_DB_URL = CarregarVariaveis.getLocalDbUrl();
-
-        this.REMOTE_DB_URL = CarregarVariaveis.getRemoteDbUrl();
-        this.USER = CarregarVariaveis.getUser();
-        this.PASSWORD = CarregarVariaveis.getPassword();
         if (logs != null) {
             exibirLogs = logs;
         }
-        Connection conexaoRemoto = null;
-        if (configGlobal.conexaoRemota == null || configGlobal.conexaoRemota.isClosed()) {
-                conexaoRemoto = DriverManager.getConnection(REMOTE_DB_URL, USER, PASSWORD);
-                configGlobal.conexaoRemota = conexaoRemoto; // Armazena a nova conexão
-                configGlobal.incrementarContadorExecucoes();
-            } else {
-                conexaoRemoto = configGlobal.conexaoRemota;
-            }
+
         List<String> tabelasIgnoradas = List.of("login_acesso", "login_registros", "log_sincronizacao");
         String[] tables = getTables();
-        try (Connection conexaoLocal = DriverManager.getConnection(LOCAL_DB_URL, USER, PASSWORD); ) {
-            
+
+        try (
+                Connection conexaoLocal = new fazconexao().conectar(); Connection conexaoRemoto = ConexaoRemota.getConnection()) {
             for (String tabela : tables) {
                 if (tabelasIgnoradas.contains(tabela)) {
                     if (exibirLogs != null) {
                         exibirLogs.append(String.format("Tabela %s ignorada na sincronização.%n", tabela));
                     }
                     System.out.printf("Tabela %s ignorada na sincronização.%n", tabela);
-                    continue; // pula para a próxima
+                    continue;
                 }
 
                 if (!sincronizarTabela(tabela, conexaoLocal, conexaoRemoto)) {
@@ -54,16 +39,21 @@ public class DatabaseSynchronizer {
                     }
                 }
             }
+
         } catch (SQLException e) {
-            if (exibirLogs != null) exibirLogs.append(String.format("Erro na sincronização: %s%n", e.getMessage()));
+            if (exibirLogs != null) {
+                exibirLogs.append(String.format("Erro na sincronização: %s%n", e.getMessage()));
+            }
         } catch (Exception e) {
-            if (exibirLogs != null) exibirLogs.append(String.format("Erro inesperado: %s%n", e.getMessage()));
+            if (exibirLogs != null) {
+                exibirLogs.append(String.format("Erro inesperado: %s%n", e.getMessage()));
+            }
         }
     }
 
     private String[] getTables() throws SQLException {
         List<String> tableList = new ArrayList<>();
-        try (Connection conexao = DriverManager.getConnection(LOCAL_DB_URL, USER, PASSWORD)) {
+        try (Connection conexao = new fazconexao().conectar()) {
             DatabaseMetaData metaData = conexao.getMetaData();
             ResultSet tables = metaData.getTables(null, null, "%", new String[]{"TABLE"});
 

@@ -40,7 +40,8 @@ public class ConfereLocacoes extends JFrame {
     private JButton buscarButton, btnGerarPDF, btnMaisDetalhes;
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
     private int contaResultados;
-    private JLabel contaLabel;
+    private JLabel contaLabel, quartoLabel, consumoLabel;
+    
 
     public ConfereLocacoes() {
         setTitle("Consulta de Locações");
@@ -134,6 +135,12 @@ public class ConfereLocacoes extends JFrame {
 // Painel para o label à direita
         JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         contaLabel = new JLabel("Nenhum resultado");
+        consumoLabel = new JLabel("00");
+        quartoLabel = new JLabel("00");
+        consumoLabel.setFont(labelFont);
+        quartoLabel.setFont(labelFont);
+        rightPanel.add(consumoLabel);
+        rightPanel.add(quartoLabel);
         rightPanel.add(contaLabel);
 
 // Adiciona os dois subpainéis no painel principal
@@ -242,6 +249,7 @@ public class ConfereLocacoes extends JFrame {
         fquartos quartosdao = new fquartos();
         //carregar os dados
         contaResultados = 0;
+        float valorQuarto = 0, valorConsumo = 0;
         for (int id : idList) {
             if (quartosdao.getIdCaixa(id) != caixaAtual) {
                 model.addRow(new Object[]{
@@ -260,6 +268,8 @@ public class ConfereLocacoes extends JFrame {
                     int idlocacao = resultado.getInt("idlocacao");
                     valQ = resultado.getFloat("valorquarto");
                     valC = resultado.getFloat("valorconsumo");
+                    valorConsumo+= valC;
+                    valorQuarto += valQ;
                     model.addRow(new Object[]{
                         resultado.getTimestamp("horainicio"),
                         resultado.getTimestamp("horafim"),
@@ -280,6 +290,8 @@ public class ConfereLocacoes extends JFrame {
                 }
             }
             contaLabel.setText(String.format("Mostrando %d resultados", contaResultados));
+            consumoLabel.setText(String.format("R$%.2f de consumo", valorConsumo));
+            quartoLabel.setText(String.format("R$%.2f de locações", valorQuarto));
         }
 
         //mostraResultados
@@ -373,7 +385,7 @@ public class ConfereLocacoes extends JFrame {
         }
     }
 
-    public void mostraDetalhes(int idCaixa) {
+    public void mostraDetalhes(int idCaixa) throws SQLException {
         JFrame detalhesFrame = new JFrame("Detalhes do Caixa" + idCaixa);
         detalhesFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         detalhesFrame.setSize(1200, 800);

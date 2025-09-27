@@ -1,39 +1,50 @@
 package com.motelinteligente.dados;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.lang.reflect.Proxy;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import javax.swing.JOptionPane;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
 public class fazconexao {
 
-    private static fazconexao instance;
-    private Connection connection;
+    // 🔑 Usar um único DataSource (pool) em toda a aplicação
+    private static HikariDataSource dataSource;
 
-    private String LOCAL_DB_URL;
-    private String USER;
-    private String PASSWORD;
-
-    public fazconexao() {
-        this.LOCAL_DB_URL = CarregarVariaveis.getLocalDbUrl();
-        this.USER = CarregarVariaveis.getUser();
-        this.PASSWORD = CarregarVariaveis.getPassword();
-    }
-
-    public Connection conectar() {
+    static {
         try {
+            HikariConfig config = new HikariConfig();
+            config.setJdbcUrl(CarregarVariaveis.getLocalDbUrl());
+            config.setUsername(CarregarVariaveis.getUser());
+            config.setPassword(CarregarVariaveis.getPassword());
 
-            Connection conn = DriverManager.getConnection(LOCAL_DB_URL, USER, PASSWORD);
-            // Retorna a conexão global
-            return createConnectionProxy(conn);
+            // Configurações recomendadas
+            config.setMaximumPoolSize(10);
+            config.setMinimumIdle(2);
+            config.setIdleTimeout(300000); // 5 min
+            config.setConnectionTimeout(30000);
+            config.setLeakDetectionThreshold(60000);
+            // Previne conexões zumbis
+            config.setConnectionTestQuery("SELECT 1");
+            config.setValidationTimeout(3000);  // 3s pra testar
+            config.setMaxLifetime(1800000);     // recicla a conexão a cada 30 min
+            config.setKeepaliveTime(300000);    // manda ping a cada 5 min
+            dataSource = new HikariDataSource(config);
+
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Erro ao conectar com o banco de dados: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Erro ao inicializar pool de conexões: " + e.getMessage());
             e.printStackTrace();
         }
-        return null;
+    }
+
+    public Connection conectar() throws SQLException {
+        // Agora, cada chamada pega uma conexão do pool
+        Connection conn = dataSource.getConnection();
+        return createConnectionProxy(conn);
     }
 
     private Connection createConnectionProxy(Connection connection) {
@@ -44,25 +55,24 @@ public class fazconexao {
         );
     }
 
-    // Remova o link.close() daqui!
     public int verificaCaixa() {
         String consultaSQL = "SELECT id FROM caixa WHERE saldofecha IS NULL";
-        Connection link = null;
-        try {
-            // Agora, conectar() vai sempre pegar a mesma conexão
-            link = conectar();
-            PreparedStatement statement = link.prepareStatement(consultaSQL);
-            ResultSet resultado = statement.executeQuery();
+        try (Connection link = conectar(); PreparedStatement statement = link.prepareStatement(consultaSQL); ResultSet resultado = statement.executeQuery()) {
+
             if (resultado.next()) {
-                int numero = resultado.getInt("id");
-                return numero;
-            } else {
-                return 0;
+                return resultado.getInt("id");
             }
+            return 0;
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e);
+            return 0;
         }
-        return 0;
     }
 
+    // Método opcional para fechar o pool ao encerrar o sistema
+    public static void fecharPool() {
+        if (dataSource != null) {
+            dataSource.close();
+        }
+    }
 }

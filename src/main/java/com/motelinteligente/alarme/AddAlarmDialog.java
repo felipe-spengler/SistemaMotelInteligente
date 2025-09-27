@@ -23,52 +23,52 @@ public class AddAlarmDialog extends JDialog {
     private JTextField noteField;
 
     public AddAlarmDialog() {
-    setTitle("Adicionar Novo Alarme");
-    setLayout(new GridLayout(5, 2));
-    setSize(300, 200);
-    setLocationRelativeTo(null);
+        setTitle("Adicionar Novo Alarme");
+        setLayout(new GridLayout(5, 2));
+        setSize(300, 200);
+        setLocationRelativeTo(null);
 
-    // Obter a data e hora atuais
-    Calendar calendar = Calendar.getInstance();
+        // Obter a data e hora atuais
+        Calendar calendar = Calendar.getInstance();
 
-    // Criar e configurar o SpinnerDateModel para data
-    SpinnerDateModel dateModel = new SpinnerDateModel(new Date(), null, null, java.util.Calendar.DAY_OF_MONTH);
-    dateSpinner = new JSpinner(dateModel);
-    JSpinner.DateEditor dateEditor = new JSpinner.DateEditor(dateSpinner, "dd/MM/yyyy");
-    dateSpinner.setEditor(dateEditor);
+        // Criar e configurar o SpinnerDateModel para data
+        SpinnerDateModel dateModel = new SpinnerDateModel(new Date(), null, null, java.util.Calendar.DAY_OF_MONTH);
+        dateSpinner = new JSpinner(dateModel);
+        JSpinner.DateEditor dateEditor = new JSpinner.DateEditor(dateSpinner, "dd/MM/yyyy");
+        dateSpinner.setEditor(dateEditor);
 
-    // Configurar centralização para o editor de data
-    JTextField dateField = ((JSpinner.DateEditor) dateSpinner.getEditor()).getTextField();
-    dateField.setHorizontalAlignment(JTextField.CENTER);
+        // Configurar centralização para o editor de data
+        JTextField dateField = ((JSpinner.DateEditor) dateSpinner.getEditor()).getTextField();
+        dateField.setHorizontalAlignment(JTextField.CENTER);
 
-    // Criar e configurar os spinners para hora e minuto
-    int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
-    int currentMinute = calendar.get(Calendar.MINUTE);
-    
-    hourSpinner = new JSpinner(new SpinnerNumberModel(currentHour, 0, 23, 1));
-    minuteSpinner = new JSpinner(new SpinnerNumberModel(currentMinute, 0, 59, 1));
+        // Criar e configurar os spinners para hora e minuto
+        int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
+        int currentMinute = calendar.get(Calendar.MINUTE);
 
-    // Configurar centralização para os editores de hora e minuto
-    JTextField hourField = ((JSpinner.NumberEditor) hourSpinner.getEditor()).getTextField();
-    hourField.setHorizontalAlignment(JTextField.CENTER);
-    JTextField minuteField = ((JSpinner.NumberEditor) minuteSpinner.getEditor()).getTextField();
-    minuteField.setHorizontalAlignment(JTextField.CENTER);
+        hourSpinner = new JSpinner(new SpinnerNumberModel(currentHour, 0, 23, 1));
+        minuteSpinner = new JSpinner(new SpinnerNumberModel(currentMinute, 0, 59, 1));
 
-    noteField = new JTextField();
+        // Configurar centralização para os editores de hora e minuto
+        JTextField hourField = ((JSpinner.NumberEditor) hourSpinner.getEditor()).getTextField();
+        hourField.setHorizontalAlignment(JTextField.CENTER);
+        JTextField minuteField = ((JSpinner.NumberEditor) minuteSpinner.getEditor()).getTextField();
+        minuteField.setHorizontalAlignment(JTextField.CENTER);
 
-    JButton addButton = new JButton("Adicionar Alarme");
-    addButton.addActionListener(e -> addAlarm());
+        noteField = new JTextField();
 
-    add(new JLabel("Data:"));
-    add(dateSpinner);
-    add(new JLabel("Hora:"));
-    add(hourSpinner);
-    add(new JLabel("Minuto:"));
-    add(minuteSpinner);
-    add(new JLabel("Título do Alarme:"));
-    add(noteField);
-    add(addButton);
-}
+        JButton addButton = new JButton("Adicionar Alarme");
+        addButton.addActionListener(e -> addAlarm());
+
+        add(new JLabel("Data:"));
+        add(dateSpinner);
+        add(new JLabel("Hora:"));
+        add(hourSpinner);
+        add(new JLabel("Minuto:"));
+        add(minuteSpinner);
+        add(new JLabel("Título do Alarme:"));
+        add(noteField);
+        add(addButton);
+    }
 
     private void addAlarm() {
         // Obtendo a data selecionada no dateSpinner
@@ -94,26 +94,25 @@ public class AddAlarmDialog extends JDialog {
             return;
         }
 
-        try {
-            Connection conn = new fazconexao().conectar();
-            // Inserir o alarme no banco de dados
-        String sql = "INSERT INTO alarmes (hora_adicionado, hora_despertar, descricao) VALUES (?, ?, ?)";
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            // Obtém o horário atual da máquina
-        LocalDateTime horaAtual = LocalDateTime.now();
+        try (Connection conn = new fazconexao().conectar(); PreparedStatement stmt = conn.prepareStatement("INSERT INTO alarmes (hora_adicionado, hora_despertar, descricao) VALUES (?, ?, ?)")) {
 
-        // Define os parâmetros
+            // Obtém o horário atual da máquina
+            LocalDateTime horaAtual = LocalDateTime.now();
+
+            // Define os parâmetros
             stmt.setTimestamp(1, Timestamp.valueOf(horaAtual)); // hora_adicionado
             stmt.setTimestamp(2, Timestamp.valueOf(dateTime));  // Convertendo LocalDateTime para Timestamp
             stmt.setString(3, note);  // Descrição do alarme
+
+            // Executa a instrução
             stmt.executeUpdate();
-            
+
             // Atualiza o contador de alarmes ativos
             configGlobal config = configGlobal.getInstance();
             config.incrementarAlarme();
-            
+
             JOptionPane.showMessageDialog(this, "Alarme adicionado com sucesso!");
-            dispose();  // Fecha o diálogo após o sucesso
+            dispose(); // Fecha o diálogo após o sucesso
         } catch (SQLException ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(this, "Erro ao salvar o alarme no banco de dados.", "Erro", JOptionPane.ERROR_MESSAGE);

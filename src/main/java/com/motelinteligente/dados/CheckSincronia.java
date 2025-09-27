@@ -1,6 +1,5 @@
 package com.motelinteligente.dados;
 
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.*;
@@ -8,41 +7,55 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.slf4j.LoggerFactory;
 
 public class CheckSincronia {
 
-    private String LOCAL_DB_URL;
-    private String REMOTE_DB_URL;
-    private String USER;
-    private String PASSWORD;
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(CheckSincronia.class);
+    private final AtomicBoolean executando = new AtomicBoolean(false);
 
     public void start() {
-        this.LOCAL_DB_URL = CarregarVariaveis.getLocalDbUrl();
-        this.REMOTE_DB_URL = CarregarVariaveis.getRemoteDbUrl();
-        this.USER = CarregarVariaveis.getUser();
-        this.PASSWORD = CarregarVariaveis.getPassword();
-        
         Timer timer = new Timer(true);
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                // Executa a sincronização em uma nova thread
-                new Thread(() -> {
+                if (executando.compareAndSet(false, true)) {
                     try {
-                        checkDatabaseSync();
-                    } catch (UnsupportedEncodingException ex) {
-                        ex.printStackTrace();
-                    } catch (IOException ex) {
-                        Logger.getLogger(CheckSincronia.class.getName()).log(Level.SEVERE, null, ex);
+                        if (temRegistrosParaSincronizar()) {
+                            logger.info("Iniciando sincronização de registros...");
+                            checkDatabaseSync();
+                            logger.info("Sincronização concluída.");
+                        } else {
+                            logger.debug("Nenhum registro para sincronizar no momento.");
+                        }
+                    } catch (Exception ex) {
+                        logger.error("Erro durante execução de CheckSincronia: {}", ex.getMessage(), ex);
+                    } finally {
+                        executando.set(false);
                     }
-                }).start();
+                } else {
+                    logger.warn("CheckSincronia já em execução. Ignorando nova chamada.");
+                }
             }
-        }, 0, 60 * 2); // Executa a cada 2 seg
+        }, 0, 10_000); // Executa a cada 10 segundos
+    }
+
+    private boolean temRegistrosParaSincronizar() {
+        String queryCount = "SELECT COUNT(*) FROM log_sincronizacao";
+        try (Connection localConn = new fazconexao().conectar();
+             PreparedStatement stmt = localConn.prepareStatement(queryCount);
+             ResultSet rs = stmt.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            logger.error("Erro ao verificar registros para sincronizar: {}", e.getMessage(), e);
+        }
+        return false;
     }
 
     private void checkDatabaseSync() throws UnsupportedEncodingException, IOException {
@@ -53,45 +66,45 @@ public class CheckSincronia {
             "status", "valorcartao", "portoes", "reservas"
         };
 
-        Connection localConn = null;
-        Connection remoteConn = null;
+        try (Connection localConn = new fazconexao().conectar();
+             Connection remoteConn = ConexaoRemota.getConnection()) {
 
-        try {
-            localConn = DriverManager.getConnection(LOCAL_DB_URL, USER, PASSWORD);
-            if (configGlobal.conexaoRemota == null || configGlobal.conexaoRemota.isClosed()) {
-                remoteConn = DriverManager.getConnection(REMOTE_DB_URL, USER, PASSWORD);
-                configGlobal.conexaoRemota = remoteConn; // Armazena a nova conexão
-                configGlobal.incrementarContadorExecucoes();
-            } else {
-
-                remoteConn = configGlobal.conexaoRemota;
-
+            if (remoteConn == null) {
+                logger.error("Não foi possível obter conexão remota (remoteConn é null). Sincronização abortada.");
+                return;
             }
 
             boolean isSynced = true;
-
-            // Verificar e sincronizar com base na tabela de logs
             for (String tabela : tables) {
-                isSynced &= sincronizarTabela(tabela, localConn, remoteConn);
+                try {
+                    if (!sincronizarTabela(tabela, localConn, remoteConn)) {
+                        isSynced = false;
+                    }
+                } catch (Exception e) {
+                    logger.error("Erro ao sincronizar tabela '{}': {}", tabela, e.getMessage(), e);
+                    isSynced = false;
+                }
+            }
+
+            if (!isSynced) {
+                logger.warn("Algumas tabelas não foram sincronizadas corretamente. Verifique os logs para detalhes.");
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
-        } 
+            logger.error("Erro de conexão ao tentar sincronizar bancos: {}", e.getMessage(), e);
+        }
     }
 
-    private boolean sincronizarTabela(String tabela, Connection conexaoLocal, Connection conexaoRemoto) throws SQLException, IOException {
-        String campoId = obterCampoId(tabela);
+    private boolean sincronizarTabela(String tabela, Connection conexaoLocal, Connection conexaoRemoto)
+            throws SQLException, IOException {
 
+        String campoId = obterCampoId(tabela);
         if (campoId == null) {
-            System.err.println("Campo de " + campoId + " não encontrado para a tabela: " + tabela);
+            logger.error("Não foi possível identificar campo ID para tabela '{}'.", tabela);
             return false;
         }
 
         String queryLog = "SELECT * FROM log_sincronizacao WHERE tabela_nome = ?";
-        String querySelectLocal = "SELECT * FROM " + tabela + " WHERE " + campoId + " = ?";
-        String querySelectRemoto = "SELECT * FROM " + tabela + " WHERE " + campoId + " = ?";
-
         boolean isSynced = true;
 
         try (PreparedStatement stmtLog = conexaoLocal.prepareStatement(queryLog)) {
@@ -100,32 +113,13 @@ public class CheckSincronia {
             try (ResultSet rsLog = stmtLog.executeQuery()) {
                 while (rsLog.next()) {
                     Object id = rsLog.getObject("registro_id");
-
-                    // Verificar registro no banco de dados local
-                    try (PreparedStatement stmtSelectLocal = conexaoLocal.prepareStatement(querySelectLocal); PreparedStatement stmtSelectRemoto = conexaoRemoto.prepareStatement(querySelectRemoto)) {
-
-                        stmtSelectLocal.setObject(1, id);
-                        stmtSelectRemoto.setObject(1, id);
-
-                        try (ResultSet rsLocal = stmtSelectLocal.executeQuery(); ResultSet rsRemoto = stmtSelectRemoto.executeQuery()) {
-
-                            if (rsLocal.next() && rsRemoto.next()) {
-                                // Comparar registros e logar discrepâncias
-                                List<String> discrepancias = compararRegistrosDetalhado(rsLocal, rsRemoto);
-                                if (!discrepancias.isEmpty()) {
-                                    isSynced = false;
-                                    logger.warn(String.format("DISCREPÂNCIA ENCONTRADA NA TABELA '%s' PARA ID '%s': %s",
-                                            tabela, id, String.join(", ", discrepancias)));
-                                    sincronizarRegistro(tabela, campoId, id, conexaoLocal, conexaoRemoto);
-                                }
-                            } else {
-                                // Sincronizar registros se necessário
-                                sincronizarRegistro(tabela, campoId, id, conexaoLocal, conexaoRemoto);
-                            }
-
-                            // Excluir registro do log após sincronização
-                            deletarRegistroLog(conexaoLocal, tabela, id);
-                        }
+                    try {
+                        sincronizarRegistro(tabela, campoId, id, conexaoLocal, conexaoRemoto);
+                        deletarRegistroLog(conexaoLocal, tabela, id);
+                    } catch (Exception e) {
+                        logger.error("Erro ao sincronizar registro ID '{}' da tabela '{}': {}",
+                                id, tabela, e.getMessage(), e);
+                        isSynced = false;
                     }
                 }
             }
@@ -287,35 +281,7 @@ public class CheckSincronia {
         }
     }
 
-    private boolean compararRegistros(ResultSet rsLocal, ResultSet rsRemoto) throws SQLException {
-        ResultSetMetaData metaDataLocal = rsLocal.getMetaData();
-        ResultSetMetaData metaDataRemoto = rsRemoto.getMetaData();
-
-        int columnCountLocal = metaDataLocal.getColumnCount();
-        int columnCountRemoto = metaDataRemoto.getColumnCount();
-
-        if (columnCountLocal != columnCountRemoto) {
-            return false;
-        }
-
-        for (int i = 1; i <= columnCountLocal; i++) {
-            Object localValue = rsLocal.getObject(i);
-            Object remotoValue = rsRemoto.getObject(i);
-
-            // Truncar para comparação
-            if (localValue instanceof Timestamp && remotoValue instanceof Timestamp) {
-                localValue = Timestamp.valueOf(localValue.toString().substring(0, 19)); // Até segundos
-                remotoValue = Timestamp.valueOf(remotoValue.toString().substring(0, 19)); // Até segundos
-            }
-
-            if ((localValue != null && !localValue.equals(remotoValue)) || (localValue == null && remotoValue != null)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
+    
     private String obterCampoId(String tabela) {
         switch (tabela) {
             case "alarmes":
@@ -367,8 +333,5 @@ public class CheckSincronia {
         }
     }
 
-    public static void main(String[] args) {
-        CheckSincronia checkSincronia = new CheckSincronia();
-        checkSincronia.start();
-    }
+   
 }

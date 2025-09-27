@@ -33,7 +33,7 @@ public class CacheDados {
     public Map<Integer, List<DadosVendidos>> cacheProdutosVendidos = new HashMap<>();
     public Map<Integer, Timestamp> despertador = new HashMap<>();
     public static SerialPort arduinoPort;
-    private static final Logger logger = LoggerFactory.getLogger(fquartos.class);
+    private static final Logger logger = LoggerFactory.getLogger(CacheDados.class); // Corrigido a classe de log
 
     private CacheDados() {
         // Construtor privado para impedir instâncias diretas
@@ -115,43 +115,36 @@ public class CacheDados {
         carregaProdutosNegociadosCache(idLoca);
     }
 
-    
     public void carregaProdutosNegociadosCache(int idLoca) {
-    // 1. Obtenha a conexão UMA VEZ.
-    Connection link = new fazconexao().conectar();
-    
-    // Certifique-se de que a conexão não é nula antes de continuar
-    if (link == null) {
-        System.err.println("Falha ao obter a conexão com o banco de dados.");
-        return;
-    }
+        // Usa o try-with-resources para garantir que a conexão e statements sejam fechados automaticamente.
+        try (Connection link = new fazconexao().conectar()) {
+            if (link == null) {
+                System.err.println("Falha ao obter a conexão com o banco de dados.");
+                return;
+            }
 
-    try {
-        // 2. Use a mesma conexão para a primeira consulta.
-        String consultaProdutosSQL = "SELECT idproduto, quantidade FROM prevendidos WHERE idlocacao = ?";
-        try (PreparedStatement statementProdutos = link.prepareStatement(consultaProdutosSQL, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
-            statementProdutos.setInt(1, idLoca);
-            try (ResultSet resultadoProdutos = statementProdutos.executeQuery()) {
-                if (resultadoProdutos.next()) {
+            // 1. Consulta para produtos vendidos
+            String consultaProdutosSQL = "SELECT idproduto, quantidade FROM prevendidos WHERE idlocacao = ?";
+            try (PreparedStatement statementProdutos = link.prepareStatement(consultaProdutosSQL)) {
+                statementProdutos.setInt(1, idLoca);
+                try (ResultSet resultadoProdutos = statementProdutos.executeQuery()) {
                     List<DadosVendidos> produtosVendidos = new ArrayList<>();
-                    resultadoProdutos.beforeFirst();
                     while (resultadoProdutos.next()) {
                         int idProdutoBD = resultadoProdutos.getInt("idproduto");
                         int quantidadeBD = resultadoProdutos.getInt("quantidade");
                         produtosVendidos.add(new DadosVendidos(idProdutoBD, quantidadeBD));
                     }
-                    cacheProdutosVendidos.put(idLoca, produtosVendidos);
+                    if (!produtosVendidos.isEmpty()) {
+                        cacheProdutosVendidos.put(idLoca, produtosVendidos);
+                    }
                 }
             }
-        }
-        
-        // 3. Use a mesma conexão para a segunda consulta.
-        String consultaNegociacoesSQL = "SELECT * FROM antecipado WHERE idlocacao = ?";
-        try (PreparedStatement statementNegociacoes = link.prepareStatement(consultaNegociacoesSQL, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
-            statementNegociacoes.setInt(1, idLoca);
-            try (ResultSet resultadoNegociacoes = statementNegociacoes.executeQuery()) {
-                if (resultadoNegociacoes.next()) {
-                    resultadoNegociacoes.beforeFirst();
+
+            // 2. Consulta para negociações
+            String consultaNegociacoesSQL = "SELECT tipo, valor FROM antecipado WHERE idlocacao = ?";
+            try (PreparedStatement statementNegociacoes = link.prepareStatement(consultaNegociacoesSQL)) {
+                statementNegociacoes.setInt(1, idLoca);
+                try (ResultSet resultadoNegociacoes = statementNegociacoes.executeQuery()) {
                     List<Negociados> negociacoes = new ArrayList<>();
                     while (resultadoNegociacoes.next()) {
                         String tipo = resultadoNegociacoes.getString("tipo");
@@ -160,31 +153,26 @@ public class CacheDados {
                         Negociados negociado = new Negociados(tipo, valor);
                         negociacoes.add(negociado);
                     }
+                    // Você pode querer fazer algo com a lista 'negociacoes' aqui
+                    // já que ela não está sendo usada no seu código original.
                 }
             }
+        } catch (SQLException e) {
+            // Em um ambiente de produção, logar a exceção é melhor do que apenas imprimir a pilha.
+            logger.error("Erro ao carregar produtos e negociações para a locação: " + idLoca, e);
         }
-        
-    } catch (SQLException e) {
-        e.printStackTrace();
-    } 
-}
-    public CarregaQuarto carregarDadosQuarto() {
-        int numeroQuarto = 0;
-        String data;
-        String status;
-        String tipo;
-        Connection link = null;
-        try {
-            link = new fazconexao().conectar();
-            String consultaSQL = "select * from status order by numeroquarto";
-            PreparedStatement statement = link.prepareStatement(consultaSQL);
-            ResultSet resultado = statement.executeQuery();
-            while (resultado.next()) {
+    }
 
-                numeroQuarto = resultado.getInt("numeroquarto");
-                status = resultado.getString("atualquarto");
-                data = String.valueOf(resultado.getTimestamp("horastatus"));
-                tipo = new fquartos().getTipo(numeroQuarto);
+    public CarregaQuarto carregarDadosQuarto() {
+        try (Connection link = new fazconexao().conectar();
+             PreparedStatement statement = link.prepareStatement("select * from status order by numeroquarto");
+             ResultSet resultado = statement.executeQuery()) {
+
+            while (resultado.next()) {
+                int numeroQuarto = resultado.getInt("numeroquarto");
+                String status = resultado.getString("atualquarto");
+                String data = String.valueOf(resultado.getTimestamp("horastatus"));
+                String tipo = new fquartos().getTipo(numeroQuarto);
 
                 CarregaQuarto quarto = new CarregaQuarto();
                 quarto.setNumeroQuarto(numeroQuarto);
@@ -197,12 +185,10 @@ public class CacheDados {
                     carregarOcupado(numeroQuarto);
                 }
             }
-            // Fechar os recursos
-            resultado.close();
-            statement.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } 
+        } catch (SQLException e) {
+            // Em um ambiente de produção, logar a exceção é melhor do que apenas imprimir a pilha.
+            logger.error("Erro ao carregar dados dos quartos", e);
+        }
         return null;
     }
 
@@ -215,16 +201,12 @@ public class CacheDados {
     }
 
     public void mostrarCacheQuarto() {
-        // Cria o JFrame para exibir os dados
         JFrame frame = new JFrame("Cache de Quartos");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(800, 600);
-
-        // Cria um JTextArea para exibir o conteúdo
         JTextArea textArea = new JTextArea();
         textArea.setEditable(false);
 
-        // Adiciona os dados da cacheQuarto
         if (cacheQuarto.isEmpty()) {
             textArea.append("A cache de quartos está vazia.\n");
         } else {
@@ -238,7 +220,6 @@ public class CacheDados {
             }
         }
 
-        // Adiciona os dados da cacheOcupado
         if (cacheOcupado.isEmpty()) {
             textArea.append("\nA cache de quartos OCUPADOS está vazia.\n");
         } else {
@@ -250,25 +231,18 @@ public class CacheDados {
             }
         }
 
-        // Adiciona o JTextArea a um JScrollPane para suporte a rolagem
         JScrollPane scrollPane = new JScrollPane(textArea);
         frame.add(scrollPane);
-
-        // Torna a janela visível
         frame.setVisible(true);
     }
 
     public void mostrarCacheProdutosVendidos() {
-        // Cria o JFrame para exibir os dados
         JFrame frame = new JFrame("Cache de Produtos Vendidos");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(800, 600);
-
-        // Cria um JTextArea para exibir o conteúdo
         JTextArea textArea = new JTextArea();
         textArea.setEditable(false);
 
-        // Adiciona os dados da cacheProdutosVendidos
         if (cacheProdutosVendidos.isEmpty()) {
             textArea.append("A cache de produtos vendidos está vazia.\n");
         } else {
@@ -285,16 +259,12 @@ public class CacheDados {
             }
         }
 
-        // Adiciona o JTextArea a um JScrollPane para suporte a rolagem
         JScrollPane scrollPane = new JScrollPane(textArea);
         frame.add(scrollPane);
-
-        // Torna a janela visível
         frame.setVisible(true);
     }
 
     public static class DadosVendidos {
-
         public int idProduto;
         public int quantidadeVendida;
 
@@ -302,11 +272,9 @@ public class CacheDados {
             idProduto = id;
             quantidadeVendida = qnt;
         }
-
     }
 
     public static class Negociados {
-
         public String tipo;
         public float valor;
 
@@ -314,6 +282,5 @@ public class CacheDados {
             tipo = tp;
             valor = val;
         }
-
     }
 }

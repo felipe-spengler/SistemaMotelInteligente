@@ -6,7 +6,8 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.3.4</version>
-        <relativePath/> </parent>
+        <relativePath/> 
+    </parent>
     <groupId>com.motelinteligente</groupId>
     <artifactId>MotelInteligente</artifactId>
     <version>0.0.1-SNAPSHOT</version>
@@ -16,6 +17,11 @@
         <maven.build.timestamp.format>yyyyMMdd-HHmmss</maven.build.timestamp.format>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>5.1.0</version>
+        </dependency>
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
