@@ -28,9 +28,7 @@ public class CheckSincronia {
                             logger.info("Iniciando sincronização de registros...");
                             checkDatabaseSync();
                             logger.info("Sincronização concluída.");
-                        } else {
-                            logger.debug("Nenhum registro para sincronizar no momento.");
-                        }
+                        } 
                     } catch (Exception ex) {
                         logger.error("Erro durante execução de CheckSincronia: {}", ex.getMessage(), ex);
                     } finally {
