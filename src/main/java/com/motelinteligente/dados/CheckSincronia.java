@@ -11,36 +11,48 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.LoggerFactory;
 
-public class CheckSincronia {
-
+public class CheckSincronia extends TimerTask {
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(CheckSincronia.class);
+
+    // Singleton
+    private static CheckSincronia instance;
+    private static Timer timer;
+    private static final long INTERVALO = 10_000; // 10 segundos
+
     private final AtomicBoolean executando = new AtomicBoolean(false);
 
-    public void start() {
-        Timer timer = new Timer(true);
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                if (executando.compareAndSet(false, true)) {
-                    try {
-                        if (temRegistrosParaSincronizar()) {
-                            logger.info("Iniciando sincronização de registros...");
-                            checkDatabaseSync();
-                            logger.info("Sincronização concluída.");
-                        } 
-                    } catch (Exception ex) {
-                        logger.error("Erro durante execução de CheckSincronia: {}", ex.getMessage(), ex);
-                    } finally {
-                        executando.set(false);
-                    }
-                } else {
-                    logger.warn("CheckSincronia já em execução. Ignorando nova chamada.");
-                }
-            }
-        }, 0, 10_000); // Executa a cada 10 segundos
+    private CheckSincronia() {}
+
+    public static synchronized void start() {
+        if (instance == null) {
+            instance = new CheckSincronia();
+            timer = new Timer(true);
+            timer.scheduleAtFixedRate(instance, 0, INTERVALO);
+            logger.info(">>> CheckSincronia iniciado (única instância).");
+        } else {
+            logger.info(">>> CheckSincronia já em execução, ignorando novo start().");
+        }
     }
 
+    @Override
+    public void run() {
+        if (executando.compareAndSet(false, true)) {
+            try {
+                if (temRegistrosParaSincronizar()) {
+                    logger.info("Iniciando sincronização de registros...");
+                    checkDatabaseSync();
+                    logger.info("Sincronização concluída.");
+                }
+            } catch (Exception ex) {
+                logger.error("Erro durante execução de CheckSincronia: {}", ex.getMessage(), ex);
+            } finally {
+                executando.set(false);
+            }
+        } else {
+            logger.warn("CheckSincronia já em execução. Ignorando nova chamada.");
+        }
+    }
     private boolean temRegistrosParaSincronizar() {
         String queryCount = "SELECT COUNT(*) FROM log_sincronizacao";
         try (Connection localConn = new fazconexao().conectar();

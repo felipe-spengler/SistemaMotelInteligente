@@ -4,10 +4,10 @@
  */
 package com.motelinteligente.telas;
 
+import com.motelinteligente.dados.CacheDados;
 import com.motelinteligente.dados.fazconexao;
 import com.motelinteligente.dados.fquartos;
 import com.motelinteligente.pdf.Relatorio;
-import com.motelinteligente.pdf.RelatorioCaixaPDF;
 import com.motelinteligente.pdf.RelatorioLocacoesPDF;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -21,7 +21,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,6 +29,8 @@ import java.util.Date;
 import java.util.List;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ConfereLocacoes extends JFrame {
 
@@ -41,7 +42,7 @@ public class ConfereLocacoes extends JFrame {
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
     private int contaResultados;
     private JLabel contaLabel, quartoLabel, consumoLabel;
-    
+    private static final Logger logger = LoggerFactory.getLogger(ConfereLocacoes.class);
 
     public ConfereLocacoes() {
         setTitle("Consulta de Locações");
@@ -188,7 +189,7 @@ public class ConfereLocacoes extends JFrame {
                             }
                         }
                     } catch (Exception ex) {
-                        ex.printStackTrace();
+                        logger.error("Erro:" + ex.getMessage());
                         JOptionPane.showMessageDialog(null, "Erro ao consultar locação: " + ex.getMessage());
                     }
                 } else {
@@ -204,38 +205,43 @@ public class ConfereLocacoes extends JFrame {
         Date dataInicio = dateChooserInicio.getDate();
         Date dataFim = dateChooserFim.getDate();
         Calendar cal = Calendar.getInstance();
+
+        // Ajusta a hora final para o último milissegundo do dia 'dataFim'
         cal.setTime(dataFim);
         cal.set(Calendar.HOUR_OF_DAY, 23);
         cal.set(Calendar.MINUTE, 59);
         cal.set(Calendar.SECOND, 59);
         cal.set(Calendar.MILLISECOND, 999);
         dataFim = cal.getTime();
-        
-        try {
 
-            String consultaSQL = "SELECT idlocacao FROM registralocado WHERE horainicio >= ? AND horainicio <= ?";
-            consultaSQL += " AND valorquarto IS NOT NULL order by idcaixaatual";
-            java.sql.Connection link = new fazconexao().conectar();
-            PreparedStatement stmt = link.prepareStatement(consultaSQL);
+        String consultaSQL = "SELECT idlocacao FROM registralocado WHERE horainicio >= ? AND horainicio <= ? AND valorquarto IS NOT NULL order by idcaixaatual";
+
+        try (java.sql.Connection link = new fazconexao().conectar(); PreparedStatement stmt = link.prepareStatement(consultaSQL)) {
+
+            // Configura os parâmetros da consulta
             stmt.setTimestamp(1, new Timestamp(dataInicio.getTime()));
             stmt.setTimestamp(2, new Timestamp(dataFim.getTime()));
-            ResultSet resultSet = stmt.executeQuery();
 
-            while (resultSet.next()) {
-                int id = resultSet.getInt("idlocacao");
-                idList.add(id);
-            }
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                while (resultSet.next()) {
+                    int id = resultSet.getInt("idlocacao");
+                    idList.add(id);
+                }
+            } // <-- ResultSet fechado aqui
 
             // chama a funcao para carregar a tabela
             carregaTabela(idList);
+
         } catch (Exception e) {
-            JOptionPane.showConfirmDialog(null, e);
+            JOptionPane.showMessageDialog(null, "Ocorreu um erro ao carregar as locações:\n" + e.getMessage(), "Erro de Banco de Dados", JOptionPane.ERROR_MESSAGE);
+            logger.error("Erro:" + e.getMessage());
         }
     }
 
     public void carregaTabela(ArrayList<Integer> idList) {
         DefaultTableModel model = (DefaultTableModel) table.getModel();
 
+        // Configurações da tabela (mantidas)
         table.setRowHeight(30);
         table.getColumn(table.getColumnName(0)).setPreferredWidth(200);
         table.getColumn(table.getColumnName(1)).setPreferredWidth(200);
@@ -247,69 +253,71 @@ public class ConfereLocacoes extends JFrame {
         int caixaAtual = 0;
         model.setNumRows(0);
         fquartos quartosdao = new fquartos();
-        //carregar os dados
+
+        // carregar os dados
         contaResultados = 0;
         float valorQuarto = 0, valorConsumo = 0;
+
+        // Consulta SQL usando placeholder (?) para segurança (PreparedStatement)
+        final String consultaSQL = "SELECT * FROM registralocado WHERE idlocacao = ? AND valorquarto IS NOT NULL";
+
         for (int id : idList) {
+            // Lógica de agrupamento por Caixa (mantida)
             if (quartosdao.getIdCaixa(id) != caixaAtual) {
                 model.addRow(new Object[]{
                     "Caixa " + quartosdao.getIdCaixa(id)});
                 caixaAtual = quartosdao.getIdCaixa(id);
             }
-            String consultaSQL = "SELECT * FROM registralocado WHERE idlocacao = " + id + " AND valorquarto IS NOT NULL";
-            Connection link = null;
             float valQ = 0, valC = 0;
-            try {
-                link = new fazconexao().conectar();
-                Statement statement = link.createStatement();
-                ResultSet resultado = statement.executeQuery(consultaSQL);
-                if (resultado.next()) {
-                    contaResultados++;
-                    int idlocacao = resultado.getInt("idlocacao");
-                    valQ = resultado.getFloat("valorquarto");
-                    valC = resultado.getFloat("valorconsumo");
-                    valorConsumo+= valC;
-                    valorQuarto += valQ;
-                    model.addRow(new Object[]{
-                        resultado.getTimestamp("horainicio"),
-                        resultado.getTimestamp("horafim"),
-                        resultado.getInt("numquarto"),
-                        resultado.getFloat("valorquarto"),
-                        resultado.getFloat("valorconsumo"),
-                        resultado.getFloat("valorquarto") + resultado.getFloat("valorconsumo"),});
-                }
-            } catch (Exception e) {
-                JOptionPane.showConfirmDialog(null, e);
-            } finally {
-                try {
-                    if (link != null && !link.isClosed()) {
-                        link.close();
+            try (java.sql.Connection link = new fazconexao().conectar(); java.sql.PreparedStatement stmt = link.prepareStatement(consultaSQL)) { // 1. PreparedStatement para segurança
+
+                stmt.setInt(1, id); // 2. Define o ID no placeholder (?)
+
+                // ResultSet é aninhado em um try-with-resources para garantir seu fechamento imediato
+                try (java.sql.ResultSet resultado = stmt.executeQuery()) {
+                    if (resultado.next()) {
+                        contaResultados++;
+
+                        // Não é mais necessário obter o idlocacao aqui, a menos que seja usado depois
+                        // int idlocacao = resultado.getInt("idlocacao"); 
+                        valQ = resultado.getFloat("valorquarto");
+                        valC = resultado.getFloat("valorconsumo");
+                        valorConsumo += valC;
+                        valorQuarto += valQ;
+
+                        model.addRow(new Object[]{
+                            resultado.getTimestamp("horainicio"),
+                            resultado.getTimestamp("horafim"),
+                            resultado.getInt("numquarto"),
+                            valQ, // Usando a variável local para clareza
+                            valC, // Usando a variável local para clareza
+                            valQ + valC // Total
+                        });
                     }
-                } catch (SQLException e) {
-                    e.printStackTrace();
                 }
+
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "Erro ao carregar locação ID " + id + ":\n" + e.getMessage(), "Erro de Banco de Dados", JOptionPane.ERROR_MESSAGE);
+                logger.error("Erro:" + e.getMessage());
             }
+
+            // Atualização dos Labels (movida para dentro do loop para refletir o valor atual)
             contaLabel.setText(String.format("Mostrando %d resultados", contaResultados));
             consumoLabel.setText(String.format("R$%.2f de consumo", valorConsumo));
             quartoLabel.setText(String.format("R$%.2f de locações", valorQuarto));
         }
 
-        //mostraResultados
         table.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) { // Verifica se foi um clique duplo
-                    int row = table.getSelectedRow(); // Obtém a linha selecionada
-                    // Faça algo com a linha selecionada, por exemplo:
+                if (e.getClickCount() == 2) {
+                    int row = table.getSelectedRow();
                     System.out.println("Clique duplo na linha: " + row);
                 }
             }
         });
 
-// Associe o renderizador personalizado à coluna que você deseja
-        int columnIndex = 0; // Índice da coluna que deseja aplicar o renderizador (por exemplo, a primeira coluna)
-
+        int columnIndex = 0;
         table.getColumnModel().getColumn(columnIndex).setCellRenderer(new ConfereLocacoes.CustomCellRenderer());
-
     }
 
     public void prepararPDF() {
@@ -345,7 +353,6 @@ public class ConfereLocacoes extends JFrame {
             Object dadoColuna4 = model.getValueAt(i, 3); // 4ª coluna
             Object dadoColuna5 = model.getValueAt(i, 4); // 5ª coluna
             Object dadoColuna6 = model.getValueAt(i, 5); // 6ª coluna
-            
 
             // Adiciona os dados da linha à lista
             dadosLinha.add(dadoColuna1);
@@ -439,7 +446,7 @@ public class ConfereLocacoes extends JFrame {
             detalhesFrame.add(scrollPane);
             detalhesFrame.setVisible(true);
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Erro:" + e.getMessage());
         } finally {
             try {
                 // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções

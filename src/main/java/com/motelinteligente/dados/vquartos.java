@@ -13,13 +13,15 @@ public class vquartos {
     private int numeroquarto;
     private float valorquarto;
     private float pernoitequarto;	
+    public float addPessoa;
 
-    public vquartos(int idquartos, String tipoquarto, int numeroquarto, float valorquarto, float pernoitequarto) {
+    public vquartos(int idquartos, String tipoquarto, int numeroquarto, float valorquarto, float pernoitequarto, float adicionalPessoa) {
         this.idquartos = idquartos;
         this.tipoquarto = tipoquarto;
         this.numeroquarto = numeroquarto;
         this.valorquarto = valorquarto;
         this.pernoitequarto = pernoitequarto;
+        this.addPessoa = adicionalPessoa;
     }
     public vquartos(){
         
@@ -36,7 +38,12 @@ public class vquartos {
     public String getTipoquarto() {
         return tipoquarto;
     }
-
+    public float getAddPessoa(){
+        return addPessoa;
+    }
+    public void setAddPessoa(float valor){
+        this.addPessoa = valor;
+    }
     public void setTipoquarto(String tipoquarto) {
         this.tipoquarto = tipoquarto;
     }

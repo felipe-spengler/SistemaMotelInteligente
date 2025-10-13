@@ -51,6 +51,7 @@ public class fquartos {
                 quarto.setNumeroquarto(resultado.getInt("numeroquarto"));
                 quarto.setValorquarto(resultado.getFloat("valorquarto"));
                 quarto.setPernoitequarto(resultado.getFloat("pernoitequarto"));
+                quarto.setAddPessoa(resultado.getFloat("addPessoa"));
                 quartos.add(quarto);
             }
         } catch (SQLException e) {
@@ -101,7 +102,7 @@ public class fquartos {
     }
 
     public boolean insercao(vquartos dados, float adicional, String periodo) {
-        String insertQuartosSQL = "INSERT INTO quartos (tipoquarto, numeroquarto, valorquarto, pernoitequarto) VALUES (?, ?, ?, ?)";
+        String insertQuartosSQL = "INSERT INTO quartos (tipoquarto, numeroquarto, valorquarto, pernoitequarto, addPessoa) VALUES (?, ?, ?, ?,?)";
         String insertStatusSQL = "INSERT INTO status (numeroquarto, atualquarto, horastatus, periodo, adicional) VALUES (?, ?, ?, ?, ?)";
         try (Connection link = conexao.conectar()) {
             link.setAutoCommit(false); // Inicia a transação
@@ -112,6 +113,7 @@ public class fquartos {
                 statementQuartos.setInt(2, dados.getNumeroquarto());
                 statementQuartos.setFloat(3, dados.getValorquarto());
                 statementQuartos.setFloat(4, dados.getPernoitequarto());
+                statementQuartos.setFloat(4, dados.getAddPessoa());
                 if (statementQuartos.executeUpdate() == 0) {
                     link.rollback();
                     return false;
@@ -143,7 +145,7 @@ public class fquartos {
 
     public boolean fazOUp(vquartos dados, float hora_adicional, String periodo) {
         // SQL to update data in 'quartos' table
-        String consultaQuarto = "UPDATE quartos SET tipoquarto = ?, valorquarto = ?, pernoitequarto = ? WHERE numeroquarto = ?";
+        String consultaQuarto = "UPDATE quartos SET tipoquarto = ?, valorquarto = ?, pernoitequarto = ?, addPessoa = ? WHERE numeroquarto = ?";
 
         // SQL to update data in 'status' table
         String consultaStatus = "UPDATE status SET adicional = ?, periodo = ? WHERE numeroquarto = ?";
@@ -156,7 +158,8 @@ public class fquartos {
                 statementQuarto.setString(1, dados.getTipoquarto());
                 statementQuarto.setFloat(2, dados.getValorquarto());
                 statementQuarto.setFloat(3, dados.getPernoitequarto());
-                statementQuarto.setInt(4, dados.getNumeroquarto());
+                statementQuarto.setInt(5, dados.getNumeroquarto());
+                statementQuarto.setFloat(4, dados.getAddPessoa());
                 statementQuarto.executeUpdate();
             }
 
@@ -181,12 +184,13 @@ public class fquartos {
     }
 
     public boolean edicao(vquartos dados) {
-        String consultaSQL = "UPDATE quartos SET tipoquarto = ?, valorquarto = ?, pernoitequarto = ? WHERE numeroquarto = ?";
+        String consultaSQL = "UPDATE quartos SET tipoquarto = ?, valorquarto = ?, pernoitequarto = ?, addPessoa = ? WHERE numeroquarto = ?";
         try (Connection link = conexao.conectar(); PreparedStatement statement = link.prepareStatement(consultaSQL)) {
             statement.setString(1, dados.getTipoquarto());
             statement.setFloat(2, dados.getValorquarto());
             statement.setFloat(3, dados.getPernoitequarto());
-            statement.setInt(4, dados.getNumeroquarto());
+            statement.setInt(5, dados.getNumeroquarto());
+            statement.setFloat(4, dados.getAddPessoa());
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             logger.error("Erro na edição de quarto: ", e);
@@ -388,7 +392,7 @@ public class fquartos {
                     //logger.info("Registro inserido com sucesso: ID = " + idLocacaoGerado + ", Quarto = " + numeroQuarto);
 
                     //insere na cache ocupado
-                    float valPeriodo = 0, valPernoite = 0, valAdicional = 0;
+                    float valPeriodo = 0, valPernoite = 0, valAdicional = 0, addPessoa = 0;
                     int pessoas = 0;
                     fquartos quartodao = new fquartos();
                     valPernoite = quartodao.getValorQuarto(numeroQuarto, "pernoite");
@@ -472,7 +476,22 @@ public class fquartos {
         }
         return 0;
     }
-
+    public float getAddPessoa(int idQuarto) {
+        String consultaSQL = "SELECT addPessoa FROM quartos WHERE numeroquarto = ? ";
+        try (Connection link = conexao.conectar(); PreparedStatement statement = link.prepareStatement(consultaSQL)) {
+            statement.setInt(1, idQuarto);
+            try (ResultSet resultado = statement.executeQuery()) {
+                if (resultado.next()) {
+                    return resultado.getFloat("addPessoa");
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Erro ao obter número de pessoas: ", e);
+            JOptionPane.showMessageDialog(null, "Erro ao obter número de pessoas: " + e.getMessage());
+        }
+        return 0;
+    }
+    
     public Timestamp getHoraInicio(int idLocacao) {
         String consultaSQL = "SELECT horainicio FROM registralocado WHERE idlocacao = ? AND horafim IS NULL";
         try (Connection link = conexao.conectar(); PreparedStatement statement = link.prepareStatement(consultaSQL)) {

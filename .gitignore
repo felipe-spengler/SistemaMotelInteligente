@@ -35,6 +35,5 @@ build/
 # Ignorar arquivos específicos
 src/main/java/Telas/MinhaClasse.java
 nbactions.xml
-src/main/java/com/motelinteligente/dados/TelaSistema.java
 src/main/java/com/motelinteligente/dados/DatabaseSynchronizer.java
 src/main/resources/application.properties

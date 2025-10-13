@@ -75,6 +75,7 @@ class Agendamentos {
     private DatabaseSynchronizer databaseSynchronizer;
     @Autowired
     private TelaSistema telaSistema;
+
     // Agendar para as 03:00 da manhã
     @Scheduled(cron = "0 0 3 * * ?")
     public void agendarTresDaManha() {
@@ -91,21 +92,29 @@ class Agendamentos {
     // Agendar para o meio-dia (12:00)
     @Scheduled(cron = "0 0 12 * * ?")
     public void agendarMeioDia() {
-        logger.info("Meio-dia: Acionando a tela de atualização...");
+        logger.info("Verificando se há nova versão do sistema...");
 
-        SwingUtilities.invokeLater(() -> {
-            JOptionPane.showMessageDialog(null, 
-                "Aguardando para Atualizar o Sistema", 
-                "Atualização Agendada", 
-                JOptionPane.INFORMATION_MESSAGE);
-            
-            // Use a instância injetada
-            telaSistema.setVisible(true);
-            
-            // Simula o clique no botão 'startButton'
-            telaSistema.getStartButton().doClick();
-            
-            logger.info("Tela de atualização exibida e botão 'Iniciar Verificação' clicado.");
-        });
+        // Verifica antes de abrir a tela
+        boolean precisaAtualizar = false;
+        try {
+            precisaAtualizar = telaSistema.temNovaVersaoDisponivel();
+        } catch (Exception e) {
+            logger.error("Erro ao verificar atualização: ", e);
+        }
+
+        if (precisaAtualizar) {
+            logger.info("Nova versão detectada. Exibindo tela de atualização...");
+            SwingUtilities.invokeLater(() -> {
+                JOptionPane.showMessageDialog(null,
+                        "Uma nova versão do sistema foi encontrada! Iniciando atualização...",
+                        "Atualização Disponível",
+                        JOptionPane.INFORMATION_MESSAGE);
+
+                telaSistema.setVisible(true);
+                telaSistema.getStartButton().doClick();
+            });
+        } else {
+            logger.info("Nenhuma atualização disponível no momento.");
+        }
     }
 }

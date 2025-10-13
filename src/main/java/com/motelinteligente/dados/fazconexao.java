@@ -23,7 +23,7 @@ public class fazconexao {
             config.setPassword(CarregarVariaveis.getPassword());
 
             // Configurações recomendadas
-            config.setMaximumPoolSize(10);
+            config.setMaximumPoolSize(15);
             config.setMinimumIdle(2);
             config.setIdleTimeout(300000); // 5 min
             config.setConnectionTimeout(30000);

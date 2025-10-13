@@ -34,7 +34,7 @@ public class DadosOcupados {
     public String getTempoPeriodo() {
         return periodoQuarto;
     }
-
+    
     public void setTempoPeriodo(String tempo) {
         this.periodoQuarto = tempo;
     }

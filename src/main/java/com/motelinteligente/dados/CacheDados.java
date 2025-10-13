@@ -106,7 +106,7 @@ public class CacheDados {
         valPernoite = quartodao.getValorQuarto(numeroQuarto, "pernoite");
         valPeriodo = quartodao.getValorQuarto(numeroQuarto, "periodo");
         valAdicional = quartodao.getAdicional(numeroQuarto);
-        pessoas = quartodao.getPessoas(numeroQuarto);
+ 
         String tempo = quartodao.getPeriodo(numeroQuarto);
         int idLoca = quartodao.getIdLocacao(numeroQuarto);
         Timestamp entrada = quartodao.getHoraInicio(idLoca);

@@ -220,7 +220,6 @@ public class TelaLogin extends javax.swing.JFrame {
             // Carrega informações globais de configuração do usuário logado
             configuracoes.carregarInformacoes(cargo, texto_login);
             cache.carregarDadosQuarto();
-
             // Carrega Arduino, se necessário
             if (!configuracoes.isFlagArduino()) {
                 cache.carregaArduino();

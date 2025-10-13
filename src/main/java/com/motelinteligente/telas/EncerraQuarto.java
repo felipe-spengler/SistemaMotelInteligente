@@ -403,7 +403,9 @@ public class EncerraQuarto extends javax.swing.JFrame {
     }
 
     public float calculaAdicionalPessoa(int numeroPessoas) {
-        float adicionalPessoas = (numeroPessoas - 2) * 30;
+        float valAdd = new fquartos().getAddPessoa(numeroDoQuarto);
+        if(valAdd == 0) valAdd = 1;
+        float adicionalPessoas = (numeroPessoas - 2) * valAdd;
         if (adicionalPessoas <= 0) {
             adicionalPessoas = 0;
         }
@@ -1212,40 +1214,50 @@ public class EncerraQuarto extends javax.swing.JFrame {
     private void btInserirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btInserirActionPerformed
         DefaultTableModel modelo = (DefaultTableModel) tabela.getModel();
 
-        if (isInteger(txtIdProduto.getText())) {
-            fprodutos produtodao = new fprodutos();
-            String texto = produtodao.getDescicao(txtIdProduto.getText());
-            if (texto != null) {
-                if (isInteger(txtQuantidade.getText())) {
-                    float valor = produtodao.getValorProduto(Integer.parseInt(txtIdProduto.getText()));
-                    float valorSoma = valor * Integer.parseInt(txtQuantidade.getText());
-                    modelo.addRow(new Object[]{
-                        txtIdProduto.getText(),
-                        txtQuantidade.getText(),
-                        texto,
-                        valor,
-                        valorSoma
-                    });
-                    outraTela.adicionaTabela(txtIdProduto.getText(), txtQuantidade.getText(), texto, valor, valorSoma);
+    if (isInteger(txtIdProduto.getText())) {
+        fprodutos produtodao = new fprodutos();
+        String texto = produtodao.getDescicao(txtIdProduto.getText());
+        
+        if (texto != null) {
+            String quantidadeTexto = txtQuantidade.getText().trim(); // Remove espaços em branco
+            
+            // Verifica se o campo de quantidade está vazio
+            if (quantidadeTexto.isEmpty()) {
+                quantidadeTexto = "1"; // Define a quantidade como 1 se estiver vazio
+            }
 
-                    //inseriu o produto
-                    //agora atualiza os valores
-                    atualizaConsumo();
+            if (isInteger(quantidadeTexto)) {
+                
+                int quantidade = Integer.parseInt(quantidadeTexto); // Usa a quantidade (1 ou a digitada)
+                
+                float valor = produtodao.getValorProduto(Integer.parseInt(txtIdProduto.getText()));
+                float valorSoma = valor * quantidade; // Usa a variável 'quantidade'
+                
+                modelo.addRow(new Object[]{
+                    txtIdProduto.getText(),
+                    quantidadeTexto, // Usa a quantidade (1 ou a digitada) como String
+                    texto,
+                    valor,
+                    valorSoma
+                });
+                outraTela.adicionaTabela(txtIdProduto.getText(), quantidadeTexto, texto, valor, valorSoma);
+                atualizaConsumo();
 
-                } else {
-                    JOptionPane.showMessageDialog(rootPane, "Quantidade inválida!");
-
-                }
             } else {
-                JOptionPane.showMessageDialog(rootPane, "Código inserido invalido!");
+                // Isso só será executado se o texto digitado (e não vazio) não for um número inteiro
+                JOptionPane.showMessageDialog(rootPane, "Quantidade inválida!");
+
             }
         } else {
-            JOptionPane.showMessageDialog(rootPane, "Digite um valor válido!");
+            JOptionPane.showMessageDialog(rootPane, "Código inserido invalido!");
         }
+    } else {
+        JOptionPane.showMessageDialog(rootPane, "Digite um valor válido!");
+    }
 
-        setValorDivida();
-        txtQuantidade.setText("");
-        txtIdProduto.setText("");
+    setValorDivida();
+    txtQuantidade.setText("");
+    txtIdProduto.setText("");
 
     }//GEN-LAST:event_btInserirActionPerformed
     public void atualizaConsumo() {

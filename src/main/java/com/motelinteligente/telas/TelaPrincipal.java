@@ -10,6 +10,7 @@ import com.motelinteligente.dados.CacheDados;
 import com.motelinteligente.dados.CacheDados.DadosVendidos;
 import com.motelinteligente.dados.CarregaQuarto;
 import com.motelinteligente.dados.CheckSincronia;
+import com.motelinteligente.dados.ConexaoRemota;
 import com.motelinteligente.dados.DadosOcupados;
 import com.motelinteligente.dados.configGlobal;
 import com.motelinteligente.dados.fazconexao;
@@ -47,6 +48,8 @@ import java.awt.MouseInfo;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileInputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -59,11 +62,16 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Time;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Properties;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JScrollPane;
@@ -132,8 +140,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         // Inicializa o BackupExecutor
         new BackupExecutor().start();
-        CheckSincronia checkSincronia = new CheckSincronia();
-        checkSincronia.start();
+        CheckSincronia.start();
 
         setExtendedState(MAXIMIZED_BOTH);
         iniciar();
@@ -298,7 +305,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         txtPessoas.setText("2");
         CacheDados cache = CacheDados.getInstancia();
         CarregaQuarto quarto = cache.getCacheQuarto().get(quartoEmFoco);
-        if(quartoEmFoco > 0){
+        if (quartoEmFoco > 0) {
 
             String status = quarto.getStatusQuarto();
             DefaultTableModel modelo = (DefaultTableModel) tabela1.getModel();
@@ -597,6 +604,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         btNegociar = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
         painelQuartos = new javax.swing.JPanel();
         tabela = new javax.swing.JPanel();
         srPane = new javax.swing.JDesktopPane();
@@ -1087,7 +1095,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                         .addComponent(bt_Antecipado, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btNegociar, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(31, Short.MAX_VALUE))
+                .addContainerGap(45, Short.MAX_VALUE))
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1156,9 +1164,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 .addComponent(jTabbedPane1))
         );
 
-        jButton1.setFont(new java.awt.Font("Stencil", 0, 14)); // NOI18N
+        jButton1.setFont(new java.awt.Font("Tw Cen MT", 3, 18)); // NOI18N
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/bt_entrada_icone.png"))); // NOI18N
-        jButton1.setText("Portão Entrada");
+        jButton1.setText("ENTRADA");
         jButton1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jButton1.setFocusable(false);
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -1167,13 +1175,25 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             }
         });
 
-        jButton3.setFont(new java.awt.Font("Stencil", 0, 14)); // NOI18N
+        jButton3.setFont(new java.awt.Font("Tw Cen MT", 3, 18)); // NOI18N
         jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/bt_saida_icone.png"))); // NOI18N
-        jButton3.setText("Portão Saída");
+        jButton3.setText("SAÍDA");
         jButton3.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton3ActionPerformed(evt);
+            }
+        });
+
+        jButton2.setBackground(new java.awt.Color(102, 102, 102));
+        jButton2.setFont(new java.awt.Font("Tw Cen MT", 3, 14)); // NOI18N
+        jButton2.setForeground(new java.awt.Color(255, 255, 255));
+        jButton2.setText("CORTINA");
+        jButton2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jButton2.setFocusable(false);
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
             }
         });
 
@@ -1206,9 +1226,12 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addGap(6, 6, 6)
-                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(6, 6, 6)
+                                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(6, 6, 6)
+                                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))
                             .addComponent(painelSecundario2))
                         .addGap(35, 35, 35))))
             .addGroup(jPanel2Layout.createSequentialGroup()
@@ -1236,7 +1259,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton1)
-                    .addComponent(jButton3))
+                    .addComponent(jButton3)
+                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(1, 1, 1)
                 .addComponent(painelSecundario2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -1260,7 +1284,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         );
         srPaneLayout.setVerticalGroup(
             srPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 591, Short.MAX_VALUE)
+            .addGap(0, 556, Short.MAX_VALUE)
         );
 
         painelBotton.setBackground(new java.awt.Color(255, 255, 255));
@@ -1317,7 +1341,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         painelBottonLayout.setVerticalGroup(
             painelBottonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelBottonLayout.createSequentialGroup()
-                .addContainerGap(62, Short.MAX_VALUE)
+                .addContainerGap(61, Short.MAX_VALUE)
                 .addGroup(painelBottonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblAlarmeAtivo)
                     .addGroup(painelBottonLayout.createSequentialGroup()
@@ -1328,7 +1352,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 .addGap(20, 20, 20))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelBottonLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(painelReservasProximas, javax.swing.GroupLayout.DEFAULT_SIZE, 102, Short.MAX_VALUE)
+                .addComponent(painelReservasProximas, javax.swing.GroupLayout.DEFAULT_SIZE, 101, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -1605,14 +1629,14 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(srPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 23, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(painelQuartos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, 0)
                         .addComponent(tabela, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 434, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(painelBotton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                        .addGap(12, 12, 12)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 411, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(23, 23, 23))
+                    .addComponent(painelBotton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1726,6 +1750,141 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         scheduler.scheduleAtFixedRate(() -> {
             verificarReservasProximas();
         }, 0, 1, TimeUnit.HOURS);
+        // Tarefa 2: Roda a cada 3 horas (a que você pediu)
+        scheduler.scheduleAtFixedRate(() -> {
+            verificarMensalidade();
+        }, 0, 3, TimeUnit.HOURS);
+
+    }
+
+    private String getSistemaProperty() {
+        Properties props = new Properties();
+
+        // CORREÇÃO CRÍTICA: Corrigido o erro de digitação de "Documetos" para "Documents"
+        String userHome = System.getProperty("user.home");
+        String path = userHome + File.separator + "Documents"
+                + File.separator + "logs" + File.separator + "application.properties";
+
+        try (FileInputStream fis = new FileInputStream(path)) {
+            props.load(fis);
+
+            // 1. Pega o valor da propriedade "SISTEMA"
+            String sistema = props.getProperty("SISTEMA", "SistemaDesconhecido");
+
+            // 2. Transforma para minúsculo (necessário para o switch/case no PHP)
+            String sistemaLower = sistema.toLowerCase();
+
+            // 3. (Sugestão de segurança) Codifica para URL, caso tenha caracteres especiais
+            return URLEncoder.encode(sistemaLower, StandardCharsets.UTF_8.toString());
+
+        } catch (Exception e) {
+            // Agora, o erro reporta o caminho exato que falhou (para melhor debug)
+            System.err.println("Erro ao ler o arquivo application.properties no caminho: " + path);
+            System.err.println("Detalhe do erro: " + e.getMessage());
+            return "SistemaDesconhecido";
+        }
+    }
+
+    public void verificarMensalidade() {
+        String sistemaNome = getSistemaProperty();
+        LocalDate hoje = LocalDate.now();
+        int diaDoMes = hoje.getDayOfMonth();
+
+        // Conexão com o banco de dados
+        try (Connection conn = ConexaoRemota.getConnection()) {
+            String sql = "SELECT referente FROM mensalidade WHERE status = 'approved' ORDER BY referente DESC LIMIT 1";
+            try (PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
+
+                LocalDate ultimoPagamento = null;
+                if (rs.next()) {
+                    // Pega a data de referência da última mensalidade paga
+                    ultimoPagamento = rs.getDate("referente").toLocalDate();
+                }
+
+                // --- Lógica de Verificação ---
+                // 1. Verifica se a última mensalidade paga é a deste mês (ou já paga)
+                if (ultimoPagamento != null && ultimoPagamento.getMonth() == hoje.getMonth() && ultimoPagamento.getYear() == hoje.getYear()) {
+                    // Mensalidade deste mês paga. Não faz nada e sai.
+                    return;
+                }
+
+                // --- Se chegou aqui, a mensalidade está em aberto ou atrasada ---
+                // URL de pagamento (O valor final será definido em mensalidade.php)
+                final String redirectUrl = "http://motelinteligente.com/api/mensalidade.php?sistema=" + sistemaNome;
+
+                String titulo = "Aviso de Mensalidade";
+                String mensagem;
+                int tipoMensagem; // Tipo de ícone: WARNING ou ERROR
+
+                if (diaDoMes <= 10) {
+                    // Até o dia 10: Vencimento próximo (Aviso Amarelo)
+                    mensagem = "O vencimento da Mensalidade está próximo (dia 10).\nDeseja pagar agora?";
+                    tipoMensagem = JOptionPane.WARNING_MESSAGE;
+                } else {
+                    // Após o dia 10: Mensalidade atrasada (Erro Vermelho)
+                    mensagem = "Sua mensalidade está em atraso.\nPor favor, regularize o pagamento para evitar interrupções.\nDeseja pagar agora?";
+                    tipoMensagem = JOptionPane.ERROR_MESSAGE;
+                }
+
+                // Define os botões personalizados
+                Object[] options = {"Pagar Agora", "Pagar Depois"};
+
+                // Exibe a janela modal
+                int escolha = JOptionPane.showOptionDialog(
+                        null, // Componente pai (null para centralizar na tela)
+                        mensagem,
+                        titulo,
+                        JOptionPane.YES_NO_OPTION, // Opções de sim/não
+                        tipoMensagem,
+                        null, // Ícone customizado (null usa o padrão)
+                        options, // Os botões 'Pagar Agora' e 'Pagar Depois'
+                        options[0] // Botão padrão (focado)
+                );
+
+                // Ação baseada na escolha do usuário
+                if (escolha == JOptionPane.YES_OPTION) { // Pagar Agora
+                    // Abre o navegador com o link
+                    abrirURL(redirectUrl);
+                }
+                // Se o usuário clicar em "Pagar Depois" (NO_OPTION) ou fechar no X (CANCEL_OPTION), a função apenas sai (ignora).
+
+            }
+        } catch (Exception e) {
+            logger.error("Erro ao verificar mensalidade: " + e);
+        }
+    }
+
+    public void abrirURL(String url) {
+        if (Objects.requireNonNull(url, "A URL não pode ser nula").isEmpty()) {
+            return;
+        }
+
+        // Verifica se o Desktop API é suportado (requer Java 1.6+)
+        if (java.awt.Desktop.isDesktopSupported()) {
+            java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+            try {
+                desktop.browse(new java.net.URI(url));
+            } catch (Exception e) {
+                // Log de erro se o navegador não puder ser aberto
+                logger.error("Não foi possível abrir o navegador: " + e);
+                JOptionPane.showMessageDialog(null, "Não foi possível abrir o navegador. Copie e cole este link:\n" + url, "Erro", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            // Solução de fallback para ambientes sem suporte a Desktop API
+            String os = System.getProperty("os.name").toLowerCase();
+            try {
+                if (os.contains("win")) {
+                    Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + url);
+                } else if (os.contains("mac")) {
+                    Runtime.getRuntime().exec("open " + url);
+                } else { // Linux/Unix
+                    Runtime.getRuntime().exec("xdg-open " + url);
+                }
+            } catch (Exception e) {
+                logger.error("Não foi possível executar o comando de abertura de URL: " + e);
+                JOptionPane.showMessageDialog(null, "Não foi possível abrir o navegador. Copie e cole este link:\n" + url, "Erro", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
 
     private void verificarReservasProximas() {
@@ -2639,8 +2798,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         List<Antecipado> antecipados = new ArrayList<>();
         float jaRecebeu = 0;
         float valorDesconto = 0;
-        try(Connection link = new fazconexao().conectar()) {
-            
+        try (Connection link = new fazconexao().conectar()) {
+
             // Consulta SQL para buscar registros da tabela "antecipado" para a locação especificada
             String selectSQL = "SELECT tipo, valor, hora FROM antecipado WHERE idlocacao = ?";
             PreparedStatement preparedStatement = link.prepareStatement(selectSQL);
@@ -2850,8 +3009,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         String consultaSQL = "SELECT * FROM antecipado WHERE idlocacao = ? AND tipo = ?";
 
-        try (Connection link = new fazconexao().conectar()){
-            
+        try (Connection link = new fazconexao().conectar()) {
+
             PreparedStatement statement = link.prepareStatement(consultaSQL);
             statement.setInt(1, idLocacao);
             statement.setString(2, recebido);
@@ -2864,7 +3023,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e);
             return 0;
-        } 
+        }
         return 0;
     }
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -2965,8 +3124,14 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
     private void menuSistemaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSistemaActionPerformed
         // Cria a nova janela
-        
+
     }//GEN-LAST:event_menuSistemaActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        SwingUtilities.invokeLater(() -> {
+            new ConectaArduino(777);
+        });
+    }//GEN-LAST:event_jButton2ActionPerformed
     private void trocaQuarto(int idLocacao, int numeroNovoQuarto) {
         fquartos quarto = new fquartos();
         String horaStatus = quarto.getDataInicio(quartoEmFoco);
@@ -2993,7 +3158,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, "Erro ao trocar o quarto: " + e.getMessage());
             e.printStackTrace();
-        } 
+        }
         focoQuarto();
         mostraQuartos();
 
@@ -3015,7 +3180,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         configGlobal config = configGlobal.getInstance();
         int idCaixaatual = config.getCaixa();
 
-        try(Connection link = new fazconexao().conectar()) {
+        try (Connection link = new fazconexao().conectar()) {
             String currentTime = new java.sql.Timestamp(System.currentTimeMillis()).toString();
 
             // Primeiro, tenta atualizar um registro existente
@@ -3068,7 +3233,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        
+
         new TelaPrincipal();
 
     }
@@ -3094,6 +3259,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private javax.swing.JMenuItem itemManutencao;
     private javax.swing.JMenuItem itemReserva;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JFrame jFrame1;

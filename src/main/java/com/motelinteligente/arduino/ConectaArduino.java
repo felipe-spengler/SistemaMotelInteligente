@@ -34,10 +34,10 @@
                     if (enviarCodigoPortao(codigo, bitLength)) {
                         System.out.println("Código do portão enviado com sucesso.");
                     } else {
-                        System.out.println("Falha ao enviar o código do portão.");
+                        JOptionPane.showMessageDialog(null, "Falha ao enviar o código do portão.");
                     }
                 } else {
-                    System.out.println("Portão não encontrado no banco de dados.");
+                    JOptionPane.showMessageDialog(null,"Portão não encontrado no banco de dados.");
                 }
             } else {
                 enviaBotoeira(valorPortao);
