@@ -1,0 +1,501 @@
+DELIMITER //
+
+CREATE TRIGGER log_alarmes_insert 
+AFTER INSERT ON alarmes 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('alarmes', NEW.id);
+END; //
+
+CREATE TRIGGER log_alarmes_update 
+AFTER UPDATE ON alarmes 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('alarmes', OLD.id);
+END; //
+
+CREATE TRIGGER log_alarmes_delete 
+AFTER DELETE ON alarmes 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('alarmes', OLD.id);
+END; //
+
+CREATE TRIGGER log_antecipado_insert 
+AFTER INSERT ON antecipado 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('antecipado', NEW.id);
+END; //
+
+CREATE TRIGGER log_antecipado_update 
+AFTER UPDATE ON antecipado 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('antecipado', OLD.id);
+END; //
+
+CREATE TRIGGER log_antecipado_delete 
+AFTER DELETE ON antecipado 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('antecipado', OLD.id);
+END; //
+
+CREATE TRIGGER log_caixa_insert 
+AFTER INSERT ON caixa 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('caixa', NEW.id);
+END; //
+
+CREATE TRIGGER log_caixa_update 
+AFTER UPDATE ON caixa 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('caixa', OLD.id);
+END; //
+
+CREATE TRIGGER log_caixa_delete 
+AFTER DELETE ON caixa 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('caixa', OLD.id);
+END; //
+
+CREATE TRIGGER log_configuracoes_insert 
+AFTER INSERT ON configuracoes 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('configuracoes', NEW.id);
+END; //
+
+CREATE TRIGGER log_configuracoes_update 
+AFTER UPDATE ON configuracoes 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('configuracoes', OLD.id);
+END; //
+
+CREATE TRIGGER log_configuracoes_delete 
+AFTER DELETE ON configuracoes 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('configuracoes', OLD.id);
+END; //
+
+CREATE TRIGGER log_desistencia_insert 
+AFTER INSERT ON desistencia 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('desistencia', NEW.id);
+END; //
+
+CREATE TRIGGER log_desistencia_update 
+AFTER UPDATE ON desistencia 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('desistencia', OLD.id);
+END; //
+
+CREATE TRIGGER log_desistencia_delete 
+AFTER DELETE ON desistencia 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('desistencia', OLD.id);
+END; //
+
+CREATE TRIGGER log_prevendidos_insert 
+AFTER INSERT ON prevendidos 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('prevendidos', NEW.id);
+END; //
+
+CREATE TRIGGER log_prevendidos_update 
+AFTER UPDATE ON prevendidos 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('prevendidos', OLD.id);
+END; //
+
+CREATE TRIGGER log_prevendidos_delete 
+AFTER DELETE ON prevendidos 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('prevendidos', OLD.id);
+END; //
+
+CREATE TRIGGER log_justificativa_insert 
+AFTER INSERT ON justificativa 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('justificativa', NEW.id);
+END; //
+
+CREATE TRIGGER log_justificativa_update 
+AFTER UPDATE ON justificativa 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('justificativa', OLD.id);
+END; //
+
+CREATE TRIGGER log_justificativa_delete 
+AFTER DELETE ON justificativa 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('justificativa', OLD.id);
+END; //
+
+CREATE TRIGGER log_funcionario_insert 
+AFTER INSERT ON funcionario 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('funcionario', NEW.idfuncionario);
+END; //
+
+CREATE TRIGGER log_funcionario_update 
+AFTER UPDATE ON funcionario 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('funcionario', OLD.idfuncionario);
+END; //
+
+CREATE TRIGGER log_funcionario_delete 
+AFTER DELETE ON funcionario 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('funcionario', OLD.idfuncionario);
+END; //
+
+CREATE TRIGGER log_registralimpeza_insert 
+AFTER INSERT ON registralimpeza 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('registralimpeza', NEW.id);
+END; //
+
+CREATE TRIGGER log_registralimpeza_update 
+AFTER UPDATE ON registralimpeza 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('registralimpeza', OLD.id);
+END; //
+
+CREATE TRIGGER log_registralimpeza_delete 
+AFTER DELETE ON registralimpeza 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('registralimpeza', OLD.id);
+END; //
+
+CREATE TRIGGER log_registramanutencao_insert 
+AFTER INSERT ON registramanutencao 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('registramanutencao', NEW.id);
+END; //
+
+CREATE TRIGGER log_registramanutencao_update 
+AFTER UPDATE ON registramanutencao 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('registramanutencao', OLD.id);
+END; //
+
+CREATE TRIGGER log_registramanutencao_delete 
+AFTER DELETE ON registramanutencao 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('registramanutencao', OLD.id);
+END; //
+
+CREATE TRIGGER log_registrareserva_insert 
+AFTER INSERT ON registrareserva 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('registrareserva', NEW.id);
+END; //
+
+CREATE TRIGGER log_registrareserva_update 
+AFTER UPDATE ON registrareserva 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('registrareserva', OLD.id);
+END; //
+
+CREATE TRIGGER log_registrareserva_delete 
+AFTER DELETE ON registrareserva 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('registrareserva', OLD.id);
+END; //
+
+CREATE TRIGGER log_produtos_insert 
+AFTER INSERT ON produtos 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('produtos', NEW.idproduto);
+END; //
+
+CREATE TRIGGER log_produtos_update 
+AFTER UPDATE ON produtos 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('produtos', OLD.idproduto);
+END; //
+
+CREATE TRIGGER log_produtos_delete 
+AFTER DELETE ON produtos 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('produtos', OLD.idproduto);
+END; //
+
+CREATE TRIGGER log_quartos_insert 
+AFTER INSERT ON quartos 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('quartos', NEW.numeroquarto);
+END; //
+
+CREATE TRIGGER log_quartos_update 
+AFTER UPDATE ON quartos 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('quartos', OLD.numeroquarto);
+END; //
+
+CREATE TRIGGER log_quartos_delete 
+AFTER DELETE ON quartos 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('quartos', OLD.numeroquarto);
+END; //
+
+CREATE TRIGGER log_imagens_insert 
+AFTER INSERT ON imagens 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('imagens', NEW.id);
+END; //
+
+CREATE TRIGGER log_imagens_update 
+AFTER UPDATE ON imagens 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('imagens', OLD.id);
+END; //
+
+CREATE TRIGGER log_imagens_delete 
+AFTER DELETE ON imagens 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('imagens', OLD.id);
+END; //
+
+CREATE TRIGGER log_registravendido_insert 
+AFTER INSERT ON registravendido 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('registravendido', NEW.id);
+END; //
+
+CREATE TRIGGER log_registravendido_update 
+AFTER UPDATE ON registravendido 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('registravendido', OLD.id);
+END; //
+
+CREATE TRIGGER log_registravendido_delete 
+AFTER DELETE ON registravendido 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('registravendido', OLD.id);
+END; //
+
+CREATE TRIGGER log_status_insert 
+AFTER INSERT ON status 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('status', NEW.numeroquarto);
+END; //
+
+CREATE TRIGGER log_status_update 
+AFTER UPDATE ON status 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('status', OLD.numeroquarto);
+END; //
+
+CREATE TRIGGER log_status_delete 
+AFTER DELETE ON status 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('status', OLD.numeroquarto);
+END; //
+
+CREATE TRIGGER log_registralocado_insert 
+AFTER INSERT ON registralocado 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('registralocado', NEW.idlocacao);
+END; //
+
+CREATE TRIGGER log_registralocado_update 
+AFTER UPDATE ON registralocado 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('registralocado', OLD.idlocacao);
+END; //
+
+CREATE TRIGGER log_registralocado_delete 
+AFTER DELETE ON registralocado 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('registralocado', OLD.idlocacao);
+END; //
+
+CREATE TRIGGER log_portoes_insert 
+AFTER INSERT ON portoes 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('portoes', NEW.id);
+END; //
+
+CREATE TRIGGER log_portoes_update 
+AFTER UPDATE ON portoes 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('portoes', OLD.id);
+END; //
+CREATE TRIGGER log_portoes_delete 
+AFTER DELETE ON portoes 
+FOR EACH ROW 
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('portoes', OLD.id);
+END; //
+
+DELIMITER ;
+
+-- Trigger para INSERT
+DROP TRIGGER IF EXISTS log_valorcartao_insert;
+DELIMITER //
+CREATE TRIGGER log_valorcartao_insert
+AFTER INSERT ON valorcartao
+FOR EACH ROW
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('valorcartao', NEW.id);
+END;
+//
+DELIMITER ;
+
+-- Trigger para UPDATE
+DROP TRIGGER IF EXISTS log_valorcartao_update;
+DELIMITER //
+CREATE TRIGGER log_valorcartao_update
+AFTER UPDATE ON valorcartao
+FOR EACH ROW
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('valorcartao', NEW.id);
+END;
+//
+DELIMITER ;
+
+-- Trigger para DELETE
+DROP TRIGGER IF EXISTS log_valorcartao_delete;
+DELIMITER //
+CREATE TRIGGER log_valorcartao_delete
+AFTER DELETE ON valorcartao
+FOR EACH ROW
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('valorcartao', OLD.id);
+END;
+//
+DELIMITER ;
+DELIMITER //
+DELIMITER //
+
+CREATE DEFINER=`u876938716_rootuser`@`%` TRIGGER log_reservas_insert
+AFTER INSERT ON reservas
+FOR EACH ROW
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('reservas', NEW.id_reserva);
+END; //
+
+CREATE DEFINER=`u876938716_rootuser`@`%` TRIGGER log_reservas_update
+AFTER UPDATE ON reservas
+FOR EACH ROW
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('reservas', OLD.id_reserva);
+END; //
+
+CREATE DEFINER=`u876938716_rootuser`@`%` TRIGGER log_reservas_delete
+AFTER DELETE ON reservas
+FOR EACH ROW
+BEGIN
+    INSERT INTO log_sincronizacao (tabela_nome, registro_id)
+    VALUES ('reservas', OLD.id_reserva);
+END; //
+
+DELIMITER ;

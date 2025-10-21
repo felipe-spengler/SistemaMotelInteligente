@@ -55,18 +55,26 @@ public class CacheDados {
         System.out.println("Portas seriais disponíveis:");
 
         for (SerialPort porta : portas) {
+            String descricao = porta.getDescriptivePortName().toLowerCase();
+
             System.out.println("Nome: " + porta.getSystemPortName() + ", Descrição: " + porta.getDescriptivePortName());
 
-            // Verifica se a porta corresponde ao USB-SERIAL CH340
-            if (porta.getDescriptivePortName().toLowerCase().contains("usb-serial ch340")) {
-                System.out.println("Arduino (CH340) encontrado na porta: " + porta.getSystemPortName());
+            // =========================================================================
+            // === MUDANÇA AQUI: Adicionar verificações para todos os chips conhecidos ===
+            // =========================================================================
+            boolean isCh340 = descricao.contains("usb-serial ch340");
+            boolean isFt232 = descricao.contains("ft232r usb uart") || descricao.contains("usb serial port");
+
+            if (isCh340 || isFt232) {
+                String tipo = isCh340 ? "CH340" : "FT232R/Genérico";
+                System.out.println("Arduino (" + tipo + ") encontrado na porta: " + porta.getSystemPortName());
                 arduinoPort = porta; // Define a porta do Arduino
-                break;
+                break; // Para o loop assim que encontrar o primeiro
             }
         }
 
         if (arduinoPort == null) {
-            JOptionPane.showMessageDialog(null, "Nenhum Arduino (CH340) encontrado.");
+            JOptionPane.showMessageDialog(null, "Nenhum Arduino (CH340, FT232R, etc.) encontrado.");
             return;
         }
 
@@ -106,7 +114,7 @@ public class CacheDados {
         valPernoite = quartodao.getValorQuarto(numeroQuarto, "pernoite");
         valPeriodo = quartodao.getValorQuarto(numeroQuarto, "periodo");
         valAdicional = quartodao.getAdicional(numeroQuarto);
- 
+
         String tempo = quartodao.getPeriodo(numeroQuarto);
         int idLoca = quartodao.getIdLocacao(numeroQuarto);
         Timestamp entrada = quartodao.getHoraInicio(idLoca);
@@ -164,9 +172,7 @@ public class CacheDados {
     }
 
     public CarregaQuarto carregarDadosQuarto() {
-        try (Connection link = new fazconexao().conectar();
-             PreparedStatement statement = link.prepareStatement("select * from status order by numeroquarto");
-             ResultSet resultado = statement.executeQuery()) {
+        try (Connection link = new fazconexao().conectar(); PreparedStatement statement = link.prepareStatement("select * from status order by numeroquarto"); ResultSet resultado = statement.executeQuery()) {
 
             while (resultado.next()) {
                 int numeroQuarto = resultado.getInt("numeroquarto");
@@ -265,6 +271,7 @@ public class CacheDados {
     }
 
     public static class DadosVendidos {
+
         public int idProduto;
         public int quantidadeVendida;
 
@@ -275,6 +282,7 @@ public class CacheDados {
     }
 
     public static class Negociados {
+
         public String tipo;
         public float valor;
 
