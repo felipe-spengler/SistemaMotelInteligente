@@ -26,33 +26,46 @@ public class fcaixa {
     private static final Logger logger = LoggerFactory.getLogger(fcaixa.class);
 
     public boolean abrirCaixa(float valorAbrir) {
-        // Primeiro, verifique se o caixa já está aberto
+        // Verifica se já existe caixa aberto
         if (new fazconexao().verificaCaixa() != 0) {
             JOptionPane.showMessageDialog(null, "O Caixa já está Aberto!");
             return false;
         }
 
-        String consultaSQL = "INSERT INTO caixa (horaabre, usuarioabre, saldoabre) VALUES (?, ?, ?)";
-        try (Connection link = new fazconexao().conectar();
-             PreparedStatement statement = link.prepareStatement(consultaSQL)) {
+        String sqlBuscaId = "SELECT COALESCE(MAX(id), 0) + 1 AS novo_id FROM caixa";
+        String sqlInsert = "INSERT INTO caixa (id, horaabre, usuarioabre, saldoabre) VALUES (?, ?, ?, ?)";
+
+        try (Connection link = new fazconexao().conectar(); PreparedStatement psBusca = link.prepareStatement(sqlBuscaId); PreparedStatement psInsert = link.prepareStatement(sqlInsert)) {
+
+            // Busca o próximo ID manualmente
+            ResultSet rs = psBusca.executeQuery();
+            int novoId = 1;
+            if (rs.next()) {
+                novoId = rs.getInt("novo_id");
+            }
 
             Date dataAtual = new Date();
             Timestamp timestamp = new Timestamp(dataAtual.getTime());
             configGlobal config = configGlobal.getInstance();
 
-            statement.setTimestamp(1, timestamp);
-            statement.setString(2, config.getUsuario());
-            statement.setFloat(3, valorAbrir);
+            // Preenche o INSERT
+            psInsert.setInt(1, novoId);
+            psInsert.setTimestamp(2, timestamp);
+            psInsert.setString(3, config.getUsuario());
+            psInsert.setFloat(4, valorAbrir);
 
-            int n = statement.executeUpdate();
-            if (n > 0) { // Alterado para 'n > 0' para ser mais genérico
-                JOptionPane.showMessageDialog(null, "Caixa Aberto com Sucesso!");
+            int resultado = psInsert.executeUpdate();
+
+            if (resultado > 0) {
+                JOptionPane.showMessageDialog(null, "Caixa Aberto com Sucesso! ID: " + novoId);
                 return true;
             }
+
         } catch (SQLException e) {
             logger.error("Erro ao tentar abrir o caixa: ", e);
             JOptionPane.showMessageDialog(null, "Erro ao abrir o caixa: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
         }
+
         return false;
     }
 
@@ -65,9 +78,8 @@ public class fcaixa {
 
         configGlobal config = configGlobal.getInstance();
         String consultaSQL = "UPDATE caixa SET horafecha = ?, usuariofecha = ?, saldofecha = ? WHERE id = ?";
-        
-        try (Connection link = new fazconexao().conectar();
-             PreparedStatement statement = link.prepareStatement(consultaSQL)) {
+
+        try (Connection link = new fazconexao().conectar(); PreparedStatement statement = link.prepareStatement(consultaSQL)) {
 
             Date dataAtual = new Date();
             Timestamp timestamp = new Timestamp(dataAtual.getTime());
@@ -90,8 +102,7 @@ public class fcaixa {
 
     public String getUsuarioAbriu(int idPassado) {
         String consultaSQL = "SELECT usuarioabre FROM caixa WHERE id = ?";
-        try (Connection link = new fazconexao().conectar();
-             PreparedStatement statement = link.prepareStatement(consultaSQL)) {
+        try (Connection link = new fazconexao().conectar(); PreparedStatement statement = link.prepareStatement(consultaSQL)) {
             statement.setInt(1, idPassado);
             try (ResultSet resultado = statement.executeQuery()) {
                 if (resultado.next()) {
@@ -108,8 +119,7 @@ public class fcaixa {
     public valores getValores(int idCaixa) {
         valores val = new valores();
         String consultaSQL = "SELECT pagocartao, pagodinheiro, pagopix, valorconsumo, valorquarto FROM registralocado WHERE idcaixaatual = ?";
-        try (Connection link = new fazconexao().conectar();
-             PreparedStatement statement = link.prepareStatement(consultaSQL)) {
+        try (Connection link = new fazconexao().conectar(); PreparedStatement statement = link.prepareStatement(consultaSQL)) {
             statement.setInt(1, idCaixa);
             try (ResultSet resultado = statement.executeQuery()) {
                 while (resultado.next()) {
@@ -131,8 +141,7 @@ public class fcaixa {
     public List<Integer> getIdsLocacoes(int idCaixa) {
         List<Integer> idsLocacaoList = new ArrayList<>();
         String consultaSQL = "SELECT idlocacao FROM registralocado WHERE idcaixaatual = ?";
-        try (Connection link = new fazconexao().conectar();
-             PreparedStatement statement = link.prepareStatement(consultaSQL)) {
+        try (Connection link = new fazconexao().conectar(); PreparedStatement statement = link.prepareStatement(consultaSQL)) {
             statement.setInt(1, idCaixa);
             try (ResultSet resultado = statement.executeQuery()) {
                 while (resultado.next()) {
@@ -148,9 +157,7 @@ public class fcaixa {
 
     public int getIdCaixa() {
         String consultaSQL = "SELECT id FROM caixa WHERE horafecha IS NULL";
-        try (Connection link = new fazconexao().conectar();
-             PreparedStatement statement = link.prepareStatement(consultaSQL);
-             ResultSet resultado = statement.executeQuery()) {
+        try (Connection link = new fazconexao().conectar(); PreparedStatement statement = link.prepareStatement(consultaSQL); ResultSet resultado = statement.executeQuery()) {
             if (resultado.next()) {
                 return resultado.getInt("id");
             }
@@ -160,13 +167,12 @@ public class fcaixa {
         }
         return 0;
     }
-    
+
     // Este método é redundante, pois a lógica de fechamento já usa o ID. 
     // Mantenho para compatibilidade, mas sua lógica pode ser simplificada na aplicação.
     public Timestamp getDataAbriu(int idPassado) {
         String consultaSQL = "SELECT horaabre FROM caixa WHERE id = ?";
-        try (Connection link = new fazconexao().conectar();
-             PreparedStatement statement = link.prepareStatement(consultaSQL)) {
+        try (Connection link = new fazconexao().conectar(); PreparedStatement statement = link.prepareStatement(consultaSQL)) {
             statement.setInt(1, idPassado);
             try (ResultSet resultado = statement.executeQuery()) {
                 if (resultado.next()) {
@@ -182,8 +188,7 @@ public class fcaixa {
 
     public float getValorAbriu(int idPassado) {
         String consultaSQL = "SELECT saldoabre FROM caixa WHERE id = ?";
-        try (Connection link = new fazconexao().conectar();
-             PreparedStatement statement = link.prepareStatement(consultaSQL)) {
+        try (Connection link = new fazconexao().conectar(); PreparedStatement statement = link.prepareStatement(consultaSQL)) {
             statement.setInt(1, idPassado);
             try (ResultSet resultado = statement.executeQuery()) {
                 if (resultado.next()) {

@@ -15,6 +15,7 @@ public class CarregarVariaveis {
     private static final String REMOTE_DB_URL;
     private static final String USER;
     private static final String PASSWORD;
+    private static final String FILIAL;
 
     static {
         // Constrói o caminho completo do arquivo
@@ -29,7 +30,7 @@ public class CarregarVariaveis {
             LOCAL_DB_URL = properties.getProperty("LOCAL_DB_URL");
             REMOTE_DB_URL = properties.getProperty("REMOTE_DB_URL");
             USER = properties.getProperty("USER_DB");
-
+            FILIAL = properties.getProperty("SISTEMA");
             // Carrega a senha ofuscada e a descriptografa
             String obfuscatedPassword = properties.getProperty("PASS_DB");
             if (obfuscatedPassword != null) {
@@ -37,6 +38,8 @@ public class CarregarVariaveis {
             } else {
                 PASSWORD = "";
             }
+
+            
         } catch (IOException e) {
             System.err.println("Erro ao carregar o arquivo de propriedades: " + filePath);
             e.printStackTrace();
@@ -83,5 +86,9 @@ public class CarregarVariaveis {
 
     public static String getPassword() {
         return PASSWORD;
+    }
+
+    public static String getFilial() {
+        return FILIAL;
     }
 }

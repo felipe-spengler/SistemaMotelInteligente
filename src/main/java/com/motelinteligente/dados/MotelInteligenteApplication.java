@@ -18,6 +18,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.swing.SwingUtilities;
+import java.util.Collections; // Importação essencial para o setDefaultProperties
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +35,15 @@ public class MotelInteligenteApplication {
 
     public static void main(String[] args) {
         SSLUtil.disableSSLCertificateChecking();
-        SpringApplication.run(MotelInteligenteApplication.class, args);
+        
+        // Substituindo SpringApplication.run(...) para configurar a porta externa
+        SpringApplication app = new SpringApplication(MotelInteligenteApplication.class);
+        String portaExterna = "1521";
+        app.setDefaultProperties(
+            Collections.singletonMap("server.port", portaExterna)
+        );
+        app.run(args);
+        new VerificaComandosRemotos().start();
 
         try {
             URL url = new URL("http://checkip.amazonaws.com/");

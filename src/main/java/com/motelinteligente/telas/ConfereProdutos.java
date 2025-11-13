@@ -102,7 +102,7 @@ public class ConfereProdutos extends JFrame {
         topPanel.add(buscarButton);
 
         // Tabela para exibir os resultados
-        tableModel = new DefaultTableModel(new Object[]{"Inicio", "Fim", "N° Quarto", "Valor Quarto", "Valor Consumo", "Valor Total"}, 0) {
+        tableModel = new DefaultTableModel(new Object[]{"Id", "Descricao", "Quantidade", "Valor Und", "Valor Total"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false; // nenhuma célula será editável

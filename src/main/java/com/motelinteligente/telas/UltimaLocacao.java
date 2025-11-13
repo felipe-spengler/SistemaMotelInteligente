@@ -694,6 +694,75 @@ public class UltimaLocacao extends javax.swing.JFrame {
                                     }
                                 }
                             }
+                        } else {
+// INÍCIO DO NOVO BLOCO ELSE (INSERÇÃO)
+// Como não há registro, os valores iniciais de Crédito e Débito são 0
+                            valCred = 0;
+                            valDeb = 0;
+
+// Interface para entrada dos valores (INSERÇÃO)
+                            JPanel painel = new JPanel(new GridLayout(3, 2, 10, 10));
+                            painel.setBorder(BorderFactory.createTitledBorder(
+                                    BorderFactory.createEtchedBorder(),
+                                    "Detalhar Pagamento Cartão",
+                                    TitledBorder.CENTER,
+                                    TitledBorder.TOP
+                            ));
+
+// Inicializa com 0.00
+                            JTextField txtCredito = new JTextField(String.format("%.2f", 0.0f));
+                            JTextField txtDebito = new JTextField(String.format("%.2f", 0.0f));
+
+                            painel.add(new JLabel("Valor Crédito:"));
+                            painel.add(txtCredito);
+                            painel.add(new JLabel("Valor Débito:"));
+                            painel.add(txtDebito);
+
+// Teclas Enter e Tab (iguais)
+                            txtCredito.addKeyListener(new java.awt.event.KeyAdapter() {
+                                public void keyPressed(java.awt.event.KeyEvent evt) {
+                                    if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER || evt.getKeyCode() == java.awt.event.KeyEvent.VK_TAB) {
+                                        txtDebito.requestFocus();
+                                    }
+                                }
+                            });
+                            txtDebito.addKeyListener(new java.awt.event.KeyAdapter() {
+                                public void keyPressed(java.awt.event.KeyEvent evt) {
+                                    if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+                                        txtDebito.transferFocus();
+                                    }
+                                }
+                            });
+
+                            boolean valoresCorretos = false;
+                            while (!valoresCorretos) {
+                                int result = JOptionPane.showConfirmDialog(null, painel, "Informe os valores de cartão", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+                                if (result == JOptionPane.OK_OPTION) {
+                                    try {
+                                        float novoCredito = Float.parseFloat(txtCredito.getText().replace(",", "."));
+                                        float novoDebito = Float.parseFloat(txtDebito.getText().replace(",", "."));
+
+// Verifica se a soma bate com o total do cartão recebido (recC)
+                                        if ((novoCredito + novoDebito) == recC) {
+// SQL INSERT para criar o novo registro
+                                            PreparedStatement insertStmt = link.prepareStatement("INSERT INTO valorcartao (valorcredito, valordebito, idlocacao) VALUES (?, ?, ?)");
+                                            insertStmt.setFloat(1, novoCredito);
+                                            insertStmt.setFloat(2, novoDebito);
+                                            insertStmt.setInt(3, idLocacao);
+                                            insertStmt.executeUpdate();
+                                            insertStmt.close();
+                                            valoresCorretos = true;
+                                        } else {
+                                            JOptionPane.showMessageDialog(null, "A soma dos valores não bate com o total do cartão (" + recC + "). Tente novamente.");
+                                        }
+                                    } catch (NumberFormatException ex) {
+                                        JOptionPane.showMessageDialog(null, "Digite apenas números válidos.");
+                                    }
+                                } else {
+                                    JOptionPane.showMessageDialog(null, "Operação cancelada. Valores não inseridos.");
+                                    break;
+                                }
+                            }
                         }
 
                         stmt.close();
@@ -704,7 +773,7 @@ public class UltimaLocacao extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(null, "Somente Desconto ou Acréscimo! Arrume essa bagunça.");
                 }
                 JOptionPane.showMessageDialog(null, " Registro Alterado Com Sucesso");
-                
+
             }
 
         } catch (Exception e) {
@@ -790,7 +859,7 @@ public class UltimaLocacao extends javax.swing.JFrame {
             deleteStatement.close();
 
             reinsereProdutos();
-            
+
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, "SalvaVendidos:" + e);
             e.printStackTrace();

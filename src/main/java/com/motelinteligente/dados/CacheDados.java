@@ -109,12 +109,16 @@ public class CacheDados {
 
     public void carregarOcupado(int numeroQuarto) {
         float valPeriodo = 0, valPernoite = 0, valAdicional = 0;
-        int pessoas = 0;
+        int pessoas = 2;
         fquartos quartodao = new fquartos();
         valPernoite = quartodao.getValorQuarto(numeroQuarto, "pernoite");
         valPeriodo = quartodao.getValorQuarto(numeroQuarto, "periodo");
         valAdicional = quartodao.getAdicional(numeroQuarto);
-
+        try{
+            pessoas = quartodao.getPessoas(numeroQuarto);
+        }catch(Exception e){
+            pessoas = 2;
+        }
         String tempo = quartodao.getPeriodo(numeroQuarto);
         int idLoca = quartodao.getIdLocacao(numeroQuarto);
         Timestamp entrada = quartodao.getHoraInicio(idLoca);

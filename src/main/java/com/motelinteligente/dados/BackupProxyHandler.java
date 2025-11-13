@@ -80,7 +80,7 @@ public class BackupProxyHandler implements InvocationHandler {
             
                 // Verifica se é uma operação de escrita antes de adicionar à fila
                 if (isWriteOperation(sql)) {
-                    logger.info("Query de backup (Statement): \n" + sql);
+                    //logger.info("Query de backup (Statement): \n" + sql);
                     BackupQueueManager.getInstance().addTask(new BackupTask(sql, null)); 
                 }
             }
@@ -119,7 +119,7 @@ class PreparedStatementProxyHandler implements InvocationHandler {
             String completeSql = fillPlaceholders(sql, parameters);
             
             if (isWriteOperation(completeSql)) {
-                logger.info(String.format("Query de backup Prepared: " + completeSql));
+                //logger.info(String.format("Query de backup Prepared: " + completeSql));
                 BackupQueueManager.getInstance().addTask(new BackupTask(completeSql, originalPreparedStatement));
             }
 

@@ -23,6 +23,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -37,7 +39,7 @@ public class CadastraQuarto extends javax.swing.JFrame {
     private float hora_adicional;
     public float addPessoa;
     private String periodo;
-
+    private static final Logger logger = LoggerFactory.getLogger(CadastraQuarto.class);
     /**
      * Creates new form CadastraQuarto
      */
@@ -431,152 +433,221 @@ public class CadastraQuarto extends javax.swing.JFrame {
     }//GEN-LAST:event_bt_voltarActionPerformed
 
     private void bt_salvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_salvarActionPerformed
-        // TODO add your handling code here:
         int cont = 0;
         boolean excluir = false;
         boolean continuar = true;
-        if (tipo_quarto.getText() != null) {
+
+        logger.info("--- Início do Processo de Cadastro/Atualização de Quarto ---");
+
+        // --- 1. Validação de Tipo de Quarto
+        if (tipo_quarto.getText() != null && !tipo_quarto.getText().trim().isEmpty()) {
             cont++;
             tp_quarto = tipo_quarto.getText();
         } else {
-            JOptionPane.showMessageDialog(null, "Revise as inforções do Tipo de Quarto!");
+            JOptionPane.showMessageDialog(null, "Revise as informações do Tipo de Quarto!");
+            continuar = false;
+            logger.warn("Validação falhou: Tipo de Quarto vazio.");
         }
-        try {
-            numero_quarto = Integer.parseInt(num_quarto.getText());
-            cont++;
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(null, "Revise as inforções do Numero do Quarto");
-            num_quarto.grabFocus();// foca o campo
-            num_quarto.setText(""); //limpa o campo
-        }
-        // verificar se ja tem esse quarto cadastrado
-        if (new fquartos().verExiste(numero_quarto) == true) {
-            if (new fquartos().getStatus(numero_quarto).equals("ocupado")) {
-                JOptionPane.showMessageDialog(null, "Quarto já cadastrado e OCUPADO. Não é possível modificar no momento!");
+
+        // --- 2. Validação de Número do Quarto
+        if (continuar) {
+            try {
+                numero_quarto = Integer.parseInt(num_quarto.getText());
+                cont++;
+                logger.debug("Número do Quarto validado: #" + numero_quarto);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(null, "Revise as informações do Numero do Quarto");
+                num_quarto.grabFocus();
+                num_quarto.setText("");
                 continuar = false;
-                System.out.println("é false");
-            } else {
-                int escolha = JOptionPane.showConfirmDialog(null, "Esse quarto ja está cadastrado. Deseja sobreescrever??");
-                if (escolha == JOptionPane.YES_OPTION) {
-                    continuar = true;
-                    excluir = true;
-                } else {
-                    System.out.println("é false");
+                logger.error("Validação falhou: Número do Quarto não é numérico.", ex);
+            }
+        }
+
+        // --- 3. Verificação de Existência (Fluxo de Lógica)
+        if (continuar) {
+
+            logger.info("Verificando se o Quarto #" + numero_quarto + " JÁ EXISTE (fquartos.verExiste()).");
+
+            if (new fquartos().verExiste(numero_quarto) == true) {
+
+                logger.warn("Quarto #" + numero_quarto + " JÁ EXISTE. Estado atual: " + new fquartos().getStatus(numero_quarto));
+
+                if (new fquartos().getStatus(numero_quarto).equals("ocupado")) {
+
+                    logger.warn("Quarto #" + numero_quarto + " OCUPADO. Bloqueando modificação.");
+                    JOptionPane.showMessageDialog(null, "Quarto já cadastrado e OCUPADO. Não é possível modificar no momento!");
                     continuar = false;
 
-                }
-            }
-            tipo_quarto.grabFocus();// foca o campo
-            num_quarto.setText(""); //limpa o campo
+                } else {
 
+                    logger.info("Quarto #" + numero_quarto + " LIVRE. Perguntando ao usuário se deseja sobreescrever.");
+                    int escolha = JOptionPane.showConfirmDialog(null, "Esse quarto já está cadastrado. Deseja sobreescrever??");
+
+                    if (escolha == JOptionPane.YES_OPTION) {
+                        continuar = true;
+                        excluir = true; // Sinaliza para fazer UPDATE
+                        logger.info("Usuário optou por sobreescrever (UPDATE).");
+                    } else {
+                        continuar = false;
+                        logger.info("Usuário optou por CANCELAR a sobreescrita.");
+                    }
+                }
+
+                // Limpa e foca, independente da escolha
+                tipo_quarto.grabFocus();
+                num_quarto.setText("");
+            } else {
+                logger.info("Quarto #" + numero_quarto + " NÃO EXISTE. Prosseguindo para NOVO CADASTRO (INSERT).");
+            }
         }
 
+        // --- 4. Validação dos demais campos (Continuar se 'continuar' for true)
         if (continuar == true) {
 
+            // Validação Adicional
             try {
                 hora_adicional = Float.parseFloat(horaAdicional.getText());
                 cont++;
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(null, "Revise as inforções de Adicional");
-                horaAdicional.grabFocus();// foca o campo
-                horaAdicional.setText(""); //limpa o campo
+                JOptionPane.showMessageDialog(null, "Revise as informações de Hora Adicional");
+                horaAdicional.grabFocus();
+                horaAdicional.setText("");
+                continuar = false;
             }
+
+            // Validação Período (Horas/Minutos)
             try {
                 int horas = Integer.parseInt(periodoHoras.getText());
                 int min;
                 if (periodoMin.getText().trim().isEmpty()) {
-                    min = 0; // se vazio define 0
+                    min = 0;
                 } else {
                     min = Integer.parseInt(periodoMin.getText());
                 }
                 periodo = horas + ":" + min;
                 cont++;
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(null, "Revise as inforções de Horário. ");
-                periodoMin.grabFocus();// foca o campo
-                periodoMin.setText(""); //limpa o campo
+                JOptionPane.showMessageDialog(null, "Revise as informações de Horário.");
+                periodoMin.grabFocus();
+                periodoMin.setText("");
+                continuar = false;
             }
+
+            // Validação Valor Período
             try {
                 valor_periodo = Float.parseFloat(val_quarto.getText());
                 cont++;
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(null, "Revise as inforções do Valor do Quarto");
-                val_quarto.grabFocus();// foca o campo
-                val_quarto.setText(""); //limpa o campo
+                JOptionPane.showMessageDialog(null, "Revise as informações do Valor do Quarto");
+                val_quarto.grabFocus();
+                val_quarto.setText("");
+                continuar = false;
             }
+
+            // Validação Valor Pernoite
             try {
                 valor_pernoite = Float.parseFloat(pernoite.getText());
                 cont++;
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(null, "Revise as inforções do Valor do Pernoite");
-                pernoite.grabFocus();// foca o campo
-                pernoite.setText(""); //limpa o campo
+                JOptionPane.showMessageDialog(null, "Revise as informações do Valor do Pernoite");
+                pernoite.grabFocus();
+                pernoite.setText("");
+                continuar = false;
             }
+
+            // Validação Add Pessoa
             try {
                 addPessoa = Float.parseFloat(pessoaAdicional.getText());
                 cont++;
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(null, "Revise as inforções do Valor do Pernoite");
-                pernoite.grabFocus();// foca o campo
-                pernoite.setText(""); //limpa o campo
+                JOptionPane.showMessageDialog(null, "Revise as informações de Adicional por Pessoa");
+                pessoaAdicional.grabFocus();
+                pessoaAdicional.setText("");
+                continuar = false;
             }
 
+            // --- 5. Execução (INSERT ou UPDATE)
             if (cont == 7) {
+
+                logger.info("Todos os 7 campos validados. Tentando persistência.");
                 vquartos novo = new vquartos(0, tp_quarto, numero_quarto, valor_periodo, valor_pernoite, addPessoa);
 
-                if (excluir == true) {
+                if (excluir == true) { // UPDATE
 
-                    //se cair aqui o quarto ja existe
+                    logger.info("Chamando fquartos.fazOUp (UPDATE) para Quarto #" + numero_quarto);
+
                     if (new fquartos().fazOUp(novo, hora_adicional, periodo)) {
                         JOptionPane.showMessageDialog(null, "Atualizado com Sucesso");
+
+                        // --- Lógica de Cache (UPDATE)
+                        logger.debug("Atualizando CacheOcupado para Quarto #" + numero_quarto);
+                        CacheDados cache = CacheDados.getInstancia();
+                        Map<Integer, DadosOcupados> dadosOcupados = cache.getCacheOcupado();
+
+                        if (dadosOcupados.containsKey(numero_quarto)) {
+                            DadosOcupados quartoOcupado = dadosOcupados.get(numero_quarto);
+                            // Verifica e atualiza dados
+                            if (quartoOcupado.getValorAdicional() != hora_adicional) {
+                                quartoOcupado.setValorAdicional(hora_adicional);
+                            }
+                            if (quartoOcupado.getValorPeriodo() != valor_periodo) {
+                                quartoOcupado.setValorPeriodo(valor_periodo);
+                            }
+                            if (quartoOcupado.getValorPernoite() != valor_pernoite) {
+                                quartoOcupado.setValorPernoite(valor_pernoite);
+                            }
+                            if (!quartoOcupado.getTempoPeriodo().equals(periodo)) {
+                                quartoOcupado.setTempoPeriodo(periodo);
+                            }
+                            // O cacheOcupado não precisa de `put` aqui, pois `quartoOcupado` é uma referência.
+                        } else {
+                            logger.debug("Quarto #" + numero_quarto + " não estava no CacheOcupado, apenas no CacheQuarto.");
+                        }
+
                     } else {
+                        logger.error("A função fazOUp() retornou false para o Quarto #" + numero_quarto);
                         JOptionPane.showMessageDialog(null, "Erro ao fazer UPDATE quarto");
                     }
-                    //verifica se está na cacheOcupados pra alterar la tbm
-                    CacheDados cache = CacheDados.getInstancia();
-                    Map<Integer, DadosOcupados> dadosOcupados = cache.getCacheOcupado();
-                    if (dadosOcupados.containsKey(numero_quarto)) {
-                        DadosOcupados quartoOcupado = dadosOcupados.get(numero_quarto);
-                        //verifica que dados mudou
-                        if (quartoOcupado.getValorAdicional() != hora_adicional) {
-                            quartoOcupado.setValorAdicional(hora_adicional);
-                        }
-                        if (quartoOcupado.getValorPeriodo() != valor_periodo) {
-                            quartoOcupado.setValorPeriodo(valor_periodo);
-                        }
-                        if (quartoOcupado.getValorPernoite() != valor_pernoite) {
-                            quartoOcupado.setValorPernoite(valor_pernoite);
-                        }
-                        if (!quartoOcupado.getTempoPeriodo().equals(periodo)) {
-                            quartoOcupado.setTempoPeriodo(periodo);
-                        }
-                        
-                        dadosOcupados.put(numero_quarto, quartoOcupado);
-                    } 
-                } else {
+
+                } else { // INSERT
+
+                    logger.info("Chamando fquartos.insercao (INSERT) para Quarto #" + numero_quarto);
+
                     if (new fquartos().insercao(novo, hora_adicional, periodo) == true) {
                         JOptionPane.showMessageDialog(null, "Cadastrado com sucesso");
+
+                        // --- Lógica de Cache (INSERT)
+                        logger.debug("Adicionando Quarto #" + numero_quarto + " ao CacheQuarto.");
                         Date dataAtual = new Date();
                         Timestamp timestamp = new Timestamp(dataAtual.getTime());
 
                         CacheDados dados = CacheDados.getInstancia();
                         CarregaQuarto quarto = new CarregaQuarto(numero_quarto, tp_quarto, "livre", String.valueOf(timestamp));
                         dados.getCacheQuarto().put(numero_quarto, quarto);
-                    }
-                    num_quarto.setText(""); //limpa o campo
-                    val_quarto.setText("");
-                    pernoite.setText(""); //limpa o campo
-                    tipo_quarto.setText("");
 
+                    } else {
+                        logger.error("A função insercao() retornou false para o Quarto #" + numero_quarto);
+                        JOptionPane.showMessageDialog(null, "A função insercao() falhou. Verifique o log.");
+                    }
+
+                    // Limpa os campos após sucesso no INSERT
+                    num_quarto.setText("");
+                    val_quarto.setText("");
+                    pernoite.setText("");
+                    tipo_quarto.setText("");
                     num_quarto.setEditable(true);
                 }
+            } else {
+                logger.warn("Processo interrompido. Nem todos os 7 campos foram validados (Contador: " + cont + ").");
             }
-
         }
+
         mostraJTable();
 
         configGlobal config = configGlobal.getInstance();
         config.setMudanca(true);
+        logger.info("--- Fim do Processo de Cadastro/Atualização de Quarto ---");
     }//GEN-LAST:event_bt_salvarActionPerformed
 
     private void num_quartoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_num_quartoActionPerformed
@@ -742,7 +813,7 @@ public class CadastraQuarto extends javax.swing.JFrame {
                 q.getValorquarto(),
                 q.getPernoitequarto(),
                 q.getAddPessoa()
-                    
+
             });
         }
     }

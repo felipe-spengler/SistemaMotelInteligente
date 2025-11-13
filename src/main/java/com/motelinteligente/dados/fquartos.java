@@ -104,83 +104,112 @@ public class fquartos {
     public boolean insercao(vquartos dados, float adicional, String periodo) {
         String insertQuartosSQL = "INSERT INTO quartos (tipoquarto, numeroquarto, valorquarto, pernoitequarto, addPessoa) VALUES (?, ?, ?, ?,?)";
         String insertStatusSQL = "INSERT INTO status (numeroquarto, atualquarto, horastatus, periodo, adicional) VALUES (?, ?, ?, ?, ?)";
+
+        logger.info("Tentativa de INSERT para o Quarto #" + dados.getNumeroquarto() + ". Tipo: " + dados.getTipoquarto());
+
         try (Connection link = conexao.conectar()) {
-            link.setAutoCommit(false); // Inicia a transação
+            link.setAutoCommit(false);
             try (PreparedStatement statementQuartos = link.prepareStatement(insertQuartosSQL); PreparedStatement statementStatus = link.prepareStatement(insertStatusSQL)) {
 
-                // Insere na tabela 'quartos'
+                // --- Insere na tabela 'quartos'
+                logger.debug("Executando INSERT em 'quartos' com parâmetros: Tipo=" + dados.getTipoquarto() + ", Número=" + dados.getNumeroquarto());
+
                 statementQuartos.setString(1, dados.getTipoquarto());
                 statementQuartos.setInt(2, dados.getNumeroquarto());
                 statementQuartos.setFloat(3, dados.getValorquarto());
                 statementQuartos.setFloat(4, dados.getPernoitequarto());
-                statementQuartos.setFloat(4, dados.getAddPessoa());
-                if (statementQuartos.executeUpdate() == 0) {
+                statementQuartos.setFloat(5, dados.getAddPessoa()); // <--- CORREÇÃO CRÍTICA (era 4)
+
+                int affectedRowsQuartos = statementQuartos.executeUpdate();
+
+                logger.debug("'quartos' afetadas: " + affectedRowsQuartos);
+
+                if (affectedRowsQuartos == 0) {
+                    logger.warn("INSERT em 'quartos' falhou (0 linhas afetadas). Fazendo ROLLBACK.");
                     link.rollback();
                     return false;
                 }
 
-                // Insere na tabela 'status'
+                // --- Insere na tabela 'status'
+                logger.debug("Executando INSERT em 'status'.");
+
                 statementStatus.setInt(1, dados.getNumeroquarto());
                 statementStatus.setString(2, "livre");
                 statementStatus.setTimestamp(3, new Timestamp(new Date().getTime()));
                 statementStatus.setString(4, periodo);
                 statementStatus.setFloat(5, adicional);
-                if (statementStatus.executeUpdate() == 0) {
+                int affectedRowsStatus = statementStatus.executeUpdate();
+
+                logger.debug("'status' afetadas: " + affectedRowsStatus);
+
+                if (affectedRowsStatus == 0) {
+                    logger.warn("INSERT em 'status' falhou (0 linhas afetadas). Fazendo ROLLBACK.");
                     link.rollback();
                     return false;
                 }
 
                 link.commit(); // Confirma a transação
+                logger.info("INSERT de Quarto #" + dados.getNumeroquarto() + " COMITADO com sucesso.");
                 return true;
             } catch (SQLException e) {
-                link.rollback(); // Desfaz a transação em caso de erro
-                throw e; // Lança a exceção para ser capturada pelo bloco principal
+                link.rollback();
+                logger.error("ERRO DURANTE a transação (INSERT) no Quarto #" + dados.getNumeroquarto(), e);
+                throw e;
             }
         } catch (SQLException e) {
-            logger.error("Erro na inserção de quarto: ", e);
+            logger.error("Erro na inserção de quarto (Conexão ou Rollback): ", e);
             JOptionPane.showMessageDialog(null, "Erro na inserção de quarto: " + e.getMessage());
             return false;
         }
     }
 
     public boolean fazOUp(vquartos dados, float hora_adicional, String periodo) {
-        // SQL to update data in 'quartos' table
         String consultaQuarto = "UPDATE quartos SET tipoquarto = ?, valorquarto = ?, pernoitequarto = ?, addPessoa = ? WHERE numeroquarto = ?";
-
-        // SQL to update data in 'status' table
         String consultaStatus = "UPDATE status SET adicional = ?, periodo = ? WHERE numeroquarto = ?";
+
+        logger.info("Tentativa de UPDATE para o Quarto #" + dados.getNumeroquarto() + ". Tipo: " + dados.getTipoquarto());
 
         try (Connection link = new fazconexao().conectar()) {
             link.setAutoCommit(false); // Begin the transaction
 
             // Update the 'quartos' table
             try (PreparedStatement statementQuarto = link.prepareStatement(consultaQuarto)) {
+
+                logger.debug("Executando UPDATE em 'quartos' para Quarto #" + dados.getNumeroquarto());
+
                 statementQuarto.setString(1, dados.getTipoquarto());
                 statementQuarto.setFloat(2, dados.getValorquarto());
                 statementQuarto.setFloat(3, dados.getPernoitequarto());
+                statementQuarto.setFloat(4, dados.getAddPessoa()); // addPessoa
                 statementQuarto.setInt(5, dados.getNumeroquarto());
-                statementQuarto.setFloat(4, dados.getAddPessoa());
+
                 statementQuarto.executeUpdate();
+                logger.debug("UPDATE em 'quartos' executado para Quarto #" + dados.getNumeroquarto());
             }
 
             // Update the 'status' table
             try (PreparedStatement statementStatus = link.prepareStatement(consultaStatus)) {
+
+                logger.debug("Executando UPDATE em 'status' para Quarto #" + dados.getNumeroquarto());
+
                 statementStatus.setFloat(1, hora_adicional);
                 statementStatus.setString(2, periodo);
                 statementStatus.setInt(3, dados.getNumeroquarto());
+
                 statementStatus.executeUpdate();
+                logger.debug("UPDATE em 'status' executado para Quarto #" + dados.getNumeroquarto());
             }
 
             link.commit(); // Commit changes if both updates were successful
+            logger.info("UPDATE do Quarto #" + dados.getNumeroquarto() + " COMITADO com sucesso.");
             return true;
 
         } catch (SQLException e) {
-            // If an error occurs, the transaction is rolled back automatically by the `try-with-resources` block (if not already committed)
-            logger.error("Erro ao fazer UPDATE no quarto e locação: ", e);
+            // Log de Erro na Transação
+            logger.error("Erro ao fazer UPDATE no quarto #" + dados.getNumeroquarto() + " e locação: ", e);
             JOptionPane.showMessageDialog(null, "Erro ao atualizar os dados: " + e.getMessage());
             return false;
         }
-
     }
 
     public boolean edicao(vquartos dados) {
@@ -342,7 +371,7 @@ public class fquartos {
             statement.setInt(9, idPassado);
             if (statement.executeUpdate() == 0) {
                 logger.error("Nenhuma linha foi atualizada para idlocacao: " + idPassado);
-                JOptionPane.showMessageDialog(null, "Contacte o suporte: Erro locação " + idPassado);
+                JOptionPane.showMessageDialog(null, "Contacte o suporte: Erro salvar locação " + idPassado);
             }
         } catch (SQLException e) {
             logger.error("Erro ao salvar locação: ", e);
@@ -370,7 +399,7 @@ public class fquartos {
             if (rs.next() && rs.getInt(1) > 0) {
                 // Registro duplicado encontrado
                 String mensagemErro = "registro duplicado: Quarto = " + numeroQuarto + ", Horário = " + timestamp;
-                logger.error( "Erro: Registro duplicado encontrado.\n" + mensagemErro);
+                logger.error("Erro: Registro duplicado encontrado.\n" + mensagemErro);
                 JOptionPane.showMessageDialog(null, "Erro: Registro duplicado encontrado.\n" + mensagemErro);
                 return false;
             }
@@ -476,6 +505,7 @@ public class fquartos {
         }
         return 0;
     }
+
     public float getAddPessoa(int idQuarto) {
         String consultaSQL = "SELECT addPessoa FROM quartos WHERE numeroquarto = ? ";
         try (Connection link = conexao.conectar(); PreparedStatement statement = link.prepareStatement(consultaSQL)) {
@@ -491,7 +521,7 @@ public class fquartos {
         }
         return 0;
     }
-    
+
     public Timestamp getHoraInicio(int idLocacao) {
         String consultaSQL = "SELECT horainicio FROM registralocado WHERE idlocacao = ? AND horafim IS NULL";
         try (Connection link = conexao.conectar(); PreparedStatement statement = link.prepareStatement(consultaSQL)) {
@@ -580,7 +610,7 @@ public class fquartos {
 
             statement.setString(1, diferencaFormatada);
             statement.setTimestamp(2, horaBanco);
-            statement.setInt(3, numeroQuarto);       
+            statement.setInt(3, numeroQuarto);
             int n = statement.executeUpdate();
             return n != 0;
 
@@ -700,30 +730,30 @@ public class fquartos {
         }
         return 0;
     }
+
     public String getData(int idPassado) {
-    String consultaSQL = "SELECT horastatus FROM status WHERE numeroquarto = ?";
-    
-    try (Connection link = new fazconexao().conectar();
-         PreparedStatement statement = link.prepareStatement(consultaSQL)) {
-        
-        statement.setInt(1, idPassado);
-        
-        try (ResultSet resultado = statement.executeQuery()) {
-            if (resultado.next()) {
-                Timestamp horaBanco = resultado.getTimestamp("horastatus");
-                long diferencaMillis = System.currentTimeMillis() - horaBanco.getTime();
-                
-                long horas = diferencaMillis / (60 * 60 * 1000);
-                long minutos = (diferencaMillis % (60 * 60 * 1000)) / (60 * 1000);
-                
-                return String.format("%02d:%02d", horas, minutos);
+        String consultaSQL = "SELECT horastatus FROM status WHERE numeroquarto = ?";
+
+        try (Connection link = new fazconexao().conectar(); PreparedStatement statement = link.prepareStatement(consultaSQL)) {
+
+            statement.setInt(1, idPassado);
+
+            try (ResultSet resultado = statement.executeQuery()) {
+                if (resultado.next()) {
+                    Timestamp horaBanco = resultado.getTimestamp("horastatus");
+                    long diferencaMillis = System.currentTimeMillis() - horaBanco.getTime();
+
+                    long horas = diferencaMillis / (60 * 60 * 1000);
+                    long minutos = (diferencaMillis % (60 * 60 * 1000)) / (60 * 1000);
+
+                    return String.format("%02d:%02d", horas, minutos);
+                }
             }
+        } catch (SQLException e) {
+            logger.error("Erro ao obter a diferença de tempo: ", e);
+            JOptionPane.showMessageDialog(null, "Erro ao obter dados: " + e.getMessage());
         }
-    } catch (SQLException e) {
-        logger.error("Erro ao obter a diferença de tempo: ", e);
-        JOptionPane.showMessageDialog(null, "Erro ao obter dados: " + e.getMessage());
+
+        return null;
     }
-   
-    return null;
-}
 }
