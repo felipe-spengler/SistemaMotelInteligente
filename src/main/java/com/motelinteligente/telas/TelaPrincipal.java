@@ -261,7 +261,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                     }
                 }
             } catch (SQLException ex) {
-                ex.printStackTrace();
+                logger.error("Erro ao verificar alarmes ativos", ex);
             }
         }
     }
@@ -361,7 +361,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                     int novoID = new fquartos().getIdLocacao(quartoEmFoco);
                     quartoOcupado.setIdLoca(novoID);
                     cache.getCacheOcupado().put(quartoEmFoco, quartoOcupado);
-                    cache.carregaProdutosNegociadosCache(novoID);
                 }
                 //insere prevendidos tabela
                 populaPrevendidos();
@@ -386,37 +385,45 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     }
 
     public void populaPrevendidos() {
-        DefaultTableModel modelo = (DefaultTableModel) tabela1.getModel();
-        CacheDados cache = CacheDados.getInstancia();
-        modelo.setNumRows(0);
-        int locacao = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
-        float totalVendido = 0;
-        // Verifica se a cache contém produtos vendidos para essa locação
-        if (cache.cacheProdutosVendidos.containsKey(locacao)) {
-            // Obtém a lista de produtos vendidos associada a essa locação
-            List<DadosVendidos> produtosVendidos = cache.cacheProdutosVendidos.get(locacao);
 
-            // Popula a tabela com os prevendidos
-            fprodutos produtoDao = new fprodutos();
-            for (DadosVendidos produtoVendido : produtosVendidos) {
-                int idProduto = produtoVendido.idProduto;
-                int quantidade = produtoVendido.quantidadeVendida;
-                String desc = produtoDao.getDescicao(String.valueOf(idProduto));
-                float valor = produtoDao.getValorProduto(idProduto);
-                float total = valor * quantidade;
-                totalVendido += total;
-                // Adiciona uma nova linha ao modelo da tabela
-                modelo.addRow(new Object[]{
-                    quantidade,
-                    desc,
-                    valor,
-                    total
-                });
+        // A conexão agora também está em try-with-resources
+        try (Connection link = new fazconexao().conectar()) {
+
+            DefaultTableModel modelo = (DefaultTableModel) tabela1.getModel();
+            CacheDados cache = CacheDados.getInstancia();
+            modelo.setNumRows(0);
+            int locacao = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
+            float totalVendido = 0;
+            String consultaProdutosSQL = "SELECT idproduto, quantidade FROM prevendidos WHERE idlocacao = ?";
+            try (PreparedStatement statementProdutos = link.prepareStatement(consultaProdutosSQL)) {
+                statementProdutos.setInt(1, locacao);
+                try (ResultSet resultadoProdutos = statementProdutos.executeQuery()) {
+                    fprodutos produtoDao = new fprodutos();
+                    while (resultadoProdutos.next()) {
+                        int idProduto = resultadoProdutos.getInt("idproduto");
+                        int quantidade = resultadoProdutos.getInt("quantidade");
+                        String desc = produtoDao.getDescicao(String.valueOf(idProduto));
+                        float valor = produtoDao.getValorProduto(idProduto);
+                        float total = valor * quantidade;
+                        totalVendido += total;
+
+                        modelo.addRow(new Object[]{
+                            quantidade,
+                            desc,
+                            valor,
+                            total
+                        });
+                    }
+
+                    lblValorConsumo.setText("R$ " + totalVendido);
+                    lblValorConsumo.repaint();
+                }
             }
-            lblValorConsumo.setText("R$ " + totalVendido);
-            lblValorConsumo.repaint();
-        }
 
+        } catch (SQLException e) {
+            Logger.getLogger(this.getClass().getName())
+                    .log(Level.SEVERE, "Erro em populaPrevendidos: ", e);
+        }
     }
 
     public static String formatarData(String dataOriginal) {
@@ -433,8 +440,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             // Formatando a data para o formato desejado
             return formatoDesejado.format(data);
         } catch (ParseException e) {
+            logger.error("Erro na função formatarData", e);
             JOptionPane.showMessageDialog(null, "Erro na função FORMATARDATA: " + e.getMessage());
-            e.printStackTrace();
             return null;
         }
     }
@@ -637,8 +644,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         btDespertador = new javax.swing.JMenu();
         menuReservas = new javax.swing.JMenu();
         menuSistema = new javax.swing.JMenu();
-        menuFazBackup = new javax.swing.JMenuItem();
         menuResBackup = new javax.swing.JMenuItem();
+        jMenuItem1 = new javax.swing.JMenuItem();
         btMenuSair = new javax.swing.JMenu();
 
         javax.swing.GroupLayout jFrame1Layout = new javax.swing.GroupLayout(jFrame1.getContentPane());
@@ -1599,17 +1606,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             }
         });
 
-        menuFazBackup.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_backup.png"))); // NOI18N
-        menuFazBackup.setText("Mostra Cache ProdutosV");
-        menuFazBackup.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        menuFazBackup.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuFazBackupActionPerformed(evt);
-            }
-        });
-        menuSistema.add(menuFazBackup);
-
-        menuResBackup.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_restaura.png"))); // NOI18N
+        menuResBackup.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/relatorios.png"))); // NOI18N
         menuResBackup.setText("Mostra Cache Atual");
         menuResBackup.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         menuResBackup.addActionListener(new java.awt.event.ActionListener() {
@@ -1618,6 +1615,15 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             }
         });
         menuSistema.add(menuResBackup);
+
+        jMenuItem1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/consumo.png"))); // NOI18N
+        jMenuItem1.setText("Atualizar & Sincronizar");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        menuSistema.add(jMenuItem1);
 
         jMenuBar1.add(menuSistema);
 
@@ -1707,7 +1713,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 config.setAlarmesAtivos(alarmesAtivos);
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.error("Erro ao carregar número de alarmes ativos", ex);
         }
 
         // Atualiza a data na interface
@@ -1795,9 +1801,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             return URLEncoder.encode(sistemaLower, StandardCharsets.UTF_8.toString());
 
         } catch (Exception e) {
-            // Agora, o erro reporta o caminho exato que falhou (para melhor debug)
-            System.err.println("Erro ao ler o arquivo application.properties no caminho: " + path);
-            System.err.println("Detalhe do erro: " + e.getMessage());
+            logger.error("Erro ao ler application.properties em {}", path, e);
             return "SistemaDesconhecido";
         }
     }
@@ -1820,8 +1824,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
                 // --- Lógica de Verificação ---
                 // 1. Verifica se a última mensalidade paga é a deste mês (ou já paga)
-                if (ultimoPagamento != null && ultimoPagamento.getMonth() == hoje.getMonth() && ultimoPagamento.getYear() == hoje.getYear()) {
-                    // Mensalidade deste mês paga. Não faz nada e sai.
+                if (ultimoPagamento != null && !ultimoPagamento.isBefore(hoje.withDayOfMonth(1))) {
+                    // A última mensalidade paga é a deste mês ou já está adiantada.
                     return;
                 }
 
@@ -1974,7 +1978,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             });
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Erro ao verificar reservas próximas", e);
         }
     }
 
@@ -2278,7 +2282,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                             new ConectaArduino(quartoEmFoco);
                             Thread.sleep(800); // Pausa por 0,3s
                         } catch (InterruptedException ex) {
-                            JOptionPane.showMessageDialog(null, ex);
+                            Thread.currentThread().interrupt();
+                            logger.error("Thread interrompida ao acionar Arduino no início da locação", ex);
                         }
                         new ConectaArduino(888);
                     }).start(); // Inicia a thread
@@ -2328,6 +2333,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         try {
             frame.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/imagens/iconeMotel.png")));
         } catch (Exception e) {
+            logger.warn("Não foi possível definir o ícone da janela", e);
         }
     }
     private void btQuartosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btQuartosActionPerformed
@@ -2436,11 +2442,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
     }//GEN-LAST:event_menuResBackupActionPerformed
 
-    private void menuFazBackupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuFazBackupActionPerformed
-        CacheDados cache = CacheDados.getInstancia();
-        cache.mostrarCacheProdutosVendidos();
-    }//GEN-LAST:event_menuFazBackupActionPerformed
-
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         // TODO add your handling code here:
     }//GEN-LAST:event_formWindowClosed
@@ -2474,6 +2475,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             salvaAntecipado(idLocacao, "recebido", valorRecebido);
             JOptionPane.showMessageDialog(null, "Recebimento Antecipado adicionado com Sucesso!");
         } catch (NumberFormatException e) {
+            logger.warn("Valor inválido em txtAntecipadoActionPerformed: {}", txtAntecipado.getText(), e);
             JOptionPane.showMessageDialog(null, "Valor digitado não é monetário");
         }
 
@@ -2486,59 +2488,44 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private void bt_apagarProdutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_apagarProdutoActionPerformed
         DefaultTableModel modelo = (DefaultTableModel) tabela1.getModel();
         int linhaSelecionada = tabela1.getSelectedRow();
+
         if (linhaSelecionada != -1) {
+            // 1. Coleta dos dados para exclusão no banco
             String desc = modelo.getValueAt(linhaSelecionada, 1).toString();
             int qntVendida = Integer.valueOf(modelo.getValueAt(linhaSelecionada, 0).toString());
+
+            // 2. Remove o item visualmente da tabela
             modelo.removeRow(linhaSelecionada);
+
+            // 3. Remove o registro do produto no banco de dados
+            // Assumindo que 'fprodutos().removePreVendido' já cuida da lógica SQL
             new fprodutos().removePreVendido(quartoEmFoco, desc, qntVendida);
-            JOptionPane.showMessageDialog(null, "Excluido com sucesso");
 
-            //remove da cache tbm
-            CacheDados cache = CacheDados.getInstancia();
-            int idLoca = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
-            int idProduto = new fprodutos().getIdProduto(desc);
-            if (idLoca == 0) {
-                DadosOcupados quartoOcupado = cache.getCacheOcupado().get(quartoEmFoco);
-                int novoID = new fquartos().getIdLocacao(quartoEmFoco);
-                quartoOcupado.setIdLoca(novoID);
-                cache.getCacheOcupado().put(quartoEmFoco, quartoOcupado);
+            JOptionPane.showMessageDialog(null, "Excluído com sucesso");
 
-                cache.carregaProdutosNegociadosCache(novoID);
-            }
-            int limitador = 0;
-            float valorProdutos = 0;
-            if (cache.cacheProdutosVendidos.containsKey(idLoca)) {
-                List<DadosVendidos> produtosVendidos = new ArrayList<>(cache.cacheProdutosVendidos.get(idLoca)); // Obtem a lista da cache
-                // Itera sobre a lista usando um índice para poder remover um item
-                for (int i = 0; i < produtosVendidos.size(); i++) {
-                    DadosVendidos dados = produtosVendidos.get(i);
-                    if (dados.idProduto == idProduto && dados.quantidadeVendida == qntVendida && limitador == 0) {
-                        produtosVendidos.remove(i); // Remove o item da lista
-                        System.out.println("removendo produto " + idProduto);
-                        limitador++;
+            // 4. Recalcula e atualiza o total na interface gráfica
+            // (Você pode reusar a lógica de atualização que removeu do outro método)
+            atualizaTotalConsumo(); // Método sugerido para recalcular e atualizar o lblValorConsumo
 
-                    } else {
-                        valorProdutos += dados.quantidadeVendida + new fprodutos().getValorProduto(idProduto);
-                    }
-                }
-                lblValorConsumo.setText(String.valueOf(valorProdutos));
-                System.out.println("saiu do for");
-                // Verifica se a lista ficou vazia
-                if (produtosVendidos.isEmpty()) {
-                    // Remove a entrada correspondente da cache
-                    cache.cacheProdutosVendidos.remove(idLoca);
-                    System.out.println("lista é vazia");
-                } else {
-                    // Atualiza a lista na cache
-                    cache.cacheProdutosVendidos.put(idLoca, produtosVendidos);
-                }
-
-            }
         } else {
             JOptionPane.showMessageDialog(null, "Nenhum produto selecionado");
         }
     }//GEN-LAST:event_bt_apagarProdutoActionPerformed
+    public void atualizaTotalConsumo() {
+        float totalVendido = 0;
+        DefaultTableModel modelo = (DefaultTableModel) tabela1.getModel();
 
+        // Itera sobre as linhas remanescentes da tabela
+        for (int i = 0; i < modelo.getRowCount(); i++) {
+            // Assume que a coluna 3 (índice 3) contém o valor TOTAL da linha
+            // Ajuste o índice se o TOTAL estiver em outra coluna (0=QNT, 1=DESC, 2=VALOR, 3=TOTAL)
+            float totalLinha = Float.parseFloat(modelo.getValueAt(i, 3).toString());
+            totalVendido += totalLinha;
+        }
+
+        lblValorConsumo.setText("R$ " + totalVendido);
+        lblValorConsumo.repaint();
+    }
     private void botaoTrocaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoTrocaActionPerformed
         // Obtém a instância da cache de dados
         CacheDados cache = CacheDados.getInstancia();
@@ -2675,7 +2662,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             }
             setValorQuarto();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Erro ao atualizar número de pessoas do quarto {}", quartoEmFoco, e);
         }
     }//GEN-LAST:event_txtPessoasActionPerformed
 
@@ -2690,7 +2677,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 try {
                     Thread.sleep(500); // Esperar meio segundo
                 } catch (InterruptedException ex) {
-                    ex.printStackTrace();
+                    Thread.currentThread().interrupt();
+                    logger.warn("Thread interrompida ao reabilitar botão Iniciar", ex);
                 } finally {
                     isClickable = true; // Desbloquear o botão
                 }
@@ -2711,7 +2699,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 try {
                     Thread.sleep(1000); // Esperar um segundo
                 } catch (InterruptedException ex) {
-                    ex.printStackTrace();
+                    Thread.currentThread().interrupt();
+                    logger.warn("Thread interrompida ao reabilitar botão Encerrar", ex);
                 } finally {
                     isClickable = true; // Desbloquear o botão
                     System.out.println("setou is clickable true de novo");
@@ -2789,6 +2778,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 JOptionPane.showMessageDialog(null, "Valor de desconto salvo");
                 txtDescontoNegociado.setText("R$" + valorDesconto);
             } catch (NumberFormatException ex) {
+                logger.warn("Valor de desconto inválido informado: {}", descontoInput, ex);
                 JOptionPane.showMessageDialog(null, "Valor inválido! Insira um número válido.", "Erro", JOptionPane.ERROR_MESSAGE);
             }
         }
@@ -2833,8 +2823,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             resultSet.close();
             preparedStatement.close();
         } catch (SQLException e) {
+            logger.error("Erro ao buscar dados antecipados para locacao {}", locacao, e);
             JOptionPane.showMessageDialog(null, "Erro ao buscar dados antecipados: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
         }
     }
 
@@ -2915,89 +2905,131 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     }
 
     private void criarTelaEntradaValor(float valorRecebido, String tipoPago, int idLocacao) {
-        JDialog dialog = new JDialog();
-        dialog.setTitle("Entrada de Valor");
-        dialog.setModal(true);
-        dialog.setSize(450, 300);
-        dialog.setResizable(false);
-        dialog.setLocationRelativeTo(null);
+    JDialog dialog = new JDialog();
+    dialog.setTitle("Entrada de Valor");
+    dialog.setModal(true);
+    dialog.setSize(500, 350); 
+    dialog.setResizable(false);
+    dialog.setLocationRelativeTo(null);
 
-        JPanel panel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.gridx = 0;
-        gbc.gridy = 0;
+    JPanel panel = new JPanel(new GridBagLayout());
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.insets = new Insets(10, 10, 10, 10);
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.gridx = 0;
+    gbc.gridy = 0;
 
-        String recebido = switch (tipoPago) {
-            case "C" ->
-                "credito";
-            case "D" ->
-                "debito";
-            case "O" ->
-                "dinheiro";
-            default ->
-                "pix";
+    String recebido = switch (tipoPago) {
+        case "C" ->
+            "credito";
+        case "D" ->
+            "debito";
+        case "O" ->
+            "dinheiro";
+        default ->
+            "pix";
+    };
 
-        };
+    JLabel label = new JLabel("<html><center><b>Valor Atual Recebido:</b> R$ " + String.format("%.2f", valorRecebido)
+            + " em " + recebido + "<br><br>Digite o valor a ser usado na operação:</center></html>");
+    label.setFont(new Font("Arial", Font.PLAIN, 14));
 
-        JLabel label = new JLabel("<html><center><b>Havia recebido:</b> R$ " + String.format("%.2f", valorRecebido)
-                + " em " + recebido + "<br><br>Digite o valor total já recebido em " + recebido + ":</center></html>");
-        label.setFont(new Font("Arial", Font.PLAIN, 14));
+    JTextField valorField = new JTextField(10);
+    valorField.setFont(new Font("Arial", Font.BOLD, 16));
 
-        JTextField valorField = new JTextField(10);
-        valorField.setFont(new Font("Arial", Font.BOLD, 16));
+    // --- BOTÃO 2 AGORA É O PRIMEIRO (SOMAR) ---
+    JButton botaoSomar = new JButton(" Somar ao Recebido ");
+    botaoSomar.setPreferredSize(new Dimension(200, 40));
+    botaoSomar.setBackground(new Color(30, 144, 255)); // Azul forte
+    botaoSomar.setForeground(Color.WHITE);
+    botaoSomar.setFocusPainted(false);
+    botaoSomar.setFont(new Font("Arial", Font.BOLD, 14));
+    botaoSomar.addActionListener(e -> salvarValor(valorField, tipoPago, idLocacao, dialog, "SOMAR", valorRecebido));
 
-        JButton botaoSalvar = new JButton("Salvar");
-        botaoSalvar.setPreferredSize(new Dimension(100, 40));
-        botaoSalvar.setBackground(new Color(30, 144, 255)); // Azul forte
-        botaoSalvar.setForeground(Color.WHITE);
-        botaoSalvar.setFocusPainted(false);
-        botaoSalvar.setFont(new Font("Arial", Font.BOLD, 14));
+    // --- BOTÃO 1 AGORA É O SEGUNDO (SUBSTITUIR/SETAR) ---
+    JButton botaoSubstituir = new JButton(" Setar Valor Total ");
+    botaoSubstituir.setPreferredSize(new Dimension(200, 40));
+    botaoSubstituir.setBackground(new Color(255, 140, 0)); // Laranja
+    botaoSubstituir.setForeground(Color.WHITE);
+    botaoSubstituir.setFocusPainted(false);
+    botaoSubstituir.setFont(new Font("Arial", Font.BOLD, 14));
+    botaoSubstituir.addActionListener(e -> salvarValor(valorField, tipoPago, idLocacao, dialog, "SUBSTITUIR", valorRecebido));
 
-        botaoSalvar.addActionListener(e -> salvarValor(valorField, tipoPago, idLocacao, dialog));
+    // --- Mapeamento do teclado (ENTER e ESC) ---
+    InputMap inputMap = valorField.getInputMap(JComponent.WHEN_FOCUSED);
+    ActionMap actionMap = valorField.getActionMap();
+    
+    // Mapeando ESC
+    inputMap.put(KeyStroke.getKeyStroke("ESCAPE"), "fechar");
+    actionMap.put("fechar", new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            dialog.dispose();
+        }
+    });
 
-        // Mapeando Enter para o botão salvar
-        InputMap inputMap = valorField.getInputMap(JComponent.WHEN_FOCUSED);
-        ActionMap actionMap = valorField.getActionMap();
-        inputMap.put(KeyStroke.getKeyStroke("ENTER"), "salvar");
-        actionMap.put("salvar", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                botaoSalvar.doClick();
-            }
-        });
-        // Mapeando ESC para fechar a tela mesmo com o campo focado
-        inputMap.put(KeyStroke.getKeyStroke("ESCAPE"), "fechar");
-        actionMap.put("fechar", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dialog.dispose(); // Fecha a tela
-            }
-        });
+    // Mapeando ENTER para clicar no botão SOMAR
+    inputMap.put(KeyStroke.getKeyStroke("ENTER"), "somarValor");
+    actionMap.put("somarValor", new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            salvarValor(valorField, tipoPago, idLocacao, dialog, "SOMAR", valorRecebido);
+        }
+    });
 
-        panel.add(label, gbc);
-        gbc.gridy++;
-        panel.add(valorField, gbc);
-        gbc.gridy++;
-        panel.add(botaoSalvar, gbc);
+    // Adiciona os componentes ao painel
+    panel.add(label, gbc);
+    gbc.gridy++;
+    panel.add(valorField, gbc);
+    gbc.gridy++;
 
-        dialog.add(panel);
-        dialog.setVisible(true);
+    // Adicionar os botões lado a lado - Ordem alterada aqui!
+    JPanel botoesPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
+    botoesPanel.add(botaoSomar); // ⬅️ Somar primeiro
+    botoesPanel.add(botaoSubstituir); // ⬅️ Substituir segundo
 
-        // Definir o foco no campo de texto ao abrir a tela
-        SwingUtilities.invokeLater(valorField::requestFocusInWindow);
-        valorField.setText(null);
-    }
+    panel.add(botoesPanel, gbc);
 
-    private void salvarValor(JTextField valorField, String tipoPagamento, int idLocacao, JDialog dialog) {
+    dialog.add(panel);
+    dialog.setVisible(true);
+
+
+    SwingUtilities.invokeLater(valorField::requestFocusInWindow);
+    valorField.setText(null);
+}
+
+    private void salvarValor(JTextField valorField, String tipoPagamento, int idLocacao, JDialog dialog, String operacao, float valorRecebidoAnterior) {
         String valorInserido = valorField.getText().replace(",", ".");
         try {
             float valor = Float.parseFloat(valorInserido);
-            salvaAntecipado(idLocacao, tipoPagamento, valor);
-            JOptionPane.showMessageDialog(dialog, "Valor salvo com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+            float novoValor = 0;
+            String mensagem;
+
+            if ("SUBSTITUIR".equals(operacao)) {
+                // O valor digitado é o novo total
+                novoValor = valor;
+                mensagem = "Valor total substituído com sucesso!";
+            } else if ("SOMAR".equals(operacao)) {
+                // Soma o valor digitado ao valor anterior
+                novoValor = valorRecebidoAnterior + valor;
+                mensagem = "Valor somado! Novo total recebido: R$ " + String.format("%.2f", novoValor);
+            } else {
+                // Caso de erro, embora não deva acontecer com a implementação acima
+                JOptionPane.showMessageDialog(dialog, "Operação inválida.", "Erro", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            salvaAntecipado(idLocacao, tipoPagamento, novoValor);
+
+            // Exibe o feedback
+            JOptionPane.showMessageDialog(dialog, mensagem, "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+
             dialog.dispose();
+
+            // Opcional: Chama a atualização da tela principal se necessário
+            atualizaAntecipado(idLocacao);
         } catch (NumberFormatException ex) {
+            logger.warn("Valor inválido informado em salvarValor: {}", valorInserido, ex);
             JOptionPane.showMessageDialog(dialog, "Valor inválido. Insira um número válido.", "Erro", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -3031,6 +3063,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 return valor;
             }
         } catch (Exception e) {
+            logger.error("Erro ao carregar valor recebido. tipo={}, idLocacao={}", tipoPagamento, idLocacao, e);
             JOptionPane.showMessageDialog(null, e);
             return 0;
         }
@@ -3127,9 +3160,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     }//GEN-LAST:event_btMenuSairActionPerformed
 
     private void menuSistemaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menuSistemaMouseClicked
-        TelaSistema telaSistema = new TelaSistema();
-        // Torna a janela visível
-        telaSistema.setVisible(true);
+        
     }//GEN-LAST:event_menuSistemaMouseClicked
 
     private void menuSistemaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSistemaActionPerformed
@@ -3145,49 +3176,55 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
     private void limpezaManutencaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_limpezaManutencaoActionPerformed
         if (quartoEmFoco != 0) {
-                        mudaStatusNaCache(quartoEmFoco, "manutencao", null);
-                        configGlobal config = configGlobal.getInstance();
-                        config.setMudanca(true);
+            mudaStatusNaCache(quartoEmFoco, "manutencao", null);
+            configGlobal config = configGlobal.getInstance();
+            config.setMudanca(true);
 
-                        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
-                            @Override
-                            protected Void doInBackground() throws Exception {
-                                fquartos quarto = new fquartos();
-                                String statusAntes = quarto.getStatus(quartoEmFoco);
-                                quarto.setStatus(quartoEmFoco, "manutencao");
-                                if (!(statusAntes.equals("livre"))) {
-                                    quarto.alteraRegistro(quartoEmFoco, statusAntes);
-                                }
-                                quarto.adicionaRegistro(quartoEmFoco, "manutencao");
-                                return null;
-                            }
-                        };
-                        worker.execute();
+            SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+                @Override
+                protected Void doInBackground() throws Exception {
+                    fquartos quarto = new fquartos();
+                    String statusAntes = quarto.getStatus(quartoEmFoco);
+                    quarto.setStatus(quartoEmFoco, "manutencao");
+                    if (!(statusAntes.equals("livre"))) {
+                        quarto.alteraRegistro(quartoEmFoco, statusAntes);
                     }
+                    quarto.adicionaRegistro(quartoEmFoco, "manutencao");
+                    return null;
+                }
+            };
+            worker.execute();
+        }
     }//GEN-LAST:event_limpezaManutencaoActionPerformed
 
     private void limpezaReservaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_limpezaReservaActionPerformed
         if (quartoEmFoco != 0) {
-        mudaStatusNaCache(quartoEmFoco, "reservado", null);
-        configGlobal config = configGlobal.getInstance();
-        config.setMudanca(true);
+            mudaStatusNaCache(quartoEmFoco, "reservado", null);
+            configGlobal config = configGlobal.getInstance();
+            config.setMudanca(true);
 
-        SwingWorker<Void, Void> worker = new SwingWorker<>() {
-            @Override
-            protected Void doInBackground() throws Exception {
-                fquartos quarto = new fquartos();
-                String statusAntes = quarto.getStatus(quartoEmFoco);
-                quarto.setStatus(quartoEmFoco, "reservado");
-                if (!(statusAntes.equals("livre"))) {
-                    quarto.alteraRegistro(quartoEmFoco, statusAntes);
+            SwingWorker<Void, Void> worker = new SwingWorker<>() {
+                @Override
+                protected Void doInBackground() throws Exception {
+                    fquartos quarto = new fquartos();
+                    String statusAntes = quarto.getStatus(quartoEmFoco);
+                    quarto.setStatus(quartoEmFoco, "reservado");
+                    if (!(statusAntes.equals("livre"))) {
+                        quarto.alteraRegistro(quartoEmFoco, statusAntes);
+                    }
+                    quarto.adicionaRegistro(quartoEmFoco, "reservado");
+                    return null;
                 }
-                quarto.adicionaRegistro(quartoEmFoco, "reservado");
-                return null;
-            }
-        };
-        worker.execute();
+            };
+            worker.execute();
         }
     }//GEN-LAST:event_limpezaReservaActionPerformed
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        TelaSistema telaSistema = new TelaSistema();
+        // Torna a janela visível
+        telaSistema.setVisible(true);
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
     private void trocaQuarto(int idLocacao, int numeroNovoQuarto) {
         fquartos quarto = new fquartos();
         String horaStatus = quarto.getDataInicio(quartoEmFoco);
@@ -3195,7 +3232,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         try {
             hStatus = Timestamp.valueOf(horaStatus);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Erro ao converter horaStatus para Timestamp. horaStatus={}", horaStatus, e);
         }
 
         mudaStatusNaCache(quartoEmFoco, "limpeza", hStatus);
@@ -3212,8 +3249,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 JOptionPane.showMessageDialog(null, "Troca de quarto realizada com sucesso!");
             }
         } catch (SQLException e) {
+            logger.error("Erro ao trocar o quarto de {} para {}", quartoEmFoco, numeroNovoQuarto, e);
             JOptionPane.showMessageDialog(null, "Erro ao trocar o quarto: " + e.getMessage());
-            e.printStackTrace();
         }
         focoQuarto();
         mostraQuartos();
@@ -3221,6 +3258,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     }
 
     public void salvaAntecipado(int idLocacao, String tipo, float valor) {
+        // Esta parte transforma o código (C, D, O, P) no nome do tipo de BD (credito, debito, etc.)
         tipo = switch (tipo) {
             case "C" ->
                 "credito";
@@ -3239,11 +3277,11 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         try (Connection link = new fazconexao().conectar()) {
             String currentTime = new java.sql.Timestamp(System.currentTimeMillis()).toString();
 
-            // Primeiro, tenta atualizar um registro existente
-            String updateSQL = "UPDATE antecipado SET valor = ?, hora = ?, idcaixaatual = ?  WHERE idlocacao = ? AND tipo = ?";
+            // 1. Tenta atualizar (UPSERT: Update)
+            String updateSQL = "UPDATE antecipado SET valor = ?, hora = ?, idcaixaatual = ? WHERE idlocacao = ? AND tipo = ?";
             PreparedStatement updateStatement = link.prepareStatement(updateSQL);
-            updateStatement.setFloat(1, valor);
-            updateStatement.setString(2, currentTime); // Adiciona a hora atual
+            updateStatement.setFloat(1, valor); // Este 'valor' é o novo total calculado em salvarValor
+            updateStatement.setString(2, currentTime);
             updateStatement.setInt(3, idCaixaatual);
             updateStatement.setInt(4, idLocacao);
             updateStatement.setString(5, tipo);
@@ -3251,23 +3289,22 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             int rowsUpdated = updateStatement.executeUpdate();
             updateStatement.close();
 
-            // Se nenhum registro foi atualizado, faz a inserção
+            // 2. Se não atualizou, insere (UPSERT: Insert)
             if (rowsUpdated == 0) {
                 String insertSQL = "INSERT INTO antecipado (idlocacao, tipo, valor, hora , idcaixaatual) VALUES (?, ?, ?, ?, ?)";
                 PreparedStatement insertStatement = link.prepareStatement(insertSQL);
                 insertStatement.setInt(1, idLocacao);
                 insertStatement.setString(2, tipo);
-                insertStatement.setFloat(3, valor);
-                insertStatement.setString(4, currentTime); // Adiciona a hora atual
+                insertStatement.setFloat(3, valor); // Este 'valor' é o novo total calculado em salvarValor
+                insertStatement.setString(4, currentTime);
                 insertStatement.setInt(5, idCaixaatual);
                 insertStatement.executeUpdate();
                 insertStatement.close();
             }
 
-            // Fecha a conexão
         } catch (SQLException e) {
+            logger.error("Erro ao inserir/atualizar antecipado. locacao={}, tipo={}", idLocacao, tipo, e);
             JOptionPane.showMessageDialog(null, "Erro ao inserir/atualizar: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
         }
     }
 
@@ -3339,6 +3376,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu5;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -3368,7 +3406,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private javax.swing.JMenuItem menuCadastraProduto;
     private javax.swing.JMenu menuCaixaBt;
     private javax.swing.JMenu menuConfigAd;
-    private javax.swing.JMenuItem menuFazBackup;
     private javax.swing.JPopupMenu menuLimpeza;
     private javax.swing.JPopupMenu menuOcupado;
     private javax.swing.JMenuItem menuRelaVenProdutos;

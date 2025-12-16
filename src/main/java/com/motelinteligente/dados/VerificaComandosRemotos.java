@@ -16,10 +16,12 @@ import java.util.Date;
 public class VerificaComandosRemotos extends Thread {
 
     private static final Logger logger = LoggerFactory.getLogger(VerificaComandosRemotos.class);
-    private final HttpClient client = HttpClient.newHttpClient();
+    private final HttpClient client = HttpClient.newBuilder()
+            .followRedirects(HttpClient.Redirect.NORMAL)
+            .build();
 
     // Base URL do site
-    private final String baseUrl = "https://motelinteligente.com";
+    private final String baseUrl = "https://www.motelinteligente.com";
 
     // Pega a filial do arquivo
     private final String filial = CarregarVariaveis.getFilial();
@@ -35,6 +37,8 @@ public class VerificaComandosRemotos extends Thread {
             try {
                 // 1️⃣ Busca o comando remoto
                 String getUrl = baseUrl + "/get_comandos.php?filial=" + filial;
+                //logger.info("Tentando obter comandos de: " + getUrl); // LOG EXTRA DE DEBUG
+
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(URI.create(getUrl))
                         .timeout(java.time.Duration.ofSeconds(5))
@@ -42,13 +46,14 @@ public class VerificaComandosRemotos extends Thread {
 
                 HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
                 String body = response.body();
+                //logger.info("Resposta recebida do servidor: " + body); // LOG EXTRA DE DEBUG
 
                 if (body != null && !body.trim().equals("") && !body.trim().equals("null")) {
                     JSONObject json = new JSONObject(body);
                     int idComando = json.getInt("id");
                     String comando = json.getString("comando");
 
-                    logger.info("Comando remoto recebido: " + comando);
+                    //logger.info("Comando remoto recebido: " + comando);
 
                     // 2️⃣ Executa a ação correspondente
                     processarComando(comando);
@@ -188,8 +193,7 @@ public class VerificaComandosRemotos extends Thread {
                         };
                         worker.execute();
                     }
-                }
-                else if (acao.equals("reproduzir")) {
+                } else if (acao.equals("reproduzir")) {
                     new playSound().playSound("som/mensagem conferencia.wav");
                 }
             }
@@ -200,15 +204,29 @@ public class VerificaComandosRemotos extends Thread {
 
     private boolean mudaStatusNaCache(int quartoMudar, String statusColocar) {
         CacheDados dados = CacheDados.getInstancia();
-        CarregaQuarto quarto = dados.getCacheQuarto().get(quartoMudar);
-        Date dataAtual = new Date();
-        Timestamp timestamp = new Timestamp(dataAtual.getTime());
-        quarto.setStatusQuarto(statusColocar);
-        quarto.setHoraStatus(String.valueOf(timestamp));
-        dados.getCacheQuarto().put(quartoMudar, quarto);
 
-        if (statusColocar.equals("limpeza")) {
-            dados.getCacheOcupado().remove(quartoMudar);
+        // 🛑 Sincroniza o bloco de código que acessa a cache 🛑
+        synchronized (dados.getCacheQuarto()) {
+            CarregaQuarto quarto = dados.getCacheQuarto().get(quartoMudar);
+
+            // Mantemos a verificação de nulidade (segurança)
+            if (quarto == null) {
+                logger.error(
+                        "Tentativa de mudar status do Quarto {} para {} falhou: Quarto não encontrado na Cache (Race Condition?).",
+                        quartoMudar, statusColocar);
+                return false;
+            }
+
+            Date dataAtual = new Date();
+            Timestamp timestamp = new Timestamp(dataAtual.getTime());
+            quarto.setStatusQuarto(statusColocar);
+            quarto.setHoraStatus(String.valueOf(timestamp));
+            dados.getCacheQuarto().put(quartoMudar, quarto);
+
+            if (statusColocar.equals("limpeza")) {
+                // Se o cacheOcupado não for sincronizado, ele também precisa ser envolvido.
+                dados.getCacheOcupado().remove(quartoMudar);
+            }
         }
         return true;
     }

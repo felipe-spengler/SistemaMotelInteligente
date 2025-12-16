@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ffuncionario {
 
-    private static final Logger logger = LoggerFactory.getLogger(fprodutos.class);
+    private static final Logger logger = LoggerFactory.getLogger(ffuncionario.class);
 
     public int totalRegistros;
 
@@ -199,7 +199,7 @@ public class ffuncionario {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Erro ao buscar id do funcionário", e);
         }
 
         return id;

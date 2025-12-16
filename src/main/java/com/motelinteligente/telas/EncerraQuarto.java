@@ -79,6 +79,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
 import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery;
 import uk.co.caprica.vlcj.player.base.MediaPlayer;
@@ -88,13 +90,13 @@ import uk.co.caprica.vlcj.player.base.MediaPlayer;
  * @author MOTEL
  */
 public class EncerraQuarto extends javax.swing.JFrame {
-
+    private static final Logger logger = LoggerFactory.getLogger(EncerraQuarto.class);
     private boolean isFrameOpen = false, salvouLocacao = false;
     private JFrame secondaryFrame;
     int idLocacao = 0;
     private MediaPlayerFactory mediaPlayerFactory;
     private MediaPlayer mediaPlayer;
-    private boolean recording = false;  // Controle de gravação
+    private boolean recording = false; // Controle de gravação
     private boolean jopAberto = false;
     String dataInicio, dataFim, tempoTotalLocado;
     float valorAcrescimo = 0, valorDesconto = 0;
@@ -142,8 +144,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
         System.setProperty("VLC_PLUGIN_PATH", "C:\\Program Files\\VideoLAN\\VLC\\plugins");
 
         // Inicializa a fábrica e o media player
-        //mediaPlayerFactory = new MediaPlayerFactory();
-        //mediaPlayer = mediaPlayerFactory.mediaPlayers().newMediaPlayer();
+        // mediaPlayerFactory = new MediaPlayerFactory();
+        // mediaPlayer = mediaPlayerFactory.mediaPlayers().newMediaPlayer();
         startRecording(numeroQuarto);
         tabela.getModel().addTableModelListener(new TableModelListener() {
             @Override
@@ -162,14 +164,12 @@ public class EncerraQuarto extends javax.swing.JFrame {
         });
 
         setValorDivida();
-        
-
-        
 
         boolean found = new NativeDiscovery().discover();
         if (!found) {
-            System.err.println("Não foi possível localizar as bibliotecas VLC. Certifique-se de que o VLC está instalado.");
-            return;  // Sai do construtor se as bibliotecas não forem encontradas
+            System.err.println(
+                    "Não foi possível localizar as bibliotecas VLC. Certifique-se de que o VLC está instalado.");
+            return; // Sai do construtor se as bibliotecas não forem encontradas
         }
         txtIdProduto.grabFocus();
     }
@@ -184,7 +184,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         actionMap.put("ESCAPE", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                btVoltar.doClick();  // Simula o clique no botão "Voltar"
+                btVoltar.doClick(); // Simula o clique no botão "Voltar"
             }
         });
 
@@ -195,8 +195,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
             public void actionPerformed(ActionEvent e) {
                 if (!jopAberto) {
                     jopAberto = true;
-                    btSalvar.doClick();  // Simula o clique no botão "Salvar"
-                    jopAberto = false;    // Reseta o estado após a ação
+                    btSalvar.doClick(); // Simula o clique no botão "Salvar"
+                    jopAberto = false; // Reseta o estado após a ação
                 }
             }
         });
@@ -206,16 +206,16 @@ public class EncerraQuarto extends javax.swing.JFrame {
         actionMap.put("F2", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                btConferencia.doClick();  // Simula o clique no botão "Conferência"
+                btConferencia.doClick(); // Simula o clique no botão "Conferência"
             }
         });
-        
+
         // Mapeia a tecla F4 para débito
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F4, 0), "F4");
         actionMap.put("F4", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                btDebito.doClick();  // Simula o clique no botão "Débito"
+                btDebito.doClick(); // Simula o clique no botão "Débito"
             }
         });
 
@@ -224,10 +224,10 @@ public class EncerraQuarto extends javax.swing.JFrame {
         actionMap.put("F6", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                btDesistencia.doClick();  // Simula o clique no botão "Desistência"
+                btDesistencia.doClick(); // Simula o clique no botão "Desistência"
             }
         });
-        
+
     }
 
     public void setaLabelGeral(int numeroQuarto) {
@@ -265,21 +265,21 @@ public class EncerraQuarto extends javax.swing.JFrame {
         // seta a data de inicio
         fquartos quartodao = new fquartos();
         dataInicio = quartodao.getDataInicio(numeroQuarto);
-        lblInicioLocacao.setText(dataInicio);
-        //setar a data final
+        lblInicioLocacao.setText(formatarDataHora(dataInicio));
+        // setar a data final
         Date dataAtual = new Date();
         Timestamp horaAtual = new Timestamp(dataAtual.getTime());
 
         dataFim = String.valueOf(horaAtual);
-        lblFimLocacao.setText(dataFim);
+        lblFimLocacao.setText(formatarDataHora(dataFim));
 
         tempoTotalLocado = quartodao.getData(numeroQuarto);
 
         labelEncerramento.setText("Encerramento Quarto " + numeroDoQuarto);
-        //setar tempo locado
+        // setar tempo locado
         lblTempoLocado.setText(tempoTotalLocado);
 
-        //setar valor quarto e adicionalPeriodo começa agora
+        // setar valor quarto e adicionalPeriodo começa agora
         CacheDados cache = CacheDados.getInstancia();
         DadosOcupados ocupado = cache.getCacheOcupado().get(numeroQuarto);
         CarregaQuarto quarto = cache.getCacheQuarto().get(numeroQuarto);
@@ -314,34 +314,63 @@ public class EncerraQuarto extends javax.swing.JFrame {
         antecipados = verAntecipado(idLocacao);
         setValorDivida();
 
-        //setar as datas da tela do cliente
+        // setar as datas da tela do cliente
         outraTela.setaDatas(dataInicio, dataFim, tempoTotalLocado);
         outraTela.setTitulo(numeroQuarto);
 
     }
 
+    public static String formatarDataHora(String dataHoraStr) {
+        if (dataHoraStr == null || "N/A".equals(dataHoraStr)) {
+            return "N/A";
+        }
+
+        // Remove os milissegundos se existirem (tudo depois do ponto)
+        if (dataHoraStr.contains(".")) {
+            dataHoraStr = dataHoraStr.substring(0, dataHoraStr.indexOf('.'));
+        }
+
+        // Agora a string está no formato: "yyyy-MM-dd HH:mm:ss"
+        // Vamos pegar: dia (8-9), mês (5-6), hora (11-12), minuto (14-15)
+
+        String dia = dataHoraStr.substring(8, 10);
+        String mes = dataHoraStr.substring(5, 7);
+        String hora = dataHoraStr.substring(11, 13);
+        String minuto = dataHoraStr.substring(14, 16);
+
+        return dia + "/" + mes + " " + hora + ":" + minuto;
+    }
+
     public void adicionaPreVendidos(int locacao) {
-        // Verifica se a cache de produtos vendidos contém a locação
-        CacheDados cache = CacheDados.getInstancia();
+        String consultaProdutosSQL = "SELECT idproduto, quantidade FROM prevendidos WHERE idlocacao = ?";
 
-        if (cache.cacheProdutosVendidos.containsKey(locacao)) {
-            // Obtém a lista de produtos vendidos para esta locação da cache
-            List<DadosVendidos> produtosVendidos = cache.cacheProdutosVendidos.get(locacao);
+        try (Connection link = new fazconexao().conectar();
+                PreparedStatement statementProdutos = link.prepareStatement(consultaProdutosSQL)) {
 
-            // Percorre a lista de produtos vendidos
-            for (DadosVendidos produto : produtosVendidos) {
-                // Preenche os campos com os dados de prevendidos
-                int id = produto.idProduto;
-                int quantidade = produto.quantidadeVendida;
-                txtIdProduto.setText(Integer.toString(id));
-                txtQuantidade.setText(Integer.toString(quantidade));
+            statementProdutos.setInt(1, locacao);
 
-                // Simula um clique no botão btInserir
-                btInserir.doClick();
+            try (ResultSet resultadoProdutos = statementProdutos.executeQuery()) {
+
+                while (resultadoProdutos.next()) {
+                    int id = resultadoProdutos.getInt("idproduto");
+                    int quantidade = resultadoProdutos.getInt("quantidade");
+
+                    txtIdProduto.setText(Integer.toString(id));
+                    txtQuantidade.setText(Integer.toString(quantidade));
+
+                    btInserir.doClick();
+                }
+
+                atualizaConsumo();
+
+            } catch (SQLException e) {
+                // Log do erro ao executar a query ou processar o ResultSet
+                logger.error("Erro ao adicionar prevendidos (execucao da query): ", e);
             }
 
-            // Atualiza o label (se necessário)
-            atualizaConsumo();
+        } catch (SQLException e) {
+            // Log do erro ao tentar conectar ou preparar o statement
+            logger.error("Erro ao preparar ou conectar para adicionar prevendidos: ", e);
         }
     }
 
@@ -351,7 +380,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
         float jaRecebeu = 0;
         try {
             link = new fazconexao().conectar();
-            // Consulta SQL para buscar registros da tabela "antecipado" para a locação especificada
+            // Consulta SQL para buscar registros da tabela "antecipado" para a locação
+            // especificada
             String selectSQL = "SELECT tipo, valor, hora FROM antecipado WHERE idlocacao = ?";
             PreparedStatement preparedStatement = link.prepareStatement(selectSQL);
             preparedStatement.setInt(1, locacao);
@@ -385,7 +415,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
             preparedStatement.close();
             link.close();
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Erro ao buscar dados antecipados: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Erro ao buscar dados antecipados: " + e.getMessage(), "Erro",
+                    JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         } finally {
             try {
@@ -404,7 +435,9 @@ public class EncerraQuarto extends javax.swing.JFrame {
 
     public float calculaAdicionalPessoa(int numeroPessoas) {
         float valAdd = new fquartos().getAddPessoa(numeroDoQuarto);
-        if(valAdd == 0) valAdd = 1;
+        if (valAdd == 0) {
+            valAdd = 1;
+        }
         float adicionalPessoas = (numeroPessoas - 2) * valAdd;
         if (adicionalPessoas <= 0) {
             adicionalPessoas = 0;
@@ -492,8 +525,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
         }
     }
 
-
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         barraCima = new javax.swing.JPanel();
@@ -555,6 +588,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
             public void windowGainedFocus(java.awt.event.WindowEvent evt) {
                 formWindowGainedFocus(evt);
             }
+
             public void windowLostFocus(java.awt.event.WindowEvent evt) {
             }
         });
@@ -562,6 +596,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
             public void windowActivated(java.awt.event.WindowEvent evt) {
                 formWindowActivated(evt);
             }
+
             public void windowOpened(java.awt.event.WindowEvent evt) {
                 formWindowOpened(evt);
             }
@@ -617,7 +652,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
 
         btConferencia.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         btConferencia.setForeground(new java.awt.Color(204, 51, 0));
-        btConferencia.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/technicalsupport_support_representative_person_people_man_1641.png"))); // NOI18N
+        btConferencia.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/imagens/technicalsupport_support_representative_person_people_man_1641.png"))); // NOI18N
         btConferencia.setText("Conferencia (F2)");
         btConferencia.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btConferencia.setMaximumSize(new java.awt.Dimension(130, 79));
@@ -632,7 +668,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
 
         btDesistencia.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         btDesistencia.setForeground(new java.awt.Color(204, 51, 0));
-        btDesistencia.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/cancel_icon-icons.com_52401.png"))); // NOI18N
+        btDesistencia
+                .setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/cancel_icon-icons.com_52401.png"))); // NOI18N
         btDesistencia.setText("Desistencia (F6)");
         btDesistencia.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btDesistencia.setMaximumSize(new java.awt.Dimension(130, 79));
@@ -664,39 +701,52 @@ public class EncerraQuarto extends javax.swing.JFrame {
         javax.swing.GroupLayout barraCimaLayout = new javax.swing.GroupLayout(barraCima);
         barraCima.setLayout(barraCimaLayout);
         barraCimaLayout.setHorizontalGroup(
-            barraCimaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(barraCimaLayout.createSequentialGroup()
-                .addGap(21, 21, 21)
-                .addComponent(btVoltar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btSalvar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btConferencia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btDebito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btDesistencia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btWifi, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        barraCimaLayout.setVerticalGroup(
-            barraCimaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, barraCimaLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(barraCimaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btWifi, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btDesistencia, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btConferencia, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btDebito, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(barraCimaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                barraCimaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(barraCimaLayout.createSequentialGroup()
-                            .addComponent(btSalvar, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addContainerGap())
+                                .addGap(21, 21, 21)
+                                .addComponent(btVoltar, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btSalvar, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btConferencia, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btDebito, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btDesistencia, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btWifi, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
+        barraCimaLayout.setVerticalGroup(
+                barraCimaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, barraCimaLayout.createSequentialGroup()
-                            .addComponent(btVoltar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGap(16, 16, 16)))))
-        );
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(barraCimaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(btWifi, javax.swing.GroupLayout.PREFERRED_SIZE, 76,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(btDesistencia, javax.swing.GroupLayout.PREFERRED_SIZE, 76,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(btConferencia, javax.swing.GroupLayout.PREFERRED_SIZE, 76,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(btDebito, javax.swing.GroupLayout.PREFERRED_SIZE, 76,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGroup(barraCimaLayout
+                                                .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addGroup(barraCimaLayout.createSequentialGroup()
+                                                        .addComponent(btSalvar, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                76, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addContainerGap())
+                                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, barraCimaLayout
+                                                        .createSequentialGroup()
+                                                        .addComponent(btVoltar, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addGap(16, 16, 16))))));
 
         painelProdutos.setBackground(new java.awt.Color(204, 204, 204));
 
@@ -718,29 +768,29 @@ public class EncerraQuarto extends javax.swing.JFrame {
 
         tabela.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         tabela.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null}
-            },
-            new String [] {
-                "id", "Quantidade", "Descrição", "Valor und", "Valor Total"
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.Float.class, java.lang.Float.class
+                new Object[][] {
+                        { null, null, null, null, null },
+                        { null, null, null, null, null },
+                        { null, null, null, null, null },
+                        { null, null, null, null, null }
+                },
+                new String[] {
+                        "id", "Quantidade", "Descrição", "Valor und", "Valor Total"
+                }) {
+            Class[] types = new Class[] {
+                    java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.Float.class,
+                    java.lang.Float.class
             };
-            boolean[] canEdit = new boolean [] {
-                false, true, false, false, false
+            boolean[] canEdit = new boolean[] {
+                    false, true, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
+                return types[columnIndex];
             }
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
+                return canEdit[columnIndex];
             }
         });
         tabela.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
@@ -783,61 +833,84 @@ public class EncerraQuarto extends javax.swing.JFrame {
         javax.swing.GroupLayout painelProdutosLayout = new javax.swing.GroupLayout(painelProdutos);
         painelProdutos.setLayout(painelProdutosLayout);
         painelProdutosLayout.setHorizontalGroup(
-            painelProdutosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelProdutosLayout.createSequentialGroup()
-                .addGap(18, 18, 18)
-                .addComponent(btApagar, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel11)
-                .addGap(28, 28, 28)
-                .addComponent(lblValorConsumo)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(painelProdutosLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(painelProdutosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2)
-                    .addGroup(painelProdutosLayout.createSequentialGroup()
-                        .addGroup(painelProdutosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel7)
-                            .addComponent(jLabel8))
-                        .addGap(12, 12, 12)
-                        .addGroup(painelProdutosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(painelProdutosLayout.createSequentialGroup()
-                                .addComponent(txtQuantidade, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btInserir))
-                            .addGroup(painelProdutosLayout.createSequentialGroup()
-                                .addComponent(txtIdProduto, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(lblNomeProduto, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 652, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(76, Short.MAX_VALUE))
-        );
+                painelProdutosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING,
+                                painelProdutosLayout.createSequentialGroup()
+                                        .addGap(18, 18, 18)
+                                        .addComponent(btApagar, javax.swing.GroupLayout.PREFERRED_SIZE, 125,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jLabel11)
+                                        .addGap(28, 28, 28)
+                                        .addComponent(lblValorConsumo)
+                                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(painelProdutosLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(painelProdutosLayout
+                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jLabel2)
+                                        .addGroup(painelProdutosLayout.createSequentialGroup()
+                                                .addGroup(painelProdutosLayout
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(jLabel7)
+                                                        .addComponent(jLabel8))
+                                                .addGap(12, 12, 12)
+                                                .addGroup(painelProdutosLayout
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(painelProdutosLayout.createSequentialGroup()
+                                                                .addComponent(txtQuantidade,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE, 88,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addPreferredGap(
+                                                                        javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addComponent(btInserir))
+                                                        .addGroup(painelProdutosLayout.createSequentialGroup()
+                                                                .addComponent(txtIdProduto,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE, 88,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addPreferredGap(
+                                                                        javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                                .addComponent(lblNomeProduto,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE, 163,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 652,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap(76, Short.MAX_VALUE)));
         painelProdutosLayout.setVerticalGroup(
-            painelProdutosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(painelProdutosLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(painelProdutosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel7)
-                    .addComponent(txtIdProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblNomeProduto))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(painelProdutosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel8)
-                    .addComponent(txtQuantidade, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btInserir))
-                .addGap(21, 21, 21)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addGroup(painelProdutosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(painelProdutosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel11)
-                        .addComponent(lblValorConsumo))
-                    .addComponent(btApagar, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+                painelProdutosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(painelProdutosLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(painelProdutosLayout
+                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel7)
+                                        .addComponent(txtIdProduto, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(lblNomeProduto))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(painelProdutosLayout
+                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel8)
+                                        .addComponent(txtQuantidade, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(btInserir))
+                                .addGap(21, 21, 21)
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 210,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addGroup(painelProdutosLayout
+                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(painelProdutosLayout
+                                                .createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                .addComponent(jLabel11)
+                                                .addComponent(lblValorConsumo))
+                                        .addComponent(btApagar, javax.swing.GroupLayout.PREFERRED_SIZE, 33,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
 
         painelInfo.setBackground(new java.awt.Color(204, 204, 204));
         painelInfo.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -947,68 +1020,76 @@ public class EncerraQuarto extends javax.swing.JFrame {
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addGap(76, 76, 76)
-                                .addComponent(jLabel18))
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addGap(101, 101, 101)
-                                .addComponent(lblAReceber)))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel13, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addContainerGap())
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addGap(0, 17, Short.MAX_VALUE)
-                .addComponent(jLabel19)
-                .addGap(18, 18, 18)
-                .addComponent(txtRecebidoAntecipado, javax.swing.GroupLayout.PREFERRED_SIZE, 161, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(61, 61, 61))
-        );
+                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(jPanel2Layout.createSequentialGroup()
+                                                .addGroup(jPanel2Layout
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(jPanel2Layout.createSequentialGroup()
+                                                                .addGap(76, 76, 76)
+                                                                .addComponent(jLabel18))
+                                                        .addGroup(jPanel2Layout.createSequentialGroup()
+                                                                .addGap(101, 101, 101)
+                                                                .addComponent(lblAReceber)))
+                                                .addGap(0, 0, Short.MAX_VALUE))
+                                        .addGroup(jPanel2Layout.createSequentialGroup()
+                                                .addContainerGap()
+                                                .addComponent(jLabel13, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                .addContainerGap())
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                                .addGap(0, 17, Short.MAX_VALUE)
+                                .addComponent(jLabel19)
+                                .addGap(18, 18, 18)
+                                .addComponent(txtRecebidoAntecipado, javax.swing.GroupLayout.PREFERRED_SIZE, 161,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(61, 61, 61)));
         jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel13)
-                .addGap(18, 18, 18)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel19)
-                    .addComponent(txtRecebidoAntecipado, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, Short.MAX_VALUE)
-                .addComponent(jLabel18)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblAReceber)
-                .addGap(32, 32, 32))
-        );
+                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel13)
+                                .addGap(18, 18, 18)
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel19)
+                                        .addComponent(txtRecebidoAntecipado, javax.swing.GroupLayout.PREFERRED_SIZE, 32,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(18, 18, Short.MAX_VALUE)
+                                .addComponent(jLabel18)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblAReceber)
+                                .addGap(32, 32, 32)));
 
         javax.swing.GroupLayout painelRecebimentoLayout = new javax.swing.GroupLayout(painelRecebimento);
         painelRecebimento.setLayout(painelRecebimentoLayout);
         painelRecebimentoLayout.setHorizontalGroup(
-            painelRecebimentoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(painelRecebimentoLayout.createSequentialGroup()
-                .addGroup(painelRecebimentoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(painelRecebimentoLayout.createSequentialGroup()
-                        .addComponent(jLabel16)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtJustifica, javax.swing.GroupLayout.PREFERRED_SIZE, 278, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 0, Short.MAX_VALUE))
-        );
+                painelRecebimentoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(painelRecebimentoLayout.createSequentialGroup()
+                                .addGroup(painelRecebimentoLayout
+                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(painelRecebimentoLayout.createSequentialGroup()
+                                                .addComponent(jLabel16)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(txtJustifica, javax.swing.GroupLayout.PREFERRED_SIZE, 278,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(0, 0, Short.MAX_VALUE)));
         painelRecebimentoLayout.setVerticalGroup(
-            painelRecebimentoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(painelRecebimentoLayout.createSequentialGroup()
-                .addGroup(painelRecebimentoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel16)
-                    .addComponent(txtJustifica, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
-        );
+                painelRecebimentoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(painelRecebimentoLayout.createSequentialGroup()
+                                .addGroup(painelRecebimentoLayout
+                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel16)
+                                        .addComponent(txtJustifica, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addContainerGap()));
 
         jLabel14.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel14.setText("Desconto:");
@@ -1049,121 +1130,149 @@ public class EncerraQuarto extends javax.swing.JFrame {
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(painelRecebimento, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addComponent(jLabel14)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtDescontoPorcento, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtDesconto, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGap(30, 30, 30)
-                        .addComponent(jLabel15)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtAcrescimo, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(9, 9, 9))))
-        );
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(painelRecebimento, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                                .addGap(6, 6, 6)
+                                                .addComponent(jLabel14)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(txtDescontoPorcento,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE, 53,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(txtDesconto, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addGap(30, 30, 30)
+                                                .addComponent(jLabel15)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(txtAcrescimo, javax.swing.GroupLayout.PREFERRED_SIZE, 50,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(9, 9, 9)))));
         jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap(12, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel14)
-                    .addComponent(txtDesconto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtDescontoPorcento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel15)
-                    .addComponent(txtAcrescimo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(painelRecebimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-        );
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addContainerGap(12, Short.MAX_VALUE)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel14)
+                                        .addComponent(txtDesconto, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(txtDescontoPorcento, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel15)
+                                        .addComponent(txtAcrescimo, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(painelRecebimento, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap()));
 
         javax.swing.GroupLayout painelInfoLayout = new javax.swing.GroupLayout(painelInfo);
         painelInfo.setLayout(painelInfoLayout);
         painelInfoLayout.setHorizontalGroup(
-            painelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(painelInfoLayout.createSequentialGroup()
-                .addGroup(painelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(painelInfoLayout.createSequentialGroup()
-                        .addGap(15, 15, 15)
-                        .addGroup(painelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(painelInfoLayout.createSequentialGroup()
-                                .addGroup(painelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel3)
-                                    .addComponent(jLabel1))
-                                .addGap(46, 46, 46)
-                                .addGroup(painelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(lblInicioLocacao)
-                                    .addComponent(lblFimLocacao)))
-                            .addGroup(painelInfoLayout.createSequentialGroup()
-                                .addComponent(jLabel9)
-                                .addGap(63, 63, 63)
-                                .addComponent(lblTempoLocado))
-                            .addGroup(painelInfoLayout.createSequentialGroup()
-                                .addGroup(painelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel5)
-                                    .addComponent(jLabel6)
-                                    .addComponent(jLabel10)
-                                    .addComponent(jLabel4))
-                                .addGap(32, 32, 32)
-                                .addGroup(painelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(lblValorQuarto)
-                                    .addComponent(lblHoraAdicional)
-                                    .addComponent(lblValorConsumo2)
-                                    .addComponent(txtPessoas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                    .addGroup(painelInfoLayout.createSequentialGroup()
-                        .addGap(59, 59, 59)
-                        .addComponent(jLabel12)
-                        .addGap(18, 18, 18)
-                        .addComponent(txtValorDivida)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+                painelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(painelInfoLayout.createSequentialGroup()
+                                .addGroup(painelInfoLayout
+                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(painelInfoLayout.createSequentialGroup()
+                                                .addGap(15, 15, 15)
+                                                .addGroup(painelInfoLayout
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(painelInfoLayout.createSequentialGroup()
+                                                                .addGroup(painelInfoLayout.createParallelGroup(
+                                                                        javax.swing.GroupLayout.Alignment.LEADING)
+                                                                        .addComponent(jLabel3)
+                                                                        .addComponent(jLabel1))
+                                                                .addGap(46, 46, 46)
+                                                                .addGroup(painelInfoLayout.createParallelGroup(
+                                                                        javax.swing.GroupLayout.Alignment.LEADING)
+                                                                        .addComponent(lblInicioLocacao)
+                                                                        .addComponent(lblFimLocacao)))
+                                                        .addGroup(painelInfoLayout.createSequentialGroup()
+                                                                .addComponent(jLabel9)
+                                                                .addGap(63, 63, 63)
+                                                                .addComponent(lblTempoLocado))
+                                                        .addGroup(painelInfoLayout.createSequentialGroup()
+                                                                .addGroup(painelInfoLayout.createParallelGroup(
+                                                                        javax.swing.GroupLayout.Alignment.LEADING)
+                                                                        .addComponent(jLabel5)
+                                                                        .addComponent(jLabel6)
+                                                                        .addComponent(jLabel10)
+                                                                        .addComponent(jLabel4))
+                                                                .addGap(32, 32, 32)
+                                                                .addGroup(painelInfoLayout.createParallelGroup(
+                                                                        javax.swing.GroupLayout.Alignment.LEADING)
+                                                                        .addComponent(lblValorQuarto)
+                                                                        .addComponent(lblHoraAdicional)
+                                                                        .addComponent(lblValorConsumo2)
+                                                                        .addComponent(txtPessoas,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                        .addGroup(painelInfoLayout.createSequentialGroup()
+                                                .addGap(59, 59, 59)
+                                                .addComponent(jLabel12)
+                                                .addGap(18, 18, 18)
+                                                .addComponent(txtValorDivida)))
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
         painelInfoLayout.setVerticalGroup(
-            painelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(painelInfoLayout.createSequentialGroup()
-                .addGap(14, 14, 14)
-                .addGroup(painelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(lblInicioLocacao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(painelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
-                    .addComponent(lblFimLocacao))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(painelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblTempoLocado)
-                    .addComponent(jLabel9))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(painelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(painelInfoLayout.createSequentialGroup()
-                        .addComponent(txtPessoas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblValorQuarto)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblHoraAdicional))
-                    .addGroup(painelInfoLayout.createSequentialGroup()
-                        .addComponent(jLabel10)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel5)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel6)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(painelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel4)
-                            .addComponent(lblValorConsumo2))))
-                .addGap(18, 18, 18)
-                .addGroup(painelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel12)
-                    .addComponent(txtValorDivida))
-                .addGap(28, 28, 28)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
-        );
+                painelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(painelInfoLayout.createSequentialGroup()
+                                .addGap(14, 14, 14)
+                                .addGroup(
+                                        painelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                .addComponent(jLabel1)
+                                                .addComponent(lblInicioLocacao, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(
+                                        painelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                .addComponent(jLabel3)
+                                                .addComponent(lblFimLocacao))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(
+                                        painelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addComponent(lblTempoLocado)
+                                                .addComponent(jLabel9))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(painelInfoLayout
+                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(painelInfoLayout.createSequentialGroup()
+                                                .addComponent(txtPessoas, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                        javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(lblValorQuarto)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(lblHoraAdicional))
+                                        .addGroup(painelInfoLayout.createSequentialGroup()
+                                                .addComponent(jLabel10)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(jLabel5)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(jLabel6)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addGroup(painelInfoLayout
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                        .addComponent(jLabel4)
+                                                        .addComponent(lblValorConsumo2))))
+                                .addGap(18, 18, 18)
+                                .addGroup(
+                                        painelInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                .addComponent(jLabel12)
+                                                .addComponent(txtValorDivida))
+                                .addGap(28, 28, 28)
+                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE)));
 
         labelEncerramento.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         labelEncerramento.setText("Encerramento Quarto xxx");
@@ -1171,95 +1280,105 @@ public class EncerraQuarto extends javax.swing.JFrame {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(barraCima, javax.swing.GroupLayout.DEFAULT_SIZE, 1137, Short.MAX_VALUE)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(painelInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(67, 67, 67)
-                        .addComponent(labelEncerramento, javax.swing.GroupLayout.PREFERRED_SIZE, 606, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(painelProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap())))
-        );
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(barraCima, javax.swing.GroupLayout.DEFAULT_SIZE, 1137, Short.MAX_VALUE)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(painelInfo, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGap(67, 67, 67)
+                                                .addComponent(labelEncerramento, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                        606, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED,
+                                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addComponent(painelProdutos, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                        javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addContainerGap()))));
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(barraCima, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(painelInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(labelEncerramento, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(painelProdutos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addContainerGap())))
-        );
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(barraCima, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(painelInfo, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(labelEncerramento, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                        42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(18, 18, 18)
+                                                .addComponent(painelProdutos, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addContainerGap()))));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void txtIdProdutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtIdProdutoActionPerformed
+    private void txtIdProdutoActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_txtIdProdutoActionPerformed
 
-    }//GEN-LAST:event_txtIdProdutoActionPerformed
+    }// GEN-LAST:event_txtIdProdutoActionPerformed
 
-    private void txtQuantidadeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtQuantidadeActionPerformed
+    private void txtQuantidadeActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_txtQuantidadeActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtQuantidadeActionPerformed
+    }// GEN-LAST:event_txtQuantidadeActionPerformed
 
-    private void btInserirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btInserirActionPerformed
+    private void btInserirActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btInserirActionPerformed
         DefaultTableModel modelo = (DefaultTableModel) tabela.getModel();
 
-    if (isInteger(txtIdProduto.getText())) {
-        fprodutos produtodao = new fprodutos();
-        String texto = produtodao.getDescicao(txtIdProduto.getText());
-        
-        if (texto != null) {
-            String quantidadeTexto = txtQuantidade.getText().trim(); // Remove espaços em branco
-            
-            // Verifica se o campo de quantidade está vazio
-            if (quantidadeTexto.isEmpty()) {
-                quantidadeTexto = "1"; // Define a quantidade como 1 se estiver vazio
-            }
+        if (isInteger(txtIdProduto.getText())) {
+            fprodutos produtodao = new fprodutos();
+            String texto = produtodao.getDescicao(txtIdProduto.getText());
 
-            if (isInteger(quantidadeTexto)) {
-                
-                int quantidade = Integer.parseInt(quantidadeTexto); // Usa a quantidade (1 ou a digitada)
-                
-                float valor = produtodao.getValorProduto(Integer.parseInt(txtIdProduto.getText()));
-                float valorSoma = valor * quantidade; // Usa a variável 'quantidade'
-                
-                modelo.addRow(new Object[]{
-                    txtIdProduto.getText(),
-                    quantidadeTexto, // Usa a quantidade (1 ou a digitada) como String
-                    texto,
-                    valor,
-                    valorSoma
-                });
-                outraTela.adicionaTabela(txtIdProduto.getText(), quantidadeTexto, texto, valor, valorSoma);
-                atualizaConsumo();
+            if (texto != null) {
+                String quantidadeTexto = txtQuantidade.getText().trim(); // Remove espaços em branco
 
+                // Verifica se o campo de quantidade está vazio
+                if (quantidadeTexto.isEmpty()) {
+                    quantidadeTexto = "1"; // Define a quantidade como 1 se estiver vazio
+                }
+
+                if (isInteger(quantidadeTexto)) {
+
+                    int quantidade = Integer.parseInt(quantidadeTexto); // Usa a quantidade (1 ou a digitada)
+
+                    float valor = produtodao.getValorProduto(Integer.parseInt(txtIdProduto.getText()));
+                    float valorSoma = valor * quantidade; // Usa a variável 'quantidade'
+
+                    modelo.addRow(new Object[] {
+                            txtIdProduto.getText(),
+                            quantidadeTexto, // Usa a quantidade (1 ou a digitada) como String
+                            texto,
+                            valor,
+                            valorSoma
+                    });
+                    outraTela.adicionaTabela(txtIdProduto.getText(), quantidadeTexto, texto, valor, valorSoma);
+                    atualizaConsumo();
+
+                } else {
+                    // Isso só será executado se o texto digitado (e não vazio) não for um número
+                    // inteiro
+                    JOptionPane.showMessageDialog(rootPane, "Quantidade inválida!");
+
+                }
             } else {
-                // Isso só será executado se o texto digitado (e não vazio) não for um número inteiro
-                JOptionPane.showMessageDialog(rootPane, "Quantidade inválida!");
-
+                JOptionPane.showMessageDialog(rootPane, "Código inserido invalido!");
             }
         } else {
-            JOptionPane.showMessageDialog(rootPane, "Código inserido invalido!");
+            JOptionPane.showMessageDialog(rootPane, "Digite um valor válido!");
         }
-    } else {
-        JOptionPane.showMessageDialog(rootPane, "Digite um valor válido!");
-    }
 
-    setValorDivida();
-    txtQuantidade.setText("");
-    txtIdProduto.setText("");
+        setValorDivida();
+        txtQuantidade.setText("");
+        txtIdProduto.setText("");
 
-    }//GEN-LAST:event_btInserirActionPerformed
+    }// GEN-LAST:event_btInserirActionPerformed
+
     public void atualizaConsumo() {
         valorConsumo = 0;
         DefaultTableModel model = (DefaultTableModel) tabela.getModel();
@@ -1278,7 +1397,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
 
         });
     }
-    private void txtPessoasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPessoasActionPerformed
+
+    private void txtPessoasActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_txtPessoasActionPerformed
         if (txtPessoas.getText() != null) {
             try {
                 int qnt = Integer.valueOf(txtPessoas.getText());
@@ -1296,7 +1416,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
 
         }
 
-    }//GEN-LAST:event_txtPessoasActionPerformed
+    }// GEN-LAST:event_txtPessoasActionPerformed
+
     private void setValorDivida() {
         float valorSomar = valorAcrescimo + valorQuarto + valorConsumo + valorAdicionalPeriodo + valorAdicionalPessoa;
         valorDivida = valorSomar - valorDesconto;
@@ -1309,7 +1430,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
         outraTela.setValorTotal(valorDivida - valoreRecebido - valorRecebidoAgora);
         outraTela.setConsumo(valorConsumo);
     }
-    private void btSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btSalvarActionPerformed
+
+    private void btSalvarActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btSalvarActionPerformed
         if (motivo != null) {
             // foi dado desistencia
             salvaDesistencia();
@@ -1340,7 +1462,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
         }
         jopAberto = false;
 
-    }//GEN-LAST:event_btSalvarActionPerformed
+    }// GEN-LAST:event_btSalvarActionPerformed
+
     public void salvaJustifica(String tipoValor, float valorSalvar) {
         Connection link = null;
         CacheDados cache = CacheDados.getInstancia();
@@ -1403,8 +1526,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
 
             }
         }
-        String horaFim = lblFimLocacao.getText();
-        String horaInicio = lblInicioLocacao.getText();
+        String horaFim = dataFim;
+        String horaInicio = dataInicio;
         Connection link = null;
         try {
             link = new fazconexao().conectar();
@@ -1425,13 +1548,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 excluiDaRegistraLocado(idLocacao);
                 // altera o status do quarto para limpeza
                 mudaStatusNaCache(numeroDoQuarto, "limpeza");
-                //retira da cache ocupados
+                // retira da cache ocupados
                 cache.getCacheOcupado().remove(numeroDoQuarto);
-
-                //se tiver prevendidos ou negociados retira tambem
-                if (cache.cacheProdutosVendidos.containsKey(idLocacao)) {
-                    cache.cacheProdutosVendidos.remove(idLocacao);
-                }
                 quartodao.setStatus(numeroDoQuarto, "limpeza");
                 quartodao.adicionaRegistro(numeroDoQuarto, "limpeza");
                 config.setMudanca(true);
@@ -1469,11 +1587,13 @@ public class EncerraQuarto extends javax.swing.JFrame {
             if (n != 0) {
 
             } else {
-                JOptionPane.showMessageDialog(null, "Nenhum registro encontrado para exclusão na tabela registralocado!");
+                JOptionPane.showMessageDialog(null,
+                        "Nenhum registro encontrado para exclusão na tabela registralocado!");
             }
             statement.close();
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Erro ao excluir registro de locação na tabela registralocado! Informe ao Suporte do Sistema!");
+            JOptionPane.showMessageDialog(null,
+                    "Erro ao excluir registro de locação na tabela registralocado! Informe ao Suporte do Sistema!");
         } finally {
             try {
                 // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
@@ -1515,7 +1635,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         JButton botaoAcertouPix = new JButton("Acertou no Pix (F9)");
 
         JButton botaoSalvar = new JButton("Salvar (S)");
-
+        JButton botaoZerarRecebido = new JButton("Zerar Recebido (Z)");
         // Painel principal com layout nulo
         JPanel panel = new JPanel();
         panel.setPreferredSize(new Dimension(700, 400)); // Defina um tamanho adequado para o painel
@@ -1546,8 +1666,10 @@ public class EncerraQuarto extends javax.swing.JFrame {
         JLabel labelRecebidos = new JLabel("Valores Recebidos:");
         labelRecebidos.setBounds(50, 210, 200, 30);
         scrollPane.setBounds(50, 240, 350, 100);
-
-        botaoSalvar.setBounds(420, 300, 100, 40);
+        botaoZerarRecebido.setBounds(420, 250, 180, 40); // Posição (420, 250) com 180 de largura
+        botaoZerarRecebido.setBackground(Color.RED);
+        botaoZerarRecebido.setForeground(Color.WHITE);
+        botaoSalvar.setBounds(420, 300, 180, 40);
 
         // Adicionando os componentes ao painel
         panel.add(botaoCredito);
@@ -1563,19 +1685,21 @@ public class EncerraQuarto extends javax.swing.JFrame {
         panel.add(botaoAcertouPix);
         panel.add(labelRecebidos);
         panel.add(scrollPane);
+        panel.add(botaoZerarRecebido);
         panel.add(botaoSalvar);
         // Resetando a aparência dos botões para o estado não selecionado
         resetarBotoes(botaoCredito, botaoDebito, botaoDinheiro, botaoPix);
 
         // Variáveis de controle
-        final String[] tipoPagamento = {""}; // Armazena o tipo de pagamento selecionado
-        final float[] recebidoDin = {0}, recebidoPix = {0}, recebidoCredito = {0}, recebidoDebito = {0};
-        boolean[] sucesso = {false}; // Variável de controle para indicar sucesso do pagamento
+        final String[] tipoPagamento = { "" }; // Armazena o tipo de pagamento selecionado
+        final float[] recebidoDin = { 0 }, recebidoPix = { 0 }, recebidoCredito = { 0 }, recebidoDebito = { 0 };
+        boolean[] sucesso = { false }; // Variável de controle para indicar sucesso do pagamento
 
         // Listener comum para selecionar o tipo de pagamento e focar no campo de valor
         ActionListener selecionarMetodo = e -> {
             JButton source = (JButton) e.getSource();
-            tipoPagamento[0] = source.getText().substring(source.getText().indexOf("(") + 1, source.getText().indexOf(")"));
+            tipoPagamento[0] = source.getText().substring(source.getText().indexOf("(") + 1,
+                    source.getText().indexOf(")"));
             System.out.println(tipoPagamento[0]);
 
             // Marca o botão como selecionado visualmente
@@ -1688,10 +1812,12 @@ public class EncerraQuarto extends javax.swing.JFrame {
         });
         // Exibição do JOptionPane
 
-        JOptionPane optionPane = new JOptionPane(panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.DEFAULT_OPTION, null, new Object[]{}, null);
+        JOptionPane optionPane = new JOptionPane(panel, JOptionPane.PLAIN_MESSAGE, JOptionPane.DEFAULT_OPTION, null,
+                new Object[] {}, null);
         JDialog dialog = optionPane.createDialog("Digite os valores recebidos");
         dialog.setSize(800, 500);
-        // Adicionando suporte para atalhos de teclado (teclas C, D, O, P, S) no JRootPane do diálogo
+        // Adicionando suporte para atalhos de teclado (teclas C, D, O, P, S) no
+        // JRootPane do diálogo
         JRootPane rootPane = dialog.getRootPane();
         rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("C"), "credito");
         rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("D"), "debito");
@@ -1729,6 +1855,12 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 botaoSalvar.doClick(); // Simula o clique do botão Salvar
             }
         });
+        rootPane.getActionMap().put("zerar", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                botaoZerarRecebido.doClick(); // Simula o clique do botão "Zerar Recebido"
+            }
+        });
         // Listener para acertar o valor no dinheiro
         botaoAcertouDinheiro.addActionListener(e -> {
             recebidoDin[0] = valorDivida - valoreRecebido;
@@ -1736,28 +1868,45 @@ public class EncerraQuarto extends javax.swing.JFrame {
             resetarBotoes(botaoCredito, botaoDebito, botaoDinheiro, botaoPix);
         });
 
-// Listener para acertar o valor no débito
+        // Listener para acertar o valor no débito
         botaoAcertouDebito.addActionListener(e -> {
             recebidoDebito[0] = valorDivida - valoreRecebido;
             atualizarValoresRecebidos.run();
             resetarBotoes(botaoCredito, botaoDebito, botaoDinheiro, botaoPix);
         });
 
-// Listener para acertar o valor no crédito
+        // Listener para acertar o valor no crédito
         botaoAcertouCredito.addActionListener(e -> {
             recebidoCredito[0] = valorDivida - valoreRecebido;
             atualizarValoresRecebidos.run();
             resetarBotoes(botaoCredito, botaoDebito, botaoDinheiro, botaoPix);
         });
 
-// Listener para acertar o valor no pix
+        // Listener para acertar o valor no pix
         botaoAcertouPix.addActionListener(e -> {
             recebidoPix[0] = valorDivida - valoreRecebido;
             atualizarValoresRecebidos.run();
             resetarBotoes(botaoCredito, botaoDebito, botaoDinheiro, botaoPix);
         });
+        botaoZerarRecebido.addActionListener(e -> {
+            // Zera todos os valores recebidos
+            recebidoDin[0] = 0;
+            recebidoPix[0] = 0;
+            recebidoCredito[0] = 0;
+            recebidoDebito[0] = 0;
+            valoreRecebido = 0;
+            // Atualiza a área de texto para mostrar que os valores foram zerados
+            atualizarValoresRecebidos.run();
 
-// Adicionando atalhos de teclado F6, F7, F8, F9 no JRootPane
+            // Limpa a seleção do tipo de pagamento
+            resetarBotoes(botaoCredito, botaoDebito, botaoDinheiro, botaoPix);
+            tipoPagamento[0] = ""; // Limpa a variável de controle do tipo de pagamento
+
+            // Opcional: Avisa o usuário
+            JOptionPane.showMessageDialog(null, "Valores recebidos zerados com sucesso.", "Atenção",
+                    JOptionPane.WARNING_MESSAGE);
+        });
+        // Adicionando atalhos de teclado F6, F7, F8, F9 no JRootPane
         rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F6"), "acertouDinheiro");
         rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F7"), "acertouDebito");
         rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F8"), "acertouCredito");
@@ -1803,11 +1952,10 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 dialog.dispose(); // Fecha o JDialog
             } else {
                 if (totalRecebido > valorDivida) {
-                    //devolver troco
+                    JOptionPane.showMessageDialog(null, "Valores divergentes! Total recebido: " + totalRecebido);
 
                 } else {
                     JOptionPane.showMessageDialog(null, "Valores divergentes! Total recebido: " + totalRecebido);
-
                 }
             }
         });
@@ -1819,7 +1967,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
     public void salvaCartao(int idLocacao, float recebidoCredito, float recebidoDebito) {
         String consultaSQL = "INSERT INTO valorcartao (idlocacao, valorcredito, valordebito) VALUES (?, ?, ?)";
 
-        try (Connection link = new fazconexao().conectar(); PreparedStatement statement = link.prepareStatement(consultaSQL)) {
+        try (Connection link = new fazconexao().conectar();
+                PreparedStatement statement = link.prepareStatement(consultaSQL)) {
 
             statement.setInt(1, idLocacao);
             statement.setFloat(2, recebidoCredito);
@@ -1831,7 +1980,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
             }
 
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Erro ao salvar o cartão: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Erro ao salvar o cartão: " + e.getMessage(), "Erro",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -1892,18 +2042,16 @@ public class EncerraQuarto extends javax.swing.JFrame {
         }
 
         float valorDoQuarto = valorQuarto + valorAdicionalPeriodo + valorAdicionalPessoa;
-        String horaFim = lblFimLocacao.getText();
-        String horaInicio = lblInicioLocacao.getText();
-        quartodao.salvaLocacao(idLocacao, Timestamp.valueOf(horaInicio), Timestamp.valueOf(horaFim), valorDoQuarto, valorConsumo, valD, valP, valC);
+        // Usa as variáveis de classe que contém o timestamp no formato correto
+        // yyyy-MM-dd HH:mm:ss
+        quartodao.salvaLocacao(idLocacao, Timestamp.valueOf(dataInicio), Timestamp.valueOf(dataFim), valorDoQuarto,
+                valorConsumo, valD, valP, valC);
         new playSound().playSound("som/agradecemosPreferencia.wav");
         new ConectaArduino(999);
 
         mudaStatusNaCache(numeroDoQuarto, "limpeza");
         cache.getCacheOcupado().remove(numeroDoQuarto);
 
-        if (cache.cacheProdutosVendidos.containsKey(idLocacao)) {
-            cache.cacheProdutosVendidos.remove(idLocacao);
-        }
         quartodao.setStatus(numeroDoQuarto, "limpeza");
         quartodao.adicionaRegistro(numeroDoQuarto, "limpeza");
         configGlobal config = configGlobal.getInstance();
@@ -1915,9 +2063,9 @@ public class EncerraQuarto extends javax.swing.JFrame {
         JOptionPane optionPane = new JOptionPane("Registro salvo com sucesso!", JOptionPane.INFORMATION_MESSAGE);
         JDialog dialog = optionPane.createDialog((java.awt.Frame) null, "Mensagem");
 
-        final boolean[] fechadoPorTempo = {false};
+        final boolean[] fechadoPorTempo = { false };
         final int tempoTotal = 15; // segundos
-        final int[] tempoRestante = {tempoTotal};
+        final int[] tempoRestante = { tempoTotal };
 
         // Timer para fechar o diálogo após 15 segundos
         Timer timerFechar = new Timer(tempoTotal * 1000, new ActionListener() {
@@ -1973,14 +2121,15 @@ public class EncerraQuarto extends javax.swing.JFrame {
         return true;
 
     }
-    private void btVoltarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btVoltarActionPerformed
+
+    private void btVoltarActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btVoltarActionPerformed
         // TODO add your handling code here:
 
         outraTela.dispose();
         this.dispose();
-    }//GEN-LAST:event_btVoltarActionPerformed
+    }// GEN-LAST:event_btVoltarActionPerformed
 
-    private void btDebitoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btDebitoActionPerformed
+    private void btDebitoActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btDebitoActionPerformed
         // clicou falar débito
         String valorDebito;
         float valor = (valorDivida - valoreRecebido);
@@ -1989,11 +2138,12 @@ public class EncerraQuarto extends javax.swing.JFrame {
 
         reproduzirSonsEmSequencia(palavras, 0);
 
-    }//GEN-LAST:event_btDebitoActionPerformed
+    }// GEN-LAST:event_btDebitoActionPerformed
+
     public static void reproduzirSonsEmSequencia(String[] palavras, int indice) {
         if (indice < palavras.length) {
             String palavraAtual = palavras[indice];
-            String caminhoSom = "/som/" + palavraAtual + ".wav";  // Caminho relativo dentro do .jar
+            String caminhoSom = "/som/" + palavraAtual + ".wav"; // Caminho relativo dentro do .jar
 
             try (InputStream audioSrc = EncerraQuarto.class.getResourceAsStream(caminhoSom)) {
                 if (audioSrc == null) {
@@ -2022,14 +2172,14 @@ public class EncerraQuarto extends javax.swing.JFrame {
         }
     }
 
-    private void btConferenciaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btConferenciaActionPerformed
+    private void btConferenciaActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btConferenciaActionPerformed
         // TODO add your handling code here:
         new playSound().playSound("som/mensagem conferencia.wav");
         txtIdProduto.grabFocus();
-    }//GEN-LAST:event_btConferenciaActionPerformed
+    }// GEN-LAST:event_btConferenciaActionPerformed
 
-    private void btDesistenciaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btDesistenciaActionPerformed
-        //verifica o tempo que está locado
+    private void btDesistenciaActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btDesistenciaActionPerformed
+        // verifica o tempo que está locado
 
         String[] partes = tempoTotalLocado.split(":");
         int horas = Integer.parseInt(partes[0]);
@@ -2038,18 +2188,20 @@ public class EncerraQuarto extends javax.swing.JFrame {
         String cargo = config.getCargoUsuario();
 
         if (horas == 0 && minutos <= 10) {
-            //da tempo de fazer desistencia
+            // da tempo de fazer desistencia
             fazDesistencia();
         } else {
             if (cargo.equals("gerente") || cargo.equals("admin")) {
                 fazDesistencia();
                 lblAReceber.setText("0.00");
             } else {
-                JOptionPane.showMessageDialog(null, "Seu cargo não possui permissão para essa desistência! Contacte um gerente.");
+                JOptionPane.showMessageDialog(null,
+                        "Seu cargo não possui permissão para essa desistência! Contacte um gerente.");
             }
         }
 
-    }//GEN-LAST:event_btDesistenciaActionPerformed
+    }// GEN-LAST:event_btDesistenciaActionPerformed
+
     public void fazDesistencia() {
         motivo = JOptionPane.showInputDialog(null, "Digite o motivo da Desistencia:");
         if (motivo != null) {
@@ -2061,14 +2213,16 @@ public class EncerraQuarto extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Precisa digitar o motivo!!");
         }
     }
-    private void txtDescontoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDescontoActionPerformed
-        verificaDesconto(2);
-    }//GEN-LAST:event_txtDescontoActionPerformed
 
-    private void txtDescontoPorcentoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDescontoPorcentoActionPerformed
+    private void txtDescontoActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_txtDescontoActionPerformed
+        verificaDesconto(2);
+    }// GEN-LAST:event_txtDescontoActionPerformed
+
+    private void txtDescontoPorcentoActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_txtDescontoPorcentoActionPerformed
         verificaDesconto(1);
 
-    }//GEN-LAST:event_txtDescontoPorcentoActionPerformed
+    }// GEN-LAST:event_txtDescontoPorcentoActionPerformed
+
     public void verificaDesconto(int numero) {
         float valorDesconto = 0, valorPorcento = 0;
 
@@ -2104,8 +2258,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         setValorDivida();
     }
 
-
-    private void txtAcrescimoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtAcrescimoActionPerformed
+    private void txtAcrescimoActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_txtAcrescimoActionPerformed
         if (txtAcrescimo.getText() != null) {
             try {
                 float valorAcrescimo = Float.valueOf(txtAcrescimo.getText());
@@ -2118,13 +2271,13 @@ public class EncerraQuarto extends javax.swing.JFrame {
 
         }
 
-    }//GEN-LAST:event_txtAcrescimoActionPerformed
+    }// GEN-LAST:event_txtAcrescimoActionPerformed
 
-    private void txtJustificaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtJustificaActionPerformed
+    private void txtJustificaActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_txtJustificaActionPerformed
         // setar justificativa
-    }//GEN-LAST:event_txtJustificaActionPerformed
+    }// GEN-LAST:event_txtJustificaActionPerformed
 
-    private void txtRecebidoAntecipadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtRecebidoAntecipadoActionPerformed
+    private void txtRecebidoAntecipadoActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_txtRecebidoAntecipadoActionPerformed
         // TODO add your handling code here:
         try {
             String recebido = txtRecebidoAntecipado.getText();
@@ -2138,9 +2291,9 @@ public class EncerraQuarto extends javax.swing.JFrame {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }//GEN-LAST:event_txtRecebidoAntecipadoActionPerformed
+    }// GEN-LAST:event_txtRecebidoAntecipadoActionPerformed
 
-    private void btApagarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btApagarActionPerformed
+    private void btApagarActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btApagarActionPerformed
         DefaultTableModel modelo = (DefaultTableModel) tabela.getModel();
 
         int selectedRow;
@@ -2155,42 +2308,46 @@ public class EncerraQuarto extends javax.swing.JFrame {
         } else {
             JOptionPane.showMessageDialog(null, "Nenhum produto selecionado!");
         }
-    }//GEN-LAST:event_btApagarActionPerformed
+    }// GEN-LAST:event_btApagarActionPerformed
 
-    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
-    }//GEN-LAST:event_formWindowOpened
-    // Iniciar gravação
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {// GEN-FIRST:event_formWindowOpened
+    }// GEN-LAST:event_formWindowOpened
+     // Iniciar gravação
 
     private void startRecording(int numeroQuarto) {
-        /*if (!recording) {
-            CacheDados cache = CacheDados.getInstancia();
-            if (idLocacao == 0) {
-                idLocacao = cache.getCacheOcupado().get(numeroDoQuarto).getIdLoca();
-                if (idLocacao == 0) {
-                    DadosOcupados quartoOcupado = cache.getCacheOcupado().get(numeroDoQuarto);
-                    int novoID = new fquartos().getIdLocacao(numeroDoQuarto);
-                    idLocacao = novoID;
-
-                }
-            }
-            // Caminho onde o vídeo será salvo (alterar conforme necessário)
-            String outputFilePath = new File("src/main/resources/videos/temp", idLocacao + ".mp4").getAbsolutePath();
-
-            // URL da câmera (RTSP)
-            String mediaUrl = "rtsp://admin:Felipe0110@192.168.100.135:554/cam/realmonitor?channel=1&subtype=0";
-
-            String[] mediaOptions = {
-                ":sout=#file{dst=" + outputFilePath + "}",
-                ":network-caching=1000", // Cache de rede para suavizar
-                ":no-sout-all",
-                ":sout-keep"
-            };
-
-            // Inicia a gravação diretamente, sem exibir vídeo
-            mediaPlayer.media().play(mediaUrl, mediaOptions);
-            recording = true;  // Marca que a gravação está em andamento
-            System.out.println("Gravação iniciada.");
-        }*/
+        /*
+         * if (!recording) {
+         * CacheDados cache = CacheDados.getInstancia();
+         * if (idLocacao == 0) {
+         * idLocacao = cache.getCacheOcupado().get(numeroDoQuarto).getIdLoca();
+         * if (idLocacao == 0) {
+         * DadosOcupados quartoOcupado = cache.getCacheOcupado().get(numeroDoQuarto);
+         * int novoID = new fquartos().getIdLocacao(numeroDoQuarto);
+         * idLocacao = novoID;
+         * 
+         * }
+         * }
+         * // Caminho onde o vídeo será salvo (alterar conforme necessário)
+         * String outputFilePath = new File("src/main/resources/videos/temp", idLocacao
+         * + ".mp4").getAbsolutePath();
+         * 
+         * // URL da câmera (RTSP)
+         * String mediaUrl =
+         * "rtsp://admin:Felipe0110@192.168.100.135:554/cam/realmonitor?channel=1&subtype=0";
+         * 
+         * String[] mediaOptions = {
+         * ":sout=#file{dst=" + outputFilePath + "}",
+         * ":network-caching=1000", // Cache de rede para suavizar
+         * ":no-sout-all",
+         * ":sout-keep"
+         * };
+         * 
+         * // Inicia a gravação diretamente, sem exibir vídeo
+         * mediaPlayer.media().play(mediaUrl, mediaOptions);
+         * recording = true; // Marca que a gravação está em andamento
+         * System.out.println("Gravação iniciada.");
+         * }
+         */
     }
 
     // Parar gravação
@@ -2198,8 +2355,9 @@ public class EncerraQuarto extends javax.swing.JFrame {
         if (recording) {
             // Para a gravação
             mediaPlayer.controls().stop();
-            recording = false;  // Marca que a gravação foi interrompida
-            String infoFilePath = new File("src/main/resources/videos/temp", "locacao_" + idLocacao + ".txt").getAbsolutePath();
+            recording = false; // Marca que a gravação foi interrompida
+            String infoFilePath = new File("src/main/resources/videos/temp", "locacao_" + idLocacao + ".txt")
+                    .getAbsolutePath();
             String videoFilePath = new File("src/main/resources/videos/temp", idLocacao + ".mp4").getAbsolutePath();
 
             if (salvouLocacao) {
@@ -2242,8 +2400,12 @@ public class EncerraQuarto extends javax.swing.JFrame {
         while (retries < maxRetries) {
             try {
                 // Tenta mover os arquivos
-                Files.move(Path.of(videoFilePath), Path.of("src/main/resources/videos/definitivo", new File(videoFilePath).getName()), StandardCopyOption.REPLACE_EXISTING);
-                Files.move(Path.of(infoFilePath), Path.of("src/main/resources/videos/definitivo", new File(infoFilePath).getName()), StandardCopyOption.REPLACE_EXISTING);
+                Files.move(Path.of(videoFilePath),
+                        Path.of("src/main/resources/videos/definitivo", new File(videoFilePath).getName()),
+                        StandardCopyOption.REPLACE_EXISTING);
+                Files.move(Path.of(infoFilePath),
+                        Path.of("src/main/resources/videos/definitivo", new File(infoFilePath).getName()),
+                        StandardCopyOption.REPLACE_EXISTING);
 
                 System.out.println("Arquivos movidos com sucesso.");
                 return; // Se mover os arquivos com sucesso, sai do método
@@ -2354,7 +2516,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         }
     }
 
-// Lê os arquivos de texto e cria as telas pretas correspondentes
+    // Lê os arquivos de texto e cria as telas pretas correspondentes
     public void createBlackScreensForVideos() throws IOException, InterruptedException {
         File folder = new File("src/main/resources/videos/definitivo");
         File[] textFiles = folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".txt"));
@@ -2367,12 +2529,13 @@ public class EncerraQuarto extends javax.swing.JFrame {
         for (File textFile : textFiles) {
             String infoText = readTextFromFile(textFile);
             String idLocacao = textFile.getName().replace("locacao_", "").replace(".txt", "");
-            String outputFilePath = new File("src/main/resources/videos/definitivo", "black_" + idLocacao + ".mp4").getAbsolutePath();
+            String outputFilePath = new File("src/main/resources/videos/definitivo", "black_" + idLocacao + ".mp4")
+                    .getAbsolutePath();
             createBlackScreen(infoText, outputFilePath);
         }
     }
 
-// Lê o conteúdo do arquivo de texto
+    // Lê o conteúdo do arquivo de texto
     private static String readTextFromFile(File file) throws IOException {
         StringBuilder content = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
@@ -2384,9 +2547,10 @@ public class EncerraQuarto extends javax.swing.JFrame {
         return content.toString();
     }
 
-// Gera a tela preta com texto usando FFmpeg
+    // Gera a tela preta com texto usando FFmpeg
     private void createBlackScreen(String text, String outputFilePath) throws IOException, InterruptedException {
-        // Substitua "/path/to/font.ttf" pelo caminho completo de uma fonte TTF no seu sistema
+        // Substitua "/path/to/font.ttf" pelo caminho completo de uma fonte TTF no seu
+        // sistema
         String fontFilePath = "C:/Windows/Fonts/Arial.ttf"; // Certifique-se de que o caminho para a fonte está correto
         String command = String.format("ffmpeg -f lavfi -i color=c=black:s=1280x720:d=5 -vf \"drawtext=fontfile='%s': "
                 + "text='%s': fontcolor=white: fontsize=36: box=1: boxcolor=black@0.5: boxborderw=5: x=(w-text_w)/2: y=(h-text_h)/2\" "
@@ -2416,7 +2580,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         }
     }
 
-// Concatena os vídeos usando FFmpeg
+    // Concatena os vídeos usando FFmpeg
     private void concatenateVideos(List<String> videoPaths, String outputVideoPath) {
         try {
             // Cria a string de comando para o FFMPEG
@@ -2436,7 +2600,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
             }
 
             // Adiciona o caminho do arquivo de lista de vídeos ao comando
-            command.append("\"").append(listFilePath).append("\"").append(" -c copy \"").append(outputVideoPath).append("\"");
+            command.append("\"").append(listFilePath).append("\"").append(" -c copy \"").append(outputVideoPath)
+                    .append("\"");
 
             // Executa o comando usando o CMD no Windows
             executeCommand(command.toString());
@@ -2446,7 +2611,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         }
     }
 
-    private void btWifiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btWifiActionPerformed
+    private void btWifiActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btWifiActionPerformed
         // mostra a img de conexao de wi-fi na 2a Tela
         if (!isFrameOpen) {
             // Obtém a tela a mostrar da instância global
@@ -2506,17 +2671,17 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 secondaryFrame.dispose();
                 secondaryFrame = null;
             }
-            btWifi.setBackground(null);  // Restaura a cor original do botão
+            btWifi.setBackground(null); // Restaura a cor original do botão
             isFrameOpen = false;
         }
-    }//GEN-LAST:event_btWifiActionPerformed
+    }// GEN-LAST:event_btWifiActionPerformed
 
-    private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
+    private void formWindowActivated(java.awt.event.WindowEvent evt) {// GEN-FIRST:event_formWindowActivated
         // TODO add your handling code here:
-    }//GEN-LAST:event_formWindowActivated
+    }// GEN-LAST:event_formWindowActivated
 
-    private void formWindowGainedFocus(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowGainedFocus
-    }//GEN-LAST:event_formWindowGainedFocus
+    private void formWindowGainedFocus(java.awt.event.WindowEvent evt) {// GEN-FIRST:event_formWindowGainedFocus
+    }// GEN-LAST:event_formWindowGainedFocus
 
     /**
      * @param args the command line arguments

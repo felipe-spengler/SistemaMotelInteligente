@@ -138,7 +138,7 @@ public class configGlobal {
         }
         
     } catch (Exception e) {
-        // Use showMessageDialog para exibir o erro, é mais comum
+        logger.error("Erro ao carregar configurações adicionais", e);
         JOptionPane.showMessageDialog(null, "Erro ao conectar e carregar informações: " + e.getMessage(), "Erro de Conexão", JOptionPane.ERROR_MESSAGE);
     }
 }

@@ -380,85 +380,75 @@ public class fquartos {
     }
 
     public boolean registraLocacao(int numeroQuarto) {
-        String verificaDuplicidadeSQL = "SELECT COUNT(*) FROM registralocado WHERE numquarto = ? AND horainicio = ?";
-        String consultaSQL = "INSERT INTO registralocado (numquarto, horainicio, numpessoas) VALUES (?, ?, ?)";
-        Date dataAtual = new Date();
-        Timestamp timestamp = new Timestamp(dataAtual.getTime());
-        Connection link = null;
-        PreparedStatement statement = null;
+    String verificaDuplicidadeSQL = "SELECT COUNT(*) FROM registralocado WHERE numquarto = ? AND horainicio = ?";
+    String consultaSQL = "INSERT INTO registralocado (numquarto, horainicio, numpessoas) VALUES (?, ?, ?)";
+    Date dataAtual = new Date();
+    Timestamp timestamp = new Timestamp(dataAtual.getTime());
 
-        try {
-            link = new fazconexao().conectar();
+    // Usa try-with-resources para a Connection (link)
+    try (Connection link = new fazconexao().conectar()) {
 
-            // Verificar duplicidade
-            statement = link.prepareStatement(verificaDuplicidadeSQL);
-            statement.setInt(1, numeroQuarto);
-            statement.setTimestamp(2, timestamp);
-            ResultSet rs = statement.executeQuery();
-
-            if (rs.next() && rs.getInt(1) > 0) {
-                // Registro duplicado encontrado
-                String mensagemErro = "registro duplicado: Quarto = " + numeroQuarto + ", Horário = " + timestamp;
-                logger.error("Erro: Registro duplicado encontrado.\n" + mensagemErro);
-                JOptionPane.showMessageDialog(null, "Erro: Registro duplicado encontrado.\n" + mensagemErro);
-                return false;
+        // Verificar duplicidade (Statement e ResultSet internos)
+        try (PreparedStatement statementVerifica = link.prepareStatement(verificaDuplicidadeSQL)) {
+            statementVerifica.setInt(1, numeroQuarto);
+            statementVerifica.setTimestamp(2, timestamp);
+            
+            // Usa try-with-resources para o ResultSet de verificação
+            try (ResultSet rs = statementVerifica.executeQuery()) {
+                if (rs.next() && rs.getInt(1) > 0) {
+                    // Registro duplicado encontrado
+                    String mensagemErro = "registro duplicado: Quarto = " + numeroQuarto + ", Horário = " + timestamp;
+                    logger.error("Erro: Registro duplicado encontrado.\n" + mensagemErro);
+                    JOptionPane.showMessageDialog(null, "Erro: Registro duplicado encontrado.\n" + mensagemErro);
+                    return false;
+                }
             }
+        }
 
-            // Fechar o statement de verificação antes de criar o próximo
-            statement.close();
+        // Inserir registro (Statement e ResultSet internos)
+        try (PreparedStatement statementInsere = link.prepareStatement(consultaSQL, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            statementInsere.setInt(1, numeroQuarto);
+            statementInsere.setTimestamp(2, timestamp);
+            statementInsere.setInt(3, 2);
 
-            // Inserir registro
-            statement = link.prepareStatement(consultaSQL, PreparedStatement.RETURN_GENERATED_KEYS);
-            statement.setInt(1, numeroQuarto);
-            statement.setTimestamp(2, timestamp);
-            statement.setInt(3, 2);
-
-            int n = statement.executeUpdate();
+            int n = statementInsere.executeUpdate();
             if (n != 0) {
-                ResultSet generatedKeys = statement.getGeneratedKeys();
-                if (generatedKeys.next()) {
-                    int idLocacaoGerado = generatedKeys.getInt(1);
-                    //logger.info("Registro inserido com sucesso: ID = " + idLocacaoGerado + ", Quarto = " + numeroQuarto);
-
-                    //insere na cache ocupado
-                    float valPeriodo = 0, valPernoite = 0, valAdicional = 0, addPessoa = 0;
-                    int pessoas = 0;
-                    fquartos quartodao = new fquartos();
-                    valPernoite = quartodao.getValorQuarto(numeroQuarto, "pernoite");
-                    valPeriodo = quartodao.getValorQuarto(numeroQuarto, "periodo");
-                    valAdicional = quartodao.getAdicional(numeroQuarto);
-                    pessoas = quartodao.getPessoas(numeroQuarto);
-                    int idLoca = new fquartos().getIdLocacao(numeroQuarto);
-                    String tempo = quartodao.getPeriodo(numeroQuarto);
-                    DadosOcupados ocupado = new DadosOcupados(timestamp, idLocacaoGerado, valPeriodo, valPernoite, pessoas, valAdicional, tempo);
-                    CacheDados cache = CacheDados.getInstancia();
-                    cache.getCacheOcupado().put(numeroQuarto, ocupado);
-
-                    generatedKeys.close();
-                } else {
-                    logger.warn("Registro inserido, mas nenhum ID foi retornado. Quarto = " + numeroQuarto + ", Horário = " + timestamp);
+                // Usa try-with-resources para o ResultSet de chaves geradas
+                try (ResultSet generatedKeys = statementInsere.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        int idLocacaoGerado = generatedKeys.getInt(1);
+                        
+                        // Lógica de cache (Mantida. Os métodos DAO internos já usam try-with-resources.)
+                        float valPeriodo = 0, valPernoite = 0, valAdicional = 0, addPessoa = 0;
+                        int pessoas = 0;
+                        fquartos quartodao = new fquartos();
+                        valPernoite = quartodao.getValorQuarto(numeroQuarto, "pernoite");
+                        valPeriodo = quartodao.getValorQuarto(numeroQuarto, "periodo");
+                        valAdicional = quartodao.getAdicional(numeroQuarto);
+                        pessoas = quartodao.getPessoas(numeroQuarto);
+                        int idLoca = new fquartos().getIdLocacao(numeroQuarto);
+                        String tempo = quartodao.getPeriodo(numeroQuarto);
+                        DadosOcupados ocupado = new DadosOcupados(timestamp, idLocacaoGerado, valPeriodo, valPernoite, pessoas, valAdicional, tempo);
+                        CacheDados cache = CacheDados.getInstancia();
+                        cache.getCacheOcupado().put(numeroQuarto, ocupado);
+                    } else {
+                        logger.warn("Registro inserido, mas nenhum ID foi retornado. Quarto = " + numeroQuarto + ", Horário = " + timestamp);
+                    }
                 }
                 return true;
             } else {
                 logger.warn("Falha ao inserir registro. Nenhuma linha afetada. SQL: " + consultaSQL);
             }
-        } catch (SQLException e) {
-            logger.error("Erro ao executar registraLocacao: ", e);
-            JOptionPane.showMessageDialog(null, "Erro ao registrar locação: " + e.getMessage());
-        } finally {
-            try {
-                if (statement != null && !statement.isClosed()) {
-                    statement.close();
-                }
-                if (link != null && !link.isClosed()) {
-                    link.close();
-                }
-            } catch (SQLException e) {
-                logger.error("Erro ao fechar recursos: ", e);
-            }
         }
-        return false;
+
+    } catch (SQLException e) {
+        logger.error("Erro ao executar registraLocacao: ", e);
+        JOptionPane.showMessageDialog(null, "Erro ao registrar locação: " + e.getMessage());
     }
+
+
+    return false;
+}
 
     public boolean salvaProduto(int idLocacao, int idProduto, int qnt, float valorUnidade, float valorTotal) {
         int idCaixa = configGlobal.getInstance().getCaixa();

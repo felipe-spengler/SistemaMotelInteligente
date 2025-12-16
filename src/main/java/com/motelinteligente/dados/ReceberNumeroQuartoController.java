@@ -25,122 +25,129 @@ public class ReceberNumeroQuartoController {
 
     @PostMapping(value = "/receberNumeroQuarto", consumes = "text/plain", produces = "text/plain")
     public ResponseEntity<String> receberNumeroQuarto(@RequestBody String numeroQuarto) {
-        String[] partes = numeroQuarto.split(" ");
+        try {
+            String[] partes = numeroQuarto.split(" ");
 
-        if (partes.length != 2) {
-            return new ResponseEntity<>("Formato inválido", HttpStatus.BAD_REQUEST);
-        }
-        String acao = partes[0];
-        String numero = partes[1];
-
-        if (acao.equals("abrir")) {
-            switch (numero) {
-                case "entrada" -> new ConectaArduino(888);
-                case "saida" -> new ConectaArduino(999);
-                default -> new ConectaArduino(Integer.parseInt(numero));
+            if (partes.length != 2) {
+                logger.warn("Formato inválido recebido em receberNumeroQuarto: {}", numeroQuarto);
+                return new ResponseEntity<>("Formato inválido", HttpStatus.BAD_REQUEST);
             }
+            String acao = partes[0];
+            String numero = partes[1];
 
-        } else {
-            int quartoEmFoco = Integer.parseInt(numero);
-            if (acao.equals("reproduzir")) {
-                new playSound().playSound("som/mensagem conferencia.wav");
-            } else if (acao.equals("reservar")) {
-                if (quartoEmFoco != 0) {
-                    mudaStatusNaCache(quartoEmFoco, "reservado");
-                    configGlobal config = configGlobal.getInstance();
-                    config.setMudanca(true);
+            if (acao.equals("abrir")) {
+                switch (numero) {
+                    case "entrada" -> new ConectaArduino(888);
+                    case "saida" -> new ConectaArduino(999);
+                    default -> new ConectaArduino(Integer.parseInt(numero));
+                }
 
-                    SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
-                        @Override
-                        protected Void doInBackground() throws Exception {
-                            fquartos quarto = new fquartos();
-                            String statusAntes = quarto.getStatus(quartoEmFoco);
-                            quarto.setStatus(quartoEmFoco, "reservado");
-                            if (!(statusAntes.equals("livre"))) {
-                                quarto.alteraRegistro(quartoEmFoco, statusAntes);
-                            }
-                            quarto.adicionaRegistro(quartoEmFoco, "reservado");
-                            return null;
-                        }
-                    };
-                    worker.execute();
-                }
-            } else if (acao.equals("manutencao")) {
-                if (quartoEmFoco != 0) {
-                    mudaStatusNaCache(quartoEmFoco, "manutencao");
-                    configGlobal config = configGlobal.getInstance();
-                    config.setMudanca(true);
+            } else {
+                int quartoEmFoco = Integer.parseInt(numero);
+                if (acao.equals("reproduzir")) {
+                    new playSound().playSound("som/mensagem conferencia.wav");
+                } else if (acao.equals("reservar")) {
+                    if (quartoEmFoco != 0) {
+                        mudaStatusNaCache(quartoEmFoco, "reservado");
+                        configGlobal config = configGlobal.getInstance();
+                        config.setMudanca(true);
 
-                    SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
-                        @Override
-                        protected Void doInBackground() throws Exception {
-                            fquartos quarto = new fquartos();
-                            String statusAntes = quarto.getStatus(quartoEmFoco);
-                            quarto.setStatus(quartoEmFoco, "manutencao");
-                            if (!(statusAntes.equals("livre"))) {
-                                quarto.alteraRegistro(quartoEmFoco, statusAntes);
+                        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+                            @Override
+                            protected Void doInBackground() throws Exception {
+                                fquartos quarto = new fquartos();
+                                String statusAntes = quarto.getStatus(quartoEmFoco);
+                                quarto.setStatus(quartoEmFoco, "reservado");
+                                if (!(statusAntes.equals("livre"))) {
+                                    quarto.alteraRegistro(quartoEmFoco, statusAntes);
+                                }
+                                quarto.adicionaRegistro(quartoEmFoco, "reservado");
+                                return null;
                             }
-                            quarto.adicionaRegistro(quartoEmFoco, "manutencao");
-                            return null;
-                        }
-                    };
-                    worker.execute();
-                }
-            } else if (acao.equals("disponibilizar")) {
-                if (quartoEmFoco != 0) {
-                    mudaStatusNaCache(quartoEmFoco, "livre");
-                    configGlobal config = configGlobal.getInstance();
-                    config.setMudanca(true);
-                    
-                    SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
-                        @Override
-                        protected Void doInBackground() throws Exception {
-                            fquartos quarto = new fquartos();
-                            String statusAntes = quarto.getStatus(quartoEmFoco);
-                            quarto.setStatus(quartoEmFoco, "livre");
-                            if (!(statusAntes.equals("livre"))) {
-                                quarto.alteraRegistro(quartoEmFoco, statusAntes);
+                        };
+                        worker.execute();
+                    }
+                } else if (acao.equals("manutencao")) {
+                    if (quartoEmFoco != 0) {
+                        mudaStatusNaCache(quartoEmFoco, "manutencao");
+                        configGlobal config = configGlobal.getInstance();
+                        config.setMudanca(true);
+
+                        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+                            @Override
+                            protected Void doInBackground() throws Exception {
+                                fquartos quarto = new fquartos();
+                                String statusAntes = quarto.getStatus(quartoEmFoco);
+                                quarto.setStatus(quartoEmFoco, "manutencao");
+                                if (!(statusAntes.equals("livre"))) {
+                                    quarto.alteraRegistro(quartoEmFoco, statusAntes);
+                                }
+                                quarto.adicionaRegistro(quartoEmFoco, "manutencao");
+                                return null;
                             }
-                            return null;
-                        }
-                    };
-                    worker.execute();
-                }
-            } else if (acao.equals("locar")) {
-                if (quartoEmFoco != 0) {
-                    CacheDados cache = CacheDados.getInstancia();
-                    String statusAtual = cache.getCacheQuarto().get(quartoEmFoco).getStatusQuarto();
-                    if (statusAtual.equals("livre")) {
-                        mudaStatusNaCache(quartoEmFoco, "ocupado-periodo");
-                        if (new fquartos().registraLocacao(quartoEmFoco)) {
-                            if (!new fquartos().setStatus(quartoEmFoco, "ocupado-periodo")) {
-                                JOptionPane.showMessageDialog(null, "Falha ao iniciar locação no banco!");
+                        };
+                        worker.execute();
+                    }
+                } else if (acao.equals("disponibilizar")) {
+                    if (quartoEmFoco != 0) {
+                        mudaStatusNaCache(quartoEmFoco, "livre");
+                        configGlobal config = configGlobal.getInstance();
+                        config.setMudanca(true);
+                        
+                        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+                            @Override
+                            protected Void doInBackground() throws Exception {
+                                fquartos quarto = new fquartos();
+                                String statusAntes = quarto.getStatus(quartoEmFoco);
+                                quarto.setStatus(quartoEmFoco, "livre");
+                                if (!(statusAntes.equals("livre"))) {
+                                    quarto.alteraRegistro(quartoEmFoco, statusAntes);
+                                }
+                                return null;
+                            }
+                        };
+                        worker.execute();
+                    }
+                } else if (acao.equals("locar")) {
+                    if (quartoEmFoco != 0) {
+                        CacheDados cache = CacheDados.getInstancia();
+                        String statusAtual = cache.getCacheQuarto().get(quartoEmFoco).getStatusQuarto();
+                        if (statusAtual.equals("livre")) {
+                            mudaStatusNaCache(quartoEmFoco, "ocupado-periodo");
+                            if (new fquartos().registraLocacao(quartoEmFoco)) {
+                                if (!new fquartos().setStatus(quartoEmFoco, "ocupado-periodo")) {
+                                    JOptionPane.showMessageDialog(null, "Falha ao iniciar locação no banco!");
+                                } else {
+                                    configGlobal config = configGlobal.getInstance();
+                                    config.setMudanca(true);
+                                    new Thread(() -> {
+                                        try {
+                                            Thread.sleep(500); // Pausa por 0,5s
+                                            new ConectaArduino(quartoEmFoco);
+                                            Thread.sleep(800); // Pausa por 0,8s
+                                        } catch (InterruptedException ex) {
+                                            Thread.currentThread().interrupt();
+                                            logger.error("Thread interrompida ao acionar Arduino", ex);
+                                        }
+                                        new ConectaArduino(888);
+                                    }).start();
+                                }
                             } else {
-                                configGlobal config = configGlobal.getInstance();
-                                config.setMudanca(true);
-                                new Thread(() -> {
-                                    try {
-                                        Thread.sleep(500); // Pausa por 0,5s
-                                        new ConectaArduino(quartoEmFoco);
-                                        Thread.sleep(800); // Pausa por 0,8s
-                                    } catch (InterruptedException ex) {
-                                        ex.printStackTrace();
-                                    }
-                                    new ConectaArduino(888);
-                                }).start();
+                                logger.error("Erro ao tentar locar - recebido SpringBoot - return false ");
+                                JOptionPane.showMessageDialog(null, "Falha ao iniciar locação!");
                             }
                         } else {
-                            logger.error("Erro ao tentar locar - recebido SpringBoot - return false ");
-                            JOptionPane.showMessageDialog(null, "Falha ao iniciar locação!");
+                            JOptionPane.showMessageDialog(null, "Tentando alugar quarto não disponível");
+                            logger.error("Tentando alugar quarto não disponível");
                         }
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Tentando alugar quarto não disponível");
-                        logger.error("Tentando alugar quarto não disponível");
                     }
                 }
             }
+            return new ResponseEntity<>("Dados recebidos com sucesso", HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error("Erro ao processar receberNumeroQuarto: {}", numeroQuarto, e);
+            return new ResponseEntity<>("Erro interno", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>("Dados recebidos com sucesso", HttpStatus.OK);
     }
 
     public boolean mudaStatusNaCache(int quartoMudar, String statusColocar) {

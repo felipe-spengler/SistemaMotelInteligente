@@ -134,66 +134,68 @@ public class ObterProdutoFrame extends JFrame {
     }
 
     private void inserirProduto() {
-        String idProdutoStr = txtCodProduto.getText();
-        int quantidade = (Integer) spinnerQuantidade.getValue();
+    String idProdutoStr = txtCodProduto.getText();
+    int quantidade = (Integer) spinnerQuantidade.getValue();
 
-        if (isInteger(idProdutoStr)) {
-            fprodutos produtodao = new fprodutos();
-            String texto = produtodao.getDescicao(idProdutoStr);
-            if (texto != null) {
-                if (quantidade != 0) {
-                    boolean inseriu = false;
-                    float valor = produtodao.getValorProduto(Integer.parseInt(idProdutoStr));
-                    float valorSoma = valor * quantidade;
+    if (isInteger(idProdutoStr)) {
+        fprodutos produtodao = new fprodutos();
+        String texto = produtodao.getDescicao(idProdutoStr);
+        
+        if (texto != null) {
+            if (quantidade != 0) {
+                boolean inseriu = false;
+                float valor = produtodao.getValorProduto(Integer.parseInt(idProdutoStr));
+                float valorSoma = valor * quantidade;
 
-                    if (numeroQuarto != 0) {
-                        CacheDados cache = CacheDados.getInstancia();
-                        int idLoca = cache.getCacheOcupado().get(numeroQuarto).getIdLoca();
-                        if (idLoca == 0) {
-                            DadosOcupados quartoOcupado = cache.getCacheOcupado().get(numeroQuarto);
-                            int novoID = new fquartos().getIdLocacao(numeroQuarto);
-                            quartoOcupado.setIdLoca(novoID);
-                            if (numeroQuarto != 0) {
-                                cache.getCacheOcupado().put(numeroQuarto, quartoOcupado);
-                            }
-
-                            cache.carregaProdutosNegociadosCache(novoID);
+                if (numeroQuarto != 0) {
+                    // Mantém o uso da cache para obter e atualizar o ID da Locação (idLoca)
+                    CacheDados cache = CacheDados.getInstancia();
+                    int idLoca = cache.getCacheOcupado().get(numeroQuarto).getIdLoca();
+                    
+                    if (idLoca == 0) {
+                        DadosOcupados quartoOcupado = cache.getCacheOcupado().get(numeroQuarto);
+                        int novoID = new fquartos().getIdLocacao(numeroQuarto);
+                        quartoOcupado.setIdLoca(novoID);
+                        
+                        if (numeroQuarto != 0) {
+                            cache.getCacheOcupado().put(numeroQuarto, quartoOcupado);
                         }
-                        List<DadosVendidos> produtosVendidos = new ArrayList<>();
-                        if (cache.cacheProdutosVendidos.containsKey(idLoca)) {
-                            produtosVendidos = cache.cacheProdutosVendidos.get(idLoca);
-                        }
-                        produtosVendidos.add(new DadosVendidos(Integer.valueOf(idProdutoStr), Integer.valueOf(quantidade)));
-                        cache.cacheProdutosVendidos.put(idLoca, produtosVendidos);
+                        idLoca = novoID; 
+                    }
 
+                    if (idLoca != 0) {
+                        // Mantém a inserção do produto como Prevendido no banco de dados
                         produtodao.inserirPrevendido(idLoca, Integer.valueOf(idProdutoStr), Integer.valueOf(quantidade));
-
                         inseriu = true;
-                    } else {
-                        modelo.addRow(new Object[]{
-                            idProdutoStr,
-                            quantidade,
-                            texto,
-                            valor,
-                            valorSoma
-                        });
-                        inseriu = true;
-                        System.out.println("produto inserido");
                     }
-                    if (inseriu) {
-                        callback.run();
-                    }
-                    this.dispose();
+                    
                 } else {
-                    JOptionPane.showMessageDialog(rootPane, "Quantidade inválida!");
+                    // Fluxo original para quando numeroQuarto é 0 (adiciona à tabela temporária/modelo)
+                    modelo.addRow(new Object[]{
+                        idProdutoStr,
+                        quantidade,
+                        texto,
+                        valor,
+                        valorSoma
+                    });
+                    inseriu = true;
+                    System.out.println("produto inserido");
                 }
+                
+                if (inseriu) {
+                    callback.run();
+                }
+                this.dispose();
             } else {
-                JOptionPane.showMessageDialog(rootPane, "Código inserido inválido!");
+                JOptionPane.showMessageDialog(rootPane, "Quantidade inválida!");
             }
         } else {
-            JOptionPane.showMessageDialog(rootPane, "Digite um valor válido!");
+            JOptionPane.showMessageDialog(rootPane, "Código inserido inválido!");
         }
+    } else {
+        JOptionPane.showMessageDialog(rootPane, "Digite um valor válido!");
     }
+}
 
     private boolean isInteger(String str) {
         try {

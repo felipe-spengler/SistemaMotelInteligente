@@ -18,11 +18,12 @@ public class CheckSincronia extends TimerTask {
     // Singleton
     private static CheckSincronia instance;
     private static Timer timer;
-    private static final long INTERVALO = 10_000; // 10 segundos
+    private static final long INTERVALO = 7_000; // 7 segundos
 
     private final AtomicBoolean executando = new AtomicBoolean(false);
 
-    private CheckSincronia() {}
+    private CheckSincronia() {
+    }
 
     public static synchronized void start() {
         if (instance == null) {
@@ -35,263 +36,226 @@ public class CheckSincronia extends TimerTask {
         }
     }
 
+    public static CheckSincronia getInstance() {
+        return instance;
+    }
+
+    public void solicitarSincroniaImediata() {
+        // Executa em uma nova thread para não travar a operação original (do Proxy)
+        new Thread(this::run).start();
+    }
+
     @Override
     public void run() {
-        if (executando.compareAndSet(false, true)) {
-            try {
-                if (temRegistrosParaSincronizar()) {
-                    logger.info("Iniciando sincronização de registros...");
-                    checkDatabaseSync();
-                    logger.info("Sincronização concluída.");
-                }
-            } catch (Exception ex) {
-                logger.error("Erro durante execução de CheckSincronia: {}", ex.getMessage(), ex);
-            } finally {
-                executando.set(false);
-            }
-        } else {
+        if (!executando.compareAndSet(false, true)) {
             logger.warn("CheckSincronia já em execução. Ignorando nova chamada.");
+            return;
+        }
+
+        try {
+            if (temRegistrosParaSincronizar()) {
+                logger.info("Iniciando sincronização de registros...");
+                checkDatabaseSync();
+                logger.info("Sincronização concluída.");
+            }
+        } catch (Exception ex) {
+            logger.error("Erro durante execução de CheckSincronia", ex);
+        } finally {
+            executando.set(false);
         }
     }
-    private boolean temRegistrosParaSincronizar() {
-        String queryCount = "SELECT COUNT(*) FROM log_sincronizacao";
-        try (Connection localConn = new fazconexao().conectar();
-             PreparedStatement stmt = localConn.prepareStatement(queryCount);
-             ResultSet rs = stmt.executeQuery()) {
 
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
-            }
+    private boolean temRegistrosParaSincronizar() {
+        String query = "SELECT COUNT(*) FROM log_sincronizacao";
+
+        try (
+                Connection conn = new fazconexao().conectar();
+                PreparedStatement stmt = conn.prepareStatement(query);
+                ResultSet rs = stmt.executeQuery()) {
+            return rs.next() && rs.getInt(1) > 0;
         } catch (SQLException e) {
-            logger.error("Erro ao verificar registros para sincronizar: {}", e.getMessage(), e);
+            logger.error("Erro ao verificar registros para sincronizar", e);
         }
         return false;
     }
 
     private void checkDatabaseSync() throws UnsupportedEncodingException, IOException {
+
         String[] tables = {
-            "alarmes", "antecipado", "caixa", "configuracoes", "desistencia", "funcionario", "imagens",
-            "justificativa", "prevendidos", "produtos", "quartos",
-            "registralimpeza", "registralocado", "registramanutencao", "registrareserva", "registravendido",
-            "status", "valorcartao", "portoes", "reservas"
+                "alarmes", "antecipado", "caixa", "configuracoes", "desistencia", "funcionario", "imagens",
+                "justificativa", "prevendidos", "produtos", "quartos",
+                "registralimpeza", "registralocado", "registramanutencao", "registrareserva", "registravendido",
+                "status", "valorcartao", "portoes", "reservas"
         };
 
-        try (Connection localConn = new fazconexao().conectar();
-             Connection remoteConn = ConexaoRemota.getConnection()) {
-
+        try (
+                Connection localConn = new fazconexao().conectar();
+                Connection remoteConn = ConexaoRemota.getConnection()) {
             if (remoteConn == null) {
-                logger.error("Não foi possível obter conexão remota (remoteConn é null). Sincronização abortada.");
+                logger.error("Não foi possível conectar no banco remoto.");
                 return;
             }
 
-            boolean isSynced = true;
+            boolean ok = true;
+
             for (String tabela : tables) {
                 try {
                     if (!sincronizarTabela(tabela, localConn, remoteConn)) {
-                        isSynced = false;
+                        ok = false;
                     }
                 } catch (Exception e) {
-                    logger.error("Erro ao sincronizar tabela '{}': {}", tabela, e.getMessage(), e);
-                    isSynced = false;
+                    logger.error("Erro ao sincronizar tabela " + tabela, e);
+                    ok = false;
                 }
             }
 
-            if (!isSynced) {
-                logger.warn("Algumas tabelas não foram sincronizadas corretamente. Verifique os logs para detalhes.");
-            }
+            if (!ok)
+                logger.warn("Nem todas tabelas foram sincronizadas corretamente.");
 
         } catch (SQLException e) {
-            logger.error("Erro de conexão ao tentar sincronizar bancos: {}", e.getMessage(), e);
+            logger.error("Erro de conexão geral ao sincronizar", e);
         }
     }
 
-    private boolean sincronizarTabela(String tabela, Connection conexaoLocal, Connection conexaoRemoto)
+    private boolean sincronizarTabela(String tabela, Connection local, Connection remoto)
             throws SQLException, IOException {
 
         String campoId = obterCampoId(tabela);
         if (campoId == null) {
-            logger.error("Não foi possível identificar campo ID para tabela '{}'.", tabela);
+            logger.error("Campo ID não identificado para tabela " + tabela);
             return false;
         }
 
-        String queryLog = "SELECT * FROM log_sincronizacao WHERE tabela_nome = ?";
-        boolean isSynced = true;
-
-        try (PreparedStatement stmtLog = conexaoLocal.prepareStatement(queryLog)) {
-            stmtLog.setString(1, tabela);
-
-            try (ResultSet rsLog = stmtLog.executeQuery()) {
-                while (rsLog.next()) {
-                    Object id = rsLog.getObject("registro_id");
-                    try {
-                        sincronizarRegistro(tabela, campoId, id, conexaoLocal, conexaoRemoto);
-                        deletarRegistroLog(conexaoLocal, tabela, id);
-                    } catch (Exception e) {
-                        logger.error("Erro ao sincronizar registro ID '{}' da tabela '{}': {}",
-                                id, tabela, e.getMessage(), e);
-                        isSynced = false;
-                    }
-                }
-            }
-        }
-
-        return isSynced;
-    }
-
-    /**
-     * Compara registros detalhadamente e retorna uma lista de discrepâncias.
-     */
-    private List<String> compararRegistrosDetalhado(ResultSet rsLocal, ResultSet rsRemoto) throws SQLException {
-        List<String> discrepancias = new ArrayList<>();
-
-        ResultSetMetaData metaData = rsLocal.getMetaData();
-        int columnCount = metaData.getColumnCount();
-
-        for (int i = 1; i <= columnCount; i++) {
-            String columnName = metaData.getColumnName(i);
-            Object valorLocal = rsLocal.getObject(columnName);
-            Object valorRemoto = rsRemoto.getObject(columnName);
-
-            // Truncar para comparação se for um Timestamp (removendo milissegundos)
-            if (valorLocal instanceof Timestamp && valorRemoto instanceof Timestamp) {
-                valorLocal = Timestamp.valueOf(((Timestamp) valorLocal).toLocalDateTime().withNano(0));
-                valorRemoto = Timestamp.valueOf(((Timestamp) valorRemoto).toLocalDateTime().withNano(0));
-            }
-
-            // Comparar valores (tratando nulos)
-            if ((valorLocal == null && valorRemoto != null) || (valorLocal != null && !valorLocal.equals(valorRemoto))) {
-                discrepancias.add(String.format("Campo '%s': LOCAL='%s', REMOTO='%s'", columnName, valorLocal, valorRemoto));
-            }
-        }
-
-        return discrepancias;
-    }
-
-    private String getColumnsList(String tabela, Connection conexaoRemoto) throws SQLException {
-        try (ResultSet rs = conexaoRemoto.getMetaData().getColumns(null, null, tabela, null)) {
-            StringBuilder columns = new StringBuilder();
-            while (rs.next()) {
-                if (columns.length() > 0) {
-                    columns.append(", ");
-                }
-                columns.append(rs.getString("COLUMN_NAME"));
-            }
-            return columns.toString();
-        }
-    }
-
-    private String getPlaceholders(String tabela, Connection conexaoRemoto) throws SQLException {
-        int columnCount = getColumnCount(tabela, conexaoRemoto);
-        StringBuilder placeholders = new StringBuilder();
-        for (int i = 0; i < columnCount; i++) {
-            if (i > 0) {
-                placeholders.append(", ");
-            }
-            placeholders.append("?");
-        }
-        return placeholders.toString();
-    }
-
-    private void sincronizarRegistro(String tabela, String campoId, Object id, Connection conexaoLocal, Connection conexaoRemoto) throws SQLException {
-        String querySelectLocal = "SELECT * FROM " + tabela + " WHERE " + campoId + " = ?";
-        String querySelectRemoto = "SELECT * FROM " + tabela + " WHERE " + campoId + " = ?";
-        String queryInsertRemoto = "INSERT INTO " + tabela + " (" + getColumnsList(tabela, conexaoRemoto) + ") VALUES (" + getPlaceholders(tabela, conexaoRemoto) + ")";
-        String queryUpdateRemoto = "UPDATE " + tabela + " SET " + getUpdateSetClause(tabela, campoId, conexaoRemoto) + " WHERE " + campoId + " = ?";
-
-        configGlobal config = configGlobal.getInstance();
+        String sql = "SELECT * FROM log_sincronizacao WHERE tabela_nome = ?";
 
         try (
-                PreparedStatement stmtSelectLocal = conexaoLocal.prepareStatement(querySelectLocal); PreparedStatement stmtSelectRemoto = conexaoRemoto.prepareStatement(querySelectRemoto); PreparedStatement stmtInsertRemoto = conexaoRemoto.prepareStatement(queryInsertRemoto); PreparedStatement stmtUpdateRemoto = conexaoRemoto.prepareStatement(queryUpdateRemoto)) {
-            // Selecionar do banco local
-            stmtSelectLocal.setObject(1, id);
-            ResultSet rsLocal = stmtSelectLocal.executeQuery();
+                PreparedStatement stmt = local.prepareStatement(sql)) {
+            stmt.setString(1, tabela);
 
-            // Selecionar do banco remoto
-            stmtSelectRemoto.setObject(1, id);
-            ResultSet rsRemoto = stmtSelectRemoto.executeQuery();
+            try (ResultSet rs = stmt.executeQuery()) {
 
-            if (rsLocal.next()) {
-                if (!rsRemoto.next()) {
-                    copyRowToPreparedStatement(rsLocal, stmtInsertRemoto, tabela, campoId, true); // Para INSERT
-                    stmtInsertRemoto.executeUpdate();
+                while (rs.next()) {
+                    Object id = rs.getObject("registro_id");
+
+                    try {
+                        sincronizarRegistro(tabela, campoId, id, local, remoto);
+                        deletarRegistroLog(local, tabela, id);
+
+                    } catch (Exception e) {
+                        logger.error("Erro ao sincronizar registro " + id + " da tabela " + tabela, e);
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private void sincronizarRegistro(String tabela, String campoId, Object id,
+            Connection local, Connection remoto)
+            throws SQLException, IOException {
+
+        String sqlSelect = "SELECT * FROM " + tabela + " WHERE " + campoId + " = ?";
+
+        // 1. Obter colunas do remoto (Target) para garantir a ordem correta no
+        // INSERT/UPDATE
+        List<String> remoteColumns = getRemoteColumnNames(tabela, remoto);
+
+        // 2. Preparar SQL INSERT
+        StringBuilder colNames = new StringBuilder();
+        StringBuilder placeholders = new StringBuilder();
+        for (String col : remoteColumns) {
+            if (colNames.length() > 0) {
+                colNames.append(", ");
+                placeholders.append(", ");
+            }
+            colNames.append(col);
+            placeholders.append("?");
+        }
+        String sqlInsert = "INSERT INTO " + tabela + " (" + colNames + ") VALUES (" + placeholders + ")";
+
+        // 3. Preparar SQL UPDATE
+        // Removemos o campo ID do SET, pois ele vai no WHERE
+        StringBuilder setBuilder = new StringBuilder();
+        List<String> updateColumns = new ArrayList<>();
+
+        for (String col : remoteColumns) {
+            if (!col.equals(campoId)) {
+                if (setBuilder.length() > 0)
+                    setBuilder.append(", ");
+                setBuilder.append(col).append(" = ?");
+                updateColumns.add(col);
+            }
+        }
+        String sqlUpdate = "UPDATE " + tabela + " SET " + setBuilder + " WHERE " + campoId + " = ?";
+
+        try (
+                PreparedStatement sl = local.prepareStatement(sqlSelect);
+                PreparedStatement sr = remoto.prepareStatement(sqlSelect);
+                PreparedStatement si = remoto.prepareStatement(sqlInsert);
+                PreparedStatement su = remoto.prepareStatement(sqlUpdate)) {
+            sl.setObject(1, id);
+            sr.setObject(1, id);
+
+            try (ResultSet rl = sl.executeQuery(); ResultSet rr = sr.executeQuery()) {
+
+                if (rl.next()) {
+                    if (!rr.next()) {
+                        // INSERT: Preenchemos todas as colunas (incluindo ID, se estiver na lista
+                        // remota)
+                        fillStatement(si, rl, remoteColumns);
+                        si.executeUpdate();
+                    } else {
+                        // UPDATE: Preenchemos colunas do SET + ID no WHERE
+                        fillStatement(su, rl, updateColumns);
+                        // O último parâmetro é o ID do WHERE
+                        su.setObject(updateColumns.size() + 1, id);
+                        su.executeUpdate();
+                    }
                 } else {
-                    copyRowToPreparedStatement(rsLocal, stmtUpdateRemoto, tabela, campoId, false); // Para UPDATE
-                    stmtUpdateRemoto.setObject(getColumnCount(tabela, conexaoRemoto), id);
-                    stmtUpdateRemoto.executeUpdate();
-                }
-            } else {
-                if (rsRemoto.next()) {
-                    String queryDeleteRemoto = "DELETE FROM " + tabela + " WHERE " + campoId + " = ?";
-                    try (PreparedStatement stmtDeleteRemoto = conexaoRemoto.prepareStatement(queryDeleteRemoto)) {
-                        stmtDeleteRemoto.setObject(1, id);
-                        stmtDeleteRemoto.executeUpdate();
+                    if (rr.next()) {
+                        String sqlDelete = "DELETE FROM " + tabela + " WHERE " + campoId + " = ?";
+                        try (PreparedStatement sd = remoto.prepareStatement(sqlDelete)) {
+                            sd.setObject(1, id);
+                            sd.executeUpdate();
+                        }
                     }
                 }
             }
         }
     }
 
-    public String getSQLString(PreparedStatement stmt, Object... params) {
-        String sql = stmt.toString();
-        for (Object param : params) {
-            String value = (param == null) ? "NULL" : param.toString();
-            // Se for uma string, adicionar aspas
-            if (param instanceof String || param instanceof java.sql.Date || param instanceof java.sql.Timestamp) {
-                value = "'" + value + "'";
-            }
-            sql = sql.replaceFirst("\\?", value);
-        }
-        return sql;
-    }
-
-    private void copyRowToPreparedStatement(ResultSet rsLocal, PreparedStatement stmt, String tabela, String campoId, boolean includeId) throws SQLException {
-        ResultSetMetaData metaData = rsLocal.getMetaData();
-        int columnCount = metaData.getColumnCount();
-
-        int paramIndex = 1;
-        for (int i = 1; i <= columnCount; i++) {
-            String columnName = metaData.getColumnName(i);
-
-            // Inclui o campo ID se necessário (para o INSERT, por exemplo)
-            if (!columnName.equals(campoId) || includeId) {
-                Object value = rsLocal.getObject(i);
-                stmt.setObject(paramIndex++, value);
-            }
-        }
-
-        // No caso de UPDATE, definimos o campo ID como o último parâmetro
-        if (!includeId) {
-            stmt.setObject(paramIndex, rsLocal.getObject(campoId));
+    // Preenche o PreparedStatement pegando os valores do ResultSet LOCAL pelo NOME
+    // da coluna
+    private void fillStatement(PreparedStatement stmt, ResultSet rsSource, List<String> columns) throws SQLException {
+        for (int i = 0; i < columns.size(); i++) {
+            String colName = columns.get(i);
+            stmt.setObject(i + 1, rsSource.getObject(colName));
         }
     }
 
-    private int getColumnCount(String tabela, Connection conexaoRemoto) throws SQLException {
-        try (ResultSet rs = conexaoRemoto.getMetaData().getColumns(null, null, tabela, null)) {
-            int count = 0;
+    private List<String> getRemoteColumnNames(String tabela, Connection conn) throws SQLException {
+        List<String> columns = new ArrayList<>();
+        try (ResultSet rs = conn.getMetaData().getColumns(null, null, tabela, null)) {
             while (rs.next()) {
-                count++;
+                columns.add(rs.getString("COLUMN_NAME"));
             }
-            return count;
+        }
+        return columns;
+    }
+
+    private void deletarRegistroLog(Connection conn, String tabela, Object id) throws SQLException {
+        String sql = "DELETE FROM log_sincronizacao WHERE tabela_nome = ? AND registro_id = ?";
+
+        try (
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, tabela);
+            stmt.setObject(2, id);
+            stmt.executeUpdate();
         }
     }
 
-    private String getUpdateSetClause(String tabela, String campoId, Connection conexaoRemoto) throws SQLException {
-        try (ResultSet rs = conexaoRemoto.getMetaData().getColumns(null, null, tabela, null)) {
-            StringBuilder setClause = new StringBuilder();
-            while (rs.next()) {
-                String columnName = rs.getString("COLUMN_NAME");
-                if (!columnName.equals(campoId)) {
-                    if (setClause.length() > 0) {
-                        setClause.append(", ");
-                    }
-                    setClause.append(columnName).append(" = ?");
-                }
-            }
-            return setClause.toString();
-        }
-    }
-
-    
     private String obterCampoId(String tabela) {
         switch (tabela) {
             case "alarmes":
@@ -329,19 +293,8 @@ public class CheckSincronia extends TimerTask {
                 return "numeroquarto";
             case "quartos":
                 return "numeroquarto";
-            default:
-                return null;
         }
+        return null;
     }
 
-    private void deletarRegistroLog(Connection conexaoLocal, String tabela, Object id) throws SQLException {
-        String queryDeleteLog = "DELETE FROM log_sincronizacao WHERE tabela_nome = ? AND registro_id = ?";
-        try (PreparedStatement stmtDeleteLog = conexaoLocal.prepareStatement(queryDeleteLog)) {
-            stmtDeleteLog.setString(1, tabela);
-            stmtDeleteLog.setObject(2, id);
-            stmtDeleteLog.executeUpdate();
-        }
-    }
-
-   
 }

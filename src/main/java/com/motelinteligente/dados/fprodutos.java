@@ -21,56 +21,37 @@ import org.slf4j.LoggerFactory;
  */
 public class fprodutos {
 
-        private static final Logger logger = LoggerFactory.getLogger(fprodutos.class);
-
+    private static final Logger logger = LoggerFactory.getLogger(fprodutos.class);
 
     public List<vprodutos> mostrarProduto() {
-        List<vprodutos> produtos = new ArrayList<>();
+    List<vprodutos> produtos = new ArrayList<>();
+    String consultaSQL = "select * from produtos order by idproduto";
 
-        String registros[] = new String[5];
-        Connection link = null;
 
-        try {
-            link = new fazconexao().conectar();
-            String consultaSQL = "select * from produtos order by idproduto";
-            PreparedStatement statement = link.prepareStatement(consultaSQL);
-            ResultSet resultado = statement.executeQuery();
+    try (Connection link = new fazconexao().conectar();
+         PreparedStatement statement = link.prepareStatement(consultaSQL)) {
 
-            // Processar o resultado
+        try (ResultSet resultado = statement.executeQuery()) {
+
             while (resultado.next()) {
                 vprodutos produto = new vprodutos();
                 produto.setIdProduto(resultado.getInt("idproduto"));
                 produto.setDescricao(resultado.getString("descricao"));
                 produto.setValor(resultado.getFloat("valorproduto"));
-                produto.setEstoque(resultado.getString("estoque"));
-                produto.setDataCompra(resultado.getTimestamp("ultimacompra"));
-
+                // Continue a popular o objeto vprodutos com os campos restantes
                 produtos.add(produto);
             }
+        } 
 
-            // Fechar os recursos
-            resultado.close();
-            statement.close();
-            link.close();
+    } catch (SQLException e) {
+        logger.error("Erro : mostrarProduto(): ", e);
+        JOptionPane.showMessageDialog(null,
+                "Erro ao mostrar produtos: " + e.getMessage(),
+                "Erro", JOptionPane.ERROR_MESSAGE);
+    } // 'link' e 'statement' fechados automaticamente
 
-        } catch (Exception e) {
-            logger.error("Erro ao obter produto: mostrarProduto(): ", e);
-
-            JOptionPane.showConfirmDialog(null, e);
-        } finally {
-            try {
-                // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
-                if (link != null && !link.isClosed()) {
-                    link.close();
-                }
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(null, e);
-                logger.error("Erro : motraProduto() finally: ", e);
-
-            }
-        }
-        return produtos;
-    }
+    return produtos;
+}
 
     public boolean diminuiEstoque(int idProduto, int quantidade) {
         String estoqueQuery = "SELECT estoque FROM produtos WHERE idproduto = ?";
@@ -168,121 +149,81 @@ public class fprodutos {
     }
 
     public boolean insercao(vprodutos dados) {
-        String consultaSQL = "INSERT INTO produtos (idproduto, descricao, valorproduto, estoque, ultimacompra) VALUES (?, ?, ?, ?, ?)";
-        Connection link = null;
 
-        try {
-            link = new fazconexao().conectar();
-            PreparedStatement statement = link.prepareStatement(consultaSQL);
-            statement.setInt(1, dados.getIdProduto());
-            statement.setString(2, dados.getDescricao());
-            statement.setFloat(3, dados.getValor());
-            statement.setString(4, dados.getEstoque());
-            statement.setTimestamp(5, dados.getDataCompra());
-            int n = statement.executeUpdate();
-            if (n != 0) {
-                link.close();
-                statement.close();
-                return true;
-            } else {
-                link.close();
-                statement.close();
-                return false;
-            }
-        } catch (Exception e) {
-            logger.error("Erro : insercao(): ", e);
-            JOptionPane.showConfirmDialog(null, e);
-            return false;
-        } finally {
-            try {
-                // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
-                if (link != null && !link.isClosed()) {
-                    link.close();
-                }
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(null, e);
-                logger.error("Erro : insercao() finally: ", e);
+    String sql = "INSERT INTO produtos (idproduto, descricao, valorproduto, estoque, ultimacompra) "
+               + "VALUES (?, ?, ?, ?, ?)";
 
-            }
-        }
+    try (Connection link = new fazconexao().conectar();
+         PreparedStatement st = link.prepareStatement(sql)) {
 
+        st.setInt(1, dados.getIdProduto());
+        st.setString(2, dados.getDescricao());
+        st.setFloat(3, dados.getValor());
+        st.setString(4, dados.getEstoque());
+        st.setTimestamp(5, dados.getDataCompra());
+
+        return st.executeUpdate() > 0;
+
+    } catch (SQLException e) {
+        logger.error("Erro : insercao(): ", e);
+        JOptionPane.showMessageDialog(null,
+                "Erro ao inserir produto: " + e.getMessage(),
+                "Erro", JOptionPane.ERROR_MESSAGE);
+        return false;
     }
+}
+
 
     public boolean exclusao(int idpassado) {
-        String consultaSQL = "delete from produtos "
-                + "where idproduto = " + idpassado;
-        Connection link = null;
 
-        try {
-            link = new fazconexao().conectar();
-            PreparedStatement statement = link.prepareStatement(consultaSQL);
-            int n = statement.executeUpdate();
-            if (n != 0) {
-                link.close();
-                statement.close();
-                return true;
-            } else {
-                link.close();
-                statement.close();
-                return false;
-            }
-        } catch (Exception e) {
-            logger.error("Erro : exclusao(): ", e);
-            JOptionPane.showConfirmDialog(null, e);
-            return false;
-        } finally {
-            try {
-                // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
-                if (link != null && !link.isClosed()) {
-                    link.close();
-                }
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(null, e);
-                logger.error("Erro : exclusao() finally: ", e);
+    String sql = "DELETE FROM produtos WHERE idproduto = ?";
 
-            }
-        }
+    try (Connection link = new fazconexao().conectar();
+         PreparedStatement st = link.prepareStatement(sql)) {
+
+        st.setInt(1, idpassado);
+        return st.executeUpdate() > 0;
+
+    } catch (SQLException e) {
+        logger.error("Erro : exclusao(): ", e);
+        JOptionPane.showMessageDialog(null,
+                "Erro ao excluir produto: " + e.getMessage(),
+                "Erro", JOptionPane.ERROR_MESSAGE);
+        return false;
     }
+}
+
 
     public vprodutos getProduto(int idPassado) {
-        vprodutos produto = new vprodutos();
-        String consultaSQL = "SELECT * FROM produtos WHERE idproduto = " + idPassado;
-        Connection link = null;
 
-        try {
-            link = new fazconexao().conectar();
-            Statement statement = link.createStatement();
+    String sql = "SELECT * FROM produtos WHERE idproduto = ?";
+    vprodutos produto = null;
 
-            ResultSet resultado = statement.executeQuery(consultaSQL);
-            if (resultado.next()) {
+    try (Connection link = new fazconexao().conectar();
+         PreparedStatement st = link.prepareStatement(sql)) {
+
+        st.setInt(1, idPassado);
+
+        try (ResultSet rs = st.executeQuery()) {
+            if (rs.next()) {
+                produto = new vprodutos();
                 produto.setIdProduto(idPassado);
-                produto.setDescricao(resultado.getString("descricao"));
-                produto.setValor(resultado.getFloat("valorproduto"));
-                produto.setEstoque(resultado.getString("estoque"));
-
-                link.close();
-                statement.close();
-                return produto;
-            } else {
-                link.close();
-                statement.close();
-            }
-        } catch (Exception e) {
-            logger.error("Erro : getProduto(): ", e);
-            JOptionPane.showConfirmDialog(null, e);
-        } finally {
-            try {
-                // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
-                if (link != null && !link.isClosed()) {
-                    link.close();
-                }
-            } catch (SQLException e) {
-                logger.error("Erro : getproduto() finally: ", e);
-                JOptionPane.showMessageDialog(null, e);
+                produto.setDescricao(rs.getString("descricao"));
+                produto.setValor(rs.getFloat("valorproduto"));
+                produto.setEstoque(rs.getString("estoque"));
             }
         }
-        return null;
+
+    } catch (SQLException e) {
+        logger.error("Erro : getProduto(): ", e);
+        JOptionPane.showMessageDialog(null,
+                "Erro ao buscar produto: " + e.getMessage(),
+                "Erro", JOptionPane.ERROR_MESSAGE);
     }
+
+    return produto;
+}
+
 
     public boolean exclui(int idpassado) {
         String consultaSQL = "delete from produtos "
@@ -320,173 +261,120 @@ public class fprodutos {
     }
 
     public String getDescicao(String idPassado) {
-        String consultaSQL = "SELECT descricao FROM produtos WHERE idproduto = " + idPassado;
-        Connection link = null;
+        String consultaSQL = "SELECT descricao FROM produtos WHERE idproduto = ?";
 
-        try {
-            link = new fazconexao().conectar();
-            Statement statement = link.createStatement();
-            ResultSet resultado = statement.executeQuery(consultaSQL);
-            if (resultado.next()) {
-                return (String) resultado.getString("descricao");
-            } else {
-                link.close();
-                statement.close();
+        try (
+                Connection link = new fazconexao().conectar(); PreparedStatement statement = link.prepareStatement(consultaSQL)) {
+            statement.setString(1, idPassado);
+
+            try (ResultSet resultado = statement.executeQuery()) {
+
+                if (resultado.next()) {
+                    return resultado.getString("descricao");
+                }
             }
+
         } catch (Exception e) {
             logger.error("Erro : getDescicao(): ", e);
-            JOptionPane.showConfirmDialog(null, e);
-        } finally {
-            try {
-                // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
-                if (link != null && !link.isClosed()) {
-                    link.close();
-                }
-            } catch (SQLException e) {
-                logger.error("Erro : getDescicao() finally: ", e);
-                JOptionPane.showMessageDialog(null, e);
-            }
+            JOptionPane.showMessageDialog(null, e);
         }
+
         return null;
     }
 
     public int getIdProduto(String desc) {
-        String consultaSQL = "SELECT idproduto FROM produtos WHERE descricao = ?";
-        Connection link = null;
-        int idProduto = -1;
+        String sql = "SELECT idproduto FROM produtos WHERE descricao = ?";
 
-        try {
-            link = new fazconexao().conectar();
-            PreparedStatement statement = link.prepareStatement(consultaSQL);
-            statement.setString(1, desc);
-            ResultSet resultado = statement.executeQuery();
-            if (resultado.next()) {
-                idProduto = resultado.getInt("idproduto");
+        try (Connection link = new fazconexao().conectar(); PreparedStatement st = link.prepareStatement(sql)) {
+
+            st.setString(1, desc);
+
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("idproduto");
+                }
             }
 
-            resultado.close();
-            statement.close();
         } catch (SQLException e) {
             logger.error("Erro : getIdProduto() : ", e);
-            JOptionPane.showMessageDialog(null, "Erro ao buscar o ID do produto: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
-        } finally {
-            try {
-                if (link != null && !link.isClosed()) {
-                    link.close();
-                }
-            } catch (SQLException e) {
-                logger.error("Erro : getIdProduto() finally: ", e);
-                JOptionPane.showMessageDialog(null, "Erro ao fechar a conexão: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
-            }
+            JOptionPane.showMessageDialog(null,
+                    "Erro ao buscar o ID do produto: " + e.getMessage(),
+                    "Erro", JOptionPane.ERROR_MESSAGE);
         }
 
-        return idProduto;
+        return -1;
     }
 
     public void removePreVendido(int numeroQuarto, String descricao, int qntd) {
-        Connection link = null;
-        try {
-            // Obter o idLocacao e idProduto
-            int idLocacao = new fquartos().getIdLocacao(numeroQuarto);
-            int idProduto = new fprodutos().getIdProduto(descricao);
 
-            if (idProduto == -1) {
-                JOptionPane.showMessageDialog(null, "Erro: Produto não encontrado.", "Erro", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
+        int idLocacao = new fquartos().getIdLocacao(numeroQuarto);
+        int idProduto = getIdProduto(descricao);
 
-            link = new fazconexao().conectar();
-            // Consulta SQL para deletar registros da tabela prevendidos
-            String consultaSQL = "DELETE FROM prevendidos WHERE idlocacao = ? AND idproduto = ? AND quantidade = ? LIMIT 1; ";
-            PreparedStatement statement = link.prepareStatement(consultaSQL);
-            statement.setInt(1, idLocacao);
-            statement.setInt(2, idProduto);
-            statement.setInt(3, qntd);
-            statement.executeUpdate();
-            statement.close();
-            link.close();
+        if (idProduto == -1) {
+            JOptionPane.showMessageDialog(null, "Erro: Produto não encontrado.",
+                    "Erro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        String sql = "DELETE FROM prevendidos "
+                + "WHERE idlocacao = ? AND idproduto = ? AND quantidade = ? LIMIT 1";
+
+        try (Connection link = new fazconexao().conectar(); PreparedStatement st = link.prepareStatement(sql)) {
+
+            st.setInt(1, idLocacao);
+            st.setInt(2, idProduto);
+            st.setInt(3, qntd);
+            st.executeUpdate();
+
         } catch (SQLException e) {
-            // Tratamento de erro
-            JOptionPane.showMessageDialog(null, "Erro ao deletar prevendidos: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
             logger.error("Erro : removePreVendido(): ", e);
-
-        } finally {
-            try {
-                // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
-                if (link != null && !link.isClosed()) {
-                    link.close();
-                }
-            } catch (SQLException e) {
-                logger.error("Erro : removePreVendido() finally: ", e);
-
-            }
+            JOptionPane.showMessageDialog(null,
+                    "Erro ao deletar prevendidos: " + e.getMessage(),
+                    "Erro", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     public float getValorProduto(int idPassado) {
-        String consultaSQL = "SELECT valorproduto FROM produtos WHERE idproduto = " + idPassado;
-        Connection link = null;
+        String sql = "SELECT valorproduto FROM produtos WHERE idproduto = ?";
 
-        try {
-            link = new fazconexao().conectar();
-            Statement statement = link.createStatement();
+        try (Connection link = new fazconexao().conectar(); PreparedStatement st = link.prepareStatement(sql)) {
 
-            ResultSet resultado = statement.executeQuery(consultaSQL);
-            if (resultado.next()) {
-                return resultado.getFloat("valorproduto");
-            } else {
-                link.close();
-                statement.close();
-            }
-        } catch (Exception e) {
-            logger.error("Erro : getValorProduto(): ", e);
+            st.setInt(1, idPassado);
 
-            JOptionPane.showConfirmDialog(null, e);
-        } finally {
-            try {
-                // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
-                if (link != null && !link.isClosed()) {
-                    link.close();
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getFloat("valorproduto");
                 }
-            } catch (SQLException e) {
-                logger.error("Erro : getValorProduto() finally: ", e);
-                JOptionPane.showMessageDialog(null, e);
             }
+
+        } catch (SQLException e) {
+            logger.error("Erro : getValorProduto(): ", e);
+            JOptionPane.showMessageDialog(null,
+                    "Erro ao buscar valor do produto: " + e.getMessage(),
+                    "Erro", JOptionPane.ERROR_MESSAGE);
         }
+
         return 0;
     }
 
     public void inserirPrevendido(int idLocacao, int idProduto, int quantidade) {
-        Connection link = null;
-        try {
-            link = new fazconexao().conectar();
 
-            // Consulta SQL para inserção de dados na tabela prevendidos
-            String consultaSQL = "INSERT INTO prevendidos (idlocacao, idproduto, quantidade) VALUES (?, ?, ?)";
-            PreparedStatement statement = link.prepareStatement(consultaSQL);
-            // Define os parâmetros da consulta
-            statement.setInt(1, idLocacao);
-            statement.setInt(2, idProduto);
-            statement.setInt(3, quantidade);
+        String sql = "INSERT INTO prevendidos (idlocacao, idproduto, quantidade) "
+                + "VALUES (?, ?, ?)";
 
-            // Executa a consulta
-            statement.executeUpdate();
+        try (Connection link = new fazconexao().conectar(); PreparedStatement st = link.prepareStatement(sql)) {
 
-            // Fecha os recursos
-            statement.close();
-            link.close();
+            st.setInt(1, idLocacao);
+            st.setInt(2, idProduto);
+            st.setInt(3, quantidade);
+            st.executeUpdate();
+
         } catch (SQLException e) {
             logger.error("Erro : inserirPrevendido(): ", e);
-            JOptionPane.showMessageDialog(null, "Erro ao inserir prevendido: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
-        } finally {
-            try {
-                // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
-                if (link != null && !link.isClosed()) {
-                    link.close();
-                }
-            } catch (SQLException e) {
-                logger.error("Erro : inserirPrevendido() finally: ", e);
-            }
+            JOptionPane.showMessageDialog(null,
+                    "Erro ao inserir prevendido: " + e.getMessage(),
+                    "Erro", JOptionPane.ERROR_MESSAGE);
         }
     }
+
 }
