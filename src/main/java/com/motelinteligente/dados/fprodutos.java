@@ -37,7 +37,8 @@ public class fprodutos {
                     produto.setIdProduto(resultado.getInt("idproduto"));
                     produto.setDescricao(resultado.getString("descricao"));
                     produto.setValor(resultado.getFloat("valorproduto"));
-                    // Continue a popular o objeto vprodutos com os campos restantes
+                    produto.setEstoque(resultado.getString("estoque"));
+                    produto.setDataCompra(resultado.getTimestamp("ultimacompra"));
                     produtos.add(produto);
                 }
             }
