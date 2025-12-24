@@ -1,494 +1,282 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package com.motelinteligente.telas;
 
-import com.motelinteligente.dados.fazconexao;
+import com.formdev.flatlaf.FlatClientProperties;
+import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.motelinteligente.dados.ffuncionario;
 import com.motelinteligente.dados.vfuncionario;
-import javax.swing.JOptionPane;
+import net.miginfocom.swing.MigLayout;
+
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.io.IOException;
 
 /**
- *
- * @author MOTEL
+ * Tela de Cadastro de Funcionários
+ * Refatorada para usar MigLayout e remover dependência do editor visual do
+ * NetBeans.
  */
-public class TelaCadFuncionario extends javax.swing.JFrame {
+public class TelaCadFuncionario extends JFrame {
 
-    boolean botaoAtualizarClick = false;
-    String mudando = "";
+    private JTextField txtNome;
+    private JTextField txtLogin;
+    private JPasswordField txtSenha1;
+    private JPasswordField txtSenha2;
+    private JComboBox<String> comboCargo;
+    private JTable tabelaFunc;
+    private DefaultTableModel tableModel;
 
-    /**
-     * Creates new form TelaCadFuncionario
-     */
+    private boolean isEditMode = false;
+    private String loginOriginal = ""; // Para controlar atualização do login
+
     public TelaCadFuncionario() {
-        initComponents();
+        initUI();
         carregaTabela();
-
     }
 
-    public void carregaTabela() {
+    private void initUI() {
+        setTitle("Cadastro de Funcionários");
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setSize(900, 500);
+        setLocationRelativeTo(null);
+
+        // Layout Principal: Duas colunas (350px fixo para form, resto para tabela)
+        setLayout(new MigLayout("fill, insets 20", "[350!, fill][grow, fill]", "[grow]"));
+
+        // --- PAINEL ESQUERDO (Formulário) ---
+        JPanel formPanel = new JPanel(new MigLayout("wrap 2, fillx, insets 20", "[][grow, fill]", "[]15[]"));
+        formPanel.setBorder(BorderFactory.createTitledBorder("Dados do Funcionário"));
+        formPanel.putClientProperty(FlatClientProperties.STYLE, "arc: 15"); // Bordas arredondadas no painel
+
+        // Campos
+        formPanel.add(new JLabel("Nome:"));
+        txtNome = new JTextField();
+        formPanel.add(txtNome);
+
+        formPanel.add(new JLabel("Login:"));
+        txtLogin = new JTextField();
+        formPanel.add(txtLogin);
+
+        formPanel.add(new JLabel("Senha:"));
+        txtSenha1 = new JPasswordField();
+        formPanel.add(txtSenha1);
+
+        formPanel.add(new JLabel("Confirmar Senha:"));
+        txtSenha2 = new JPasswordField();
+        formPanel.add(txtSenha2);
+
+        formPanel.add(new JLabel("Cargo:"));
+        comboCargo = new JComboBox<>(new String[] { "admin", "gerente", "comum" });
+        formPanel.add(comboCargo);
+
+        // Botões do Formulário
+        JButton btnSalvar = new JButton("Salvar");
+        btnSalvar.setIcon(new ImageIcon(getClass().getResource("/imagens/icon_bot_salvar.png")));
+        btnSalvar.putClientProperty(FlatClientProperties.STYLE, "semicolon;font:bold");
+        btnSalvar.addActionListener(e -> salvarFuncionario());
+
+        JButton btnCancelar = new JButton("Limpar");
+        btnCancelar.addActionListener(e -> limparCampos());
+
+        formPanel.add(btnSalvar, "span, split 2, growx, gaptop 20");
+        formPanel.add(btnCancelar, "growx, gaptop 20");
+
+        add(formPanel, "top"); // Adiciona na coluna 0
+
+        // --- PAINEL DIREITO (Tabela) ---
+        JPanel tablePanel = new JPanel(new MigLayout("fill, insets 0", "[grow]", "[grow][]"));
+        tablePanel.setBorder(BorderFactory.createTitledBorder("Lista de Funcionários"));
+
+        String[] cols = { "Nome", "Cargo", "Login" };
+        tableModel = new DefaultTableModel(cols, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        tabelaFunc = new JTable(tableModel);
+        JScrollPane scroll = new JScrollPane(tabelaFunc);
+        tablePanel.add(scroll, "grow, wrap");
+
+        // Botões de Ação da Tabela
+        JButton btnEditar = new JButton("Editar Selecionado");
+        btnEditar.setIcon(new ImageIcon(getClass().getResource("/imagens/icon_backup.png")));
+        btnEditar.addActionListener(e -> carregarParaEdicao());
+
+        JButton btnExcluir = new JButton("Excluir");
+        btnExcluir.setIcon(new ImageIcon(getClass().getResource("/imagens/icon_bot_excluir.png")));
+        btnExcluir.addActionListener(e -> excluirFuncionario());
+
+        JButton btnVoltar = new JButton("Voltar");
+        btnVoltar.setIcon(new ImageIcon(getClass().getResource("/imagens/icon_sair.png")));
+        btnVoltar.addActionListener(e -> dispose());
+
+        tablePanel.add(btnEditar, "split 3, growx");
+        tablePanel.add(btnExcluir, "growx");
+        tablePanel.add(btnVoltar, "growx");
+
+        add(tablePanel, "grow"); // Adiciona na coluna 1
+    }
+
+    private void carregaTabela() {
         ffuncionario func = new ffuncionario();
-        DefaultTableModel modelo = (DefaultTableModel) tabelaFunc.getModel();
-        modelo.setNumRows(0);
+        tableModel.setRowCount(0);
 
         for (vfuncionario q : func.mostrar()) {
-
-            modelo.addRow(new Object[]{
-                q.getNomefuncionario(),
-                q.getCargofuncionario(),
-                q.getLoginfuncionario()
+            tableModel.addRow(new Object[] {
+                    q.getNomefuncionario(),
+                    q.getCargofuncionario(),
+                    q.getLoginfuncionario()
             });
         }
     }
 
-    @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents() {
+    private void salvarFuncionario() {
+        String nome = txtNome.getText().trim();
+        String login = txtLogin.getText().trim();
+        String senha1 = new String(txtSenha1.getPassword());
+        String senha2 = new String(txtSenha2.getPassword());
+        String cargo = (String) comboCargo.getSelectedItem();
 
-        jPanel1 = new javax.swing.JPanel();
-        jLabel6 = new javax.swing.JLabel();
-        bt_Excluir = new javax.swing.JButton();
-        bt_atualizar = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        tabelaFunc = new javax.swing.JTable();
-        bt_voltar = new javax.swing.JButton();
-        bt_salvar = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        nome_func = new javax.swing.JTextField();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
-        senha1func = new javax.swing.JPasswordField();
-        senha2func = new javax.swing.JPasswordField();
-        jLabel5 = new javax.swing.JLabel();
-        cargo_func = new javax.swing.JComboBox<>();
-        login_func = new javax.swing.JTextField();
-
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-
-        jPanel1.setBackground(new java.awt.Color(204, 204, 204));
-
-        jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel6.setText("Lista de Funcionários");
-
-        bt_Excluir.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_bot_excluir.png"))); // NOI18N
-        bt_Excluir.setText("Apagar");
-        bt_Excluir.setMaximumSize(new java.awt.Dimension(87, 27));
-        bt_Excluir.setMinimumSize(new java.awt.Dimension(87, 27));
-        bt_Excluir.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bt_ExcluirActionPerformed(evt);
-            }
-        });
-
-        bt_atualizar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_backup.png"))); // NOI18N
-        bt_atualizar.setText("Atualizar");
-        bt_atualizar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bt_atualizarActionPerformed(evt);
-            }
-        });
-
-        tabelaFunc.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
-            },
-            new String [] {
-                "Nome", "Cargo", "Login"
-            }
-        ));
-        jScrollPane1.setViewportView(tabelaFunc);
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 461, Short.MAX_VALUE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(28, 28, 28)
-                                .addComponent(jLabel6))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(20, 20, 20)
-                                .addComponent(bt_atualizar)
-                                .addGap(18, 18, 18)
-                                .addComponent(bt_Excluir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addGap(10, 10, 10))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(15, 15, 15)
-                .addComponent(jLabel6)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(bt_atualizar)
-                    .addComponent(bt_Excluir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(42, Short.MAX_VALUE))
-        );
-
-        bt_voltar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_sair.png"))); // NOI18N
-        bt_voltar.setText("Voltar");
-        bt_voltar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bt_voltarActionPerformed(evt);
-            }
-        });
-
-        bt_salvar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_bot_salvar.png"))); // NOI18N
-        bt_salvar.setText("Salvar");
-        bt_salvar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bt_salvarActionPerformed(evt);
-            }
-        });
-
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel1.setText("Cadastro de Funcionário");
-
-        jLabel3.setText("Digite uma senha:");
-
-        jLabel2.setText("Nome:");
-
-        jLabel7.setText("login");
-
-        jLabel8.setText("Digite a senha novamente:");
-
-        jLabel5.setText("Cargo");
-
-        cargo_func.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "admin", "gerente", "comum", " " }));
-        cargo_func.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cargo_funcActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(9, 9, 9)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addGroup(layout.createSequentialGroup()
-                                            .addComponent(jLabel4)
-                                            .addGap(307, 307, 307))
-                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                            .addComponent(jLabel8)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                            .addComponent(senha2func))
-                                        .addGroup(layout.createSequentialGroup()
-                                            .addComponent(jLabel3)
-                                            .addGap(57, 57, 57)
-                                            .addComponent(senha1func)))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jLabel2)
-                                            .addComponent(jLabel7))
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(nome_func)
-                                            .addComponent(login_func))))
-                                .addGap(60, 60, 60))))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(bt_voltar)
-                        .addGap(26, 26, 26)
-                        .addComponent(bt_salvar)
-                        .addGap(105, 105, 105))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel5)
-                        .addGap(18, 18, 18)
-                        .addComponent(cargo_func, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(16, 16, 16)
-                        .addComponent(jLabel1)
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(nome_func, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel2))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel7)
-                            .addComponent(login_func, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel3)
-                            .addComponent(senha1func, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel8)
-                            .addComponent(senha2func, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel4)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel5)
-                            .addComponent(cargo_func, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(20, 20, 20)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(bt_salvar)
-                            .addComponent(bt_voltar)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(33, Short.MAX_VALUE))
-        );
-
-        pack();
-    }// </editor-fold>//GEN-END:initComponents
-
-    private void bt_ExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_ExcluirActionPerformed
-        int linhaSelecionada = tabelaFunc.getSelectedRow();
-
-        if (linhaSelecionada != -1) {
-            Object nomeObj = tabelaFunc.getValueAt(linhaSelecionada, 0);
-            Object cargoObj = tabelaFunc.getValueAt(linhaSelecionada, 1);
-            Object loginObj = tabelaFunc.getValueAt(linhaSelecionada, 2);
-
-            if (nomeObj != null && cargoObj != null && loginObj != null) {
-                String nome = nomeObj.toString();
-                String cargo = cargoObj.toString();
-                String login = loginObj.toString();
-
-                ffuncionario funcionario = new ffuncionario();
-                int id = funcionario.getIdFuncionario(nome, cargo, login);
-
-                if (id != -1) {
-                    int confirmar = JOptionPane.showConfirmDialog(
-                            null,
-                            "Deseja realmente excluir o funcionário " + nome + "?",
-                            "Confirmação",
-                            JOptionPane.YES_NO_OPTION
-                    );
-
-                    if (confirmar == JOptionPane.YES_OPTION) {
-                        if (funcionario.excluirFuncionario(id)) {
-                            JOptionPane.showMessageDialog(null, "Funcionário excluído com sucesso!");
-                            carregaTabela();
-                        } else {
-                            JOptionPane.showMessageDialog(null, "Erro ao excluir funcionário!");
-                        }
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(null, "Funcionário não encontrado no banco!");
-                }
-            }
-
-        } else {
-            JOptionPane.showMessageDialog(null, "Nenhum funcionário selecionado!");
-        }
-    }//GEN-LAST:event_bt_ExcluirActionPerformed
-
-    private void bt_atualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_atualizarActionPerformed
-        // TODO add your handling code here:
-        ffuncionario funcionario = new ffuncionario();
-        int linhaSelecionada = tabelaFunc.getSelectedRow();
-        if (linhaSelecionada != -1) {
-            Object nome = tabelaFunc.getValueAt(linhaSelecionada, 0); // 0 é o índice da coluna do ID
-            Object cargo = tabelaFunc.getValueAt(linhaSelecionada, 1); // 0 é o índice da coluna do ID
-            Object login = tabelaFunc.getValueAt(linhaSelecionada, 2); // 0 é o índice da coluna do ID
-
-            if (nome != null && cargo != null && login != null) {
-                String nomeFuncionario = nome.toString();
-                String cargoFuncionario = cargo.toString();
-                String loginFuncionario = login.toString();
-
-                nome_func.setText(nomeFuncionario);
-                login_func.setText(loginFuncionario);
-                if (cargo_func.getItemCount() > 0) {
-                    for (int i = 0; i < cargo_func.getItemCount(); i++) {
-                        String cargoatual = cargo_func.getItemAt(i); // Obtenha o cargo como String
-                        if (cargoatual.equals(cargoFuncionario)) {
-                            // O cargo do funcionário está presente no JComboBox
-                            // Faça algo aqui, se necessário
-                            cargo_func.setSelectedItem(cargoatual);
-                            break; // Se encontrou, pode sair do loop
-                        }
-                    }
-                }
-
-                botaoAtualizarClick = true;
-                mudando = loginFuncionario;
-            }
-
-        } else {
-            JOptionPane.showMessageDialog(null, "Nenhum quarto selecionado!");
+        // Validações Básicas
+        if (nome.isEmpty() || login.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Preencha Nome e Login!", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
         }
 
-        carregaTabela();
-    }//GEN-LAST:event_bt_atualizarActionPerformed
+        if (!senha1.equals(senha2)) {
+            JOptionPane.showMessageDialog(this, "As senhas não conferem!", "Erro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-    private void bt_voltarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_voltarActionPerformed
-        // TODO add your handling code here:
-        dispose();
-    }//GEN-LAST:event_bt_voltarActionPerformed
+        ffuncionario funcDao = new ffuncionario();
 
-    private void bt_salvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_salvarActionPerformed
-        // TODO add your handling code here:
-        String nome;
-        String login;
-        String senha1, senha2;
-        String cargo;
-        try {
-            nome = nome_func.getText();
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(null, "Revise as inforções do Nome!");
-            nome_func.grabFocus();// foca o campo
-            nome_func.setText(""); //limpa o campo
-        }
-        try {
-            login = login_func.getText();
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(null, "Revise as inforções do Login");
-            login_func.grabFocus();// foca o campo
-            login_func.setText(""); //limpa o campo
-        }
-        try {
-            cargo = (String) cargo_func.getSelectedItem();
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(null, "Revise as inforções do Cargo");
-            cargo_func.grabFocus();// foca o campo
-        }
-        try {
-            senha1 = senha1func.getText();
-            senha2 = senha2func.getText();
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(null, "Revise as senhas! ");
-            senha1func.grabFocus();// foca o campo
-            senha1func.setText(""); //limpa o campo
-            senha2func.grabFocus();// foca o campo
-            senha2func.setText(""); //limpa o campo
-        }
-        nome = nome_func.getText();
-        login = login_func.getText();
-        senha1 = senha1func.getText();
-        senha2 = senha2func.getText();
-        cargo = (String) cargo_func.getSelectedItem();
+        if (isEditMode) {
+            // Lógica de Atualização
+            // Nota: SQL antigo -> UPDATE ... WHERE login = ...?
+            // O sistema original atualiza baseado no Login antigo (loginOriginal)
+            String sqlUpdate = "UPDATE funcionario SET nomefuncionario='" + nome + "', cargofuncionario='" + cargo
+                    + "', loginfuncionario='" + login + "'";
 
-        // verificar as senhas digitadas
-        if (senha1.equals(senha2) == true) {
-            if (botaoAtualizarClick && mudando.equals(login)) {
-                String sqlUpdate = "UPDATE funcionario SET nomefuncionario='" + nome + "', cargofuncionario='" + cargo
-                        + "', loginfuncionario='" + login + "', senhafuncionario='" + senha1 + "' WHERE loginfuncionario='" + login + "'";
-                if (new ffuncionario().fazUpdate(sqlUpdate)) {
-                    JOptionPane.showMessageDialog(null, "Alterado com sucesso");
-                } else {
-                    JOptionPane.showMessageDialog(null, "Erro ao atualizar");
-                }
+            // Só atualiza senha se foi digitada
+            if (!senha1.isEmpty()) {
+                sqlUpdate += ", senhafuncionario='" + senha1 + "'";
+            }
+
+            sqlUpdate += " WHERE loginfuncionario='" + loginOriginal + "'";
+
+            if (funcDao.fazUpdate(sqlUpdate)) {
+                JOptionPane.showMessageDialog(this, "Funcionário atualizado com sucesso!");
+                limparCampos();
+                carregaTabela();
             } else {
-                vfuncionario novo;
-                novo = new vfuncionario(1, nome, cargo, login, senha1);
-                if (new ffuncionario().insercao(novo) == true) {
-                    JOptionPane.showMessageDialog(null, "Cadastrado com sucesso");
-                    nome_func.setText(""); //limpa o campo
-                    login_func.setText("");
-                    senha1func.setText(""); //limpa o campo
-                    senha2func.setText("");
-                } else {
-                    JOptionPane.showConfirmDialog(null, "Algo de errado");
-                }
+                JOptionPane.showMessageDialog(this, "Erro ao atualizar funcionário.", "Erro",
+                        JOptionPane.ERROR_MESSAGE);
             }
 
         } else {
-            JOptionPane.showMessageDialog(null, "As senhas informadas não conferem! ");
-
-        }
-        carregaTabela();
-
-    }//GEN-LAST:event_bt_salvarActionPerformed
-
-    private void cargo_funcActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cargo_funcActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_cargo_funcActionPerformed
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
+            // Lógica de Inserção
+            if (senha1.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "A senha é obrigatória para novos cadastros.", "Erro",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(TelaCadFuncionario.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(TelaCadFuncionario.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(TelaCadFuncionario.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(TelaCadFuncionario.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new TelaCadFuncionario().setVisible(true);
+            vfuncionario novo = new vfuncionario(1, nome, cargo, login, senha1);
+            if (funcDao.insercao(novo)) {
+                JOptionPane.showMessageDialog(this, "Funcionário cadastrado com sucesso!");
+                limparCampos();
+                carregaTabela();
+            } else {
+                JOptionPane.showMessageDialog(this, "Erro ao cadastrar. Verifique se o login já existe.", "Erro",
+                        JOptionPane.ERROR_MESSAGE);
             }
-        });
+        }
     }
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton bt_Excluir;
-    private javax.swing.JButton bt_atualizar;
-    private javax.swing.JButton bt_salvar;
-    private javax.swing.JButton bt_voltar;
-    private javax.swing.JComboBox<String> cargo_func;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextField login_func;
-    private javax.swing.JTextField nome_func;
-    private javax.swing.JPasswordField senha1func;
-    private javax.swing.JPasswordField senha2func;
-    private javax.swing.JTable tabelaFunc;
-    // End of variables declaration//GEN-END:variables
+    private void carregarParaEdicao() {
+        int row = tabelaFunc.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Selecione um funcionário na lista para editar.");
+            return;
+        }
+
+        String nome = (String) tabelaFunc.getValueAt(row, 0);
+        String cargo = (String) tabelaFunc.getValueAt(row, 1);
+        String login = (String) tabelaFunc.getValueAt(row, 2);
+
+        txtNome.setText(nome);
+        txtLogin.setText(login);
+        comboCargo.setSelectedItem(cargo);
+        txtSenha1.setText(""); // Não trazemos a senha por segurança
+        txtSenha2.setText("");
+
+        loginOriginal = login;
+        isEditMode = true;
+
+        // Destaque visual simples para indicar edição
+        txtNome.requestFocus();
+        setTitle("Cadastro de Funcionários - Editando: " + nome);
+    }
+
+    private void excluirFuncionario() {
+        int row = tabelaFunc.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Selecione um funcionário para excluir.");
+            return;
+        }
+
+        String nome = (String) tabelaFunc.getValueAt(row, 0);
+        String cargo = (String) tabelaFunc.getValueAt(row, 1);
+        String login = (String) tabelaFunc.getValueAt(row, 2);
+
+        ffuncionario funcDao = new ffuncionario();
+        int id = funcDao.getIdFuncionario(nome, cargo, login);
+
+        if (id != -1) {
+            int confirm = JOptionPane.showConfirmDialog(this,
+                    "Tem certeza que deseja excluir o funcionário '" + nome + "'?",
+                    "Confirmar Exclusão", JOptionPane.YES_NO_OPTION);
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                if (funcDao.excluirFuncionario(id)) {
+                    JOptionPane.showMessageDialog(this, "Funcionário excluído!");
+                    carregaTabela();
+                    limparCampos(); // Caso estivesse editando o que excluiu
+                } else {
+                    JOptionPane.showMessageDialog(this, "Erro ao excluir no banco de dados.");
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Funcionário não encontrado no banco (ID -1).");
+        }
+    }
+
+    private void limparCampos() {
+        txtNome.setText("");
+        txtLogin.setText("");
+        txtSenha1.setText("");
+        txtSenha2.setText("");
+        comboCargo.setSelectedIndex(0);
+
+        isEditMode = false;
+        loginOriginal = "";
+        setTitle("Cadastro de Funcionários");
+        tabelaFunc.clearSelection();
+    }
+
+    /**
+     * Método Main para testes isolados
+     */
+    public static void main(String args[]) {
+        try {
+            FlatIntelliJLaf.setup();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        java.awt.EventQueue.invokeLater(() -> {
+            new TelaCadFuncionario().setVisible(true);
+        });
+    }
 }

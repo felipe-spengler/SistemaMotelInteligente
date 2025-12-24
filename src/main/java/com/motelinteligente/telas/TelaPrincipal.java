@@ -200,7 +200,10 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         configGlobal config = configGlobal.getInstance();
 
         if (config.getAlarmesAtivos() > 0) {
-            try (Connection conn = new fazconexao().conectar(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery("SELECT id, hora_despertar, descricao FROM alarmes WHERE ativo = TRUE")) {
+            try (Connection conn = new fazconexao().conectar();
+                    Statement stmt = conn.createStatement();
+                    ResultSet rs = stmt
+                            .executeQuery("SELECT id, hora_despertar, descricao FROM alarmes WHERE ativo = TRUE")) {
 
                 while (rs.next()) {
                     int idAlarme = rs.getInt("id");
@@ -241,8 +244,10 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                         if (anoAtual > anoAlarme
                                 || (anoAtual == anoAlarme && mesAtual > mesAlarme)
                                 || (anoAtual == anoAlarme && mesAtual == mesAlarme && diaAtual > diaAlarme)
-                                || (anoAtual == anoAlarme && mesAtual == mesAlarme && diaAtual == diaAlarme && horaAtual > horaAlarme)
-                                || (anoAtual == anoAlarme && mesAtual == mesAlarme && diaAtual == diaAlarme && horaAtual == horaAlarme && minutoAtual > minutoAlarme)) {
+                                || (anoAtual == anoAlarme && mesAtual == mesAlarme && diaAtual == diaAlarme
+                                        && horaAtual > horaAlarme)
+                                || (anoAtual == anoAlarme && mesAtual == mesAlarme && diaAtual == diaAlarme
+                                        && horaAtual == horaAlarme && minutoAtual > minutoAlarme)) {
 
                             // Verificar se passou mais de 5 minutos
                             long diferencaMillis = agora.getTimeInMillis() - alarmeCalendar.getTimeInMillis();
@@ -279,8 +284,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 null,
                 "<html><span style='font-size:32px;'>  " + description + " </span></html>",
                 "Atenção!",
-                JOptionPane.WARNING_MESSAGE
-        );
+                JOptionPane.WARNING_MESSAGE);
 
         soundPlayer.stopSound(); // Para o som quando o alerta é fechado
         new FAlarmes().removeAlarmFromDatabase(idAlarme);
@@ -322,7 +326,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             if (status.equals("livre")) {
                 botaoStatus.setEnabled(true);
                 alteradorPaineis.setEnabledAt(1, false);
-                this.painelSecundario.setBackground(Color.green);
+                this.painelSecundario.setBackground(new Color(46, 204, 113)); // Emerald (Livre)
                 // troca os botoes
                 iniciar();
 
@@ -330,13 +334,13 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             if (status.equals("manutencao")) {
                 botaoStatus.setEnabled(true);
                 alteradorPaineis.setEnabledAt(1, false);
-                this.painelSecundario.setBackground(Color.gray);
+                this.painelSecundario.setBackground(new Color(149, 165, 166)); // Concrete (Manutenção)
                 iniciar();
             }
             if (status.equals("reservado")) {
                 botaoStatus.setEnabled(true);
                 alteradorPaineis.setEnabledAt(1, false);
-                this.painelSecundario.setBackground(Color.cyan);
+                this.painelSecundario.setBackground(new Color(52, 152, 219)); // Sky Blue (Reservado)
                 iniciar();
             }
             if (status.contains("ocupado")) {
@@ -362,20 +366,20 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                     quartoOcupado.setIdLoca(novoID);
                     cache.getCacheOcupado().put(quartoEmFoco, quartoOcupado);
                 }
-                //insere prevendidos tabela
+                // insere prevendidos tabela
                 populaPrevendidos();
                 atualizaAntecipado(idLoca);
                 if (partes[1].equals("pernoite")) {
-                    this.painelSecundario.setBackground(Color.MAGENTA);
+                    this.painelSecundario.setBackground(new Color(155, 89, 182)); // Amethyst (Pernoite)
                 } else if (partes[1].equals("periodo")) {
-                    this.painelSecundario.setBackground(Color.red);
+                    this.painelSecundario.setBackground(new Color(231, 76, 60)); // Alizarin (Período/Ocupado)
                 }
                 setValorQuarto();
             }
             if (status.equals("limpeza")) {
                 botaoStatus.setEnabled(true);
                 alteradorPaineis.setEnabledAt(1, false);
-                this.painelSecundario.setBackground(Color.yellow);
+                this.painelSecundario.setBackground(new Color(241, 196, 15)); // Sunflower (Limpeza)
                 iniciar();
             }
 
@@ -407,11 +411,11 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                         float total = valor * quantidade;
                         totalVendido += total;
 
-                        modelo.addRow(new Object[]{
-                            quantidade,
-                            desc,
-                            valor,
-                            total
+                        modelo.addRow(new Object[] {
+                                quantidade,
+                                desc,
+                                valor,
+                                total
                         });
                     }
 
@@ -457,7 +461,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         String[] partes = status.split("-");
         if (partes[1].equals("pernoite")) {
             float valor = ocupado.getValorPernoite();
-            //adiciona o valor do adicional de pessoas
+            // adiciona o valor do adicional de pessoas
             valor += calculaAdicionalPessoa(ocupado.getNumeroPessoas());
             lblValorQuarto.setText(String.valueOf(valor));
             int numeroAdicionais = subtrairHora(quartoEmFoco, horarioQuarto, "pernoite");
@@ -465,7 +469,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             lblHoraAdicional.setText(String.valueOf(valorAdicional));
         } else if (partes[1].equals("periodo")) {
             float valor = ocupado.getValorPeriodo();
-            //adiciona o valor do adicional de pessoas
+            // adiciona o valor do adicional de pessoas
             valor += calculaAdicionalPessoa(ocupado.getNumeroPessoas());
             lblValorQuarto.setText(String.valueOf(valor));
             int numeroAdicionais = subtrairHora(quartoEmFoco, horarioQuarto, ocupado.getTempoPeriodo());
@@ -548,7 +552,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
      * regenerated by the Form Editor.
      */
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jSeparator2 = new javax.swing.JSeparator();
@@ -651,46 +656,38 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         javax.swing.GroupLayout jFrame1Layout = new javax.swing.GroupLayout(jFrame1.getContentPane());
         jFrame1.getContentPane().setLayout(jFrame1Layout);
         jFrame1Layout.setHorizontalGroup(
-            jFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
+                jFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 400, Short.MAX_VALUE));
         jFrame1Layout.setVerticalGroup(
-            jFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
+                jFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 300, Short.MAX_VALUE));
 
         javax.swing.GroupLayout jFrame2Layout = new javax.swing.GroupLayout(jFrame2.getContentPane());
         jFrame2.getContentPane().setLayout(jFrame2Layout);
         jFrame2Layout.setHorizontalGroup(
-            jFrame2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
+                jFrame2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 400, Short.MAX_VALUE));
         jFrame2Layout.setVerticalGroup(
-            jFrame2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
+                jFrame2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 300, Short.MAX_VALUE));
 
         javax.swing.GroupLayout jFrame3Layout = new javax.swing.GroupLayout(jFrame3.getContentPane());
         jFrame3.getContentPane().setLayout(jFrame3Layout);
         jFrame3Layout.setHorizontalGroup(
-            jFrame3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
+                jFrame3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 400, Short.MAX_VALUE));
         jFrame3Layout.setVerticalGroup(
-            jFrame3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
+                jFrame3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 300, Short.MAX_VALUE));
 
         javax.swing.GroupLayout jFrame4Layout = new javax.swing.GroupLayout(jFrame4.getContentPane());
         jFrame4.getContentPane().setLayout(jFrame4Layout);
         jFrame4Layout.setHorizontalGroup(
-            jFrame4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
+                jFrame4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 400, Short.MAX_VALUE));
         jFrame4Layout.setVerticalGroup(
-            jFrame4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
+                jFrame4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 300, Short.MAX_VALUE));
 
         jMenuItem2.setText("jMenuItem2");
 
@@ -713,7 +710,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         menuStatus.add(itemManutencao);
 
         limpezaDisponivel.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        limpezaDisponivel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/sign-check-icon_34365.png"))); // NOI18N
+        limpezaDisponivel
+                .setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/sign-check-icon_34365.png"))); // NOI18N
         limpezaDisponivel.setText("Disponibilizar Quarto");
         limpezaDisponivel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -723,7 +721,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         menuLimpeza.add(limpezaDisponivel);
 
         limpezaManutencao.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        limpezaManutencao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/bill_payment_note_icon_143263.png"))); // NOI18N
+        limpezaManutencao.setIcon(
+                new javax.swing.ImageIcon(getClass().getResource("/imagens/bill_payment_note_icon_143263.png"))); // NOI18N
         limpezaManutencao.setText("Iniciar Manutencao");
         limpezaManutencao.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -768,9 +767,11 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             public void windowClosed(java.awt.event.WindowEvent evt) {
                 formWindowClosed(evt);
             }
+
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
             }
+
             public void windowOpened(java.awt.event.WindowEvent evt) {
                 formWindowOpened(evt);
             }
@@ -822,7 +823,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         lblNumero.setText(" ");
 
         botaoStatus.setFont(new java.awt.Font("Segoe UI", 2, 14)); // NOI18N
-        botaoStatus.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/flat-style-circle-edit_icon-icons.com_66939.png"))); // NOI18N
+        botaoStatus.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/imagens/flat-style-circle-edit_icon-icons.com_66939.png"))); // NOI18N
         botaoStatus.setText("Alterar STATUS do Quarto");
         botaoStatus.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -833,22 +835,22 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGap(23, 23, 23)
-                .addComponent(lblNumero)
-                .addGap(18, 18, 18)
-                .addComponent(botaoStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 337, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+                jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addGap(23, 23, 23)
+                                .addComponent(lblNumero)
+                                .addGap(18, 18, 18)
+                                .addComponent(botaoStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 337,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
         jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblNumero)
-                    .addComponent(botaoStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)))
-        );
+                jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(lblNumero)
+                                        .addComponent(botaoStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 35,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE))));
 
         lblEntrada.setFont(new java.awt.Font("Nunito", 1, 18)); // NOI18N
         lblEntrada.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -924,123 +926,155 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         javax.swing.GroupLayout painelSecundarioLayout = new javax.swing.GroupLayout(painelSecundario);
         painelSecundario.setLayout(painelSecundarioLayout);
         painelSecundarioLayout.setHorizontalGroup(
-            painelSecundarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(botaoEncerrar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(painelSecundarioLayout.createSequentialGroup()
-                .addGap(13, 13, 13)
-                .addGroup(painelSecundarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(painelSecundarioLayout.createSequentialGroup()
-                        .addGroup(painelSecundarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(painelSecundarioLayout.createSequentialGroup()
-                                .addComponent(jLabel9)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel10))
-                            .addGroup(painelSecundarioLayout.createSequentialGroup()
-                                .addComponent(jLabel7)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabel8)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(painelSecundarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblValorConsumo)
-                            .addComponent(lblValorQuarto))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(painelSecundarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(painelSecundarioLayout.createSequentialGroup()
-                                .addComponent(jLabel11)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabel12)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(lblHoraAdicional))
-                            .addGroup(painelSecundarioLayout.createSequentialGroup()
-                                .addComponent(jLabel13)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtPessoas, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(33, 33, 33))
-                    .addGroup(painelSecundarioLayout.createSequentialGroup()
-                        .addComponent(jButton4)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, 306, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-            .addGroup(painelSecundarioLayout.createSequentialGroup()
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
-            .addGroup(painelSecundarioLayout.createSequentialGroup()
-                .addGroup(painelSecundarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(botaoIniciar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(botaoTroca, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
-        );
+                painelSecundarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(botaoEncerrar, javax.swing.GroupLayout.Alignment.TRAILING,
+                                javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                Short.MAX_VALUE)
+                        .addGroup(painelSecundarioLayout.createSequentialGroup()
+                                .addGap(13, 13, 13)
+                                .addGroup(painelSecundarioLayout
+                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(painelSecundarioLayout.createSequentialGroup()
+                                                .addGroup(painelSecundarioLayout
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(painelSecundarioLayout.createSequentialGroup()
+                                                                .addComponent(jLabel9)
+                                                                .addPreferredGap(
+                                                                        javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addComponent(jLabel10))
+                                                        .addGroup(painelSecundarioLayout.createSequentialGroup()
+                                                                .addComponent(jLabel7)
+                                                                .addPreferredGap(
+                                                                        javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                                .addComponent(jLabel8)))
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addGroup(painelSecundarioLayout
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(lblValorConsumo)
+                                                        .addComponent(lblValorQuarto))
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED,
+                                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addGroup(painelSecundarioLayout
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING,
+                                                                false)
+                                                        .addGroup(painelSecundarioLayout.createSequentialGroup()
+                                                                .addComponent(jLabel11)
+                                                                .addPreferredGap(
+                                                                        javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                                .addComponent(jLabel12)
+                                                                .addPreferredGap(
+                                                                        javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                                .addComponent(lblHoraAdicional))
+                                                        .addGroup(painelSecundarioLayout.createSequentialGroup()
+                                                                .addComponent(jLabel13)
+                                                                .addPreferredGap(
+                                                                        javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addComponent(txtPessoas,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE, 43,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                                .addGap(33, 33, 33))
+                                        .addGroup(painelSecundarioLayout.createSequentialGroup()
+                                                .addComponent(jButton4)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(lblEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, 306,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                        Short.MAX_VALUE))))
+                        .addGroup(painelSecundarioLayout.createSequentialGroup()
+                                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                        .addGroup(painelSecundarioLayout.createSequentialGroup()
+                                .addGroup(painelSecundarioLayout
+                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(botaoIniciar, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(botaoTroca, javax.swing.GroupLayout.Alignment.TRAILING,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addContainerGap()));
         painelSecundarioLayout.setVerticalGroup(
-            painelSecundarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(painelSecundarioLayout.createSequentialGroup()
-                .addGap(5, 5, 5)
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(painelSecundarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jButton4)
-                    .addComponent(lblEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(painelSecundarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(painelSecundarioLayout.createSequentialGroup()
-                        .addGroup(painelSecundarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel7)
-                            .addComponent(jLabel8))
-                        .addGap(16, 16, 16)
-                        .addGroup(painelSecundarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel9)
-                            .addComponent(jLabel10)))
-                    .addGroup(painelSecundarioLayout.createSequentialGroup()
-                        .addGroup(painelSecundarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lblValorQuarto)
-                            .addComponent(jLabel11)
-                            .addComponent(jLabel12)
-                            .addComponent(lblHoraAdicional))
-                        .addGroup(painelSecundarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(painelSecundarioLayout.createSequentialGroup()
-                                .addGap(16, 16, 16)
-                                .addGroup(painelSecundarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(lblValorConsumo)
-                                    .addComponent(jLabel13)))
-                            .addGroup(painelSecundarioLayout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(txtPessoas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(2, 2, 2)))
-                .addGap(12, 12, 12)
-                .addComponent(botaoEncerrar)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(botaoIniciar)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(botaoTroca)
-                .addGap(5, 5, 5))
-        );
+                painelSecundarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(painelSecundarioLayout.createSequentialGroup()
+                                .addGap(5, 5, 5)
+                                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(painelSecundarioLayout
+                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(jButton4)
+                                        .addComponent(lblEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, 39,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(18, 18, 18)
+                                .addGroup(painelSecundarioLayout
+                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addGroup(painelSecundarioLayout.createSequentialGroup()
+                                                .addGroup(painelSecundarioLayout
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                        .addComponent(jLabel7)
+                                                        .addComponent(jLabel8))
+                                                .addGap(16, 16, 16)
+                                                .addGroup(painelSecundarioLayout
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                        .addComponent(jLabel9)
+                                                        .addComponent(jLabel10)))
+                                        .addGroup(painelSecundarioLayout.createSequentialGroup()
+                                                .addGroup(painelSecundarioLayout
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                        .addComponent(lblValorQuarto)
+                                                        .addComponent(jLabel11)
+                                                        .addComponent(jLabel12)
+                                                        .addComponent(lblHoraAdicional))
+                                                .addGroup(painelSecundarioLayout
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(painelSecundarioLayout.createSequentialGroup()
+                                                                .addGap(16, 16, 16)
+                                                                .addGroup(painelSecundarioLayout.createParallelGroup(
+                                                                        javax.swing.GroupLayout.Alignment.BASELINE)
+                                                                        .addComponent(lblValorConsumo)
+                                                                        .addComponent(jLabel13)))
+                                                        .addGroup(painelSecundarioLayout.createSequentialGroup()
+                                                                .addPreferredGap(
+                                                                        javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                                .addComponent(txtPessoas,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                        javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                                .addGap(2, 2, 2)))
+                                .addGap(12, 12, 12)
+                                .addComponent(botaoEncerrar)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(botaoIniciar)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(botaoTroca)
+                                .addGap(5, 5, 5)));
 
         alteradorPaineis.addTab("Principal", painelSecundario);
 
         tabela1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         tabela1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Qnt", "Descrição", "Valor und", "Valor Total"
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.String.class, java.lang.Float.class, java.lang.Float.class
+                new Object[][] {
+                        { null, null, null, null },
+                        { null, null, null, null },
+                        { null, null, null, null },
+                        { null, null, null, null }
+                },
+                new String[] {
+                        "Qnt", "Descrição", "Valor und", "Valor Total"
+                }) {
+            Class[] types = new Class[] {
+                    java.lang.Integer.class, java.lang.String.class, java.lang.Float.class, java.lang.Float.class
             };
-            boolean[] canEdit = new boolean [] {
-                false, false, false, false
+            boolean[] canEdit = new boolean[] {
+                    false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
+                return types[columnIndex];
             }
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
+                return canEdit[columnIndex];
             }
         });
         tabela1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
@@ -1114,74 +1148,90 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel6Layout.createSequentialGroup()
-                .addGap(29, 29, 29)
-                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
-                            .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                            .addComponent(txtDescontoNegociado, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE))
+                jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(jPanel6Layout.createSequentialGroup()
-                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(txtAntecipado, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(jPanel6Layout.createSequentialGroup()
-                        .addComponent(bt_Antecipado, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btNegociar, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(45, Short.MAX_VALUE))
-        );
+                                .addGap(29, 29, 29)
+                                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(jPanel6Layout
+                                                .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout
+                                                        .createSequentialGroup()
+                                                        .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addPreferredGap(
+                                                                javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                        .addComponent(txtDescontoNegociado,
+                                                                javax.swing.GroupLayout.PREFERRED_SIZE, 157,
+                                                                javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addGroup(jPanel6Layout.createSequentialGroup()
+                                                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                158, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addPreferredGap(
+                                                                javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                        .addComponent(txtAntecipado,
+                                                                javax.swing.GroupLayout.PREFERRED_SIZE, 157,
+                                                                javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                        .addGroup(jPanel6Layout.createSequentialGroup()
+                                                .addComponent(bt_Antecipado, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                        175, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(btNegociar, javax.swing.GroupLayout.PREFERRED_SIZE, 175,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addContainerGap(45, Short.MAX_VALUE)));
         jPanel6Layout.setVerticalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
-                .addContainerGap(24, Short.MAX_VALUE)
-                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(bt_Antecipado)
-                    .addComponent(btNegociar))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(txtAntecipado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
-                    .addComponent(txtDescontoNegociado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(36, 36, 36))
-        );
+                jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
+                                .addContainerGap(24, Short.MAX_VALUE)
+                                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(bt_Antecipado)
+                                        .addComponent(btNegociar))
+                                .addGap(18, 18, 18)
+                                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel1)
+                                        .addComponent(txtAntecipado, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(18, 18, 18)
+                                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel3)
+                                        .addComponent(txtDescontoNegociado, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(36, 36, 36)));
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(10, 10, 10))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(bt_inserirProduto)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(bt_apagarProduto)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 386, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+                jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(10, 10, 10))
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(bt_inserirProduto)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(bt_apagarProduto)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 386,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
         jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(bt_inserirProduto)
-                    .addComponent(bt_apagarProduto))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+                jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 135,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(bt_inserirProduto)
+                                        .addComponent(bt_apagarProduto))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
 
         alteradorPaineis.addTab("Antecipado", jPanel5);
 
@@ -1190,17 +1240,16 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         javax.swing.GroupLayout painelSecundario2Layout = new javax.swing.GroupLayout(painelSecundario2);
         painelSecundario2.setLayout(painelSecundario2Layout);
         painelSecundario2Layout.setHorizontalGroup(
-            painelSecundario2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(painelSecundario2Layout.createSequentialGroup()
-                .addGap(0, 0, 0)
-                .addComponent(alteradorPaineis))
-        );
+                painelSecundario2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(painelSecundario2Layout.createSequentialGroup()
+                                .addGap(0, 0, 0)
+                                .addComponent(alteradorPaineis)));
         painelSecundario2Layout.setVerticalGroup(
-            painelSecundario2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelSecundario2Layout.createSequentialGroup()
-                .addGap(5, 5, 5)
-                .addComponent(alteradorPaineis))
-        );
+                painelSecundario2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING,
+                                painelSecundario2Layout.createSequentialGroup()
+                                        .addGap(5, 5, 5)
+                                        .addComponent(alteradorPaineis)));
 
         jButton1.setFont(new java.awt.Font("Tw Cen MT", 3, 18)); // NOI18N
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/bt_entrada_icone.png"))); // NOI18N
@@ -1238,71 +1287,92 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jSeparator5, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel2Layout.createSequentialGroup()
+                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addContainerGap()
                                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jSeparator3, javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addGroup(jPanel2Layout.createSequentialGroup()
-                                        .addGap(132, 132, 132)
-                                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jLabel5)
-                                            .addComponent(lblPermissao))
-                                        .addGap(32, 32, 32)
-                                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(lblCargo)
-                                            .addComponent(lblUsuario))
-                                        .addGap(0, 0, Short.MAX_VALUE)))
-                                .addGap(35, 35, 35)))
-                        .addGap(17, 17, 17))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addGap(6, 6, 6)
-                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addComponent(painelSecundario2))
-                        .addGap(35, 35, 35))))
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(195, 195, 195)
-                .addComponent(jLabel2)
-                .addGap(0, 0, Short.MAX_VALUE))
-        );
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout
+                                                .createSequentialGroup()
+                                                .addGroup(jPanel2Layout
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                        .addComponent(jSeparator5,
+                                                                javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(jPanel2Layout.createSequentialGroup()
+                                                                .addGroup(jPanel2Layout.createParallelGroup(
+                                                                        javax.swing.GroupLayout.Alignment.LEADING)
+                                                                        .addComponent(jSeparator3,
+                                                                                javax.swing.GroupLayout.Alignment.TRAILING)
+                                                                        .addGroup(jPanel2Layout.createSequentialGroup()
+                                                                                .addGap(132, 132, 132)
+                                                                                .addGroup(jPanel2Layout
+                                                                                        .createParallelGroup(
+                                                                                                javax.swing.GroupLayout.Alignment.LEADING)
+                                                                                        .addComponent(jLabel5)
+                                                                                        .addComponent(lblPermissao))
+                                                                                .addGap(32, 32, 32)
+                                                                                .addGroup(jPanel2Layout
+                                                                                        .createParallelGroup(
+                                                                                                javax.swing.GroupLayout.Alignment.LEADING)
+                                                                                        .addComponent(lblCargo)
+                                                                                        .addComponent(lblUsuario))
+                                                                                .addGap(0, 0, Short.MAX_VALUE)))
+                                                                .addGap(35, 35, 35)))
+                                                .addGap(17, 17, 17))
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout
+                                                .createSequentialGroup()
+                                                .addGroup(jPanel2Layout
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                        .addGroup(jPanel2Layout.createSequentialGroup()
+                                                                .addGap(6, 6, 6)
+                                                                .addComponent(jButton1,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE, 153,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addPreferredGap(
+                                                                        javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addComponent(jButton2,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE, 72,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addPreferredGap(
+                                                                        javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addComponent(jButton3,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE, 154,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addGap(0, 0, Short.MAX_VALUE))
+                                                        .addComponent(painelSecundario2))
+                                                .addGap(35, 35, 35))))
+                        .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addGap(195, 195, 195)
+                                .addComponent(jLabel2)
+                                .addGap(0, 0, Short.MAX_VALUE)));
         jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(9, 9, 9)
-                .addComponent(jLabel2)
-                .addGap(18, 18, 18)
-                .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5)
-                    .addComponent(lblUsuario))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblPermissao)
-                    .addComponent(lblCargo))
-                .addGap(0, 0, 0)
-                .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(jButton3)
-                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(1, 1, 1)
-                .addComponent(painelSecundario2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-        );
+                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addGap(9, 9, 9)
+                                .addComponent(jLabel2)
+                                .addGap(18, 18, 18)
+                                .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 10,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, 0)
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel5)
+                                        .addComponent(lblUsuario))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(lblPermissao)
+                                        .addComponent(lblCargo))
+                                .addGap(0, 0, 0)
+                                .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jButton1)
+                                        .addComponent(jButton3)
+                                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 52,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(1, 1, 1)
+                                .addComponent(painelSecundario2, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap()));
 
         jScrollPane1.setViewportView(jPanel2);
 
@@ -1317,13 +1387,11 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         javax.swing.GroupLayout srPaneLayout = new javax.swing.GroupLayout(srPane);
         srPane.setLayout(srPaneLayout);
         srPaneLayout.setHorizontalGroup(
-            srPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 981, Short.MAX_VALUE)
-        );
+                srPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 981, Short.MAX_VALUE));
         srPaneLayout.setVerticalGroup(
-            srPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 556, Short.MAX_VALUE)
-        );
+                srPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 556, Short.MAX_VALUE));
 
         painelBotton.setBackground(new java.awt.Color(255, 255, 255));
         painelBotton.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -1347,49 +1415,53 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         javax.swing.GroupLayout painelReservasProximasLayout = new javax.swing.GroupLayout(painelReservasProximas);
         painelReservasProximas.setLayout(painelReservasProximasLayout);
         painelReservasProximasLayout.setHorizontalGroup(
-            painelReservasProximasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(painelReservasProximasLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(labelReservas, javax.swing.GroupLayout.PREFERRED_SIZE, 554, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-        );
+                painelReservasProximasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(painelReservasProximasLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(labelReservas, javax.swing.GroupLayout.PREFERRED_SIZE, 554,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap()));
         painelReservasProximasLayout.setVerticalGroup(
-            painelReservasProximasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(painelReservasProximasLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(labelReservas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
-        );
+                painelReservasProximasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(painelReservasProximasLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(labelReservas, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addContainerGap()));
 
         javax.swing.GroupLayout painelBottonLayout = new javax.swing.GroupLayout(painelBotton);
         painelBotton.setLayout(painelBottonLayout);
         painelBottonLayout.setHorizontalGroup(
-            painelBottonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelBottonLayout.createSequentialGroup()
-                .addGap(185, 185, 185)
-                .addComponent(painelReservasProximas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 242, Short.MAX_VALUE)
-                .addComponent(lblAlarmeAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(labelData)
-                .addGap(18, 18, 18)
-                .addComponent(labelHora)
-                .addGap(236, 236, 236))
-        );
+                painelBottonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelBottonLayout.createSequentialGroup()
+                                .addGap(185, 185, 185)
+                                .addComponent(painelReservasProximas, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 242,
+                                        Short.MAX_VALUE)
+                                .addComponent(lblAlarmeAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, 51,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(labelData)
+                                .addGap(18, 18, 18)
+                                .addComponent(labelHora)
+                                .addGap(236, 236, 236)));
         painelBottonLayout.setVerticalGroup(
-            painelBottonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelBottonLayout.createSequentialGroup()
-                .addContainerGap(61, Short.MAX_VALUE)
-                .addGroup(painelBottonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblAlarmeAtivo)
-                    .addGroup(painelBottonLayout.createSequentialGroup()
-                        .addGap(8, 8, 8)
-                        .addGroup(painelBottonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(labelData)
-                            .addComponent(labelHora))))
-                .addGap(20, 20, 20))
-            .addComponent(painelReservasProximas, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 113, Short.MAX_VALUE)
-        );
+                painelBottonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelBottonLayout.createSequentialGroup()
+                                .addContainerGap(61, Short.MAX_VALUE)
+                                .addGroup(painelBottonLayout
+                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(lblAlarmeAtivo)
+                                        .addGroup(painelBottonLayout.createSequentialGroup()
+                                                .addGap(8, 8, 8)
+                                                .addGroup(painelBottonLayout
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                        .addComponent(labelData)
+                                                        .addComponent(labelHora))))
+                                .addGap(20, 20, 20))
+                        .addComponent(painelReservasProximas, javax.swing.GroupLayout.Alignment.TRAILING,
+                                javax.swing.GroupLayout.DEFAULT_SIZE, 113, Short.MAX_VALUE));
 
         btCadastros.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/cadastro.png"))); // NOI18N
         btCadastros.setText("Cadastros    |");
@@ -1427,7 +1499,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         jMenuBar1.add(btCadastros);
 
-        jMenu2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/businesspackage_additionalpackage_box_add_insert_negoci_2335.png"))); // NOI18N
+        jMenu2.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/imagens/businesspackage_additionalpackage_box_add_insert_negoci_2335.png"))); // NOI18N
         jMenu2.setText("Produtos");
         jMenu2.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jMenu2.addActionListener(new java.awt.event.ActionListener() {
@@ -1507,7 +1580,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         jMenu18.setText("Produtos");
         jMenu18.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
-        menuRelaVenProdutos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_rela_produto.png"))); // NOI18N
+        menuRelaVenProdutos
+                .setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_rela_produto.png"))); // NOI18N
         menuRelaVenProdutos.setText("Relatório Produtos Vendidos");
         menuRelaVenProdutos.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         menuRelaVenProdutos.addActionListener(new java.awt.event.ActionListener() {
@@ -1647,36 +1721,52 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(srPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(painelQuartos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, 0)
-                        .addComponent(tabela, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 468, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(painelBotton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-        );
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(srPane, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                        javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED,
+                                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addComponent(painelQuartos, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                        javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(0, 0, 0)
+                                                .addComponent(tabela, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                        javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 468,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addComponent(painelBotton, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))));
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(tabela, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(139, 139, 139)
-                        .addComponent(painelQuartos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(srPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(painelBotton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
-        );
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(tabela, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGap(139, 139, 139)
+                                                .addComponent(painelQuartos, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                        javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addContainerGap()
+                                                .addComponent(srPane, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                        javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(painelBotton, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addContainerGap()));
 
         painelBotton.getAccessibleContext().setAccessibleName("");
 
@@ -1686,11 +1776,11 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void menuReservasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menuReservasMouseClicked
+    private void menuReservasMouseClicked(java.awt.event.MouseEvent evt) {// GEN-FIRST:event_menuReservasMouseClicked
         new GerenciarReservas().setVisible(true);
-    }//GEN-LAST:event_menuReservasMouseClicked
+    }// GEN-LAST:event_menuReservasMouseClicked
 
-    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {// GEN-FIRST:event_formWindowOpened
         configGlobal config = configGlobal.getInstance();
         setLabel(config.getUsuario(), config.getCargoUsuario());
         // Mostra os quartos inicialmente
@@ -1707,7 +1797,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         }
 
         // carrega o numero de alarmes ativos ao iniciar o sistema
-        try (Connection conn = new fazconexao().conectar(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(" SELECT COUNT(*) AS total FROM alarmes ")) {
+        try (Connection conn = new fazconexao().conectar();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(" SELECT COUNT(*) AS total FROM alarmes ")) {
             if (rs.next()) {
                 int alarmesAtivos = rs.getInt("total");
                 config.setAlarmesAtivos(alarmesAtivos);
@@ -1743,7 +1835,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                     });
                 }
             }
-        }, 0, 750);  // Atualiza a cada 1/2 segundo
+        }, 0, 750); // Atualiza a cada 1/2 segundo
 
         Timer alarmeTimer = new Timer();
         alarmeTimer.scheduleAtFixedRate(new TimerTask() {
@@ -1768,7 +1860,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 mostraQuartos();
                 focoQuarto();
             }
-        }, 0, 20000);  // Atualiza a cada 20 segundos
+        }, 0, 20000); // Atualiza a cada 20 segundos
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleAtFixedRate(() -> {
             verificarReservasProximas();
@@ -1783,7 +1875,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private String getSistemaProperty() {
         Properties props = new Properties();
 
-        // CORREÇÃO CRÍTICA: Corrigido o erro de digitação de "Documetos" para "Documents"
+        // CORREÇÃO CRÍTICA: Corrigido o erro de digitação de "Documetos" para
+        // "Documents"
         String userHome = System.getProperty("user.home");
         String path = userHome + File.separator + "Documents"
                 + File.separator + "logs" + File.separator + "application.properties";
@@ -1848,7 +1941,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 }
 
                 // Define os botões personalizados
-                Object[] options = {"Pagar Agora", "Pagar Depois"};
+                Object[] options = { "Pagar Agora", "Pagar Depois" };
 
                 // Exibe a janela modal
                 int escolha = JOptionPane.showOptionDialog(
@@ -1867,7 +1960,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                     // Abre o navegador com o link
                     abrirURL(redirectUrl);
                 }
-                // Se o usuário clicar em "Pagar Depois" (NO_OPTION) ou fechar no X (CANCEL_OPTION), a função apenas sai (ignora).
+                // Se o usuário clicar em "Pagar Depois" (NO_OPTION) ou fechar no X
+                // (CANCEL_OPTION), a função apenas sai (ignora).
 
             }
         } catch (Exception e) {
@@ -1888,7 +1982,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             } catch (Exception e) {
                 // Log de erro se o navegador não puder ser aberto
                 logger.error("Não foi possível abrir o navegador: " + e);
-                JOptionPane.showMessageDialog(null, "Não foi possível abrir o navegador. Copie e cole este link:\n" + url, "Erro", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null,
+                        "Não foi possível abrir o navegador. Copie e cole este link:\n" + url, "Erro",
+                        JOptionPane.ERROR_MESSAGE);
             }
         } else {
             // Solução de fallback para ambientes sem suporte a Desktop API
@@ -1903,17 +1999,20 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 }
             } catch (Exception e) {
                 logger.error("Não foi possível executar o comando de abertura de URL: " + e);
-                JOptionPane.showMessageDialog(null, "Não foi possível abrir o navegador. Copie e cole este link:\n" + url, "Erro", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null,
+                        "Não foi possível abrir o navegador. Copie e cole este link:\n" + url, "Erro",
+                        JOptionPane.ERROR_MESSAGE);
             }
         }
     }
 
     private void verificarReservasProximas() {
 
-        try (Connection conn = new fazconexao().conectar(); PreparedStatement stmt = conn.prepareStatement(
-                "SELECT * FROM reservas "
-                + "WHERE TIMESTAMP(data_entrada, horario_entrada) BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 12 HOUR)"
-        ); ResultSet rs = stmt.executeQuery()) {
+        try (Connection conn = new fazconexao().conectar();
+                PreparedStatement stmt = conn.prepareStatement(
+                        "SELECT * FROM reservas "
+                                + "WHERE TIMESTAMP(data_entrada, horario_entrada) BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 12 HOUR)");
+                ResultSet rs = stmt.executeQuery()) {
 
             CacheDados cache = CacheDados.getInstancia();
             StringBuilder textoHTML = new StringBuilder("<html>");
@@ -1928,7 +2027,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 String valorPago = rs.getString("valor_pago");
                 String nome = rs.getString("observacao");
 
-                //verifica qual o status do quarto > se possível reserva ele
+                // verifica qual o status do quarto > se possível reserva ele
                 CarregaQuarto quarto = cache.getCacheQuarto().get(Integer.parseInt(numero));
                 System.out.println("quarto de num " + numero + " está reservado");
                 if (!quarto.getStatusQuarto().contains("ocupado") || quarto.getStatusQuarto().equals("limpeza")) {
@@ -1985,7 +2084,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private void mostraQuartos() {
         String status = null, data = null;
         long currentTime = System.currentTimeMillis();
-        // Se a última atualização foi há menos de UPDATE_INTERVAL, cancela esta execução
+        // Se a última atualização foi há menos de UPDATE_INTERVAL, cancela esta
+        // execução
         if (currentTime - lastUpdate < UPDATE_INTERVAL) {
             try {
                 Thread.sleep(1000); // espera 1 segundo
@@ -2135,21 +2235,23 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         editarLocacaoItem.setFont(new Font("Arial", Font.PLAIN, 16));
         popupMenu.add(editarLocacaoItem);
 
-    }//GEN-LAST:event_formWindowOpened
+    }// GEN-LAST:event_formWindowOpened
+
     public void fecharTela() throws IOException {
         this.dispose();
         new TelaLogin().setVisible(true);
     }
-    private void menuReservasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuReservasActionPerformed
-        //DEPOIS IMPLEMENTAR A PARTE DE RESERVAS AQUI
 
-    }//GEN-LAST:event_menuReservasActionPerformed
+    private void menuReservasActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuReservasActionPerformed
+        // DEPOIS IMPLEMENTAR A PARTE DE RESERVAS AQUI
 
-    private void lblUsuarioPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_lblUsuarioPropertyChange
+    }// GEN-LAST:event_menuReservasActionPerformed
+
+    private void lblUsuarioPropertyChange(java.beans.PropertyChangeEvent evt) {// GEN-FIRST:event_lblUsuarioPropertyChange
         // TODO add your handling code here:
-    }//GEN-LAST:event_lblUsuarioPropertyChange
+    }// GEN-LAST:event_lblUsuarioPropertyChange
 
-    private void itemReservaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemReservaActionPerformed
+    private void itemReservaActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_itemReservaActionPerformed
         // TODO add your handling code here:
         if (quartoEmFoco != 0) {
             mudaStatusNaCache(quartoEmFoco, "reservado", null);
@@ -2169,9 +2271,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             };
             worker.execute();
         }
-    }//GEN-LAST:event_itemReservaActionPerformed
+    }// GEN-LAST:event_itemReservaActionPerformed
 
-    private void itemManutencaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemManutencaoActionPerformed
+    private void itemManutencaoActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_itemManutencaoActionPerformed
         // setar quarto em manutencao
         if (quartoEmFoco != 0) {
             mudaStatusNaCache(quartoEmFoco, "manutencao", null);
@@ -2192,11 +2294,12 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             worker.execute();
         }
 
-    }//GEN-LAST:event_itemManutencaoActionPerformed
+    }// GEN-LAST:event_itemManutencaoActionPerformed
 
-    private void btFuncionarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btFuncionarioActionPerformed
+    private void btFuncionarioActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btFuncionarioActionPerformed
 
-    }//GEN-LAST:event_btFuncionarioActionPerformed
+    }// GEN-LAST:event_btFuncionarioActionPerformed
+
     public void executarFinalizar() {
         configGlobal config = configGlobal.getInstance();
         int idCaixa = config.getCaixa();
@@ -2206,7 +2309,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         } else {
             // Abre uma caixa de diálogo de confirmação
-            int confirmacao = JOptionPane.showConfirmDialog(null, "Deseja encerrar o quarto " + quartoEmFoco + "?", "Confirmação", JOptionPane.YES_NO_OPTION);
+            int confirmacao = JOptionPane.showConfirmDialog(null, "Deseja encerrar o quarto " + quartoEmFoco + "?",
+                    "Confirmação", JOptionPane.YES_NO_OPTION);
             if (confirmacao == JOptionPane.YES_OPTION) {
                 abrirEncerraQuarto(quartoEmFoco);
 
@@ -2222,12 +2326,12 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         } else {
             Icon iconeAlerta = UIManager.getIcon("OptionPane.warningIcon");
 
-// Mensagem formatada com HTML
+            // Mensagem formatada com HTML
             String mensagem = "<html><body style='text-align: center; font-size: 12px;'>"
                     + "<b>Uma tela de encerramento já está aberta!</b><br>"
                     + "Se precisar, finalize a tela atual antes de abrir outra.</body></html>";
 
-// Exibe a JOptionPane com ícone e mensagem estilizada
+            // Exibe a JOptionPane com ícone e mensagem estilizada
             JOptionPane.showMessageDialog(this, mensagem, "Atenção!", JOptionPane.WARNING_MESSAGE, iconeAlerta);
             encerraQuarto.setExtendedState(JFrame.NORMAL); // Caso esteja minimizada, restaurar
             encerraQuarto.setAlwaysOnTop(true); // Coloca na frente de todas as janelas
@@ -2275,7 +2379,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                     JOptionPane.showMessageDialog(null, "Falha ao iniciar locação no banco!");
                 } else {
                     focoQuarto();
-                    //abreportao
+                    // abreportao
                     new Thread(() -> {
                         try {
                             Thread.sleep(300); // Pausa por 0,3s
@@ -2295,15 +2399,16 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         }
         System.out.println("finalizou inicialização do quarto " + quartoEmFoco);
     }
-    private void menuVerProdutosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuVerProdutosActionPerformed
+
+    private void menuVerProdutosActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuVerProdutosActionPerformed
         new Produto().setVisible(true);
-    }//GEN-LAST:event_menuVerProdutosActionPerformed
+    }// GEN-LAST:event_menuVerProdutosActionPerformed
 
-    private void menuCadastraProdutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuCadastraProdutoActionPerformed
+    private void menuCadastraProdutoActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuCadastraProdutoActionPerformed
         new CadastraProduto(null, 0).setVisible(true);
-    }//GEN-LAST:event_menuCadastraProdutoActionPerformed
+    }// GEN-LAST:event_menuCadastraProdutoActionPerformed
 
-    private void limpezaDisponivelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_limpezaDisponivelActionPerformed
+    private void limpezaDisponivelActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_limpezaDisponivelActionPerformed
         // TODO add your handling code here:
         if (quartoEmFoco != 0) {
 
@@ -2325,10 +2430,11 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             };
             worker.execute();
         }
-    }//GEN-LAST:event_limpezaDisponivelActionPerformed
+    }// GEN-LAST:event_limpezaDisponivelActionPerformed
 
-    private void jMenu2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenu2ActionPerformed
-    }//GEN-LAST:event_jMenu2ActionPerformed
+    private void jMenu2ActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_jMenu2ActionPerformed
+    }// GEN-LAST:event_jMenu2ActionPerformed
+
     public void insereIcone(JFrame frame) {
         try {
             frame.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/imagens/iconeMotel.png")));
@@ -2336,17 +2442,18 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             logger.warn("Não foi possível definir o ícone da janela", e);
         }
     }
-    private void btQuartosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btQuartosActionPerformed
 
-    }//GEN-LAST:event_btQuartosActionPerformed
+    private void btQuartosActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btQuartosActionPerformed
 
-    private void btConfereCaixaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btConfereCaixaActionPerformed
-        //abre a conferencia de caixas
+    }// GEN-LAST:event_btQuartosActionPerformed
+
+    private void btConfereCaixaActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btConfereCaixaActionPerformed
+        // abre a conferencia de caixas
         new ConfereCaixa().setVisible(true);
 
-    }//GEN-LAST:event_btConfereCaixaActionPerformed
+    }// GEN-LAST:event_btConfereCaixaActionPerformed
 
-    private void btConfereLocacaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btConfereLocacaoActionPerformed
+    private void btConfereLocacaoActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btConfereLocacaoActionPerformed
         if (cargo != null) {
             if (cargo.equals("admin") || cargo.equals("gerente")) {
                 new ConfereLocacoes().setVisible(true);
@@ -2358,29 +2465,29 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             JOptionPane.showMessageDialog(null, "Erro Grave no sistema! Nenhum Cargo");
 
         }
-    }//GEN-LAST:event_btConfereLocacaoActionPerformed
+    }// GEN-LAST:event_btConfereLocacaoActionPerformed
 
-    private void menuRelaVenProdutosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuRelaVenProdutosActionPerformed
+    private void menuRelaVenProdutosActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuRelaVenProdutosActionPerformed
         new ConfereProdutos().setVisible(true);
-    }//GEN-LAST:event_menuRelaVenProdutosActionPerformed
+    }// GEN-LAST:event_menuRelaVenProdutosActionPerformed
 
-    private void menuConfigAdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuConfigAdActionPerformed
+    private void menuConfigAdActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuConfigAdActionPerformed
 
-    }//GEN-LAST:event_menuConfigAdActionPerformed
+    }// GEN-LAST:event_menuConfigAdActionPerformed
 
-    private void menuConfigAdMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menuConfigAdMouseClicked
+    private void menuConfigAdMouseClicked(java.awt.event.MouseEvent evt) {// GEN-FIRST:event_menuConfigAdMouseClicked
         new ConfiguracoesAdicionais().setVisible(true);
-    }//GEN-LAST:event_menuConfigAdMouseClicked
+    }// GEN-LAST:event_menuConfigAdMouseClicked
 
-    private void menuSobSistemaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSobSistemaActionPerformed
+    private void menuSobSistemaActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuSobSistemaActionPerformed
         new ConfigAutoAtend().setVisible(true);
-    }//GEN-LAST:event_menuSobSistemaActionPerformed
+    }// GEN-LAST:event_menuSobSistemaActionPerformed
 
-    private void menuSobSistemaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menuSobSistemaMouseClicked
+    private void menuSobSistemaMouseClicked(java.awt.event.MouseEvent evt) {// GEN-FIRST:event_menuSobSistemaMouseClicked
         new ConfigAutoAtend().setVisible(true);
-    }//GEN-LAST:event_menuSobSistemaMouseClicked
+    }// GEN-LAST:event_menuSobSistemaMouseClicked
 
-    private void radioPernoiteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioPernoiteActionPerformed
+    private void radioPernoiteActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_radioPernoiteActionPerformed
         // clicou no radiopernoite - altera status para pernoite
         if (quartoEmFoco != 0) {
             alteraOcupadoCache(quartoEmFoco, "ocupado-pernoite");
@@ -2391,8 +2498,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 @Override
                 protected Void doInBackground() throws Exception {
                     new fquartos().alteraOcupado(quartoEmFoco, "ocupado-pernoite");
-                    //quarto.setStatus(quartoEmFoco, "ocupado-periodo");
-                    //quarto.alteraRegistro(quartoEmFoco, status);
+                    // quarto.setStatus(quartoEmFoco, "ocupado-periodo");
+                    // quarto.alteraRegistro(quartoEmFoco, status);
                     focoQuarto();
                     return null;
                 }
@@ -2400,9 +2507,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             };
             worker.execute();
         }
-    }//GEN-LAST:event_radioPernoiteActionPerformed
+    }// GEN-LAST:event_radioPernoiteActionPerformed
 
-    private void radioPeriodoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioPeriodoActionPerformed
+    private void radioPeriodoActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_radioPeriodoActionPerformed
         if (quartoEmFoco != 0) {
             alteraOcupadoCache(quartoEmFoco, "ocupado-periodo");
             mostraQuartos();
@@ -2412,8 +2519,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 @Override
                 protected Void doInBackground() throws Exception {
                     new fquartos().setStatus(quartoEmFoco, "ocupado-periodo");
-                    //quarto.setStatus(quartoEmFoco, "ocupado-periodo");
-                    //quarto.alteraRegistro(quartoEmFoco, status);
+                    // quarto.setStatus(quartoEmFoco, "ocupado-periodo");
+                    // quarto.alteraRegistro(quartoEmFoco, status);
                     focoQuarto();
                     return null;
                 }
@@ -2421,12 +2528,15 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             };
             worker.execute();
         }
-    }//GEN-LAST:event_radioPeriodoActionPerformed
+    }// GEN-LAST:event_radioPeriodoActionPerformed
+
     class CentralizarCelulasRenderer extends DefaultTableCellRenderer {
 
         @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            Component cellComponent = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
+                int row, int column) {
+            Component cellComponent = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row,
+                    column);
             // Configurando a centralização do texto
             if (cellComponent instanceof JLabel) {
                 ((JLabel) cellComponent).setHorizontalAlignment(JLabel.CENTER);
@@ -2435,18 +2545,17 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         }
     }
 
-
-    private void menuResBackupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuResBackupActionPerformed
+    private void menuResBackupActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuResBackupActionPerformed
         CacheDados cache = CacheDados.getInstancia();
         cache.mostrarCacheQuarto();
 
-    }//GEN-LAST:event_menuResBackupActionPerformed
+    }// GEN-LAST:event_menuResBackupActionPerformed
 
-    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {// GEN-FIRST:event_formWindowClosed
         // TODO add your handling code here:
-    }//GEN-LAST:event_formWindowClosed
+    }// GEN-LAST:event_formWindowClosed
 
-    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {// GEN-FIRST:event_formWindowClosing
         int confirmed = JOptionPane.showConfirmDialog(this,
                 "Você tem certeza que deseja encerrar a aplicação?", "Confirmação de Encerramento",
                 JOptionPane.YES_NO_OPTION);
@@ -2454,18 +2563,18 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         if (confirmed == JOptionPane.YES_OPTION) {
             setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             fazconexao.fecharPool();
-            dispose();  // Fecha a janela e chama windowClosed
+            dispose(); // Fecha a janela e chama windowClosed
             System.exit(0);
         } else {
             setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         }
-    }//GEN-LAST:event_formWindowClosing
+    }// GEN-LAST:event_formWindowClosing
 
-    private void txtDescontoNegociadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDescontoNegociadoActionPerformed
+    private void txtDescontoNegociadoActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_txtDescontoNegociadoActionPerformed
 
-    }//GEN-LAST:event_txtDescontoNegociadoActionPerformed
+    }// GEN-LAST:event_txtDescontoNegociadoActionPerformed
 
-    private void txtAntecipadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtAntecipadoActionPerformed
+    private void txtAntecipadoActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_txtAntecipadoActionPerformed
         float valorRecebido = 0;
         try {
             valorRecebido = Float.parseFloat(txtAntecipado.getText().replace(',', '.'));
@@ -2479,13 +2588,13 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             JOptionPane.showMessageDialog(null, "Valor digitado não é monetário");
         }
 
-    }//GEN-LAST:event_txtAntecipadoActionPerformed
+    }// GEN-LAST:event_txtAntecipadoActionPerformed
 
-    private void bt_inserirProdutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_inserirProdutoActionPerformed
+    private void bt_inserirProdutoActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_bt_inserirProdutoActionPerformed
         new ObterProdutoFrame((DefaultTableModel) tabela1.getModel(), quartoEmFoco, this::populaPrevendidos);
-    }//GEN-LAST:event_bt_inserirProdutoActionPerformed
+    }// GEN-LAST:event_bt_inserirProdutoActionPerformed
 
-    private void bt_apagarProdutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_apagarProdutoActionPerformed
+    private void bt_apagarProdutoActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_bt_apagarProdutoActionPerformed
         DefaultTableModel modelo = (DefaultTableModel) tabela1.getModel();
         int linhaSelecionada = tabela1.getSelectedRow();
 
@@ -2510,7 +2619,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         } else {
             JOptionPane.showMessageDialog(null, "Nenhum produto selecionado");
         }
-    }//GEN-LAST:event_bt_apagarProdutoActionPerformed
+    }// GEN-LAST:event_bt_apagarProdutoActionPerformed
+
     public void atualizaTotalConsumo() {
         float totalVendido = 0;
         DefaultTableModel modelo = (DefaultTableModel) tabela1.getModel();
@@ -2518,7 +2628,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         // Itera sobre as linhas remanescentes da tabela
         for (int i = 0; i < modelo.getRowCount(); i++) {
             // Assume que a coluna 3 (índice 3) contém o valor TOTAL da linha
-            // Ajuste o índice se o TOTAL estiver em outra coluna (0=QNT, 1=DESC, 2=VALOR, 3=TOTAL)
+            // Ajuste o índice se o TOTAL estiver em outra coluna (0=QNT, 1=DESC, 2=VALOR,
+            // 3=TOTAL)
             float totalLinha = Float.parseFloat(modelo.getValueAt(i, 3).toString());
             totalVendido += totalLinha;
         }
@@ -2526,7 +2637,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         lblValorConsumo.setText("R$ " + totalVendido);
         lblValorConsumo.repaint();
     }
-    private void botaoTrocaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoTrocaActionPerformed
+
+    private void botaoTrocaActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_botaoTrocaActionPerformed
         // Obtém a instância da cache de dados
         CacheDados cache = CacheDados.getInstancia();
         int idLocacao = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
@@ -2545,7 +2657,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         for (Map.Entry<Integer, CarregaQuarto> entry : cache.getCacheQuarto().entrySet()) {
             CarregaQuarto quarto = entry.getValue();
             if (quarto.getStatusQuarto().equals("livre")) {
-                model.addRow(new Object[]{quarto.getNumeroQuarto(), quarto.getTipoQuarto()});
+                model.addRow(new Object[] { quarto.getNumeroQuarto(), quarto.getTipoQuarto() });
 
             }
         }
@@ -2562,7 +2674,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         header.setFont(new Font("Arial", Font.BOLD, 14));
 
         // Configura o renderizador para o cabeçalho
-        DefaultTableCellRenderer headerRenderer = (DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer();
+        DefaultTableCellRenderer headerRenderer = (DefaultTableCellRenderer) table.getTableHeader()
+                .getDefaultRenderer();
         headerRenderer.setHorizontalAlignment(JLabel.CENTER);
 
         // Selecionar linha inteira ao clicar
@@ -2574,7 +2687,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         table.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                int row = table.getSelectedRow();  // Obtém a linha selecionada
+                int row = table.getSelectedRow(); // Obtém a linha selecionada
                 // Apenas seleciona a linha, sem ação adicional ao clicar
             }
         });
@@ -2596,12 +2709,12 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         dialog.getContentPane().add(scrollPane, BorderLayout.CENTER);
         dialog.getContentPane().add(buttonPanel, BorderLayout.SOUTH);
         dialog.setSize(400, 300);
-        dialog.setLocationRelativeTo(null);  // Centraliza na tela
+        dialog.setLocationRelativeTo(null); // Centraliza na tela
         // Configura o botão "Voltar" para fechar o JDialog
         botaoVoltar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                dialog.dispose();  // Fecha o JDialog
+                dialog.dispose(); // Fecha o JDialog
             }
         });
 
@@ -2609,48 +2722,49 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         botaoTrocar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int row = table.getSelectedRow();  // Obtém a linha selecionada
+                int row = table.getSelectedRow(); // Obtém a linha selecionada
                 if (row != -1) {
-                    Object value = table.getValueAt(row, 0);  // Obtém o valor da célula
-                    String numeroQuartoStr = value.toString();  // Converte o valor para String
-                    int numeroQuarto = Integer.parseInt(numeroQuartoStr);    // Obtém o número do quarto da linha selecionada
+                    Object value = table.getValueAt(row, 0); // Obtém o valor da célula
+                    String numeroQuartoStr = value.toString(); // Converte o valor para String
+                    int numeroQuarto = Integer.parseInt(numeroQuartoStr); // Obtém o número do quarto da linha
+                                                                          // selecionada
 
                     // Abre o JOptionPane de confirmação
                     int resposta = JOptionPane.showConfirmDialog(
                             dialog,
                             "Deseja prosseguir a troca de quarto?",
                             "Confirmação",
-                            JOptionPane.YES_NO_OPTION
-                    );
+                            JOptionPane.YES_NO_OPTION);
 
                     if (resposta == JOptionPane.YES_OPTION) {
-                        trocaQuarto(idLocacao, numeroQuarto);  // Chama o método de troca de quarto
-                        dialog.dispose();  // Fecha o JDialog após a troca
+                        trocaQuarto(idLocacao, numeroQuarto); // Chama o método de troca de quarto
+                        dialog.dispose(); // Fecha o JDialog após a troca
                     }
                 } else {
-                    JOptionPane.showMessageDialog(dialog, "Por favor, selecione um quarto.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(dialog, "Por favor, selecione um quarto.", "Aviso",
+                            JOptionPane.WARNING_MESSAGE);
                 }
             }
         });
         // Exibe o JDialog
         dialog.setVisible(true);
-    }//GEN-LAST:event_botaoTrocaActionPerformed
+    }// GEN-LAST:event_botaoTrocaActionPerformed
 
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_jButton4ActionPerformed
         // abre o portão do quarto
         SwingUtilities.invokeLater(() -> {
             new ConectaArduino(quartoEmFoco);
         });
-    }//GEN-LAST:event_jButton4ActionPerformed
+    }// GEN-LAST:event_jButton4ActionPerformed
 
-    private void txtPessoasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPessoasActionPerformed
+    private void txtPessoasActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_txtPessoasActionPerformed
         try {
             int numeroPessoas = Integer.valueOf(txtPessoas.getText());
             new fquartos().atualizaPessoas(quartoEmFoco, numeroPessoas);
             if (numeroPessoas < 2) {
                 numeroPessoas = 2;
             }
-            //atualizar na cache também
+            // atualizar na cache também
             CacheDados cache = CacheDados.getInstancia();
             Map<Integer, DadosOcupados> dadosOcupados = cache.getCacheOcupado();
             if (dadosOcupados.containsKey(quartoEmFoco)) {
@@ -2664,10 +2778,10 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         } catch (Exception e) {
             logger.error("Erro ao atualizar número de pessoas do quarto {}", quartoEmFoco, e);
         }
-    }//GEN-LAST:event_txtPessoasActionPerformed
+    }// GEN-LAST:event_txtPessoasActionPerformed
 
-    private void botaoIniciarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoIniciarActionPerformed
-        //lidar com problema de duplo clique
+    private void botaoIniciarActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_botaoIniciarActionPerformed
+        // lidar com problema de duplo clique
         if (isClickable) {
             isClickable = false;
             System.out.println("está clicavel");
@@ -2687,9 +2801,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             isClickable = true;
         }
 
-    }//GEN-LAST:event_botaoIniciarActionPerformed
+    }// GEN-LAST:event_botaoIniciarActionPerformed
 
-    private void botaoEncerrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoEncerrarActionPerformed
+    private void botaoEncerrarActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_botaoEncerrarActionPerformed
         if (isClickable) {
             isClickable = false;
 
@@ -2710,9 +2824,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             isClickable = true;
             System.out.println("setou is clickable true de novo");
         }
-    }//GEN-LAST:event_botaoEncerrarActionPerformed
+    }// GEN-LAST:event_botaoEncerrarActionPerformed
 
-    private void botaoStatusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoStatusActionPerformed
+    private void botaoStatusActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_botaoStatusActionPerformed
         // TODO add your handling code here:
         if (quartoEmFoco != 0) {
             CacheDados cacheDados = CacheDados.getInstancia();
@@ -2739,15 +2853,16 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         }
         quartoClicado(quartoEmFoco);
         mostraQuartos();
-    }//GEN-LAST:event_botaoStatusActionPerformed
+    }// GEN-LAST:event_botaoStatusActionPerformed
 
-    private void btDespertadorMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btDespertadorMouseClicked
+    private void btDespertadorMouseClicked(java.awt.event.MouseEvent evt) {// GEN-FIRST:event_btDespertadorMouseClicked
         new AlarmApp();
-    }//GEN-LAST:event_btDespertadorMouseClicked
+    }// GEN-LAST:event_btDespertadorMouseClicked
 
-    private void btConferenciaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btConferenciaMouseClicked
+    private void btConferenciaMouseClicked(java.awt.event.MouseEvent evt) {// GEN-FIRST:event_btConferenciaMouseClicked
         new playSound().playSound("som/mensagem conferencia.wav");
-    }//GEN-LAST:event_btConferenciaMouseClicked
+    }// GEN-LAST:event_btConferenciaMouseClicked
+
     private void resetarBotoes(JButton... botoes) {
         Dimension buttonSize = new Dimension(120, 40);
         for (JButton botao : botoes) {
@@ -2759,9 +2874,11 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             botao.setMinimumSize(buttonSize); // Define o tamanho mínimo
         }
     }
-    private void btNegociarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btNegociarActionPerformed
+
+    private void btNegociarActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btNegociarActionPerformed
         // Exibe um JOptionPane para o cliente inserir o valor de desconto
-        String descontoInput = JOptionPane.showInputDialog(null, "Digite o valor do desconto:", "Desconto", JOptionPane.PLAIN_MESSAGE);
+        String descontoInput = JOptionPane.showInputDialog(null, "Digite o valor do desconto:", "Desconto",
+                JOptionPane.PLAIN_MESSAGE);
 
         // Verifica se o cliente inseriu algum valor
         if (descontoInput != null && !descontoInput.isEmpty()) {
@@ -2779,12 +2896,13 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 txtDescontoNegociado.setText("R$" + valorDesconto);
             } catch (NumberFormatException ex) {
                 logger.warn("Valor de desconto inválido informado: {}", descontoInput, ex);
-                JOptionPane.showMessageDialog(null, "Valor inválido! Insira um número válido.", "Erro", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Valor inválido! Insira um número válido.", "Erro",
+                        JOptionPane.ERROR_MESSAGE);
             }
         }
-    }//GEN-LAST:event_btNegociarActionPerformed
+    }// GEN-LAST:event_btNegociarActionPerformed
 
-    private void bt_AntecipadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_AntecipadoActionPerformed
+    private void bt_AntecipadoActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_bt_AntecipadoActionPerformed
         System.out.println("toooooooo no antecipadoooooooooooooooo");
 
         CacheDados cache = CacheDados.getInstancia();
@@ -2793,14 +2911,16 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         // aqui atualiza o valor do txtAntecipado
         atualizaAntecipado(idLocacao);
 
-    }//GEN-LAST:event_bt_AntecipadoActionPerformed
+    }// GEN-LAST:event_bt_AntecipadoActionPerformed
+
     public void atualizaAntecipado(int locacao) {
         List<Antecipado> antecipados = new ArrayList<>();
         float jaRecebeu = 0;
         float valorDesconto = 0;
         try (Connection link = new fazconexao().conectar()) {
 
-            // Consulta SQL para buscar registros da tabela "antecipado" para a locação especificada
+            // Consulta SQL para buscar registros da tabela "antecipado" para a locação
+            // especificada
             String selectSQL = "SELECT tipo, valor, hora FROM antecipado WHERE idlocacao = ?";
             PreparedStatement preparedStatement = link.prepareStatement(selectSQL);
             preparedStatement.setInt(1, locacao);
@@ -2824,7 +2944,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             preparedStatement.close();
         } catch (SQLException e) {
             logger.error("Erro ao buscar dados antecipados para locacao {}", locacao, e);
-            JOptionPane.showMessageDialog(null, "Erro ao buscar dados antecipados: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Erro ao buscar dados antecipados: " + e.getMessage(), "Erro",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -2851,7 +2972,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         ActionListener selecionarMetodo = e -> {
             JButton source = (JButton) e.getSource();
-            String tipoPagamentoEscolhido = source.getText().substring(source.getText().indexOf("(") + 1, source.getText().indexOf(")"));
+            String tipoPagamentoEscolhido = source.getText().substring(source.getText().indexOf("(") + 1,
+                    source.getText().indexOf(")"));
             float valorRecebido = carregarValorRecebido(tipoPagamentoEscolhido, idLocacao);
             criarTelaEntradaValor(valorRecebido, tipoPagamentoEscolhido, idLocacao);
             dialog.dispose(); // Fecha a tela após a seleção
@@ -2905,100 +3027,102 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     }
 
     private void criarTelaEntradaValor(float valorRecebido, String tipoPago, int idLocacao) {
-    JDialog dialog = new JDialog();
-    dialog.setTitle("Entrada de Valor");
-    dialog.setModal(true);
-    dialog.setSize(500, 350); 
-    dialog.setResizable(false);
-    dialog.setLocationRelativeTo(null);
+        JDialog dialog = new JDialog();
+        dialog.setTitle("Entrada de Valor");
+        dialog.setModal(true);
+        dialog.setSize(500, 350);
+        dialog.setResizable(false);
+        dialog.setLocationRelativeTo(null);
 
-    JPanel panel = new JPanel(new GridBagLayout());
-    GridBagConstraints gbc = new GridBagConstraints();
-    gbc.insets = new Insets(10, 10, 10, 10);
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.gridx = 0;
-    gbc.gridy = 0;
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
 
-    String recebido = switch (tipoPago) {
-        case "C" ->
-            "credito";
-        case "D" ->
-            "debito";
-        case "O" ->
-            "dinheiro";
-        default ->
-            "pix";
-    };
+        String recebido = switch (tipoPago) {
+            case "C" ->
+                "credito";
+            case "D" ->
+                "debito";
+            case "O" ->
+                "dinheiro";
+            default ->
+                "pix";
+        };
 
-    JLabel label = new JLabel("<html><center><b>Valor Atual Recebido:</b> R$ " + String.format("%.2f", valorRecebido)
-            + " em " + recebido + "<br><br>Digite o valor a ser usado na operação:</center></html>");
-    label.setFont(new Font("Arial", Font.PLAIN, 14));
+        JLabel label = new JLabel(
+                "<html><center><b>Valor Atual Recebido:</b> R$ " + String.format("%.2f", valorRecebido)
+                        + " em " + recebido + "<br><br>Digite o valor a ser usado na operação:</center></html>");
+        label.setFont(new Font("Arial", Font.PLAIN, 14));
 
-    JTextField valorField = new JTextField(10);
-    valorField.setFont(new Font("Arial", Font.BOLD, 16));
+        JTextField valorField = new JTextField(10);
+        valorField.setFont(new Font("Arial", Font.BOLD, 16));
 
-    // --- BOTÃO 2 AGORA É O PRIMEIRO (SOMAR) ---
-    JButton botaoSomar = new JButton(" Somar ao Recebido ");
-    botaoSomar.setPreferredSize(new Dimension(200, 40));
-    botaoSomar.setBackground(new Color(30, 144, 255)); // Azul forte
-    botaoSomar.setForeground(Color.WHITE);
-    botaoSomar.setFocusPainted(false);
-    botaoSomar.setFont(new Font("Arial", Font.BOLD, 14));
-    botaoSomar.addActionListener(e -> salvarValor(valorField, tipoPago, idLocacao, dialog, "SOMAR", valorRecebido));
+        // --- BOTÃO 2 AGORA É O PRIMEIRO (SOMAR) ---
+        JButton botaoSomar = new JButton(" Somar ao Recebido ");
+        botaoSomar.setPreferredSize(new Dimension(200, 40));
+        botaoSomar.setBackground(new Color(30, 144, 255)); // Azul forte
+        botaoSomar.setForeground(Color.WHITE);
+        botaoSomar.setFocusPainted(false);
+        botaoSomar.setFont(new Font("Arial", Font.BOLD, 14));
+        botaoSomar.addActionListener(e -> salvarValor(valorField, tipoPago, idLocacao, dialog, "SOMAR", valorRecebido));
 
-    // --- BOTÃO 1 AGORA É O SEGUNDO (SUBSTITUIR/SETAR) ---
-    JButton botaoSubstituir = new JButton(" Setar Valor Total ");
-    botaoSubstituir.setPreferredSize(new Dimension(200, 40));
-    botaoSubstituir.setBackground(new Color(255, 140, 0)); // Laranja
-    botaoSubstituir.setForeground(Color.WHITE);
-    botaoSubstituir.setFocusPainted(false);
-    botaoSubstituir.setFont(new Font("Arial", Font.BOLD, 14));
-    botaoSubstituir.addActionListener(e -> salvarValor(valorField, tipoPago, idLocacao, dialog, "SUBSTITUIR", valorRecebido));
+        // --- BOTÃO 1 AGORA É O SEGUNDO (SUBSTITUIR/SETAR) ---
+        JButton botaoSubstituir = new JButton(" Setar Valor Total ");
+        botaoSubstituir.setPreferredSize(new Dimension(200, 40));
+        botaoSubstituir.setBackground(new Color(255, 140, 0)); // Laranja
+        botaoSubstituir.setForeground(Color.WHITE);
+        botaoSubstituir.setFocusPainted(false);
+        botaoSubstituir.setFont(new Font("Arial", Font.BOLD, 14));
+        botaoSubstituir.addActionListener(
+                e -> salvarValor(valorField, tipoPago, idLocacao, dialog, "SUBSTITUIR", valorRecebido));
 
-    // --- Mapeamento do teclado (ENTER e ESC) ---
-    InputMap inputMap = valorField.getInputMap(JComponent.WHEN_FOCUSED);
-    ActionMap actionMap = valorField.getActionMap();
-    
-    // Mapeando ESC
-    inputMap.put(KeyStroke.getKeyStroke("ESCAPE"), "fechar");
-    actionMap.put("fechar", new AbstractAction() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            dialog.dispose();
-        }
-    });
+        // --- Mapeamento do teclado (ENTER e ESC) ---
+        InputMap inputMap = valorField.getInputMap(JComponent.WHEN_FOCUSED);
+        ActionMap actionMap = valorField.getActionMap();
 
-    // Mapeando ENTER para clicar no botão SOMAR
-    inputMap.put(KeyStroke.getKeyStroke("ENTER"), "somarValor");
-    actionMap.put("somarValor", new AbstractAction() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            salvarValor(valorField, tipoPago, idLocacao, dialog, "SOMAR", valorRecebido);
-        }
-    });
+        // Mapeando ESC
+        inputMap.put(KeyStroke.getKeyStroke("ESCAPE"), "fechar");
+        actionMap.put("fechar", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dialog.dispose();
+            }
+        });
 
-    // Adiciona os componentes ao painel
-    panel.add(label, gbc);
-    gbc.gridy++;
-    panel.add(valorField, gbc);
-    gbc.gridy++;
+        // Mapeando ENTER para clicar no botão SOMAR
+        inputMap.put(KeyStroke.getKeyStroke("ENTER"), "somarValor");
+        actionMap.put("somarValor", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                salvarValor(valorField, tipoPago, idLocacao, dialog, "SOMAR", valorRecebido);
+            }
+        });
 
-    // Adicionar os botões lado a lado - Ordem alterada aqui!
-    JPanel botoesPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
-    botoesPanel.add(botaoSomar); // ⬅️ Somar primeiro
-    botoesPanel.add(botaoSubstituir); // ⬅️ Substituir segundo
+        // Adiciona os componentes ao painel
+        panel.add(label, gbc);
+        gbc.gridy++;
+        panel.add(valorField, gbc);
+        gbc.gridy++;
 
-    panel.add(botoesPanel, gbc);
+        // Adicionar os botões lado a lado - Ordem alterada aqui!
+        JPanel botoesPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
+        botoesPanel.add(botaoSomar); // ⬅️ Somar primeiro
+        botoesPanel.add(botaoSubstituir); // ⬅️ Substituir segundo
 
-    dialog.add(panel);
-    dialog.setVisible(true);
+        panel.add(botoesPanel, gbc);
 
+        dialog.add(panel);
+        dialog.setVisible(true);
 
-    SwingUtilities.invokeLater(valorField::requestFocusInWindow);
-    valorField.setText(null);
-}
+        SwingUtilities.invokeLater(valorField::requestFocusInWindow);
+        valorField.setText(null);
+    }
 
-    private void salvarValor(JTextField valorField, String tipoPagamento, int idLocacao, JDialog dialog, String operacao, float valorRecebidoAnterior) {
+    private void salvarValor(JTextField valorField, String tipoPagamento, int idLocacao, JDialog dialog,
+            String operacao, float valorRecebidoAnterior) {
         String valorInserido = valorField.getText().replace(",", ".");
         try {
             float valor = Float.parseFloat(valorInserido);
@@ -3030,7 +3154,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             atualizaAntecipado(idLocacao);
         } catch (NumberFormatException ex) {
             logger.warn("Valor inválido informado em salvarValor: {}", valorInserido, ex);
-            JOptionPane.showMessageDialog(dialog, "Valor inválido. Insira um número válido.", "Erro", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(dialog, "Valor inválido. Insira um número válido.", "Erro",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -3069,20 +3194,21 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         }
         return 0;
     }
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_jButton1ActionPerformed
         SwingUtilities.invokeLater(() -> {
             new ConectaArduino(888);
         });
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }// GEN-LAST:event_jButton1ActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_jButton3ActionPerformed
         SwingUtilities.invokeLater(() -> {
             new ConectaArduino(999);
         });
-    }//GEN-LAST:event_jButton3ActionPerformed
+    }// GEN-LAST:event_jButton3ActionPerformed
 
-    private void btFuncionarioMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btFuncionarioMouseClicked
-        //cadastrar funcionario
+    private void btFuncionarioMouseClicked(java.awt.event.MouseEvent evt) {// GEN-FIRST:event_btFuncionarioMouseClicked
+        // cadastrar funcionario
         System.out.println("clicou func");
         if (cargo != null) {
             if (cargo.equals("admin")) {
@@ -3095,10 +3221,10 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         }
 
-    }//GEN-LAST:event_btFuncionarioMouseClicked
+    }// GEN-LAST:event_btFuncionarioMouseClicked
 
-    private void btQuartosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btQuartosMouseClicked
-        //alterar quartos
+    private void btQuartosMouseClicked(java.awt.event.MouseEvent evt) {// GEN-FIRST:event_btQuartosMouseClicked
+        // alterar quartos
         System.out.println("clicou abrir quartos");
         if (cargo != null) {
             if (cargo.equals("admin")) {
@@ -3110,13 +3236,14 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             JOptionPane.showMessageDialog(null, "Você não tem permissão! Somente admin");
 
         }
-    }//GEN-LAST:event_btQuartosMouseClicked
+    }// GEN-LAST:event_btQuartosMouseClicked
 
-    private void menuCaixaBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuCaixaBtActionPerformed
+    private void menuCaixaBtActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuCaixaBtActionPerformed
         abrirCaixaFrame();
-        //new CaixaFrame().setVisible(true);
+        // new CaixaFrame().setVisible(true);
 
-    }//GEN-LAST:event_menuCaixaBtActionPerformed
+    }// GEN-LAST:event_menuCaixaBtActionPerformed
+
     private void abrirCaixaFrame() {
         if (caixaFrame == null || !caixaFrame.isVisible()) {
             // Criar nova instância se não houver tela aberta
@@ -3125,12 +3252,12 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         } else {
             Icon iconeAlerta = UIManager.getIcon("OptionPane.warningIcon");
 
-// Mensagem formatada com HTML
+            // Mensagem formatada com HTML
             String mensagem = "<html><body style='text-align: center; font-size: 12px;'>"
                     + "<b>Uma tela de caixa já está aberta!</b><br>"
                     + "</body></html>";
 
-// Exibe a JOptionPane com ícone e mensagem estilizada
+            // Exibe a JOptionPane com ícone e mensagem estilizada
             JOptionPane.showMessageDialog(this, mensagem, "Atenção!", JOptionPane.WARNING_MESSAGE, iconeAlerta);
             caixaFrame.setExtendedState(JFrame.NORMAL); // Caso esteja minimizada, restaurar
             caixaFrame.setAlwaysOnTop(true); // Coloca na frente de todas as janelas
@@ -3140,11 +3267,12 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         }
     }
-    private void menuCaixaBtMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menuCaixaBtMouseClicked
-        abrirCaixaFrame();
-    }//GEN-LAST:event_menuCaixaBtMouseClicked
 
-    private void btMenuSairMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btMenuSairMouseClicked
+    private void menuCaixaBtMouseClicked(java.awt.event.MouseEvent evt) {// GEN-FIRST:event_menuCaixaBtMouseClicked
+        abrirCaixaFrame();
+    }// GEN-LAST:event_menuCaixaBtMouseClicked
+
+    private void btMenuSairMouseClicked(java.awt.event.MouseEvent evt) {// GEN-FIRST:event_btMenuSairMouseClicked
         // CODIGO PARA LOGGOF
         try {
             CacheDados cacheDados = CacheDados.getInstancia();
@@ -3153,28 +3281,28 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         } catch (IOException ex) {
             Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }//GEN-LAST:event_btMenuSairMouseClicked
+    }// GEN-LAST:event_btMenuSairMouseClicked
 
-    private void btMenuSairActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btMenuSairActionPerformed
+    private void btMenuSairActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btMenuSairActionPerformed
 
-    }//GEN-LAST:event_btMenuSairActionPerformed
+    }// GEN-LAST:event_btMenuSairActionPerformed
 
-    private void menuSistemaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menuSistemaMouseClicked
-        
-    }//GEN-LAST:event_menuSistemaMouseClicked
+    private void menuSistemaMouseClicked(java.awt.event.MouseEvent evt) {// GEN-FIRST:event_menuSistemaMouseClicked
 
-    private void menuSistemaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSistemaActionPerformed
+    }// GEN-LAST:event_menuSistemaMouseClicked
+
+    private void menuSistemaActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuSistemaActionPerformed
         // Cria a nova janela
 
-    }//GEN-LAST:event_menuSistemaActionPerformed
+    }// GEN-LAST:event_menuSistemaActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_jButton2ActionPerformed
         SwingUtilities.invokeLater(() -> {
             new ConectaArduino(777);
         });
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }// GEN-LAST:event_jButton2ActionPerformed
 
-    private void limpezaManutencaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_limpezaManutencaoActionPerformed
+    private void limpezaManutencaoActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_limpezaManutencaoActionPerformed
         if (quartoEmFoco != 0) {
             mudaStatusNaCache(quartoEmFoco, "manutencao", null);
             configGlobal config = configGlobal.getInstance();
@@ -3195,9 +3323,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             };
             worker.execute();
         }
-    }//GEN-LAST:event_limpezaManutencaoActionPerformed
+    }// GEN-LAST:event_limpezaManutencaoActionPerformed
 
-    private void limpezaReservaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_limpezaReservaActionPerformed
+    private void limpezaReservaActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_limpezaReservaActionPerformed
         if (quartoEmFoco != 0) {
             mudaStatusNaCache(quartoEmFoco, "reservado", null);
             configGlobal config = configGlobal.getInstance();
@@ -3218,13 +3346,14 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             };
             worker.execute();
         }
-    }//GEN-LAST:event_limpezaReservaActionPerformed
+    }// GEN-LAST:event_limpezaReservaActionPerformed
 
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_jMenuItem1ActionPerformed
         TelaSistema telaSistema = new TelaSistema();
         // Torna a janela visível
         telaSistema.setVisible(true);
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
+    }// GEN-LAST:event_jMenuItem1ActionPerformed
+
     private void trocaQuarto(int idLocacao, int numeroNovoQuarto) {
         fquartos quarto = new fquartos();
         String horaStatus = quarto.getDataInicio(quartoEmFoco);
@@ -3258,7 +3387,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     }
 
     public void salvaAntecipado(int idLocacao, String tipo, float valor) {
-        // Esta parte transforma o código (C, D, O, P) no nome do tipo de BD (credito, debito, etc.)
+        // Esta parte transforma o código (C, D, O, P) no nome do tipo de BD (credito,
+        // debito, etc.)
         tipo = switch (tipo) {
             case "C" ->
                 "credito";
@@ -3304,7 +3434,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         } catch (SQLException e) {
             logger.error("Erro ao inserir/atualizar antecipado. locacao={}, tipo={}", idLocacao, tipo, e);
-            JOptionPane.showMessageDialog(null, "Erro ao inserir/atualizar: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Erro ao inserir/atualizar: " + e.getMessage(), "Erro",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -3312,7 +3443,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         CacheDados dados = CacheDados.getInstancia();
         // Obtém o quarto da cache
         CarregaQuarto quarto = dados.getCacheQuarto().get(quartoMudar);
-        // Atualiza o status 
+        // Atualiza o status
         quarto.setStatusQuarto(statusColocar);
         // Atualiza o quarto na cache
         dados.getCacheQuarto().put(quartoMudar, quarto);
