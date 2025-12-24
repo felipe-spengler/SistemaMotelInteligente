@@ -24,34 +24,33 @@ public class fprodutos {
     private static final Logger logger = LoggerFactory.getLogger(fprodutos.class);
 
     public List<vprodutos> mostrarProduto() {
-    List<vprodutos> produtos = new ArrayList<>();
-    String consultaSQL = "select * from produtos order by idproduto";
+        List<vprodutos> produtos = new ArrayList<>();
+        String consultaSQL = "select * from produtos order by idproduto";
 
+        try (Connection link = new fazconexao().conectar();
+                PreparedStatement statement = link.prepareStatement(consultaSQL)) {
 
-    try (Connection link = new fazconexao().conectar();
-         PreparedStatement statement = link.prepareStatement(consultaSQL)) {
+            try (ResultSet resultado = statement.executeQuery()) {
 
-        try (ResultSet resultado = statement.executeQuery()) {
-
-            while (resultado.next()) {
-                vprodutos produto = new vprodutos();
-                produto.setIdProduto(resultado.getInt("idproduto"));
-                produto.setDescricao(resultado.getString("descricao"));
-                produto.setValor(resultado.getFloat("valorproduto"));
-                // Continue a popular o objeto vprodutos com os campos restantes
-                produtos.add(produto);
+                while (resultado.next()) {
+                    vprodutos produto = new vprodutos();
+                    produto.setIdProduto(resultado.getInt("idproduto"));
+                    produto.setDescricao(resultado.getString("descricao"));
+                    produto.setValor(resultado.getFloat("valorproduto"));
+                    // Continue a popular o objeto vprodutos com os campos restantes
+                    produtos.add(produto);
+                }
             }
-        } 
 
-    } catch (SQLException e) {
-        logger.error("Erro : mostrarProduto(): ", e);
-        JOptionPane.showMessageDialog(null,
-                "Erro ao mostrar produtos: " + e.getMessage(),
-                "Erro", JOptionPane.ERROR_MESSAGE);
-    } // 'link' e 'statement' fechados automaticamente
+        } catch (SQLException e) {
+            logger.error("Erro : mostrarProduto(): ", e);
+            JOptionPane.showMessageDialog(null,
+                    "Erro ao mostrar produtos: " + e.getMessage(),
+                    "Erro", JOptionPane.ERROR_MESSAGE);
+        } // 'link' e 'statement' fechados automaticamente
 
-    return produtos;
-}
+        return produtos;
+    }
 
     public boolean diminuiEstoque(int idProduto, int quantidade) {
         String estoqueQuery = "SELECT estoque FROM produtos WHERE idproduto = ?";
@@ -74,6 +73,9 @@ public class fprodutos {
                         statement.setInt(1, novoEstoque);
                         statement.setInt(2, idProduto);
                         int linhasAfetadas = statement.executeUpdate();
+                        if (linhasAfetadas > 0)
+                            logger.info("Estoque atualizado. Produto ID: " + idProduto + " - " + quantidade
+                                    + " unidades. Restam: " + novoEstoque);
                         return linhasAfetadas > 0;
                     } else {
                         // Não há estoque suficiente
@@ -150,80 +152,80 @@ public class fprodutos {
 
     public boolean insercao(vprodutos dados) {
 
-    String sql = "INSERT INTO produtos (idproduto, descricao, valorproduto, estoque, ultimacompra) "
-               + "VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO produtos (idproduto, descricao, valorproduto, estoque, ultimacompra) "
+                + "VALUES (?, ?, ?, ?, ?)";
 
-    try (Connection link = new fazconexao().conectar();
-         PreparedStatement st = link.prepareStatement(sql)) {
+        try (Connection link = new fazconexao().conectar();
+                PreparedStatement st = link.prepareStatement(sql)) {
 
-        st.setInt(1, dados.getIdProduto());
-        st.setString(2, dados.getDescricao());
-        st.setFloat(3, dados.getValor());
-        st.setString(4, dados.getEstoque());
-        st.setTimestamp(5, dados.getDataCompra());
+            st.setInt(1, dados.getIdProduto());
+            st.setString(2, dados.getDescricao());
+            st.setFloat(3, dados.getValor());
+            st.setString(4, dados.getEstoque());
+            st.setTimestamp(5, dados.getDataCompra());
 
-        return st.executeUpdate() > 0;
+            boolean result = st.executeUpdate() > 0;
+            if (result)
+                logger.info("Novo produto cadastrado: " + dados.getDescricao());
+            return result;
 
-    } catch (SQLException e) {
-        logger.error("Erro : insercao(): ", e);
-        JOptionPane.showMessageDialog(null,
-                "Erro ao inserir produto: " + e.getMessage(),
-                "Erro", JOptionPane.ERROR_MESSAGE);
-        return false;
+        } catch (SQLException e) {
+            logger.error("Erro : insercao(): ", e);
+            JOptionPane.showMessageDialog(null,
+                    "Erro ao inserir produto: " + e.getMessage(),
+                    "Erro", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
     }
-}
-
 
     public boolean exclusao(int idpassado) {
 
-    String sql = "DELETE FROM produtos WHERE idproduto = ?";
+        String sql = "DELETE FROM produtos WHERE idproduto = ?";
 
-    try (Connection link = new fazconexao().conectar();
-         PreparedStatement st = link.prepareStatement(sql)) {
+        try (Connection link = new fazconexao().conectar();
+                PreparedStatement st = link.prepareStatement(sql)) {
 
-        st.setInt(1, idpassado);
-        return st.executeUpdate() > 0;
+            st.setInt(1, idpassado);
+            return st.executeUpdate() > 0;
 
-    } catch (SQLException e) {
-        logger.error("Erro : exclusao(): ", e);
-        JOptionPane.showMessageDialog(null,
-                "Erro ao excluir produto: " + e.getMessage(),
-                "Erro", JOptionPane.ERROR_MESSAGE);
-        return false;
+        } catch (SQLException e) {
+            logger.error("Erro : exclusao(): ", e);
+            JOptionPane.showMessageDialog(null,
+                    "Erro ao excluir produto: " + e.getMessage(),
+                    "Erro", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
     }
-}
-
 
     public vprodutos getProduto(int idPassado) {
 
-    String sql = "SELECT * FROM produtos WHERE idproduto = ?";
-    vprodutos produto = null;
+        String sql = "SELECT * FROM produtos WHERE idproduto = ?";
+        vprodutos produto = null;
 
-    try (Connection link = new fazconexao().conectar();
-         PreparedStatement st = link.prepareStatement(sql)) {
+        try (Connection link = new fazconexao().conectar();
+                PreparedStatement st = link.prepareStatement(sql)) {
 
-        st.setInt(1, idPassado);
+            st.setInt(1, idPassado);
 
-        try (ResultSet rs = st.executeQuery()) {
-            if (rs.next()) {
-                produto = new vprodutos();
-                produto.setIdProduto(idPassado);
-                produto.setDescricao(rs.getString("descricao"));
-                produto.setValor(rs.getFloat("valorproduto"));
-                produto.setEstoque(rs.getString("estoque"));
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    produto = new vprodutos();
+                    produto.setIdProduto(idPassado);
+                    produto.setDescricao(rs.getString("descricao"));
+                    produto.setValor(rs.getFloat("valorproduto"));
+                    produto.setEstoque(rs.getString("estoque"));
+                }
             }
+
+        } catch (SQLException e) {
+            logger.error("Erro : getProduto(): ", e);
+            JOptionPane.showMessageDialog(null,
+                    "Erro ao buscar produto: " + e.getMessage(),
+                    "Erro", JOptionPane.ERROR_MESSAGE);
         }
 
-    } catch (SQLException e) {
-        logger.error("Erro : getProduto(): ", e);
-        JOptionPane.showMessageDialog(null,
-                "Erro ao buscar produto: " + e.getMessage(),
-                "Erro", JOptionPane.ERROR_MESSAGE);
+        return produto;
     }
-
-    return produto;
-}
-
 
     public boolean exclui(int idpassado) {
         String consultaSQL = "delete from produtos "
@@ -264,7 +266,8 @@ public class fprodutos {
         String consultaSQL = "SELECT descricao FROM produtos WHERE idproduto = ?";
 
         try (
-                Connection link = new fazconexao().conectar(); PreparedStatement statement = link.prepareStatement(consultaSQL)) {
+                Connection link = new fazconexao().conectar();
+                PreparedStatement statement = link.prepareStatement(consultaSQL)) {
             statement.setString(1, idPassado);
 
             try (ResultSet resultado = statement.executeQuery()) {

@@ -1,6 +1,8 @@
 package com.motelinteligente.dados;
 
 import com.motelinteligente.arduino.ConectaArduino;
+import org.eclipse.paho.client.mqttv3.*;
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,70 +15,140 @@ import java.net.http.HttpResponse;
 import java.sql.Timestamp;
 import java.util.Date;
 
-public class VerificaComandosRemotos extends Thread {
+// Adaptado para MQTT
+public class VerificaComandosRemotos extends Thread implements MqttCallback {
 
     private static final Logger logger = LoggerFactory.getLogger(VerificaComandosRemotos.class);
-    private final HttpClient client = HttpClient.newBuilder()
+
+    // ===================================================================================
+    // TODO: CONFIGURAÇÃO MQTT - ALTERE AQUI O IP DO SEU SERVIDOR COOLIFY
+    // ===================================================================================
+    private static final String BROKER_URL = "tcp://145.223.30.211:1883";
+    // ===================================================================================
+
+    private MqttClient mqttClient;
+    private final String filial = CarregarVariaveis.getFilial();
+    private final String TOPIC_COMANDOS = "motel/" + filial + "/comandos";
+
+    // Cliente HTTP legado apenas para confirmar execução no banco de dados
+    private final HttpClient httpClient = HttpClient.newBuilder()
             .followRedirects(HttpClient.Redirect.NORMAL)
             .build();
-
-    // Base URL do site
     private final String baseUrl = "https://www.motelinteligente.com";
 
-    // Pega a filial do arquivo
-    private final String filial = CarregarVariaveis.getFilial();
-
-    // ID da unidade (você pode manter 2 ou ler de outro lugar se quiser)
-    private final int intervalo = 1200; // 1,2 segundos
     private boolean executando = true;
 
     @Override
     public void run() {
-        logger.info("Thread de verificação de comandos remotos iniciada ( Filial " + filial);
+        logger.info("Iniciando serviço MQTT de comandos remotos (Filial " + filial + ")");
+        logger.info("Tópico de escuta: " + TOPIC_COMANDOS);
+
+        conectarMqtt();
+
+        // Loop de verificação de conexão (Watchdog)
         while (executando) {
             try {
-                // 1️⃣ Busca o comando remoto
-                String getUrl = baseUrl + "/get_comandos.php?filial=" + filial;
-                //logger.info("Tentando obter comandos de: " + getUrl); // LOG EXTRA DE DEBUG
-
-                HttpRequest request = HttpRequest.newBuilder()
-                        .uri(URI.create(getUrl))
-                        .timeout(java.time.Duration.ofSeconds(5))
-                        .build();
-
-                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-                String body = response.body();
-                //logger.info("Resposta recebida do servidor: " + body); // LOG EXTRA DE DEBUG
-
-                if (body != null && !body.trim().equals("") && !body.trim().equals("null")) {
-                    JSONObject json = new JSONObject(body);
-                    int idComando = json.getInt("id");
-                    String comando = json.getString("comando");
-
-                    //logger.info("Comando remoto recebido: " + comando);
-
-                    // 2️⃣ Executa a ação correspondente
-                    processarComando(comando);
-
-                    // 3️⃣ Confirma execução no servidor
-                    String confirmaUrl = baseUrl + "/confirma_comando.php?filial=" + filial + "&id=" + idComando;
-                    HttpRequest confirma = HttpRequest.newBuilder()
-                            .uri(URI.create(confirmaUrl))
-                            .timeout(java.time.Duration.ofSeconds(5))
-                            .build();
-                    client.send(confirma, HttpResponse.BodyHandlers.discarding());
-
-                    logger.info("Comando " + idComando + " confirmado com sucesso.");
+                if (mqttClient == null || !mqttClient.isConnected()) {
+                    logger.warn("Monitor: MQTT desconectado. Tentando reconectar...");
+                    conectarMqtt();
                 }
-
-                Thread.sleep(intervalo);
+                Thread.sleep(5000); // Verifica a cada 5 segundos
+            } catch (InterruptedException e) {
+                executando = false;
             } catch (Exception e) {
-                logger.error("Erro ao verificar comandos remotos: " + e.getMessage(), e);
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException ignored) {
-                }
+                logger.error("Erro no loop de monitoramento MQTT", e);
             }
+        }
+    }
+
+    private void conectarMqtt() {
+        try {
+            if (mqttClient != null && mqttClient.isConnected())
+                return;
+
+            // Gera um ID único para evitar conflito se abrir dois clientes
+            String clientId = "MotelClient_" + filial + "_" + System.currentTimeMillis();
+
+            // Persistencia em memória (não salva mensagens em disco se crashar, ok para
+            // esse uso)
+            mqttClient = new MqttClient(BROKER_URL, clientId, new MemoryPersistence());
+            mqttClient.setCallback(this);
+
+            MqttConnectOptions connOpts = new MqttConnectOptions();
+            connOpts.setCleanSession(false); // Retém a sessão se cair brevemente
+            connOpts.setAutomaticReconnect(true); // Tenta reconectar a nível de lib
+            connOpts.setConnectionTimeout(10);
+            connOpts.setKeepAliveInterval(60);
+            // connOpts.setUserName("admin"); // TODO: Descomente e ajuste se configurar
+            // usuario/senha no Mosquitto
+            // connOpts.setPassword("senha".toCharArray());
+
+            logger.info("Conectando ao broker MQTT: " + BROKER_URL + " ...");
+            mqttClient.connect(connOpts);
+            logger.info("Conectado! Inscrevendo no tópico: " + TOPIC_COMANDOS);
+
+            // QoS 1: Garante que a mensagem chegue pelo menos uma vez
+            mqttClient.subscribe(TOPIC_COMANDOS, 1);
+
+        } catch (MqttException me) {
+            logger.error("Falha na conexão MQTT: " + me.getMessage() + " (" + me.getReasonCode() + ")");
+        }
+    }
+
+    @Override
+    public void connectionLost(Throwable cause) {
+        logger.warn("Conexão MQTT perdida! Causa: " + (cause != null ? cause.getMessage() : "Desconhecida"));
+    }
+
+    @Override
+    public void messageArrived(String topic, MqttMessage message) throws Exception {
+        String payload = new String(message.getPayload());
+        logger.info(">>> MENSAGEM MQTT RECEBIDA: " + payload);
+
+        try {
+            // Espera JSON no formato: { "id": 123, "comando": "abrir entrada" }
+            // Se enviar só a string "abrir entrada", vai dar erro no JSON, então tratamos
+            // os dois casos
+            String comando;
+            int idComando = -1;
+
+            if (payload.trim().startsWith("{")) {
+                JSONObject json = new JSONObject(payload);
+                idComando = json.optInt("id", -1);
+                comando = json.getString("comando");
+            } else {
+                // Suporte para envio simples de texto (ex: teste manual via terminal)
+                comando = payload;
+            }
+
+            processarComando(comando);
+
+            // Se veio com ID, confirmamos no servidor PHP que foi feito
+            if (idComando != -1) {
+                confirmarExecucaoHttp(idComando);
+            }
+
+        } catch (Exception e) {
+            logger.error("Erro ao processar mensagem MQTT: " + payload, e);
+        }
+    }
+
+    @Override
+    public void deliveryComplete(IMqttDeliveryToken token) {
+        // Não utilizamos envio por aqui, apenas recebimento
+    }
+
+    private void confirmarExecucaoHttp(int idComando) {
+        try {
+            String confirmaUrl = baseUrl + "/confirma_comando.php?filial=" + filial + "&id=" + idComando;
+            HttpRequest confirma = HttpRequest.newBuilder()
+                    .uri(URI.create(confirmaUrl))
+                    .timeout(java.time.Duration.ofSeconds(5))
+                    .build();
+            httpClient.send(confirma, HttpResponse.BodyHandlers.discarding());
+            logger.info("Comando " + idComando + " confirmado via HTTP com sucesso.");
+        } catch (Exception e) {
+            logger.error("Erro ao confirmar comando " + idComando + " via HTTP", e);
         }
     }
 
@@ -104,6 +176,11 @@ public class VerificaComandosRemotos extends Thread {
                 int quartoEmFoco = Integer.parseInt(numero);
                 if (acao.equals("locar")) {
                     CacheDados cache = CacheDados.getInstancia();
+                    // Proteção null check
+                    if (cache.getCacheQuarto().get(quartoEmFoco) == null) {
+                        logger.error("Quarto " + quartoEmFoco + " não encontrado no cache!");
+                        return;
+                    }
                     String statusAtual = cache.getCacheQuarto().get(quartoEmFoco).getStatusQuarto();
 
                     if (statusAtual.equals("livre")) {
@@ -224,7 +301,6 @@ public class VerificaComandosRemotos extends Thread {
             dados.getCacheQuarto().put(quartoMudar, quarto);
 
             if (statusColocar.equals("limpeza")) {
-                // Se o cacheOcupado não for sincronizado, ele também precisa ser envolvido.
                 dados.getCacheOcupado().remove(quartoMudar);
             }
         }
@@ -233,5 +309,12 @@ public class VerificaComandosRemotos extends Thread {
 
     public void parar() {
         executando = false;
+        try {
+            if (mqttClient != null && mqttClient.isConnected()) {
+                mqttClient.disconnect();
+            }
+        } catch (MqttException e) {
+            logger.error("Erro ao desconectar MQTT", e);
+        }
     }
 }

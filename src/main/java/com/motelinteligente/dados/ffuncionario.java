@@ -37,7 +37,7 @@ public class ffuncionario {
 
             // Processar o resultado
             while (resultado.next()) {
-                //vquartos quarto = new vquartos(0,null, 0, 0 ,0);
+                // vquartos quarto = new vquartos(0,null, 0, 0 ,0);
                 vfuncionario funcionario = new vfuncionario();
                 funcionario.setNomefuncionario(resultado.getString("nomefuncionario"));
                 funcionario.setLoginfuncionario(resultado.getString("loginfuncionario"));
@@ -97,25 +97,31 @@ public class ffuncionario {
     public boolean insercao(vfuncionario dados) {
         String consultaSQL = "INSERT INTO funcionario (nomefuncionario,  cargofuncionario, loginfuncionario, senhafuncionario) VALUES ( ?, ?, ?, ?)";
 
-        //String inserir = Tipo de Quarto","Valor do Período","Valor Pernoite"};
-        /* String consultaSQL = "insert into quartos (tipoquarto, numeroquarto, valorquarto, pernoitequarto) values (" +
-               dados.getTipoquarto() + "', '" +
-               dados.getNumeroquarto() + "', '" +
-               dados.getValorquarto() + "', '" +
-               dados.getPernoitequarto()+ "')";*/
+        // String inserir = Tipo de Quarto","Valor do Período","Valor Pernoite"};
+        /*
+         * String consultaSQL =
+         * "insert into quartos (tipoquarto, numeroquarto, valorquarto, pernoitequarto) values ("
+         * +
+         * dados.getTipoquarto() + "', '" +
+         * dados.getNumeroquarto() + "', '" +
+         * dados.getValorquarto() + "', '" +
+         * dados.getPernoitequarto()+ "')";
+         */
         Connection link = null;
 
         try {
-            //faz a conexao com banco
+            // faz a conexao com banco
             link = new fazconexao().conectar();
             PreparedStatement statement = link.prepareStatement(consultaSQL);
-            //statement.setInt(1, dados.getIdquartos());
+            // statement.setInt(1, dados.getIdquartos());
             statement.setString(1, dados.getNomefuncionario());
             statement.setString(2, dados.getCargofuncionario());
             statement.setString(3, dados.getLoginfuncionario());
             statement.setString(4, dados.getSenhafuncionario());
             int n = statement.executeUpdate();
             if (n != 0) {
+                logger.info("Novo funcionário cadastrado: " + dados.getNomefuncionario() + " (Cargo: "
+                        + dados.getCargofuncionario() + ")");
                 link.close();
                 return true;
             } else {
@@ -151,7 +157,8 @@ public class ffuncionario {
             statement.setString(1, login);
             ResultSet resultado = statement.executeQuery();
 
-            // A consulta retornará um único valor, que é o número de vezes que o número de quarto foi encontrado.
+            // A consulta retornará um único valor, que é o número de vezes que o número de
+            // quarto foi encontrado.
             if (resultado.next()) {
                 int count = resultado.getInt(1);
                 System.out.println(count);
@@ -181,12 +188,13 @@ public class ffuncionario {
 
         return true;
     }
+
     public int getIdFuncionario(String nome, String cargo, String login) {
         int id = -1;
         String sql = "SELECT idfuncionario FROM funcionario WHERE nomefuncionario = ? AND cargofuncionario = ? AND loginfuncionario = ?";
 
         try (Connection conexao = new fazconexao().conectar();
-             PreparedStatement ps = conexao.prepareStatement(sql)) {
+                PreparedStatement ps = conexao.prepareStatement(sql)) {
 
             ps.setString(1, nome);
             ps.setString(2, cargo);
@@ -204,23 +212,25 @@ public class ffuncionario {
 
         return id;
     }
+
     public boolean excluirFuncionario(int idfuncionario) {
-    String sql = "DELETE FROM funcionario WHERE idfuncionario = ?";
-    boolean sucesso = false;
+        String sql = "DELETE FROM funcionario WHERE idfuncionario = ?";
+        boolean sucesso = false;
 
-    try (Connection conexao = new fazconexao().conectar();
-         PreparedStatement ps = conexao.prepareStatement(sql)) {
+        try (Connection conexao = new fazconexao().conectar();
+                PreparedStatement ps = conexao.prepareStatement(sql)) {
 
-        ps.setInt(1, idfuncionario);
-        int linhasAfetadas = ps.executeUpdate();
-        sucesso = linhasAfetadas > 0;
+            ps.setInt(1, idfuncionario);
+            int linhasAfetadas = ps.executeUpdate();
+            sucesso = linhasAfetadas > 0;
 
-    } catch (SQLException e) {
-        e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return sucesso;
     }
 
-    return sucesso;
-}
     public String verificaLogin(String texto_login, String texto_senha) {
         String consulta = "SELECT * FROM funcionario WHERE loginfuncionario = ? AND senhafuncionario = ?";
         String cargo = null;
@@ -233,9 +243,11 @@ public class ffuncionario {
             statement.setString(1, texto_login);
             statement.setString(2, texto_senha);
 
-            try ( ResultSet resultado = statement.executeQuery()) {
+            try (ResultSet resultado = statement.executeQuery()) {
                 if (resultado.next()) {
-                    cargo = resultado.getString("cargofuncionario"); // Supondo que a coluna na tabela seja chamada "cargo".
+                    cargo = resultado.getString("cargofuncionario"); // Supondo que a coluna na tabela seja chamada
+                                                                     // "cargo".
+                    logger.info("Login efetuado: Usuário '" + texto_login + "' - Cargo: " + cargo);
                     return cargo; // Retorna o cargo do usuário.
                 }
             }

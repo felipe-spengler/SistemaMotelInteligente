@@ -1,0 +1,418 @@
+2025-12-21 00:02:02.634 WARN  [Thread-1740] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 00:02:02.630 INFO  [Thread-1739] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 00:02:03.082 WARN  [Thread-1743] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 00:02:03.211 WARN  [Thread-1744] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 00:02:03.212 INFO  [Thread-1739] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 00:10:05.279 INFO  [Thread-1745] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 00:10:05.733 WARN  [Thread-1746] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 00:10:05.737 INFO  [Thread-1745] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 00:10:11.253 INFO  [Thread-1747] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 00:10:11.402 WARN  [Thread-1748] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 00:10:11.405 INFO  [Thread-1747] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 00:12:37.455 INFO  [Thread-1752] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 00:12:37.458 WARN  [Thread-1753] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 00:12:37.578 WARN  [Thread-1754] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 00:12:37.581 WARN  [Thread-1755] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 00:12:37.883 WARN  [Thread-1756] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 00:12:38.004 WARN  [Thread-1757] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 00:12:38.124 WARN  [Thread-1758] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 00:12:38.237 WARN  [Thread-1759] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 00:12:38.238 INFO  [Thread-1752] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 01:01:34.839 INFO  [Thread-1760] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 01:01:35.268 WARN  [Thread-1761] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 01:01:35.271 INFO  [Thread-1760] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 01:01:38.689 INFO  [Thread-1762] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 01:01:38.846 WARN  [Thread-1763] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 01:01:38.847 INFO  [Thread-1762] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 01:20:10.106 INFO  [Thread-1764] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 01:20:10.108 WARN  [Thread-1765] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 01:20:10.539 WARN  [Thread-1768] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 01:20:10.665 WARN  [Thread-1769] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 01:20:10.666 INFO  [Thread-1764] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 01:31:55.489 INFO  [Thread-1770] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 01:31:55.490 WARN  [Thread-1771] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 01:31:55.890 WARN  [Thread-1774] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 01:31:56.004 WARN  [Thread-1775] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 01:31:56.005 INFO  [Thread-1770] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 01:59:58.295 INFO  [Thread-1776] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 01:59:58.296 WARN  [Thread-1777] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 01:59:58.711 WARN  [Thread-1780] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 01:59:58.832 WARN  [Thread-1781] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 01:59:58.833 INFO  [Thread-1776] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 02:00:13.886 INFO  [Thread-1782] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 02:00:14.047 WARN  [Thread-1783] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 02:00:14.048 INFO  [Thread-1782] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 02:08:45.180 INFO  [Thread-1785] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 02:08:45.594 WARN  [Thread-1786] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 02:08:45.595 INFO  [Thread-1785] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 02:10:31.678 INFO  [Thread-1787] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 02:10:31.689 WARN  [Thread-1788] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 02:10:31.807 WARN  [Thread-1789] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 02:10:31.812 WARN  [Thread-1790] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 02:10:32.118 WARN  [Thread-1791] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 02:10:32.242 WARN  [Thread-1792] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 02:10:32.365 WARN  [Thread-1793] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 02:10:32.486 WARN  [Thread-1794] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 02:10:32.487 INFO  [Thread-1787] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 02:16:45.461 INFO  [Thread-1795] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 02:16:45.465 WARN  [Thread-1796] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 02:16:45.468 WARN  [Thread-1797] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 02:16:45.872 WARN  [Thread-1798] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 02:16:45.996 WARN  [Thread-1799] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 02:16:46.111 WARN  [Thread-1800] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 02:16:46.112 INFO  [Thread-1795] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 02:31:09.350 INFO  [Thread-1801] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 02:31:09.759 WARN  [Thread-1802] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 02:31:09.761 INFO  [Thread-1801] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 02:31:13.834 INFO  [Thread-1803] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 02:31:14.001 WARN  [Thread-1804] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 02:31:14.003 INFO  [Thread-1803] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 02:31:18.182 INFO  [Thread-1805] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 02:31:18.330 WARN  [Thread-1806] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 02:31:18.332 INFO  [Thread-1805] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 02:59:58.356 INFO  [scheduling-1] c.m.dados.Agendamentos - Executando a tarefa agendada para 03:00.
+2025-12-21 03:00:02.208 INFO  [scheduling-1] c.m.dados.Agendamentos - Sincronização agendada concluída com sucesso.
+2025-12-21 03:12:27.687 INFO  [Thread-1808] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 03:12:28.136 WARN  [Thread-1809] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 03:12:28.138 INFO  [Thread-1808] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 03:45:30.768 INFO  [Thread-1812] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 03:45:30.883 WARN  [Thread-1813] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 03:45:30.885 WARN  [Thread-1814] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 03:45:31.192 WARN  [Thread-1815] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 03:45:31.310 WARN  [Thread-1816] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 03:45:31.424 WARN  [Thread-1817] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 03:45:31.425 INFO  [Thread-1812] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 03:52:57.946 INFO  [Thread-1819] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 03:52:58.063 WARN  [Thread-1820] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 03:52:58.065 WARN  [Thread-1821] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 03:52:58.372 WARN  [Thread-1822] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 03:52:58.486 WARN  [Thread-1823] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 03:52:58.599 WARN  [Thread-1824] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 03:52:58.600 INFO  [Thread-1819] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 04:12:00.515 INFO  [Thread-1825] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 04:12:00.517 WARN  [Thread-1826] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 04:12:00.550 INFO  [Thread-10] c.m.dados.VerificaComandosRemotos - Comando 168 confirmado com sucesso.
+2025-12-21 04:12:00.730 WARN  [Timer-0] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 04:12:00.924 WARN  [Thread-1827] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 04:12:01.046 WARN  [Thread-1828] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 04:12:01.047 INFO  [Thread-1825] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 04:12:06.753 INFO  [Thread-1829] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 04:12:06.759 WARN  [Thread-1830] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 04:12:06.796 INFO  [Thread-10] c.m.dados.VerificaComandosRemotos - Comando 169 confirmado com sucesso.
+2025-12-21 04:12:06.912 WARN  [Thread-1831] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 04:12:07.031 WARN  [Thread-1832] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 04:12:07.032 INFO  [Thread-1829] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 04:12:14.230 INFO  [Thread-1833] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 04:12:14.233 WARN  [Thread-1834] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 04:12:14.264 INFO  [Thread-10] c.m.dados.VerificaComandosRemotos - Comando 170 confirmado com sucesso.
+2025-12-21 04:12:14.377 WARN  [Thread-1835] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 04:12:14.492 WARN  [Thread-1836] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 04:12:14.493 INFO  [Thread-1833] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 04:16:17.415 INFO  [Thread-10] c.m.dados.VerificaComandosRemotos - Comando 171 confirmado com sucesso.
+2025-12-21 04:48:34.176 INFO  [Thread-1837] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 04:48:34.178 WARN  [Thread-1838] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 04:48:34.577 WARN  [Thread-1841] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 04:48:34.694 WARN  [Thread-1842] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 04:48:34.695 INFO  [Thread-1837] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 05:14:23.098 INFO  [Thread-1843] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 05:14:23.542 WARN  [Thread-1844] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 05:14:23.544 INFO  [Thread-1843] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 05:15:42.038 INFO  [Thread-1846] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 05:15:42.453 WARN  [Thread-1847] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 05:15:42.455 INFO  [Thread-1846] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 05:15:47.470 INFO  [Thread-1849] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 05:15:47.582 WARN  [Thread-1850] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 05:15:47.584 WARN  [Thread-1851] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 05:15:47.622 WARN  [Thread-1852] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 05:15:47.753 WARN  [Thread-1853] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 05:15:47.754 INFO  [Thread-1849] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 05:15:49.730 INFO  [Timer-0] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 05:15:49.890 WARN  [Thread-1854] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 05:15:49.892 INFO  [Timer-0] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 07:46:29.539 INFO  [Thread-1855] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 07:46:29.543 WARN  [Thread-1856] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 07:46:29.998 WARN  [Thread-1857] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 07:46:30.119 WARN  [Thread-1858] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 07:46:30.120 INFO  [Thread-1855] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 07:46:43.577 INFO  [Thread-1859] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 07:46:43.578 WARN  [Thread-1860] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 07:46:43.742 WARN  [Thread-1861] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 07:46:43.856 WARN  [Thread-1862] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 07:46:43.857 INFO  [Thread-1859] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 09:20:08.010 INFO  [Thread-1864] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 09:20:08.426 WARN  [Thread-1865] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:20:08.429 INFO  [Thread-1864] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 09:20:11.797 INFO  [Thread-1866] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 09:20:11.960 WARN  [Thread-1867] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:20:11.963 INFO  [Thread-1866] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 09:21:10.607 INFO  [Thread-1869] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 09:21:10.607 WARN  [Thread-1870] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:21:10.614 WARN  [Thread-1871] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:21:10.726 WARN  [Thread-1872] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:21:10.729 WARN  [Timer-0] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:21:10.729 WARN  [Thread-1873] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:21:11.032 WARN  [Thread-1874] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:21:11.155 WARN  [Thread-1875] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:21:11.272 WARN  [Thread-1876] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:21:11.379 WARN  [Thread-1877] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:21:11.489 WARN  [Thread-1878] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:21:11.490 INFO  [Thread-1869] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 09:42:11.426 INFO  [Thread-1882] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 09:42:11.428 WARN  [Thread-1883] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:42:11.432 WARN  [Thread-1884] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:42:11.436 WARN  [Thread-1885] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:42:11.442 WARN  [Thread-1886] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:42:11.446 WARN  [Thread-1887] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:42:11.450 WARN  [Thread-1888] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:42:11.453 WARN  [Thread-1889] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:42:11.455 WARN  [Thread-1890] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:42:11.458 WARN  [Thread-1891] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:42:11.570 WARN  [Thread-1892] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:42:11.572 WARN  [Thread-1893] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:42:11.839 WARN  [Thread-1894] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:42:11.960 WARN  [Thread-1895] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:42:12.080 WARN  [Thread-1896] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:42:12.199 WARN  [Thread-1897] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:42:12.313 WARN  [Thread-1898] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:42:12.425 WARN  [Thread-1899] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:42:12.533 WARN  [Thread-1900] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:42:12.644 WARN  [Thread-1901] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:42:12.757 WARN  [Thread-1902] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:42:12.865 WARN  [Thread-1903] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:42:12.975 WARN  [Thread-1904] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:42:13.082 WARN  [Thread-1905] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:42:13.083 INFO  [Thread-1882] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 09:50:35.654 INFO  [Thread-1906] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 09:50:35.655 WARN  [Thread-1907] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:50:36.071 WARN  [Thread-1910] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:50:36.192 WARN  [Thread-1911] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:50:36.192 INFO  [Thread-1906] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 09:50:55.772 INFO  [Thread-1912] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 09:50:55.933 WARN  [Thread-1913] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:50:55.935 INFO  [Thread-1912] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 09:50:59.012 INFO  [Thread-1914] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 09:50:59.172 WARN  [Thread-1915] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:50:59.177 INFO  [Thread-1914] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 09:51:14.268 INFO  [Thread-1917] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 09:51:14.437 WARN  [Thread-1918] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:51:14.441 INFO  [Thread-1917] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 09:51:15.508 INFO  [Thread-1919] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 09:51:15.509 WARN  [Thread-1920] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:51:15.511 WARN  [Thread-1921] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:51:15.671 WARN  [Thread-1922] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:51:15.792 WARN  [Thread-1923] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:51:15.907 WARN  [Thread-1924] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 09:51:15.908 INFO  [Thread-1919] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 11:00:07.427 INFO  [Thread-1925] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 11:00:07.433 WARN  [Thread-1926] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 11:00:07.878 WARN  [Thread-1927] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 11:00:08.001 WARN  [Thread-1928] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 11:00:08.121 WARN  [Thread-1929] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 11:00:08.234 WARN  [Thread-1930] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 11:00:08.353 WARN  [Thread-1931] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 11:00:08.354 INFO  [Thread-1925] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 11:00:13.870 INFO  [Thread-1932] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 11:00:13.874 WARN  [Thread-1933] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 11:00:14.026 WARN  [Thread-1934] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 11:00:14.149 WARN  [Thread-1935] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 11:00:14.150 INFO  [Thread-1932] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 11:59:58.357 INFO  [scheduling-1] c.m.dados.Agendamentos - Verificando se há nova versão do sistema...
+2025-12-21 11:59:58.660 INFO  [scheduling-1] c.m.dados.Agendamentos - Nenhuma atualização disponível no momento.
+2025-12-21 13:44:10.243 INFO  [Thread-1936] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 13:44:10.245 WARN  [Thread-1937] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 13:44:10.726 WARN  [Thread-1940] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 13:44:10.854 WARN  [Thread-1941] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 13:44:10.855 INFO  [Thread-1936] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 14:26:55.524 INFO  [Thread-1943] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 14:26:55.533 WARN  [Thread-1944] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 14:26:55.655 WARN  [Thread-1945] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 14:26:55.659 WARN  [Thread-1946] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 14:26:55.949 WARN  [Thread-1947] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 14:26:56.076 WARN  [Thread-1948] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 14:26:56.196 WARN  [Thread-1949] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 14:26:56.327 WARN  [Thread-1950] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 14:26:56.328 INFO  [Thread-1943] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 15:07:18.060 INFO  [Thread-1951] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 15:07:18.062 WARN  [Thread-1952] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 15:07:18.468 WARN  [Thread-1955] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 15:07:18.585 WARN  [Thread-1956] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 15:07:18.586 INFO  [Thread-1951] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 15:15:44.179 INFO  [Thread-1957] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 15:15:44.180 WARN  [Thread-1958] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 15:15:44.597 WARN  [Thread-1961] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 15:15:44.721 WARN  [Thread-1962] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 15:15:44.722 INFO  [Thread-1957] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 15:47:52.373 INFO  [Thread-1964] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 15:47:52.490 WARN  [Thread-1965] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 15:47:52.495 WARN  [Thread-1966] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 15:47:52.812 WARN  [Thread-1967] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 15:47:52.927 WARN  [Thread-1968] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 15:47:53.043 WARN  [Thread-1969] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 15:47:53.044 INFO  [Thread-1964] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 16:03:33.562 INFO  [Thread-1970] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 16:03:33.564 WARN  [Thread-1971] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 16:03:33.729 WARN  [Timer-0] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 16:03:33.976 WARN  [Thread-1974] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 16:03:34.094 WARN  [Thread-1975] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 16:03:34.096 INFO  [Thread-1970] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 16:19:47.898 INFO  [Thread-1977] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 16:19:47.907 WARN  [Thread-1978] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 16:19:48.022 WARN  [Thread-1979] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 16:19:48.024 WARN  [Thread-1980] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 16:19:48.311 WARN  [Thread-1981] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 16:19:48.426 WARN  [Thread-1982] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 16:19:48.539 WARN  [Thread-1983] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 16:19:48.655 WARN  [Thread-1984] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 16:19:48.656 INFO  [Thread-1977] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 16:20:16.683 INFO  [Thread-1985] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 16:20:16.688 WARN  [Thread-1986] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 16:20:17.097 WARN  [Thread-1987] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 16:20:17.217 WARN  [Thread-1988] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 16:20:17.218 INFO  [Thread-1985] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 16:49:49.655 INFO  [Thread-1989] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 16:49:50.055 WARN  [Thread-1990] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 16:49:50.056 INFO  [Thread-1989] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 16:53:03.365 INFO  [Thread-1992] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 16:53:03.479 WARN  [Thread-1993] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 16:53:03.481 WARN  [Thread-1994] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 16:53:03.791 WARN  [Thread-1995] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 16:53:03.911 WARN  [Thread-1996] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 16:53:04.030 WARN  [Thread-1997] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 16:53:04.031 INFO  [Thread-1992] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 17:07:44.689 INFO  [Thread-1998] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 17:07:44.691 WARN  [Thread-1999] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 17:07:45.097 WARN  [Thread-2002] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 17:07:45.216 WARN  [Thread-2003] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 17:07:45.217 INFO  [Thread-1998] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 17:38:32.060 INFO  [Thread-2005] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 17:38:32.172 WARN  [Thread-2006] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 17:38:32.176 WARN  [Thread-2007] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 17:38:32.481 WARN  [Thread-2008] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 17:38:32.599 WARN  [Thread-2009] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 17:38:32.717 WARN  [Thread-2010] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 17:38:32.717 INFO  [Thread-2005] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 18:16:13.725 INFO  [Thread-2011] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 18:16:13.730 WARN  [Thread-2012] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 18:16:14.136 WARN  [Thread-2013] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 18:16:14.258 WARN  [Thread-2014] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 18:16:14.259 INFO  [Thread-2011] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 18:16:18.980 INFO  [Thread-2015] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 18:16:18.984 WARN  [Thread-2016] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 18:16:19.140 WARN  [Thread-2017] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 18:16:19.257 WARN  [Thread-2018] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 18:16:19.258 INFO  [Thread-2015] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 18:16:27.009 INFO  [Thread-2019] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 18:16:27.012 WARN  [Thread-2020] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 18:16:27.160 WARN  [Thread-2021] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 18:16:27.275 WARN  [Thread-2022] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 18:16:27.276 INFO  [Thread-2019] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 18:30:08.611 INFO  [Thread-2023] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 18:30:08.612 WARN  [Thread-2024] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 18:30:09.041 WARN  [Thread-2027] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 18:30:09.161 WARN  [Thread-2028] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 18:30:09.162 INFO  [Thread-2023] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 18:33:19.439 INFO  [Thread-2029] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 18:33:19.443 WARN  [Thread-2030] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 18:33:19.915 WARN  [Thread-2033] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 18:33:20.027 WARN  [Thread-2034] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 18:33:20.028 INFO  [Thread-2029] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 18:50:54.370 INFO  [Thread-2035] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 18:50:54.371 WARN  [Thread-2036] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 18:50:54.793 WARN  [Thread-2039] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 18:50:54.916 WARN  [Thread-2040] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 18:50:54.917 INFO  [Thread-2035] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 18:53:52.164 INFO  [Thread-2043] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 18:53:52.591 WARN  [Thread-2044] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 18:53:52.595 INFO  [Thread-2043] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 18:54:52.528 INFO  [Thread-2046] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 18:54:52.543 WARN  [Thread-2047] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 18:54:52.547 WARN  [Thread-2048] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 18:54:52.659 WARN  [Thread-2049] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 18:54:52.661 WARN  [Thread-2050] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 18:54:52.955 WARN  [Thread-2051] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 18:54:53.080 WARN  [Thread-2052] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 18:54:53.197 WARN  [Thread-2053] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 18:54:53.312 WARN  [Thread-2054] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 18:54:53.433 WARN  [Thread-2055] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 18:54:53.434 INFO  [Thread-2046] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 19:01:40.576 INFO  [Thread-2056] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 19:01:41.005 WARN  [Thread-2057] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 19:01:41.008 INFO  [Thread-2056] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 19:01:44.031 INFO  [Thread-2058] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 19:01:44.189 WARN  [Thread-2059] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 19:01:44.191 INFO  [Thread-2058] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 19:01:49.780 INFO  [Thread-2060] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 19:01:49.939 WARN  [Thread-2061] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 19:01:49.941 INFO  [Thread-2060] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 19:23:05.856 INFO  [Thread-2063] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 19:23:05.866 WARN  [Thread-2064] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 19:23:05.977 WARN  [Thread-2065] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 19:23:05.981 WARN  [Thread-2066] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 19:23:06.271 WARN  [Thread-2067] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 19:23:06.387 WARN  [Thread-2068] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 19:23:06.501 WARN  [Thread-2069] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 19:23:06.621 WARN  [Thread-2070] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 19:23:06.622 INFO  [Thread-2063] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 19:53:45.323 INFO  [Thread-2071] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 19:53:45.327 WARN  [Thread-2072] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 19:53:45.725 WARN  [Thread-2073] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 19:53:45.840 WARN  [Thread-2074] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 19:53:45.841 INFO  [Thread-2071] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 19:53:50.733 INFO  [Thread-2075] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 19:53:50.736 WARN  [Thread-2076] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 19:53:50.880 WARN  [Thread-2077] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 19:53:50.993 WARN  [Thread-2078] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 19:53:50.994 INFO  [Thread-2075] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 20:02:10.098 INFO  [Thread-2079] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 20:02:10.099 WARN  [Thread-2080] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 20:02:10.506 WARN  [Thread-2083] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 20:02:10.626 WARN  [Thread-2084] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 20:02:10.627 INFO  [Thread-2079] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 20:55:03.501 INFO  [Thread-2086] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 20:55:03.610 WARN  [Thread-2087] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 20:55:03.614 WARN  [Thread-2088] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 20:55:03.955 WARN  [Thread-2089] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 20:55:04.078 WARN  [Thread-2090] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 20:55:04.200 WARN  [Thread-2091] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 20:55:04.201 INFO  [Thread-2086] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 21:38:55.879 INFO  [Thread-2092] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 21:38:55.884 WARN  [Thread-2093] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 21:38:56.321 WARN  [Thread-2094] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 21:38:56.445 WARN  [Thread-2095] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 21:38:56.445 INFO  [Thread-2092] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 22:04:48.240 INFO  [Thread-2098] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 22:04:48.252 WARN  [Thread-2099] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 22:04:48.254 WARN  [Thread-2100] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 22:04:48.259 WARN  [Thread-2101] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 22:04:48.264 WARN  [Thread-2102] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 22:04:48.383 WARN  [Thread-2103] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 22:04:48.387 WARN  [Thread-2104] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 22:04:48.653 WARN  [Thread-2105] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 22:04:48.772 WARN  [Thread-2106] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 22:04:48.892 WARN  [Thread-2107] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 22:04:49.008 WARN  [Thread-2108] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 22:04:49.122 WARN  [Thread-2109] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 22:04:49.240 WARN  [Thread-2110] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 22:04:49.363 WARN  [Thread-2111] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 22:04:49.364 INFO  [Thread-2098] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 22:27:07.783 INFO  [Thread-2112] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 22:27:07.785 WARN  [Thread-2113] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 22:27:08.190 WARN  [Thread-2116] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 22:27:08.308 WARN  [Thread-2117] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 22:27:08.309 INFO  [Thread-2112] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 22:46:40.086 INFO  [Thread-2118] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 22:46:40.091 WARN  [Thread-2119] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 22:46:40.490 WARN  [Thread-2120] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 22:46:40.614 WARN  [Thread-2121] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 22:46:40.615 INFO  [Thread-2118] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 23:22:53.529 INFO  [Thread-2122] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 23:22:53.530 WARN  [Thread-2123] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 23:22:53.932 WARN  [Thread-2126] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 23:22:54.055 WARN  [Thread-2127] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 23:22:54.056 INFO  [Thread-2122] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 23:48:47.828 INFO  [Thread-2128] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 23:48:48.292 WARN  [Thread-2129] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 23:48:48.296 INFO  [Thread-2128] c.m.dados.CheckSincronia - Sincronização concluída.
+2025-12-21 23:48:56.103 INFO  [Thread-2130] c.m.dados.CheckSincronia - Iniciando sincronização de registros...
+2025-12-21 23:48:56.266 WARN  [Thread-2131] c.m.dados.CheckSincronia - CheckSincronia já em execução. Ignorando nova chamada.
+2025-12-21 23:48:56.270 INFO  [Thread-2130] c.m.dados.CheckSincronia - Sincronização concluída.

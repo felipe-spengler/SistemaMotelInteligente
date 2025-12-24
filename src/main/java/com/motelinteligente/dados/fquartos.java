@@ -25,7 +25,9 @@ public class fquartos {
     public List<CarregaQuarto> uploadQuartos() {
         List<CarregaQuarto> quartos = new ArrayList<>();
         String consultaSQL = "SELECT q.numeroquarto, s.atualquarto AS status, s.horastatus AS data, q.tipoquarto AS tipo FROM quartos q JOIN status s ON q.numeroquarto = s.numeroquarto ORDER BY q.numeroquarto";
-        try (Connection link = conexao.conectar(); PreparedStatement statement = link.prepareStatement(consultaSQL); ResultSet resultado = statement.executeQuery()) {
+        try (Connection link = conexao.conectar();
+                PreparedStatement statement = link.prepareStatement(consultaSQL);
+                ResultSet resultado = statement.executeQuery()) {
             while (resultado.next()) {
                 CarregaQuarto quarto = new CarregaQuarto();
                 quarto.setNumeroQuarto(resultado.getInt("numeroquarto"));
@@ -44,7 +46,9 @@ public class fquartos {
     public List<vquartos> mostrar() {
         List<vquartos> quartos = new ArrayList<>();
         String consultaSQL = "SELECT * FROM quartos ORDER BY numeroquarto";
-        try (Connection link = conexao.conectar(); PreparedStatement statement = link.prepareStatement(consultaSQL); ResultSet resultado = statement.executeQuery()) {
+        try (Connection link = conexao.conectar();
+                PreparedStatement statement = link.prepareStatement(consultaSQL);
+                ResultSet resultado = statement.executeQuery()) {
             while (resultado.next()) {
                 vquartos quarto = new vquartos();
                 quarto.setTipoquarto(resultado.getString("tipoquarto"));
@@ -69,11 +73,15 @@ public class fquartos {
 
     public boolean setStatus(int numero, String status, Timestamp horario) {
         String consultaSQL = "UPDATE status SET atualquarto = ?, horastatus = ? WHERE numeroquarto = ?";
-        try (Connection link = new fazconexao().conectar(); PreparedStatement statement = link.prepareStatement(consultaSQL)) {
+        try (Connection link = new fazconexao().conectar();
+                PreparedStatement statement = link.prepareStatement(consultaSQL)) {
             statement.setString(1, status);
             statement.setTimestamp(2, horario);
             statement.setInt(3, numero);
-            return statement.executeUpdate() > 0;
+            boolean result = statement.executeUpdate() > 0;
+            if (result)
+                logger.info("Status do quarto " + numero + " alterado para: " + status);
+            return result;
         } catch (SQLException e) {
             logger.error("Erro ao definir status: ", e);
             JOptionPane.showMessageDialog(null, "Erro ao definir status: " + e.getMessage());
@@ -84,7 +92,8 @@ public class fquartos {
     public boolean alteraOcupado(int numero, String status) {
         String consultaSQL = "UPDATE status SET atualquarto = ? WHERE numeroquarto = ?";
 
-        try (Connection link = new fazconexao().conectar(); PreparedStatement statement = link.prepareStatement(consultaSQL)) {
+        try (Connection link = new fazconexao().conectar();
+                PreparedStatement statement = link.prepareStatement(consultaSQL)) {
 
             statement.setString(1, status);
             statement.setInt(2, numero);
@@ -105,14 +114,17 @@ public class fquartos {
         String insertQuartosSQL = "INSERT INTO quartos (tipoquarto, numeroquarto, valorquarto, pernoitequarto, addPessoa) VALUES (?, ?, ?, ?,?)";
         String insertStatusSQL = "INSERT INTO status (numeroquarto, atualquarto, horastatus, periodo, adicional) VALUES (?, ?, ?, ?, ?)";
 
-        logger.info("Tentativa de INSERT para o Quarto #" + dados.getNumeroquarto() + ". Tipo: " + dados.getTipoquarto());
+        logger.info(
+                "Tentativa de INSERT para o Quarto #" + dados.getNumeroquarto() + ". Tipo: " + dados.getTipoquarto());
 
         try (Connection link = conexao.conectar()) {
             link.setAutoCommit(false);
-            try (PreparedStatement statementQuartos = link.prepareStatement(insertQuartosSQL); PreparedStatement statementStatus = link.prepareStatement(insertStatusSQL)) {
+            try (PreparedStatement statementQuartos = link.prepareStatement(insertQuartosSQL);
+                    PreparedStatement statementStatus = link.prepareStatement(insertStatusSQL)) {
 
                 // --- Insere na tabela 'quartos'
-                logger.debug("Executando INSERT em 'quartos' com parâmetros: Tipo=" + dados.getTipoquarto() + ", Número=" + dados.getNumeroquarto());
+                logger.debug("Executando INSERT em 'quartos' com parâmetros: Tipo=" + dados.getTipoquarto()
+                        + ", Número=" + dados.getNumeroquarto());
 
                 statementQuartos.setString(1, dados.getTipoquarto());
                 statementQuartos.setInt(2, dados.getNumeroquarto());
@@ -167,7 +179,8 @@ public class fquartos {
         String consultaQuarto = "UPDATE quartos SET tipoquarto = ?, valorquarto = ?, pernoitequarto = ?, addPessoa = ? WHERE numeroquarto = ?";
         String consultaStatus = "UPDATE status SET adicional = ?, periodo = ? WHERE numeroquarto = ?";
 
-        logger.info("Tentativa de UPDATE para o Quarto #" + dados.getNumeroquarto() + ". Tipo: " + dados.getTipoquarto());
+        logger.info(
+                "Tentativa de UPDATE para o Quarto #" + dados.getNumeroquarto() + ". Tipo: " + dados.getTipoquarto());
 
         try (Connection link = new fazconexao().conectar()) {
             link.setAutoCommit(false); // Begin the transaction
@@ -230,7 +243,9 @@ public class fquartos {
 
     public int numeroQuartos() {
         String consultaSQL = "SELECT COUNT(*) FROM quartos";
-        try (Connection link = conexao.conectar(); PreparedStatement statement = link.prepareStatement(consultaSQL); ResultSet resultado = statement.executeQuery()) {
+        try (Connection link = conexao.conectar();
+                PreparedStatement statement = link.prepareStatement(consultaSQL);
+                ResultSet resultado = statement.executeQuery()) {
             if (resultado.next()) {
                 return resultado.getInt(1);
             }
@@ -246,7 +261,8 @@ public class fquartos {
         String deleteQuartosSQL = "DELETE FROM quartos WHERE numeroquarto = ?";
         try (Connection link = conexao.conectar()) {
             link.setAutoCommit(false); // Inicia a transação
-            try (PreparedStatement statementStatus = link.prepareStatement(deleteStatusSQL); PreparedStatement statementQuartos = link.prepareStatement(deleteQuartosSQL)) {
+            try (PreparedStatement statementStatus = link.prepareStatement(deleteStatusSQL);
+                    PreparedStatement statementQuartos = link.prepareStatement(deleteQuartosSQL)) {
 
                 // Exclui da tabela 'status'
                 statementStatus.setInt(1, idQuarto);
@@ -356,7 +372,8 @@ public class fquartos {
         }
     }
 
-    public void salvaLocacao(int idPassado, Timestamp horaInicio, Timestamp horaFim, float valorDoQuarto, float valorConsumo, float valD, float valP, float valC) {
+    public void salvaLocacao(int idPassado, Timestamp horaInicio, Timestamp horaFim, float valorDoQuarto,
+            float valorConsumo, float valD, float valP, float valC) {
         int idCaixa = configGlobal.getInstance().getCaixa();
         String consultaSQL = "UPDATE registralocado SET horafim=?, horainicio=?, valorquarto=?, valorconsumo=?, pagodinheiro=?, pagopix=?, pagocartao=?, idcaixaatual=? WHERE idlocacao=?";
         try (Connection link = conexao.conectar(); PreparedStatement statement = link.prepareStatement(consultaSQL)) {
@@ -369,7 +386,12 @@ public class fquartos {
             statement.setFloat(7, valC);
             statement.setInt(8, idCaixa);
             statement.setInt(9, idPassado);
-            if (statement.executeUpdate() == 0) {
+            int rows = statement.executeUpdate();
+            if (rows > 0) {
+                logger.info("Locação encerrada. ID: " + idPassado + ", Vl. Quarto: " + valorDoQuarto + ", Vl. Consumo: "
+                        + valorConsumo);
+            }
+            if (rows == 0) {
                 logger.error("Nenhuma linha foi atualizada para idlocacao: " + idPassado);
                 JOptionPane.showMessageDialog(null, "Contacte o suporte: Erro salvar locação " + idPassado);
             }
@@ -380,75 +402,81 @@ public class fquartos {
     }
 
     public boolean registraLocacao(int numeroQuarto) {
-    String verificaDuplicidadeSQL = "SELECT COUNT(*) FROM registralocado WHERE numquarto = ? AND horainicio = ?";
-    String consultaSQL = "INSERT INTO registralocado (numquarto, horainicio, numpessoas) VALUES (?, ?, ?)";
-    Date dataAtual = new Date();
-    Timestamp timestamp = new Timestamp(dataAtual.getTime());
+        String verificaDuplicidadeSQL = "SELECT COUNT(*) FROM registralocado WHERE numquarto = ? AND horainicio = ?";
+        String consultaSQL = "INSERT INTO registralocado (numquarto, horainicio, numpessoas) VALUES (?, ?, ?)";
+        Date dataAtual = new Date();
+        Timestamp timestamp = new Timestamp(dataAtual.getTime());
 
-    // Usa try-with-resources para a Connection (link)
-    try (Connection link = new fazconexao().conectar()) {
+        // Usa try-with-resources para a Connection (link)
+        try (Connection link = new fazconexao().conectar()) {
 
-        // Verificar duplicidade (Statement e ResultSet internos)
-        try (PreparedStatement statementVerifica = link.prepareStatement(verificaDuplicidadeSQL)) {
-            statementVerifica.setInt(1, numeroQuarto);
-            statementVerifica.setTimestamp(2, timestamp);
-            
-            // Usa try-with-resources para o ResultSet de verificação
-            try (ResultSet rs = statementVerifica.executeQuery()) {
-                if (rs.next() && rs.getInt(1) > 0) {
-                    // Registro duplicado encontrado
-                    String mensagemErro = "registro duplicado: Quarto = " + numeroQuarto + ", Horário = " + timestamp;
-                    logger.error("Erro: Registro duplicado encontrado.\n" + mensagemErro);
-                    JOptionPane.showMessageDialog(null, "Erro: Registro duplicado encontrado.\n" + mensagemErro);
-                    return false;
-                }
-            }
-        }
+            // Verificar duplicidade (Statement e ResultSet internos)
+            try (PreparedStatement statementVerifica = link.prepareStatement(verificaDuplicidadeSQL)) {
+                statementVerifica.setInt(1, numeroQuarto);
+                statementVerifica.setTimestamp(2, timestamp);
 
-        // Inserir registro (Statement e ResultSet internos)
-        try (PreparedStatement statementInsere = link.prepareStatement(consultaSQL, PreparedStatement.RETURN_GENERATED_KEYS)) {
-            statementInsere.setInt(1, numeroQuarto);
-            statementInsere.setTimestamp(2, timestamp);
-            statementInsere.setInt(3, 2);
-
-            int n = statementInsere.executeUpdate();
-            if (n != 0) {
-                // Usa try-with-resources para o ResultSet de chaves geradas
-                try (ResultSet generatedKeys = statementInsere.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        int idLocacaoGerado = generatedKeys.getInt(1);
-                        
-                        // Lógica de cache (Mantida. Os métodos DAO internos já usam try-with-resources.)
-                        float valPeriodo = 0, valPernoite = 0, valAdicional = 0, addPessoa = 0;
-                        int pessoas = 0;
-                        fquartos quartodao = new fquartos();
-                        valPernoite = quartodao.getValorQuarto(numeroQuarto, "pernoite");
-                        valPeriodo = quartodao.getValorQuarto(numeroQuarto, "periodo");
-                        valAdicional = quartodao.getAdicional(numeroQuarto);
-                        pessoas = quartodao.getPessoas(numeroQuarto);
-                        int idLoca = new fquartos().getIdLocacao(numeroQuarto);
-                        String tempo = quartodao.getPeriodo(numeroQuarto);
-                        DadosOcupados ocupado = new DadosOcupados(timestamp, idLocacaoGerado, valPeriodo, valPernoite, pessoas, valAdicional, tempo);
-                        CacheDados cache = CacheDados.getInstancia();
-                        cache.getCacheOcupado().put(numeroQuarto, ocupado);
-                    } else {
-                        logger.warn("Registro inserido, mas nenhum ID foi retornado. Quarto = " + numeroQuarto + ", Horário = " + timestamp);
+                // Usa try-with-resources para o ResultSet de verificação
+                try (ResultSet rs = statementVerifica.executeQuery()) {
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        // Registro duplicado encontrado
+                        String mensagemErro = "registro duplicado: Quarto = " + numeroQuarto + ", Horário = "
+                                + timestamp;
+                        logger.error("Erro: Registro duplicado encontrado.\n" + mensagemErro);
+                        JOptionPane.showMessageDialog(null, "Erro: Registro duplicado encontrado.\n" + mensagemErro);
+                        return false;
                     }
                 }
-                return true;
-            } else {
-                logger.warn("Falha ao inserir registro. Nenhuma linha afetada. SQL: " + consultaSQL);
             }
+
+            // Inserir registro (Statement e ResultSet internos)
+            try (PreparedStatement statementInsere = link.prepareStatement(consultaSQL,
+                    PreparedStatement.RETURN_GENERATED_KEYS)) {
+                statementInsere.setInt(1, numeroQuarto);
+                statementInsere.setTimestamp(2, timestamp);
+                statementInsere.setInt(3, 2);
+
+                int n = statementInsere.executeUpdate();
+                if (n != 0) {
+                    // Usa try-with-resources para o ResultSet de chaves geradas
+                    try (ResultSet generatedKeys = statementInsere.getGeneratedKeys()) {
+                        if (generatedKeys.next()) {
+                            int idLocacaoGerado = generatedKeys.getInt(1);
+
+                            // Lógica de cache (Mantida. Os métodos DAO internos já usam
+                            // try-with-resources.)
+                            float valPeriodo = 0, valPernoite = 0, valAdicional = 0, addPessoa = 0;
+                            int pessoas = 0;
+                            fquartos quartodao = new fquartos();
+                            valPernoite = quartodao.getValorQuarto(numeroQuarto, "pernoite");
+                            valPeriodo = quartodao.getValorQuarto(numeroQuarto, "periodo");
+                            valAdicional = quartodao.getAdicional(numeroQuarto);
+                            pessoas = quartodao.getPessoas(numeroQuarto);
+                            int idLoca = new fquartos().getIdLocacao(numeroQuarto);
+                            String tempo = quartodao.getPeriodo(numeroQuarto);
+                            DadosOcupados ocupado = new DadosOcupados(timestamp, idLocacaoGerado, valPeriodo,
+                                    valPernoite, pessoas, valAdicional, tempo);
+                            CacheDados cache = CacheDados.getInstancia();
+                            cache.getCacheOcupado().put(numeroQuarto, ocupado);
+                            logger.info("Locação registrada com sucesso: Quarto " + numeroQuarto + ", ID Locação: "
+                                    + idLocacaoGerado);
+                        } else {
+                            logger.warn("Registro inserido, mas nenhum ID foi retornado. Quarto = " + numeroQuarto
+                                    + ", Horário = " + timestamp);
+                        }
+                    }
+                    return true;
+                } else {
+                    logger.warn("Falha ao inserir registro. Nenhuma linha afetada. SQL: " + consultaSQL);
+                }
+            }
+
+        } catch (SQLException e) {
+            logger.error("Erro ao executar registraLocacao: ", e);
+            JOptionPane.showMessageDialog(null, "Erro ao registrar locação: " + e.getMessage());
         }
 
-    } catch (SQLException e) {
-        logger.error("Erro ao executar registraLocacao: ", e);
-        JOptionPane.showMessageDialog(null, "Erro ao registrar locação: " + e.getMessage());
+        return false;
     }
-
-
-    return false;
-}
 
     public boolean salvaProduto(int idLocacao, int idProduto, int qnt, float valorUnidade, float valorTotal) {
         int idCaixa = configGlobal.getInstance().getCaixa();
@@ -566,7 +594,8 @@ public class fquartos {
         String consultaSQL = "SELECT horaEntrada FROM " + nomeTabela + " WHERE numquarto = ? AND tempoTotal IS NULL";
         Timestamp horaBanco = null;
 
-        try (Connection link = new fazconexao().conectar(); PreparedStatement statement = link.prepareStatement(consultaSQL)) {
+        try (Connection link = new fazconexao().conectar();
+                PreparedStatement statement = link.prepareStatement(consultaSQL)) {
 
             statement.setInt(1, numeroQuarto);
             System.out.println("Consulta SQL: " + consultaSQL);
@@ -594,9 +623,11 @@ public class fquartos {
         long horas = diferencaMillis / (60 * 60 * 1000);
         String diferencaFormatada = String.format("%02d:%02d", horas, minutos);
 
-        consultaSQL = "UPDATE " + nomeTabela + " SET tempoTotal = ?, horaEntrada = ? WHERE numquarto = ? AND tempoTotal IS NULL";
+        consultaSQL = "UPDATE " + nomeTabela
+                + " SET tempoTotal = ?, horaEntrada = ? WHERE numquarto = ? AND tempoTotal IS NULL";
 
-        try (Connection link = new fazconexao().conectar(); PreparedStatement statement = link.prepareStatement(consultaSQL)) {
+        try (Connection link = new fazconexao().conectar();
+                PreparedStatement statement = link.prepareStatement(consultaSQL)) {
 
             statement.setString(1, diferencaFormatada);
             statement.setTimestamp(2, horaBanco);
@@ -611,7 +642,8 @@ public class fquartos {
         }
     }
 
-    // Métodos utilitários adicionados para completar a funcionalidade do código original
+    // Métodos utilitários adicionados para completar a funcionalidade do código
+    // original
     public String getStatus(int numeroQuarto) {
         String consultaSQL = "SELECT atualquarto FROM status WHERE numeroquarto = ?";
         try (Connection link = conexao.conectar(); PreparedStatement statement = link.prepareStatement(consultaSQL)) {
@@ -724,7 +756,8 @@ public class fquartos {
     public String getData(int idPassado) {
         String consultaSQL = "SELECT horastatus FROM status WHERE numeroquarto = ?";
 
-        try (Connection link = new fazconexao().conectar(); PreparedStatement statement = link.prepareStatement(consultaSQL)) {
+        try (Connection link = new fazconexao().conectar();
+                PreparedStatement statement = link.prepareStatement(consultaSQL)) {
 
             statement.setInt(1, idPassado);
 

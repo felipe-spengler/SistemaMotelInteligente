@@ -48,7 +48,7 @@ public class CheckSincronia extends TimerTask {
     @Override
     public void run() {
         if (!executando.compareAndSet(false, true)) {
-            logger.warn("CheckSincronia já em execução. Ignorando nova chamada.");
+            // logger.warn("CheckSincronia já em execução. Ignorando nova chamada.");
             return;
         }
 

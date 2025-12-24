@@ -1,0 +1,5 @@
+2025-12-23 07:10:20.511 ERROR [Thread-10] c.m.dados.VerificaComandosRemotos - Erro ao verificar comandos remotos: request timed out
+java.net.http.HttpTimeoutException: request timed out
+	at java.net.http/jdk.internal.net.http.HttpClientImpl.send(HttpClientImpl.java:921)
+	at java.net.http/jdk.internal.net.http.HttpClientFacade.send(HttpClientFacade.java:133)
+	at com.motelinteligente.dados.VerificaComandosRemotos.run(VerificaComandosRemotos.java:47)
