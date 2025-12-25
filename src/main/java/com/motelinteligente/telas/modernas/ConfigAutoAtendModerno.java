@@ -63,8 +63,21 @@ public class ConfigAutoAtendModerno extends JFrame {
         pnlAudio.setBorder(BorderFactory.createTitledBorder("Mensagem de Áudio"));
         pnlAudio.add(new JLabel("Caminho/Mensagem:"));
         txtPath = new JTextField();
+        txtPath.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                salvarCaminhoAudio(txtPath.getText());
+            }
+        });
         pnlAudio.add(txtPath, "growx");
         JButton btnProcurar = new JButton("Procurar");
+        btnProcurar.addActionListener(e -> {
+            JFileChooser fc = new JFileChooser();
+            if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+                File f = fc.getSelectedFile();
+                txtPath.setText(f.getAbsolutePath());
+                salvarCaminhoAudio(f.getAbsolutePath());
+            }
+        });
         pnlAudio.add(btnProcurar, "wrap");
         panel.add(pnlAudio, "growx, wrap 20");
 
@@ -191,16 +204,69 @@ public class ConfigAutoAtendModerno extends JFrame {
         carregarDirecionamento();
         carregarCabecalho();
         carregarTabela();
+
+        // Load from configGlobal
+        com.motelinteligente.dados.configGlobal config = com.motelinteligente.dados.configGlobal.getInstance();
+        config.carregarConfiguracoesAdicionais(); // Refresh from DB
+
+        txtPath.setText(config.getCaminhoAudio());
+
+        if (config.isClienteSeleciona()) {
+            radioCliente.setSelected(true);
+        } else {
+            radioSistema.setSelected(true);
+        }
+
+        if (config.isSubtelaAtiva()) {
+            subAtiva.setSelected(true);
+        } else {
+            subDesativa.setSelected(true);
+        }
     }
 
     // --- Logic copied and adapted from ConfigAutoAtend.java ---
 
     private void salvarConfiguracaoQuarto(boolean clienteSeleciona) {
-        // Placeholder as original code seemed empty
+        com.motelinteligente.dados.configGlobal config = com.motelinteligente.dados.configGlobal.getInstance();
+        config.setClienteSeleciona(clienteSeleciona);
+
+        try (Connection conn = new fazconexao().conectar();
+                PreparedStatement stmt = conn.prepareStatement("UPDATE configuracoes SET clienteSeleciona = ?")) {
+            stmt.setBoolean(1, clienteSeleciona);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Erro ao salvar configuração: " + e.getMessage());
+        }
     }
 
     private void salvarConfiguracaoSubtela(boolean ativa) {
-        // Placeholder
+        com.motelinteligente.dados.configGlobal config = com.motelinteligente.dados.configGlobal.getInstance();
+        config.setSubtelaAtiva(ativa);
+
+        try (Connection conn = new fazconexao().conectar();
+                PreparedStatement stmt = conn.prepareStatement("UPDATE configuracoes SET subtelaAtiva = ?")) {
+            stmt.setBoolean(1, ativa);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Erro ao salvar configuração: " + e.getMessage());
+        }
+    }
+
+    private void salvarCaminhoAudio(String path) {
+        com.motelinteligente.dados.configGlobal config = com.motelinteligente.dados.configGlobal.getInstance();
+        config.setCaminhoAudio(path);
+
+        try (Connection conn = new fazconexao().conectar();
+                PreparedStatement stmt = conn.prepareStatement("UPDATE configuracoes SET caminhoAudio = ?")) {
+            stmt.setString(1, path);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // JOptionPane.showMessageDialog(this, "Erro ao salvar audio: " +
+            // e.getMessage());
+        }
     }
 
     private void carregarFundoAbertura() {

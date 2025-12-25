@@ -175,7 +175,7 @@ public class CaixaFrameModerno extends JFrame {
         lblEntradaTotal.putClientProperty("FlatLaf.style", "font: bold +8; foreground: #374151");
         totalCard.add(lblEntradaTotal);
 
-        totalCard.add(new JLabel("SALDO EM CAIXA"));
+        totalCard.add(new JLabel("SALDO EM CAIXA (inicial + vendas"));
         lblSaldoFinal = new JLabel("R$ 0,00");
         lblSaldoFinal.putClientProperty("FlatLaf.style", "font: bold +14; foreground: #2563EB");
         totalCard.add(lblSaldoFinal);

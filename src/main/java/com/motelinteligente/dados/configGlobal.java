@@ -24,9 +24,12 @@ public class configGlobal {
     private boolean flagMesmoUserCaixa;
     private boolean portoesRF;
     private int limiteDesconto;
-    private BackupQueueManager backupQueueManager; 
+    private BackupQueueManager backupQueueManager;
     private static int contadorConexoes = 0;
     private int alarmesAtivos = 0;
+    private String caminhoAudio;
+    private boolean clienteSeleciona;
+    private boolean subtelaAtiva;
 
     // Construtor privado para evitar a criação de múltiplas instâncias
     public configGlobal() {
@@ -39,10 +42,10 @@ public class configGlobal {
         controlaEstoque = false;
         flagSistemaSpring = flagArduino = false;
         telaMostrar = null;
-        
-        
+
     }
-     public int getAlarmesAtivos() {
+
+    public int getAlarmesAtivos() {
         return alarmesAtivos;
     }
 
@@ -59,21 +62,24 @@ public class configGlobal {
             this.alarmesAtivos--;
         }
     }
+
     public static void incrementarContadorExecucoes() {
         contadorConexoes++;
         logger.warn(" Total de conexoes remotas estabelecidas: " + contadorConexoes);
     }
-    
+
     public static int getContadorExecucoes() {
         return contadorConexoes;
     }
-     public BackupQueueManager getBackupQueueManager() {
+
+    public BackupQueueManager getBackupQueueManager() {
         return backupQueueManager;
     }
 
     public void initializeBackupQueueManager(BackupQueueManager backupQueueManager) {
         this.backupQueueManager = backupQueueManager;
     }
+
     public int getLimiteDesconto() {
         return limiteDesconto;
     }
@@ -81,15 +87,19 @@ public class configGlobal {
     public void setLimiteDesconto(int limiteDesconto) {
         this.limiteDesconto = limiteDesconto;
     }
+
     public boolean isFlagMesmoUserCaixa() {
         return flagMesmoUserCaixa;
     }
-     public boolean getPortoesRF() {
+
+    public boolean getPortoesRF() {
         return portoesRF;
     }
+
     public void setPortoesRF(boolean portoes) {
         this.portoesRF = portoes;
     }
+
     public void setFlagMesmoUserCaixa(boolean flagMesmoUserCaixa) {
         this.flagMesmoUserCaixa = flagMesmoUserCaixa;
     }
@@ -113,37 +123,46 @@ public class configGlobal {
     public void carregarInformacoes(String cargo, String login) {
         this.setCargoUsuario(cargo);
         this.setUsuario(login);
-        
+
         carregarConfiguracoesAdicionais();
     }
+
     public void carregarConfiguracoesAdicionais() {
-    String consultaSQL = "SELECT * FROM configuracoes";
-    
-    // O try-with-resources garante que todos os recursos entre parênteses
-    // (Connection, Statement, e ResultSet) serão fechados automaticamente.
-    try (Connection link = new fazconexao().conectar();
-         Statement statement = link.createStatement();
-         ResultSet resultado = statement.executeQuery(consultaSQL)) {
+        String consultaSQL = "SELECT * FROM configuracoes";
 
-        if (resultado.next()) {
-            // Carrega as configurações do banco de dados
-            this.logoffecharcaixa = resultado.getBoolean("logoffcaixa");
-            this.controlaEstoque = resultado.getBoolean("estoque");
-            this.flagMesmoUserCaixa = resultado.getBoolean("flagMesmoUserCaixa");
-            this.limiteDesconto = resultado.getInt("limitadesconto");
-            this.telaMostrar = resultado.getString("telaMostrar");
-            this.portoesRF = resultado.getBoolean("portoesrf");
-        } else {
-            JOptionPane.showMessageDialog(null, "Erro ao carregar Informações Adicionais. Nenhuma configuração encontrada.");
+        // O try-with-resources garante que todos os recursos entre parênteses
+        // (Connection, Statement, e ResultSet) serão fechados automaticamente.
+        try (Connection link = new fazconexao().conectar();
+                Statement statement = link.createStatement();
+                ResultSet resultado = statement.executeQuery(consultaSQL)) {
+
+            if (resultado.next()) {
+                // Carrega as configurações do banco de dados
+                this.logoffecharcaixa = resultado.getBoolean("logoffcaixa");
+                this.controlaEstoque = resultado.getBoolean("estoque");
+                this.flagMesmoUserCaixa = resultado.getBoolean("flagMesmoUserCaixa");
+                this.limiteDesconto = resultado.getInt("limitadesconto");
+                this.telaMostrar = resultado.getString("telaMostrar");
+                this.telaMostrar = resultado.getString("telaMostrar");
+                this.portoesRF = resultado.getBoolean("portoesrf");
+                try {
+                    this.caminhoAudio = resultado.getString("caminhoAudio");
+                    this.clienteSeleciona = resultado.getBoolean("clienteSeleciona");
+                    this.subtelaAtiva = resultado.getBoolean("subtelaAtiva");
+                } catch (Exception ex) {
+                    // Colunas podem não existir ainda
+                }
+            } else {
+                JOptionPane.showMessageDialog(null,
+                        "Erro ao carregar Informações Adicionais. Nenhuma configuração encontrada.");
+            }
+
+        } catch (Exception e) {
+            logger.error("Erro ao carregar configurações adicionais", e);
+            JOptionPane.showMessageDialog(null, "Erro ao conectar e carregar informações: " + e.getMessage(),
+                    "Erro de Conexão", JOptionPane.ERROR_MESSAGE);
         }
-        
-    } catch (Exception e) {
-        logger.error("Erro ao carregar configurações adicionais", e);
-        JOptionPane.showMessageDialog(null, "Erro ao conectar e carregar informações: " + e.getMessage(), "Erro de Conexão", JOptionPane.ERROR_MESSAGE);
     }
-}
-
-
 
     public String getUsuario() {
         return usuario;
@@ -172,9 +191,11 @@ public class configGlobal {
     public boolean getMudanca() {
         return mudanca;
     }
+
     public boolean getFlagFechar() {
         return flagFechar;
     }
+
     public void setFlagFechar(boolean flag) {
         this.flagFechar = flag;
     }
@@ -205,11 +226,36 @@ public class configGlobal {
         }
         return instancia;
     }
+
     public String getTelaMostrar() {
         return telaMostrar;
     }
 
     public void setTelaMostrar(String usuario) {
         this.telaMostrar = usuario;
+    }
+
+    public String getCaminhoAudio() {
+        return caminhoAudio;
+    }
+
+    public void setCaminhoAudio(String caminhoAudio) {
+        this.caminhoAudio = caminhoAudio;
+    }
+
+    public boolean isClienteSeleciona() {
+        return clienteSeleciona;
+    }
+
+    public void setClienteSeleciona(boolean clienteSeleciona) {
+        this.clienteSeleciona = clienteSeleciona;
+    }
+
+    public boolean isSubtelaAtiva() {
+        return subtelaAtiva;
+    }
+
+    public void setSubtelaAtiva(boolean subtelaAtiva) {
+        this.subtelaAtiva = subtelaAtiva;
     }
 }
