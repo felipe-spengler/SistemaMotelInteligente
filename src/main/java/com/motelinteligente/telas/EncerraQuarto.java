@@ -11,7 +11,10 @@ import com.motelinteligente.dados.configGlobal;
 import com.motelinteligente.dados.fazconexao;
 import com.motelinteligente.dados.fprodutos;
 import com.motelinteligente.dados.fquartos;
+import com.motelinteligente.dados.fquartos;
 import com.motelinteligente.dados.playSound;
+import com.motelinteligente.dados.vendaProdutos;
+import com.motelinteligente.telas.controller.EncerraQuartoController;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -107,7 +110,9 @@ public class EncerraQuarto extends javax.swing.JFrame {
     int numeroDoQuarto;
     String motivo = null;
     private Timer timer;
+
     List<Antecipado> antecipados;
+    private EncerraQuartoController controller;
 
     class numOnly extends PlainDocument {
 
@@ -130,6 +135,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
      * Creates new form EncerraQuarto
      */
     public EncerraQuarto(TelaPrincipal parent, int numeroQuarto) {
+        this.numeroDoQuarto = numeroQuarto;
+        this.controller = new EncerraQuartoController(numeroQuarto);
 
         initComponents();
         setupKeyboardShortcuts();
@@ -269,53 +276,30 @@ public class EncerraQuarto extends javax.swing.JFrame {
             txtIdProduto.grabFocus();
         });
 
-        // seta a data de inicio
-        fquartos quartodao = new fquartos();
-        dataInicio = quartodao.getDataInicio(numeroQuarto);
+        // setar a data de inicio
+        dataInicio = controller.getDataInicio();
         lblInicioLocacao.setText(formatarDataHora(dataInicio));
-        // setar a data final
-        Date dataAtual = new Date();
-        Timestamp horaAtual = new Timestamp(dataAtual.getTime());
 
-        dataFim = String.valueOf(horaAtual);
+        // setar a data final
+        dataFim = controller.getDataFim();
         lblFimLocacao.setText(formatarDataHora(dataFim));
 
-        tempoTotalLocado = quartodao.getData(numeroQuarto);
+        tempoTotalLocado = controller.getTempoTotalLocado();
 
         labelEncerramento.setText("Encerramento Quarto " + numeroDoQuarto);
         // setar tempo locado
         lblTempoLocado.setText(tempoTotalLocado);
 
-        // setar valor quarto e adicionalPeriodo começa agora
-        CacheDados cache = CacheDados.getInstancia();
-        DadosOcupados ocupado = cache.getCacheOcupado().get(numeroQuarto);
-        CarregaQuarto quarto = cache.getCacheQuarto().get(numeroQuarto);
-        String status = quarto.getStatusQuarto();
-        String horarioQuarto = quarto.getHoraStatus();
-        String[] partes = status.split("-");
+        // setar valor quarto e adicionais
+        txtPessoas.setText(
+                String.valueOf(CacheDados.getInstancia().getCacheOcupado().get(numeroQuarto).getNumeroPessoas()));
 
-        txtPessoas.setText(String.valueOf(ocupado.getNumeroPessoas()));
-        valorAdicionalPessoa = calculaAdicionalPessoa(ocupado.getNumeroPessoas());
-        if (partes[1].equals("pernoite")) {
-            valorQuarto = ocupado.getValorPernoite();
-            int numeroAdicionais = subtrairHora(numeroQuarto, horarioQuarto, "pernoite");
-            valorAdicionalPeriodo = Float.valueOf(numeroAdicionais) * ocupado.getValorAdicional();
-            lblHoraAdicional.setText("R$" + String.valueOf(valorAdicionalPeriodo));
-        } else if (partes[1].equals("periodo")) {
-            valorQuarto = ocupado.getValorPeriodo();
-            int numeroAdicionais = subtrairHora(numeroQuarto, horarioQuarto, ocupado.getTempoPeriodo());
-            valorAdicionalPeriodo = Float.valueOf(numeroAdicionais) * ocupado.getValorAdicional();
-            lblHoraAdicional.setText("R$" + String.valueOf(valorAdicionalPeriodo));
-        }
-        if (idLocacao == 0) {
-            idLocacao = cache.getCacheOcupado().get(numeroQuarto).getIdLoca();
-            if (idLocacao == 0) {
-                DadosOcupados quartoOcupado = cache.getCacheOcupado().get(numeroQuarto);
-                int novoID = new fquartos().getIdLocacao(numeroQuarto);
-                idLocacao = novoID;
+        valorAdicionalPessoa = controller.getValorAdicionalPessoa();
+        valorQuarto = controller.getValorQuartoBase();
+        valorAdicionalPeriodo = controller.getValorAdicionalPeriodo();
+        lblHoraAdicional.setText("R$" + String.valueOf(valorAdicionalPeriodo));
 
-            }
-        }
+        idLocacao = controller.getIdLocacao();
 
         adicionaPreVendidos(idLocacao);
         antecipados = verAntecipado(idLocacao);
@@ -349,108 +333,32 @@ public class EncerraQuarto extends javax.swing.JFrame {
     }
 
     public void adicionaPreVendidos(int locacao) {
-        String consultaProdutosSQL = "SELECT idproduto, quantidade FROM prevendidos WHERE idlocacao = ?";
-
-        try (Connection link = new fazconexao().conectar();
-                PreparedStatement statementProdutos = link.prepareStatement(consultaProdutosSQL)) {
-
-            statementProdutos.setInt(1, locacao);
-
-            try (ResultSet resultadoProdutos = statementProdutos.executeQuery()) {
-
-                while (resultadoProdutos.next()) {
-                    int id = resultadoProdutos.getInt("idproduto");
-                    int quantidade = resultadoProdutos.getInt("quantidade");
-
-                    txtIdProduto.setText(Integer.toString(id));
-                    txtQuantidade.setText(Integer.toString(quantidade));
-
-                    btInserir.doClick();
-                }
-
-                atualizaConsumo();
-
-            } catch (SQLException e) {
-                // Log do erro ao executar a query ou processar o ResultSet
-                logger.error("Erro ao adicionar prevendidos (execucao da query): ", e);
-            }
-
-        } catch (SQLException e) {
-            // Log do erro ao tentar conectar ou preparar o statement
-            logger.error("Erro ao preparar ou conectar para adicionar prevendidos: ", e);
+        List<vendaProdutos> vendidos = controller.buscarPreVendidos();
+        for (vendaProdutos vp : vendidos) {
+            txtIdProduto.setText(Integer.toString(vp.idProduto));
+            txtQuantidade.setText(Integer.toString(vp.quantidade));
+            btInserir.doClick();
         }
+        atualizaConsumo();
     }
 
     public List<Antecipado> verAntecipado(int locacao) {
-        List<Antecipado> antecipados = new ArrayList<>();
-        Connection link = null;
-        float jaRecebeu = 0;
-        try {
-            link = new fazconexao().conectar();
-            // Consulta SQL para buscar registros da tabela "antecipado" para a locação
-            // especificada
-            String selectSQL = "SELECT tipo, valor, hora FROM antecipado WHERE idlocacao = ?";
-            PreparedStatement preparedStatement = link.prepareStatement(selectSQL);
-            preparedStatement.setInt(1, locacao);
-            ResultSet resultSet = preparedStatement.executeQuery();
+        List<Antecipado> antecipados = controller.buscarAntecipados();
+        this.valoreRecebido = controller.getValorRecebidoAntecipado();
 
-            // Itera sobre os resultados da consulta
-            while (resultSet.next()) {
-
-                String tipo = resultSet.getString("tipo");
-                float valor = resultSet.getFloat("valor");
-                Timestamp hora = resultSet.getTimestamp("hora");
-
-                // Cria o objeto Antecipado para cada registro retornado
-                if (tipo.equals("desconto")) {
-                    this.valorDesconto = valor;
-                    txtDesconto.setText("" + valorDesconto);
-
-                    txtJustifica.setText("negociado antecipado");
-                } else {
-                    System.out.println("setando valor");
-                    jaRecebeu += valor;
-                    Antecipado antecipado = new Antecipado(tipo, valor, hora);
-                    antecipados.add(antecipado);
-                }
-
-            }
-            valoreRecebido = jaRecebeu;
-            txtRecebidoAntecipado.setText("" + jaRecebeu);
-            // Fecha os recursos
-            resultSet.close();
-            preparedStatement.close();
-            link.close();
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Erro ao buscar dados antecipados: " + e.getMessage(), "Erro",
-                    JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
-        } finally {
-            try {
-                if (link != null && !link.isClosed()) {
-                    link.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+        // Verifica se houve desconto antecipado
+        float descAntecipado = controller.getValorDesconto();
+        if (descAntecipado > 0) {
+            txtDesconto.setText(String.valueOf(descAntecipado));
+            // Força cálculo de porcentagem no UI
+            verificaDesconto(2);
         }
 
-        // Retorna a lista de pagamentos antecipados
         return antecipados;
-
     }
 
     public float calculaAdicionalPessoa(int numeroPessoas) {
-        float valAdd = new fquartos().getAddPessoa(numeroDoQuarto);
-        if (valAdd == 0) {
-            valAdd = 1;
-        }
-        float adicionalPessoas = (numeroPessoas - 2) * valAdd;
-        if (adicionalPessoas <= 0) {
-            adicionalPessoas = 0;
-        }
-        valorAdicionalPessoa = adicionalPessoas;
-        return adicionalPessoas;
+        return controller.calculaAdicionalPessoa(numeroPessoas);
     }
 
     @Override
@@ -462,62 +370,11 @@ public class EncerraQuarto extends javax.swing.JFrame {
     }
 
     public String calculaData(String dataBanco) {
-        Timestamp horaBanco = Timestamp.valueOf(dataBanco);
-        Long datetime = System.currentTimeMillis();
-        Timestamp horaAtual = new Timestamp(datetime);
-
-        long diferencaMillis = horaAtual.getTime() - horaBanco.getTime();
-
-        // Calcula a diferença em horas, minutos e segundos
-        long minutos = diferencaMillis / (60 * 1000) % 60;
-        long horas = diferencaMillis / (60 * 60 * 1000);
-
-        // Formata a diferença no formato hh:mm:ss
-        String diferencaFormatada = String.format("%02d:%02d", horas, minutos);
-        return diferencaFormatada;
+        return controller.calculaData(dataBanco);
     }
 
     public int subtrairHora(int numeroQuarto, String horarioQuarto, String ondeEncaixa) {
-        String diferenca = calculaData(horarioQuarto);
-        String[] partes = diferenca.split(":");
-        int horas = Integer.parseInt(partes[0]);
-        int minutos = Integer.parseInt(partes[1]);
-        int totalMinutos = (horas * 60) + minutos;
-        int add = 0, minPernoite = 729;
-
-        if (ondeEncaixa.equals("pernoite")) {
-            // Verifica se a diferença é maior que 12 horas e 9 minutos
-            if (totalMinutos <= minPernoite) {
-                return 0;
-            } else {
-                // Calcula as horas adicionais além do período de pernoite
-                while (totalMinutos > minPernoite) {
-                    add++;
-                    minPernoite += 60; // Adiciona mais 1 hora
-                }
-                return add;
-            }
-        } else {
-            CacheDados cache = CacheDados.getInstancia();
-            DadosOcupados ocupado = cache.getCacheOcupado().get(numeroQuarto);
-            String periodoQuarto = ocupado.getTempoPeriodo();
-            String[] partesPeriodo = periodoQuarto.split(":");
-            int horasPeriodo = Integer.parseInt(partesPeriodo[0]);
-            int minutosPeriodo = Integer.parseInt(partesPeriodo[1]);
-            int totalPeriodo = (horasPeriodo * 60) + minutosPeriodo + 9;
-
-            // Verifica se o tempo atual está dentro do período especificado
-            if (totalMinutos <= totalPeriodo) {
-                return 0;
-            } else {
-                // Calcula as horas adicionais além do período especificado
-                while (totalMinutos > totalPeriodo) {
-                    totalPeriodo += 60; // Adiciona mais 1 hora
-                    add++;
-                }
-                return add;
-            }
-        }
+        return controller.subtrairHora(numeroQuarto, horarioQuarto, ondeEncaixa);
     }
 
     public static boolean isInteger(String str) {
@@ -2027,17 +1884,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
 
     public void salvaVendidos(int numero) {
         salvouLocacao = true;
-        fquartos quartodao = new fquartos();
-        CacheDados cache = CacheDados.getInstancia();
-        if (idLocacao == 0) {
-            idLocacao = cache.getCacheOcupado().get(numeroDoQuarto).getIdLoca();
-            if (idLocacao == 0) {
-                DadosOcupados quartoOcupado = cache.getCacheOcupado().get(numeroDoQuarto);
-                int novoID = new fquartos().getIdLocacao(numeroDoQuarto);
-                idLocacao = novoID;
-            }
-        }
 
+        List<vendaProdutos> produtosParaSalvar = new ArrayList<>();
         DefaultTableModel model = (DefaultTableModel) tabela.getModel();
         int rowCount = model.getRowCount();
         for (int i = 0; i < rowCount; i++) {
@@ -2045,26 +1893,12 @@ public class EncerraQuarto extends javax.swing.JFrame {
             int quantidade = objectToInt(i, 1);
             float valUnd = (Float) model.getValueAt(i, 3);
             float valtotal = (Float) model.getValueAt(i, 4);
-
-            quartodao.salvaProduto(idLocacao, idProduto, quantidade, valUnd, valtotal);
-            new com.motelinteligente.dados.fprodutos().diminuiEstoque(idProduto, quantidade);
+            produtosParaSalvar.add(new vendaProdutos(idProduto, quantidade, valUnd, valtotal));
         }
 
-        float valorDoQuarto = valorQuarto + valorAdicionalPeriodo + valorAdicionalPessoa;
-        // Usa as variáveis de classe que contém o timestamp no formato correto
-        // yyyy-MM-dd HH:mm:ss
-        quartodao.salvaLocacao(idLocacao, Timestamp.valueOf(dataInicio), Timestamp.valueOf(dataFim), valorDoQuarto,
-                valorConsumo, valD, valP, valC);
-        new playSound().playSound("som/agradecemosPreferencia.wav");
-        new ConectaArduino(999);
+        controller.setValorConsumo(valorConsumo);
+        controller.salvarLocacao(produtosParaSalvar, valD, valP, valC, 0); // Cartão assumindo valC
 
-        mudaStatusNaCache(numeroDoQuarto, "limpeza");
-        cache.getCacheOcupado().remove(numeroDoQuarto);
-
-        quartodao.setStatus(numeroDoQuarto, "limpeza");
-        quartodao.adicionaRegistro(numeroDoQuarto, "limpeza");
-        configGlobal config = configGlobal.getInstance();
-        config.setMudanca(true);
         outraTela.dispose();
         this.dispose();
 

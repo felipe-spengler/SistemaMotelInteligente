@@ -213,7 +213,8 @@ public class CaixaFrameModerno extends JFrame {
         // Window State - ensure it's visible and focused after building
         if (!isVisible())
             setVisible(true);
-        setExtendedState(JFrame.NORMAL);
+        // setExtendedState(JFrame.NORMAL);
+        setExtendedState(JFrame.MAXIMIZED_BOTH); // Maximizar para aproveitar espaço
         toFront();
         requestFocus();
     }
@@ -253,14 +254,52 @@ public class CaixaFrameModerno extends JFrame {
     }
 
     private JPanel createTableLocacoes() {
-        JPanel p = new JPanel(new MigLayout("fill, insets 0", "[grow]", "[grow][]"));
+        JPanel p = new JPanel(new MigLayout("fill, insets 0", "[grow]", "[grow][][]")); // Mais uma linha para botão
         p.setBackground(Color.WHITE);
 
-        String[] cols = { "Entrada", "Saída", "Quarto", "V. Quarto", "V. Consumo", "Desc", "Acres", "Total" };
-        modelLocacoes = new DefaultTableModel(cols, 0);
+        String[] cols = { "Entrada", "Saída", "Quarto", "V. Quarto", "V. Consumo", "Desc", "Acres", "Total", "ID" };
+        modelLocacoes = new DefaultTableModel(cols, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Desabilita edição
+            }
+        };
         tblLocacoes = new JTable(modelLocacoes);
         styleTable(tblLocacoes);
+
+        // Esconder coluna ID
+        tblLocacoes.getColumnModel().getColumn(8).setMinWidth(0);
+        tblLocacoes.getColumnModel().getColumn(8).setMaxWidth(0);
+        tblLocacoes.getColumnModel().getColumn(8).setWidth(0);
+
         p.add(new JScrollPane(tblLocacoes), "grow, wrap");
+
+        // Botão Ver Detalhes
+        JButton btnDetalhes = new JButton("Ver Detalhes / Expandir");
+        btnDetalhes.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        btnDetalhes.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/lupa.png"))); // Tente achar um
+                                                                                                     // icone ou remova
+                                                                                                     // se nao tiver
+        // Se nao tiver icone, remove o setIcon
+        // btnDetalhes.setIcon(null);
+
+        btnDetalhes.addActionListener(e -> {
+            // Pegar lista atual do modelo
+            java.util.List<Object[]> dados = new java.util.ArrayList<>();
+            for (int i = 0; i < modelLocacoes.getRowCount(); i++) {
+                Object[] row = new Object[modelLocacoes.getColumnCount()];
+                for (int j = 0; j < modelLocacoes.getColumnCount(); j++) {
+                    row[j] = modelLocacoes.getValueAt(i, j);
+                }
+                dados.add(row);
+            }
+            new DetalhesCaixaDialog(this, dados).setVisible(true);
+        });
+
+        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        btnPanel.setOpaque(false);
+        btnPanel.add(btnDetalhes);
+        p.add(btnPanel, "growx, wrap");
 
         // Painel de Totais
         JPanel totaisPanel = new JPanel(new MigLayout("fillx, insets 10", "[]20[]20[]20[]push[]", "[]"));

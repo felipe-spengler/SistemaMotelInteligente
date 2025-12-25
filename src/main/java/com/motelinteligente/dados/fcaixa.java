@@ -366,7 +366,8 @@ public class fcaixa {
                     float total = vQuarto + vConsumo + acres - desc;
 
                     lista.add(new Object[] {
-                            ini, fim, rs.getInt("numquarto"), vQuarto, vConsumo, desc, acres, total
+                            ini, fim, rs.getInt("numquarto"), vQuarto, vConsumo, desc, acres, total,
+                            rs.getInt("idlocacao")
                     });
                 }
             }
