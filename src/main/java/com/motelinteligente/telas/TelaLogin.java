@@ -17,6 +17,7 @@ import javax.swing.JOptionPane;
 import java.awt.Toolkit;
 import javax.swing.JFrame;
 import javax.swing.JProgressBar;
+import javax.swing.UIManager;
 
 /**
  *
@@ -271,6 +272,9 @@ public class TelaLogin extends javax.swing.JFrame {
         // Configuração do Tema Moderno (FlatLaf IntelliJ)
         try {
             FlatIntelliJLaf.setup();
+            UIManager.put("Button.arc", 10);
+            UIManager.put("Component.arc", 10);
+            UIManager.put("TextComponent.arc", 10);
         } catch (Exception ex) {
             java.util.logging.Logger.getLogger(TelaLogin.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }

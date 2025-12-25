@@ -41,7 +41,7 @@ public class CadastraQuartoModerno extends JFrame {
 
     private void initUI() {
         setTitle("Gestão de Quartos");
-        setSize(1000, 700);
+        setSize(1200, 750);
         setLocationRelativeTo(null);
         EstiloModerno.aplicarEstiloFrame(this);
 
@@ -126,7 +126,7 @@ public class CadastraQuartoModerno extends JFrame {
         JLabel lblList = EstiloModerno.criarTitulo("Quartos Cadastrados");
         cardTable.add(lblList, "wrap");
 
-        String[] cols = { "Nº", "Tipo", "V. Período", "V. Pernoite", "V. 3ª Pes" };
+        String[] cols = { "Nº", "Tipo", "V. Período", "V. Pernoite", "V. Hora Adic.", "V. 3ª Pes" };
         tableModel = new DefaultTableModel(cols, 0) {
             @Override
             public boolean isCellEditable(int row, int col) {
@@ -142,6 +142,13 @@ public class CadastraQuartoModerno extends JFrame {
         tabela.setGridColor(new Color(240, 240, 240));
 
         cardTable.add(new JScrollPane(tabela), "grow, wrap");
+
+        // Centralizar conteúdo das células
+        javax.swing.table.DefaultTableCellRenderer centerRenderer = new javax.swing.table.DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(javax.swing.JLabel.CENTER);
+        for (int i = 0; i < tabela.getColumnCount(); i++) {
+            tabela.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
 
         // Ações da Tabela
         JPanel actions = new JPanel(new MigLayout("insets 0, fillx", "push[][]"));
@@ -256,12 +263,16 @@ public class CadastraQuartoModerno extends JFrame {
 
     private void carregaTabela() {
         tableModel.setRowCount(0);
-        for (vquartos q : new fquartos().mostrar()) {
+        fquartos dao = new fquartos();
+        for (vquartos q : dao.mostrar()) {
+            int numeroQuarto = q.getNumeroquarto();
+            float valorHoraAdicional = dao.getAdicional(numeroQuarto);
             tableModel.addRow(new Object[] {
-                    q.getNumeroquarto(),
+                    numeroQuarto,
                     q.getTipoquarto(),
                     q.getValorquarto(),
                     q.getPernoitequarto(),
+                    valorHoraAdicional,
                     q.getAddPessoa()
             });
         }
@@ -285,10 +296,11 @@ public class CadastraQuartoModerno extends JFrame {
         txtTipo.setText(tableModel.getValueAt(row, 1).toString());
         txtValorPeriodo.setText(tableModel.getValueAt(row, 2).toString());
         txtValorPernoite.setText(tableModel.getValueAt(row, 3).toString());
-        txtPessoaAdicional.setText(tableModel.getValueAt(row, 4).toString());
+        txtHoraAdicional.setText(tableModel.getValueAt(row, 4).toString());
+        txtPessoaAdicional.setText(tableModel.getValueAt(row, 5).toString());
 
-        // Dados que faltam na tabela (tempo periodo e valor hora adicional)
-        // Original usava fquartos().getPeriodo e getHoraAdicional
+        // Dados que faltam na tabela (tempo periodo)
+        // Original usava fquartos().getPeriodo
         fquartos dao = new fquartos();
         String p = dao.getPeriodo(num); // Esperado "HH:mm"
         if (p != null && p.contains(":")) {
@@ -296,9 +308,6 @@ public class CadastraQuartoModerno extends JFrame {
             txtPeriodoHoras.setText(parts[0]);
             txtPeriodoMin.setText(parts[1]);
         }
-
-        float horaAdd = dao.getAdicional(num);
-        txtHoraAdicional.setText(String.valueOf(horaAdd));
     }
 
     private void excluirQuarto() {

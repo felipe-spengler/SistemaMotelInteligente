@@ -372,17 +372,12 @@ public class CaixaFrameModerno extends JFrame {
         // Totais
         float entradaTotal = v.entradaConsumo + v.entradaQuarto + justif[1] - justif[0];
 
-        // Saldo Final = (EntradaTotal - AntecipadoDeOutros) + SaldoInicial
-        // *Assumindo lógica: O dinheiro físico no caixa deve bater com o que entrou
-        // HOJE, descontando o que já foi pago antes.
-        // Se a lógica for "Quanto devo ter em dinheiro/físico", seria (TotalEntradas -
-        // Cartao/Pix) + Inicial.
-        // Vou manter a lógica simples sugerida: Total +/- Antecipados
-
-        float saldoPrevisto = (entradaTotal - antecipadoOutro) + saldoIni;
+        // Saldo em Caixa = Apenas o que foi movimentado (sem considerar antecipados)
+        // O ajuste dos antecipados será feito apenas no Resumo de Fechamento
+        float saldoEmCaixa = entradaTotal + saldoIni;
 
         lblEntradaTotal.setText(df.format(entradaTotal));
-        lblSaldoFinal.setText(df.format(saldoPrevisto));
+        lblSaldoFinal.setText(df.format(saldoEmCaixa));
 
         carregarTabelas(idCaixa);
     }
@@ -514,6 +509,10 @@ public class CaixaFrameModerno extends JFrame {
             // e o Saldo Final (Físico) é apenas para conferência visual.
 
             if (new fcaixa().fecharCaixa(entradaNet)) {
+                JOptionPane.showMessageDialog(this,
+                        "Caixa fechado com sucesso!",
+                        "Sucesso",
+                        JOptionPane.INFORMATION_MESSAGE);
                 configGlobal.getInstance().setCaixa(0);
                 configGlobal.getInstance().setFlagFechar(true); // Logoff
                 dispose();

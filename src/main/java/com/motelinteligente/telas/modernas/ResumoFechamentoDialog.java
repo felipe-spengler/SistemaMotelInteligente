@@ -141,17 +141,19 @@ public class ResumoFechamentoDialog extends JDialog {
         // Esse valor aparece em `vals.entradaQuarto` deste caixa?
         // Se sim, ele infla o "Total Sistema", mas não gera dinheiro AQUI.
 
-        // Vamos calcular o ESPERADO somando fechados + antecipados
-        float esperadoDinheiro = vals.entradaD + antecipadoDetalhado.entradaD + saldoInicial; // Add saldo inicial ao
-                                                                                              // esperado em dinheiro?
-                                                                                              // Geralmente sim.
+        // Vamos calcular o ESPERADO somando fechados + antecipados em aberto -
+        // antecipados de outros caixas
+        // Saldo Inicial + Recebidos Fechados + Antecipados em Aberto - Antecipados de
+        // Outros Caixas
+        float esperadoDinheiro = saldoInicial + vals.entradaD + antecipadoDetalhado.entradaD
+                - (antecipadoOutro > 0 ? antecipadoOutro : 0);
         float esperadoCartao = vals.entradaC + antecipadoDetalhado.entradaC;
         float esperadoPix = vals.entradaP + antecipadoDetalhado.entradaP;
 
         // Mostrando o DEVE TER
         addRow(pnlFisico, "(=) Deve ter em Dinheiro", esperadoDinheiro, true);
-        addRow(pnlFisico, "(=) Deve ter em Cartão", esperadoCartao, false);
-        addRow(pnlFisico, "(=) Deve ter em Pix", esperadoPix, false);
+        addRow(pnlFisico, "(=) Deve ter em Cartão", esperadoCartao, true);
+        addRow(pnlFisico, "(=) Deve ter em Pix", esperadoPix, true);
 
         pnlFisico.add(new JSeparator(), "span 2, growx, gaptop 10, gapbottom 5");
 
@@ -179,7 +181,7 @@ public class ResumoFechamentoDialog extends JDialog {
         main.add(pnlFisico, "grow, top, wrap");
 
         // Footer Buttons
-        JPanel footer = new JPanel(new MigLayout("insets 20 0 0 0, fillx, center", "[150!][150!]"));
+        JPanel footer = new JPanel(new MigLayout("insets 20 0 0 0, fillx, center", "[150!][200!]"));
         footer.setOpaque(false);
 
         JButton btnCancelar = EstiloModerno.criarBotaoSecundario("Voltar", null);

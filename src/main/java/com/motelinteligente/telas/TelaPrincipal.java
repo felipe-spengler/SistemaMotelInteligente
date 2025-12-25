@@ -1,13 +1,12 @@
 package com.motelinteligente.telas;
 
 import com.motelinteligente.dados.TelaSistema;
-import com.motelinteligente.alarme.AlarmApp;
+import com.motelinteligente.alarme.AlarmAppModerno;
 import com.motelinteligente.alarme.FAlarmes;
 import com.motelinteligente.arduino.ConectaArduino;
 import com.motelinteligente.dados.Antecipado;
 import com.motelinteligente.dados.BackupExecutor;
 import com.motelinteligente.dados.CacheDados;
-import com.motelinteligente.dados.CacheDados.DadosVendidos;
 import com.motelinteligente.dados.CarregaQuarto;
 import com.motelinteligente.dados.CheckSincronia;
 import com.motelinteligente.dados.ConexaoRemota;
@@ -18,6 +17,10 @@ import com.motelinteligente.dados.fprodutos;
 import com.motelinteligente.dados.fquartos;
 import com.motelinteligente.dados.playSound;
 import com.motelinteligente.telas.Quadrado.QuartoClickListener;
+import com.motelinteligente.telas.modernas.ConfiguracoesModerno;
+import com.motelinteligente.telas.modernas.GerenciarReservasModerno;
+import com.motelinteligente.telas.modernas.ConfigAutoAtendModerno;
+import com.motelinteligente.telas.modernas.CaixaFrameModerno;
 import java.awt.BorderLayout;
 import javax.swing.table.JTableHeader;
 import java.awt.Color;
@@ -110,7 +113,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private long lastUpdate = 0;
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(TelaPrincipal.class);
     private EncerraQuarto encerraQuarto;
-    private CaixaFrame caixaFrame;
+    private CaixaFrameModerno caixaFrame;
     private static final long UPDATE_INTERVAL = 1000; // 1 segundo
 
     private class NumOnly extends PlainDocument {
@@ -326,7 +329,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             if (status.equals("livre")) {
                 botaoStatus.setEnabled(true);
                 alteradorPaineis.setEnabledAt(1, false);
-                this.painelSecundario.setBackground(new Color(34, 197, 94)); // Verde vibrante (Livre)
+                this.painelSecundario.setBackground(new Color(76, 175, 80)); // Verde mais vibrante (Livre)
                 // troca os botoes
                 iniciar();
 
@@ -334,13 +337,13 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             if (status.equals("manutencao")) {
                 botaoStatus.setEnabled(true);
                 alteradorPaineis.setEnabledAt(1, false);
-                this.painelSecundario.setBackground(new Color(100, 116, 139)); // Cinza moderno (Manutenção)
+                this.painelSecundario.setBackground(new Color(158, 158, 158)); // Cinza mais vibrante (Manutenção)
                 iniciar();
             }
             if (status.equals("reservado")) {
                 botaoStatus.setEnabled(true);
                 alteradorPaineis.setEnabledAt(1, false);
-                this.painelSecundario.setBackground(new Color(59, 130, 246)); // Azul vibrante (Reservado)
+                this.painelSecundario.setBackground(new Color(33, 150, 243)); // Azul mais vibrante (Reservado)
                 iniciar();
             }
             if (status.contains("ocupado")) {
@@ -370,16 +373,16 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 populaPrevendidos();
                 atualizaAntecipado(idLoca);
                 if (partes[1].equals("pernoite")) {
-                    this.painelSecundario.setBackground(new Color(168, 85, 247)); // Roxo vibrante (Pernoite)
+                    this.painelSecundario.setBackground(new Color(156, 39, 176)); // Roxo mais vibrante (Pernoite)
                 } else if (partes[1].equals("periodo")) {
-                    this.painelSecundario.setBackground(new Color(239, 68, 68)); // Vermelho vibrante (Período)
+                    this.painelSecundario.setBackground(new Color(244, 67, 54)); // Vermelho mais vibrante (Período)
                 }
                 setValorQuarto();
             }
             if (status.equals("limpeza")) {
                 botaoStatus.setEnabled(true);
                 alteradorPaineis.setEnabledAt(1, false);
-                this.painelSecundario.setBackground(new Color(234, 179, 8)); // Amarelo vibrante (Limpeza)
+                this.painelSecundario.setBackground(new Color(255, 193, 7)); // Amarelo mais vibrante (Limpeza)
                 iniciar();
             }
 
@@ -1089,6 +1092,14 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         bt_apagarProduto.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_bot_excluir.png"))); // NOI18N
         bt_apagarProduto.setText("Apagar Produto");
+        bt_apagarProduto.putClientProperty("FlatLaf.style",
+                "arc: 10; " +
+                        "borderWidth: 0; " +
+                        "background: #f44336; " +
+                        "foreground: #FFFFFF; " +
+                        "hoverBackground: #da190b; " +
+                        "pressedBackground: #c62828; " +
+                        "font: bold");
         bt_apagarProduto.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bt_apagarProdutoActionPerformed(evt);
@@ -1097,6 +1108,14 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         bt_inserirProduto.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_bot_editar.png"))); // NOI18N
         bt_inserirProduto.setText("Inserir Produto");
+        bt_inserirProduto.putClientProperty("FlatLaf.style",
+                "arc: 10; " +
+                        "borderWidth: 0; " +
+                        "background: #2196F3; " +
+                        "foreground: #FFFFFF; " +
+                        "hoverBackground: #1976D2; " +
+                        "pressedBackground: #1565C0; " +
+                        "font: bold");
         bt_inserirProduto.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bt_inserirProdutoActionPerformed(evt);
@@ -1131,6 +1150,14 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         bt_Antecipado.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_conta_recebe.png"))); // NOI18N
         bt_Antecipado.setText("Receber Antecipado");
+        bt_Antecipado.putClientProperty("FlatLaf.style",
+                "arc: 10; " +
+                        "borderWidth: 0; " +
+                        "background: #4CAF50; " +
+                        "foreground: #FFFFFF; " +
+                        "hoverBackground: #45A049; " +
+                        "pressedBackground: #3D8B40; " +
+                        "font: bold");
         bt_Antecipado.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bt_AntecipadoActionPerformed(evt);
@@ -1139,6 +1166,14 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         btNegociar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_conta_paga.png"))); // NOI18N
         btNegociar.setText("Negociar Valor");
+        btNegociar.putClientProperty("FlatLaf.style",
+                "arc: 10; " +
+                        "borderWidth: 0; " +
+                        "background: #FF9800; " +
+                        "foreground: #FFFFFF; " +
+                        "hoverBackground: #F57C00; " +
+                        "pressedBackground: #E65100; " +
+                        "font: bold");
         btNegociar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btNegociarActionPerformed(evt);
@@ -1251,33 +1286,53 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                                         .addGap(5, 5, 5)
                                         .addComponent(alteradorPaineis)));
 
-        jButton1.setFont(new java.awt.Font("Tw Cen MT", 3, 18)); // NOI18N
+        jButton1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/bt_entrada_icone.png"))); // NOI18N
         jButton1.setText("ENTRADA");
-        jButton1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jButton1.setFocusable(false);
+        jButton1.putClientProperty("FlatLaf.style",
+                "arc: 15; " +
+                        "borderWidth: 0; " +
+                        "background: #4CAF50; " +
+                        "foreground: #FFFFFF; " +
+                        "hoverBackground: #45A049; " +
+                        "pressedBackground: #3D8B40; " +
+                        "font: bold 18");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
         });
 
-        jButton3.setFont(new java.awt.Font("Tw Cen MT", 3, 18)); // NOI18N
+        jButton3.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/bt_saida_icone.png"))); // NOI18N
         jButton3.setText("SAÍDA");
-        jButton3.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jButton3.putClientProperty("FlatLaf.style",
+                "arc: 15; " +
+                        "borderWidth: 0; " +
+                        "background: #f44336; " +
+                        "foreground: #FFFFFF; " +
+                        "hoverBackground: #da190b; " +
+                        "pressedBackground: #c62828; " +
+                        "font: bold 18");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton3ActionPerformed(evt);
             }
         });
 
-        jButton2.setBackground(new java.awt.Color(102, 102, 102));
-        jButton2.setFont(new java.awt.Font("Tw Cen MT", 3, 14)); // NOI18N
+        jButton2.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
         jButton2.setForeground(new java.awt.Color(255, 255, 255));
         jButton2.setText("CORTINA");
-        jButton2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         jButton2.setFocusable(false);
+        jButton2.putClientProperty("FlatLaf.style",
+                "arc: 15; " +
+                        "borderWidth: 0; " +
+                        "background: #607D8B; " +
+                        "foreground: #FFFFFF; " +
+                        "hoverBackground: #546E7A; " +
+                        "pressedBackground: #455A64; " +
+                        "font: bold 16");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
@@ -1325,17 +1380,17 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                                                         .addGroup(jPanel2Layout.createSequentialGroup()
                                                                 .addGap(6, 6, 6)
                                                                 .addComponent(jButton1,
-                                                                        javax.swing.GroupLayout.PREFERRED_SIZE, 153,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE, 180,
                                                                         javax.swing.GroupLayout.PREFERRED_SIZE)
                                                                 .addPreferredGap(
                                                                         javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                                 .addComponent(jButton2,
-                                                                        javax.swing.GroupLayout.PREFERRED_SIZE, 72,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE, 110,
                                                                         javax.swing.GroupLayout.PREFERRED_SIZE)
                                                                 .addPreferredGap(
                                                                         javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                                 .addComponent(jButton3,
-                                                                        javax.swing.GroupLayout.PREFERRED_SIZE, 154,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE, 180,
                                                                         javax.swing.GroupLayout.PREFERRED_SIZE)
                                                                 .addGap(0, 0, Short.MAX_VALUE))
                                                         .addComponent(painelSecundario2))
@@ -1393,23 +1448,34 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 srPaneLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGap(0, 556, Short.MAX_VALUE));
 
-        painelBotton.setBackground(new java.awt.Color(255, 255, 255));
-        painelBotton.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        painelBotton.setMaximumSize(new java.awt.Dimension(990, 80));
-        painelBotton.setMinimumSize(new java.awt.Dimension(990, 80));
+        painelBotton.setBackground(new java.awt.Color(248, 249, 250)); // Bootstrap bg-light
+        painelBotton.putClientProperty("FlatLaf.style",
+                "background: linear-gradient(to bottom, #f8f9fa, #e9ecef)");
+        painelBotton
+                .setBorder(javax.swing.BorderFactory.createMatteBorder(1, 0, 0, 0, new java.awt.Color(222, 226, 230)));
+        painelBotton.setMaximumSize(new java.awt.Dimension(990, 100));
+        painelBotton.setMinimumSize(new java.awt.Dimension(990, 100));
 
+        labelHora.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        labelHora.setForeground(new java.awt.Color(33, 37, 41)); // Bootstrap dark
         labelHora.setText("hora hora hora");
 
+        labelData.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        labelData.setForeground(new java.awt.Color(33, 37, 41)); // Bootstrap dark
         labelData.setText("data data data");
 
         lblAlarmeAtivo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/bell.png"))); // NOI18N
 
         painelReservasProximas.setBackground(new java.awt.Color(255, 255, 255));
-        painelReservasProximas.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        painelReservasProximas.setMaximumSize(new java.awt.Dimension(600, 80));
-        painelReservasProximas.setMinimumSize(new java.awt.Dimension(500, 66));
-        painelReservasProximas.setPreferredSize(new java.awt.Dimension(568, 80));
+        painelReservasProximas.putClientProperty("FlatLaf.style",
+                "arc: 10; " +
+                        "border: 1,1,1,1,#dee2e6,1,10");
+        painelReservasProximas.setMaximumSize(new java.awt.Dimension(600, 90));
+        painelReservasProximas.setMinimumSize(new java.awt.Dimension(500, 76));
+        painelReservasProximas.setPreferredSize(new java.awt.Dimension(568, 90));
 
+        labelReservas.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
+        labelReservas.setForeground(new java.awt.Color(73, 80, 87)); // Bootstrap secondary
         labelReservas.setText("txt");
 
         javax.swing.GroupLayout painelReservasProximasLayout = new javax.swing.GroupLayout(painelReservasProximas);
@@ -1777,7 +1843,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     }// </editor-fold>//GEN-END:initComponents
 
     private void menuReservasMouseClicked(java.awt.event.MouseEvent evt) {// GEN-FIRST:event_menuReservasMouseClicked
-        new GerenciarReservas().setVisible(true);
+        new GerenciarReservasModerno().setVisible(true);
     }// GEN-LAST:event_menuReservasMouseClicked
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {// GEN-FIRST:event_formWindowOpened
@@ -1787,7 +1853,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         mostraQuartos();
         if (config.getCaixa() == 0) {
             JOptionPane.showMessageDialog(null, "Precisa abrir o caixa");
-            new CaixaFrame().setVisible(true);
+            new CaixaFrameModerno().setVisible(true);
         }
 
         if (config.getCargoUsuario().equals("comum")) {
@@ -2401,11 +2467,11 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     }
 
     private void menuVerProdutosActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuVerProdutosActionPerformed
-        new Produto().setVisible(true);
+        new com.motelinteligente.telas.modernas.ProdutoModerno().setVisible(true);
     }// GEN-LAST:event_menuVerProdutosActionPerformed
 
     private void menuCadastraProdutoActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuCadastraProdutoActionPerformed
-        new CadastraProduto(null, 0).setVisible(true);
+        new com.motelinteligente.telas.modernas.CadastraProdutoModerno(this, 0).setVisible(true);
     }// GEN-LAST:event_menuCadastraProdutoActionPerformed
 
     private void limpezaDisponivelActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_limpezaDisponivelActionPerformed
@@ -2476,15 +2542,15 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     }// GEN-LAST:event_menuConfigAdActionPerformed
 
     private void menuConfigAdMouseClicked(java.awt.event.MouseEvent evt) {// GEN-FIRST:event_menuConfigAdMouseClicked
-        new ConfiguracoesAdicionais().setVisible(true);
+        new ConfiguracoesModerno().setVisible(true);
     }// GEN-LAST:event_menuConfigAdMouseClicked
 
     private void menuSobSistemaActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuSobSistemaActionPerformed
-        new ConfigAutoAtend().setVisible(true);
+        new ConfigAutoAtendModerno().setVisible(true);
     }// GEN-LAST:event_menuSobSistemaActionPerformed
 
     private void menuSobSistemaMouseClicked(java.awt.event.MouseEvent evt) {// GEN-FIRST:event_menuSobSistemaMouseClicked
-        new ConfigAutoAtend().setVisible(true);
+        new ConfigAutoAtendModerno().setVisible(true);
     }// GEN-LAST:event_menuSobSistemaMouseClicked
 
     private void radioPernoiteActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_radioPernoiteActionPerformed
@@ -2856,7 +2922,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     }// GEN-LAST:event_botaoStatusActionPerformed
 
     private void btDespertadorMouseClicked(java.awt.event.MouseEvent evt) {// GEN-FIRST:event_btDespertadorMouseClicked
-        new AlarmApp();
+        new AlarmAppModerno().setVisible(true);
     }// GEN-LAST:event_btDespertadorMouseClicked
 
     private void btConferenciaMouseClicked(java.awt.event.MouseEvent evt) {// GEN-FIRST:event_btConferenciaMouseClicked
@@ -3212,7 +3278,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         System.out.println("clicou func");
         if (cargo != null) {
             if (cargo.equals("admin")) {
-                new TelaCadFuncionario().setVisible(true);
+                new com.motelinteligente.telas.modernas.TelaCadFuncionarioModerno().setVisible(true);
             } else {
                 JOptionPane.showMessageDialog(null, "Você não tem permissão! Somente admin");
             }
@@ -3247,24 +3313,11 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private void abrirCaixaFrame() {
         if (caixaFrame == null || !caixaFrame.isVisible()) {
             // Criar nova instância se não houver tela aberta
-            caixaFrame = new CaixaFrame();
+            caixaFrame = new CaixaFrameModerno();
             caixaFrame.setVisible(true);
         } else {
-            Icon iconeAlerta = UIManager.getIcon("OptionPane.warningIcon");
-
-            // Mensagem formatada com HTML
-            String mensagem = "<html><body style='text-align: center; font-size: 12px;'>"
-                    + "<b>Uma tela de caixa já está aberta!</b><br>"
-                    + "</body></html>";
-
-            // Exibe a JOptionPane com ícone e mensagem estilizada
-            JOptionPane.showMessageDialog(this, mensagem, "Atenção!", JOptionPane.WARNING_MESSAGE, iconeAlerta);
-            caixaFrame.setExtendedState(JFrame.NORMAL); // Caso esteja minimizada, restaurar
-            caixaFrame.setAlwaysOnTop(true); // Coloca na frente de todas as janelas
-            caixaFrame.toFront(); // Traz para frente
-            caixaFrame.requestFocus(); // Dá foco na janela
-            caixaFrame.setAlwaysOnTop(false); // Remove o "always on top" depois
-
+            caixaFrame.toFront();
+            caixaFrame.requestFocus();
         }
     }
 
