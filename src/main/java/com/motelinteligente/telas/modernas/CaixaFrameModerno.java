@@ -66,6 +66,11 @@ public class CaixaFrameModerno extends JFrame {
             public void windowGainedFocus(WindowEvent e) {
                 atualizarDados();
             }
+
+            @Override
+            public void windowActivated(WindowEvent e) {
+                atualizarDados();
+            }
         });
 
         // Layout Principal: Topo (Status/Ações), Meio (KPIs), Baixo (Tabelas)
@@ -170,7 +175,7 @@ public class CaixaFrameModerno extends JFrame {
         lblEntradaTotal.putClientProperty("FlatLaf.style", "font: bold +8; foreground: #374151");
         totalCard.add(lblEntradaTotal);
 
-        totalCard.add(new JLabel("SALDO EM CAIXA (Soma Total - Antecipados)"));
+        totalCard.add(new JLabel("SALDO EM CAIXA"));
         lblSaldoFinal = new JLabel("R$ 0,00");
         lblSaldoFinal.putClientProperty("FlatLaf.style", "font: bold +14; foreground: #2563EB");
         totalCard.add(lblSaldoFinal);
@@ -288,7 +293,8 @@ public class CaixaFrameModerno extends JFrame {
         t.setRowHeight(30);
         t.setShowVerticalLines(false);
         t.setGridColor(new Color(240, 240, 240));
-        t.getTableHeader().putClientProperty("FlatLaf.style", "font:bold; background:#F9FAFB; borderBottom:1, #E5E7EB");
+        t.getTableHeader().putClientProperty("FlatLaf.style",
+                "font:bold; background:#F9FAFB; border: 0,0,1,0, #E5E7EB");
 
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(JLabel.CENTER);

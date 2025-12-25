@@ -110,6 +110,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private JPopupMenu popupMenu;
     private boolean isClickable = true;
     private Timer alarmTimer; // Timer para verificar os alarmes
+    private Timer refreshTimer; // Timer para atualizar a tela
     private long lastUpdate = 0;
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(TelaPrincipal.class);
     private EncerraQuarto encerraQuarto;
@@ -144,6 +145,20 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         // Inicializa o BackupExecutor
         new BackupExecutor().start();
         CheckSincronia.start();
+
+        // Timer para atualizar o status dos quartos a cada 20 segundos
+        refreshTimer = new Timer();
+        refreshTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    CacheDados.getInstancia().carregarDadosQuarto();
+                    SwingUtilities.invokeLater(() -> mostraQuartos());
+                } catch (Exception e) {
+                    logger.error("Erro ao atualizar quartos automaticamente", e);
+                }
+            }
+        }, 5000, 20000); // Inicia após 5s, repete a cada 20s
 
         setExtendedState(MAXIMIZED_BOTH);
         iniciar();
@@ -2370,7 +2385,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         configGlobal config = configGlobal.getInstance();
         int idCaixa = config.getCaixa();
         if (idCaixa == 0) {
-            new CaixaFrame().setVisible(true);
+            new com.motelinteligente.telas.modernas.CaixaFrameModerno().setVisible(true);
             JOptionPane.showMessageDialog(null, "Precisa abrir o caixa!");
 
         } else {
@@ -2851,18 +2866,24 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         if (isClickable) {
             isClickable = false;
             System.out.println("está clicavel");
-            executaIniciar();
-            // Iniciar uma thread para desbloquear o botão após um segundo
-            new Thread(() -> {
-                try {
-                    Thread.sleep(500); // Esperar meio segundo
-                } catch (InterruptedException ex) {
-                    Thread.currentThread().interrupt();
-                    logger.warn("Thread interrompida ao reabilitar botão Iniciar", ex);
-                } finally {
-                    isClickable = true; // Desbloquear o botão
-                }
-            }).start();
+            try {
+                executaIniciar();
+            } catch (Exception e) {
+                logger.error("Erro ao executar iniciar", e);
+                JOptionPane.showMessageDialog(this, "Erro ao iniciar locação: " + e.getMessage());
+            } finally {
+                // Iniciar uma thread para desbloquear o botão após um segundo
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(500); // Esperar meio segundo
+                    } catch (InterruptedException ex) {
+                        Thread.currentThread().interrupt();
+                        logger.warn("Thread interrompida ao reabilitar botão Iniciar", ex);
+                    } finally {
+                        isClickable = true; // Desbloquear o botão
+                    }
+                }).start();
+            }
         } else {
             isClickable = true;
         }
@@ -2872,23 +2893,25 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private void botaoEncerrarActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_botaoEncerrarActionPerformed
         if (isClickable) {
             isClickable = false;
-
-            executarFinalizar();
-            // Iniciar uma thread para desbloquear o botão após um segundo
-            new Thread(() -> {
-                try {
-                    Thread.sleep(1000); // Esperar um segundo
-                } catch (InterruptedException ex) {
-                    Thread.currentThread().interrupt();
-                    logger.warn("Thread interrompida ao reabilitar botão Encerrar", ex);
-                } finally {
-                    isClickable = true; // Desbloquear o botão
-                    System.out.println("setou is clickable true de novo");
-                }
-            }).start();
-        } else {
-            isClickable = true;
-            System.out.println("setou is clickable true de novo");
+            try {
+                executarFinalizar();
+            } catch (Exception e) {
+                logger.error("Erro ao executar finalizar", e);
+                JOptionPane.showMessageDialog(this, "Erro ao abrir tela de encerramento: " + e.getMessage());
+            } finally {
+                // Iniciar uma thread para desbloquear o botão após um segundo
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(1000); // Esperar um segundo
+                    } catch (InterruptedException ex) {
+                        Thread.currentThread().interrupt();
+                        logger.warn("Thread interrompida ao reabilitar botão Encerrar", ex);
+                    } finally {
+                        isClickable = true; // Desbloquear o botão
+                        System.out.println("setou is clickable true de novo");
+                    }
+                }).start();
+            }
         }
     }// GEN-LAST:event_botaoEncerrarActionPerformed
 

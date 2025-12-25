@@ -103,7 +103,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
     float valoreRecebido = 0, valorDivida = 0, valorRecebidoAgora = 0;
     float valorConsumo = 0, valorQuarto = 0, valorAdicionalPeriodo = 0, valorAdicionalPessoa = 0;
     float valD = 0, valP = 0, valC = 0;
-    ClienteEncerra outraTela = new ClienteEncerra();
+    com.motelinteligente.telas.modernas.ClienteEncerraModerno outraTela = new com.motelinteligente.telas.modernas.ClienteEncerraModerno();
     int numeroDoQuarto;
     String motivo = null;
     private Timer timer;
@@ -165,11 +165,18 @@ public class EncerraQuarto extends javax.swing.JFrame {
 
         setValorDivida();
 
-        boolean found = new NativeDiscovery().discover();
-        if (!found) {
-            System.err.println(
-                    "Não foi possível localizar as bibliotecas VLC. Certifique-se de que o VLC está instalado.");
-            return; // Sai do construtor se as bibliotecas não forem encontradas
+        try {
+            boolean found = new NativeDiscovery().discover();
+            if (!found) {
+                System.err.println(
+                        "Não foi possível localizar as bibliotecas VLC. Certifique-se de que o VLC está instalado.");
+                // Opcional: Mostrar uma mensagem para o usuário ou simplesmente continuar sem o
+                // vídeo
+                // return; // Comentado para permitir que a tela abra mesmo sem VLC
+            }
+        } catch (Throwable t) {
+            logger.error("Erro ao inicializar VLC", t);
+            // Continua a execução sem o VLC
         }
         txtIdProduto.grabFocus();
     }
@@ -1427,6 +1434,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
         lblValorConsumo.setText(String.valueOf(valorConsumo));
         lblAReceber.setText(String.valueOf(valorDivida - valoreRecebido - valorRecebidoAgora));
         outraTela.setarValores(valorAdicionalPessoa + valorQuarto, valorAdicionalPeriodo);
+        outraTela.setDesconto(valorDesconto);
+        outraTela.setAcrescimo(valorAcrescimo);
         outraTela.setValorTotal(valorDivida - valoreRecebido - valorRecebidoAgora);
         outraTela.setConsumo(valorConsumo);
     }
