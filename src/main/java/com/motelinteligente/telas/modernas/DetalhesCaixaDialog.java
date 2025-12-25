@@ -49,54 +49,37 @@ public class DetalhesCaixaDialog extends JDialog {
             }
         };
 
-        tabela = new JTable(model);
+        tabela = new JTable(model) {
+            @Override
+            public String getToolTipText(MouseEvent e) {
+                String tip = null;
+                java.awt.Point p = e.getPoint();
+                int rowIndex = rowAtPoint(p);
+
+                if (rowIndex >= 0) {
+                    try {
+                        Object idObj = model.getValueAt(rowIndex, 8); // Tentativa de pegar ID da coluna 8
+                        if (idObj != null) {
+                            int idLocacao = Integer.parseInt(idObj.toString());
+                            String produtos = buscarProdutosFormatados(idLocacao);
+                            tip = produtos.isEmpty() ? "Nenhum consumo" : produtos;
+                        }
+                    } catch (Exception ex) {
+                        // ignore
+                    }
+                }
+                return tip;
+            }
+        };
         styleTable(tabela);
 
         // Carregar dados
         for (Object[] row : dadosOriginais) {
-            // Se row não tiver ID no final, precisamos garantir que tenha.
-            // O fcaixa.getListaLocacoes retorna um array. Vamos assumir que o ID está
-            // acessível ou foi passado.
-            // Pelo código do CaixaFrameModerno, ele pega do DAO. Precisamos ver o DAO.
-            // Mas vamos assumir que o row passado já é o dado exibido.
-            // Se faltar o ID, não conseguimos buscar os produtos.
-            // Na verdade, fcaixa.getListaLocacoes retorna obj[] que tem o ID?
-            // Vamos verificar depois. Por ora, assumimos que o último elemento ou um deles
-            // serve para busca.
-
-            // Para garantir, vamos adicionar a linha como está.
             model.addRow(row);
         }
 
         JScrollPane scroll = new JScrollPane(tabela);
         add(scroll, BorderLayout.CENTER);
-
-        // Tooltip Logic
-        tabela.addMouseMotionListener(new MouseAdapter() {
-            @Override
-            public void mouseMoved(MouseEvent e) {
-                int row = tabela.rowAtPoint(e.getPoint());
-                if (row > -1) {
-                    // Tenta obter ID da locação.
-                    // Se o modelo tem 8 colunas visiveis, precisariamos saber onde está o ID.
-                    // Supondo que fcaixa retorna o ID em alguma coluna oculta ou visivel.
-                    // Vou assumir que vamos passar o ID na coluna 8 (index 8) que adicionei agora
-                    // na view
-                    // Se row original tem menos colunas, dará erro.
-
-                    try {
-                        Object idObj = model.getValueAt(row, 8); // Tentativa de pegar ID da coluna 8
-                        if (idObj != null) {
-                            int idLocacao = Integer.parseInt(idObj.toString());
-                            String produtos = buscarProdutosFormatados(idLocacao);
-                            tabela.setToolTipText(produtos.isEmpty() ? "Nenhum consumo" : produtos);
-                        }
-                    } catch (Exception ex) {
-                        tabela.setToolTipText(null);
-                    }
-                }
-            }
-        });
 
         // Botão Fechar
         JPanel footer = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -116,9 +99,10 @@ public class DetalhesCaixaDialog extends JDialog {
         t.setDefaultRenderer(Object.class, centerRenderer);
 
         // Hide ID column if preferred, but keep it in model
-        // t.getColumnModel().getColumn(8).setMinWidth(0);
-        // t.getColumnModel().getColumn(8).setMaxWidth(0);
-        // t.getColumnModel().getColumn(8).setWidth(0);
+        // Hide ID column
+        t.getColumnModel().getColumn(8).setMinWidth(0);
+        t.getColumnModel().getColumn(8).setMaxWidth(0);
+        t.getColumnModel().getColumn(8).setWidth(0);
     }
 
     private String buscarProdutosFormatados(int idLocacao) {
