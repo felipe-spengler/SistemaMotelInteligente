@@ -73,10 +73,10 @@ public class CadastraQuartoModerno extends JFrame {
         cardForm.add(EstiloModerno.criarLabel("Valor Pernoite (R$)"));
 
         txtValorPeriodo = EstiloModerno.criarInput();
-        cardForm.add(txtValorPeriodo, "h 35!");
+        cardForm.add(txtValorPeriodo, "w 150!, h 35!");
 
         txtValorPernoite = EstiloModerno.criarInput();
-        cardForm.add(txtValorPernoite, "h 35!");
+        cardForm.add(txtValorPernoite, "w 150!, h 35!");
 
         // Linha 3: Adicionais
         cardForm.add(EstiloModerno.criarLabel("Valor Hora Adic. (R$)"));

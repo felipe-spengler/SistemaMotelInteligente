@@ -326,7 +326,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             if (status.equals("livre")) {
                 botaoStatus.setEnabled(true);
                 alteradorPaineis.setEnabledAt(1, false);
-                this.painelSecundario.setBackground(new Color(34, 197, 94)); // Verde vibrante (Livre)
+                this.painelSecundario.setBackground(new Color(46, 204, 113)); // Emerald (Livre)
                 // troca os botoes
                 iniciar();
 
@@ -334,13 +334,13 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             if (status.equals("manutencao")) {
                 botaoStatus.setEnabled(true);
                 alteradorPaineis.setEnabledAt(1, false);
-                this.painelSecundario.setBackground(new Color(100, 116, 139)); // Cinza moderno (Manutenção)
+                this.painelSecundario.setBackground(new Color(149, 165, 166)); // Concrete (Manutenção)
                 iniciar();
             }
             if (status.equals("reservado")) {
                 botaoStatus.setEnabled(true);
                 alteradorPaineis.setEnabledAt(1, false);
-                this.painelSecundario.setBackground(new Color(59, 130, 246)); // Azul vibrante (Reservado)
+                this.painelSecundario.setBackground(new Color(52, 152, 219)); // Sky Blue (Reservado)
                 iniciar();
             }
             if (status.contains("ocupado")) {
@@ -370,16 +370,16 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 populaPrevendidos();
                 atualizaAntecipado(idLoca);
                 if (partes[1].equals("pernoite")) {
-                    this.painelSecundario.setBackground(new Color(168, 85, 247)); // Roxo vibrante (Pernoite)
+                    this.painelSecundario.setBackground(new Color(155, 89, 182)); // Amethyst (Pernoite)
                 } else if (partes[1].equals("periodo")) {
-                    this.painelSecundario.setBackground(new Color(239, 68, 68)); // Vermelho vibrante (Período)
+                    this.painelSecundario.setBackground(new Color(231, 76, 60)); // Alizarin (Período/Ocupado)
                 }
                 setValorQuarto();
             }
             if (status.equals("limpeza")) {
                 botaoStatus.setEnabled(true);
                 alteradorPaineis.setEnabledAt(1, false);
-                this.painelSecundario.setBackground(new Color(234, 179, 8)); // Amarelo vibrante (Limpeza)
+                this.painelSecundario.setBackground(new Color(241, 196, 15)); // Sunflower (Limpeza)
                 iniciar();
             }
 
@@ -3228,7 +3228,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         System.out.println("clicou abrir quartos");
         if (cargo != null) {
             if (cargo.equals("admin")) {
-                new com.motelinteligente.telas.modernas.CadastraQuartoModerno().setVisible(true);
+                new CadastraQuarto().setVisible(true);
             } else {
                 JOptionPane.showMessageDialog(null, "Você não tem permissão! Somente admin");
             }
