@@ -211,12 +211,10 @@ public class CaixaFrameModerno extends JFrame {
         add(main);
 
         // Window State - ensure it's visible and focused after building
-        if (!isVisible())
-            setVisible(true);
         // setExtendedState(JFrame.NORMAL);
         setExtendedState(JFrame.MAXIMIZED_BOTH); // Maximizar para aproveitar espaço
-        toFront();
-        requestFocus();
+        // toFront();
+        // requestFocus();
     }
 
     private JLabel createValueLabel() {
@@ -277,9 +275,11 @@ public class CaixaFrameModerno extends JFrame {
         // Botão Ver Detalhes
         JButton btnDetalhes = new JButton("Ver Detalhes / Expandir");
         btnDetalhes.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        btnDetalhes.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/lupa.png"))); // Tente achar um
-                                                                                                     // icone ou remova
-                                                                                                     // se nao tiver
+        // btnDetalhes.setIcon(new
+        // javax.swing.ImageIcon(getClass().getResource("/imagens/lupa.png"))); // Tente
+        // achar um
+        // icone ou remova
+        // se nao tiver
         // Se nao tiver icone, remove o setIcon
         // btnDetalhes.setIcon(null);
 
