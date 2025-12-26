@@ -1920,9 +1920,23 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         Timer alarmeTimer = new Timer();
         alarmeTimer.scheduleAtFixedRate(new TimerTask() {
+
             @Override
             public void run() {
                 configGlobal config = configGlobal.getInstance();
+
+                // Sincronizar contagem com o banco de dados
+                try (Connection conn = new fazconexao().conectar();
+                        Statement stmt = conn.createStatement();
+                        ResultSet rs = stmt.executeQuery(" SELECT COUNT(*) AS total FROM alarmes ")) {
+                    if (rs.next()) {
+                        int alarmesAtivos = rs.getInt("total");
+                        config.setAlarmesAtivos(alarmesAtivos);
+                    }
+                } catch (SQLException ex) {
+                    logger.error("Erro ao sincronizar número de alarmes ativos", ex);
+                }
+
                 if (config.getAlarmesAtivos() > 0) {
                     lblAlarmeAtivo.setVisible(true);
                     checkAlarmsToRing();
@@ -1945,7 +1959,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleAtFixedRate(() -> {
             verificarReservasProximas();
-        }, 0, 1, TimeUnit.HOURS);
+        }, 0, 1, TimeUnit.MINUTES);
         // Tarefa 2: Roda a cada 3 horas (a que você pediu)
         scheduler.scheduleAtFixedRate(() -> {
             verificarMensalidade();
