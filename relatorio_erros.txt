@@ -1,0 +1,41 @@
+RELATÓRIO DE ANÁLISE E CORREÇÃO DE ERROS - SISTEMA MOTEL INTELIGENTE
+Data: 18/01/2026
+
+1. ANÁLISE DOS LOGS
+-------------------
+Foram analisados os arquivos de log da pasta 'logs', cobrindo o período recente (14/01 a 18/01).
+
+ERRO 1 (Recorrente/Crítico):
+- Descrição: com.formdev.flatlaf.ui.FlatStylingSupport$UnknownStyleException: unknown style 'tabAreaBackground'
+- Localização Identificada: CaixaFrameModerno.java
+- Frequência: Alta (aparecia múltiplas vezes diariamente, inclusive hoje).
+- Status: CORRIGIDO.
+- Ação: A propriedade de estilo inválida 'tabAreaBackground' foi removida do código fonte.
+
+ERRO 2 (Pontual - 16/01):
+- Descrição: java.lang.IllegalArgumentException: unknown color function 'linear-gradient(...)'
+- Status: VERIFICADO.
+- Ação: Varredura completa realizada no código fonte. O trecho causador não existe mais na versão atual, indicando que já foi corrigido anteriormente.
+
+ERRO 3 (Pontual - 14/01):
+- Descrição: com.formdev.flatlaf.ui.FlatStylingSupport$UnknownStyleException: unknown style 'type'
+- Status: VERIFICADO.
+- Ação: Varredura completa realizada no código fonte. O estilo inválido 'type' não foi encontrado, indicando correção prévia.
+
+CONCLUSÃO GERAL:
+O sistema foi limpo dos erros identificados nos logs. O erro principal que poluía o log diário (CaixaFrameModerno) foi eliminado.
+
+-------------------
+
+2. ATUALIZAÇÃO SOLICITADA (TELA ENCERRA QUARTO)
+-------------------
+Foi implementada a melhoria de usabilidade solicitada para a tela de Encerramento de Quarto.
+
+- Funcionalidade: Ao digitar um valor nos campos "Desconto" ou "Acréscimo" e pressionar ENTER:
+  1. O sistema processa e aplica o valor financeiro.
+  2. O foco (cursor) é movido automaticamente para o campo de "Justificativa".
+  
+- Arquivo Modificado: EncerraQuarto.java
+
+-------------------
+Status Final: PRONTO. Logs limpos e nova funcionalidade implementada.
