@@ -7,8 +7,6 @@ import com.motelinteligente.dados.configGlobal;
 import com.motelinteligente.dados.fquartos;
 import com.motelinteligente.dados.vquartos;
 import net.miginfocom.swing.MigLayout;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -18,8 +16,6 @@ import java.util.Date;
 import java.util.Map;
 
 public class CadastraQuartoModerno extends JFrame {
-
-    private static final Logger logger = LoggerFactory.getLogger(CadastraQuartoModerno.class);
 
     // Campos
     private JTextField txtNumero;

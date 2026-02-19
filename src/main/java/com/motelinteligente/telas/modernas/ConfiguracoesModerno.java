@@ -14,6 +14,14 @@ import java.awt.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import com.google.zxing.BarcodeFormat;
+
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
 
 public class ConfiguracoesModerno extends JFrame {
 
@@ -111,13 +119,87 @@ public class ConfiguracoesModerno extends JFrame {
         add(pnlPortoes, "growx, wrap");
 
         // Panel for Customization
-        JPanel pnlPersonaliza = new JPanel(new MigLayout("fillx, insets 0", "[]20[]", "[]"));
-        pnlPersonaliza.setBorder(BorderFactory.createTitledBorder("Personalização"));
+        // Layout principal com 2 colunas para separar Upload e Gerador
+        JPanel pnlPersonaliza = new JPanel(new MigLayout("fillx, insets 0", "[grow]", "[]"));
+        pnlPersonaliza.setBorder(BorderFactory.createTitledBorder("Personalização Wi-Fi"));
 
-        JButton btnUploadWifi = new JButton("Alterar Imagem Wi-Fi");
+        // === Sub-painel 1: Upload Manual ===
+        JPanel pnlUpload = new JPanel(new MigLayout("insets 5", "[]10[]"));
+        pnlUpload.setBorder(BorderFactory.createTitledBorder("Opção A: Upload de Imagem Pronta"));
+
+        JButton btnUploadWifi = new JButton("Carregar Imagem");
         btnUploadWifi.addActionListener(e -> selecionarImagemWifi());
-        pnlPersonaliza.add(new JLabel("Imagem Tela Cliente (Wi-Fi):"));
-        pnlPersonaliza.add(btnUploadWifi);
+        pnlUpload.add(new JLabel("Selecionar arquivo .JPG/.PNG:"));
+        pnlUpload.add(btnUploadWifi);
+
+        // === Sub-painel 2: Gerador Automático ===
+        JPanel pnlGerador = new JPanel(new MigLayout("fillx, insets 5", "[right]10[grow]", "[]10[]10[]10[]10[]"));
+        pnlGerador.setBorder(BorderFactory.createTitledBorder("Opção B: Gerar Novo QR Code"));
+
+        JTextField txtWifiRede = new JTextField(15);
+        JTextField txtWifiSenha = new JTextField(15);
+
+        // Combo de Segurança
+        String[] segurancaOptions = { "WPA/WPA2 (Padrão)", "WEP (Antigo)", "Aberta (Sem Senha)" };
+        JComboBox<String> cmbSeguranca = new JComboBox<>(segurancaOptions);
+
+        // Listener para desabilitar senha se for Aberta
+        cmbSeguranca.addActionListener(e -> {
+            boolean isAberta = cmbSeguranca.getSelectedIndex() == 2;
+            txtWifiSenha.setEnabled(!isAberta);
+            if (isAberta)
+                txtWifiSenha.setText("");
+        });
+
+        JButton btnGerarWifi = new JButton("Gerar e Salvar");
+
+        btnGerarWifi.addActionListener(e -> {
+            String rede = txtWifiRede.getText().trim();
+            String senha = txtWifiSenha.getText().trim();
+            int segIndex = cmbSeguranca.getSelectedIndex();
+
+            // Tradução do Tipo
+            String securityType = "WPA";
+            if (segIndex == 1)
+                securityType = "WEP";
+            if (segIndex == 2)
+                securityType = "nopass";
+
+            if (rede.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Preencha o Nome da Rede!", "Atenção", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            if (!securityType.equals("nopass") && senha.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Preencha a Senha!", "Atenção", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            try {
+                // Chama o método auxiliar ajustado
+                gerarSalvarQrCode(rede, senha, securityType);
+                JOptionPane.showMessageDialog(this, "QR Code gerado e salvo com sucesso!", "Sucesso",
+                        JOptionPane.INFORMATION_MESSAGE);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Erro ao gerar QR Code: " + ex.getMessage(), "Erro",
+                        JOptionPane.ERROR_MESSAGE);
+                ex.printStackTrace();
+            }
+        });
+
+        pnlGerador.add(new JLabel("Nome da Rede (SSID):"));
+        pnlGerador.add(txtWifiRede, "wrap");
+
+        pnlGerador.add(new JLabel("Segurança:"));
+        pnlGerador.add(cmbSeguranca, "wrap");
+
+        pnlGerador.add(new JLabel("Senha:"));
+        pnlGerador.add(txtWifiSenha, "wrap");
+        pnlGerador.add(btnGerarWifi, "span, center");
+
+        // Adiciona os sub-paineis ao painel de personalização
+        pnlPersonaliza.add(pnlUpload, "growx, wrap");
+        pnlPersonaliza.add(pnlGerador, "growx");
 
         add(pnlPersonaliza, "growx, wrap");
     }
@@ -236,6 +318,71 @@ public class ConfiguracoesModerno extends JFrame {
 
         configGlobal.getInstance().setTelaMostrar(tela);
         setarTela(tela);
+    }
+
+    private void gerarSalvarQrCode(String ssid, String password, String securityType) throws Exception {
+        // 1. String padrão Wi-Fi: WIFI:S:MyNetwork;T:WPA;P:mypass;;
+        // Se for aberta, é WIFI:S:MyNetwork;T:nopass;;
+        String wifiData;
+        if ("nopass".equals(securityType)) {
+            wifiData = "WIFI:S:" + ssid + ";T:nopass;;";
+        } else {
+            wifiData = "WIFI:S:" + ssid + ";T:" + securityType + ";P:" + password + ";;";
+        }
+
+        // 2. Cria o BitMatrix do QR Code (400x400)
+        int qrSize = 400;
+        QRCodeWriter qrCodeWriter = new QRCodeWriter();
+        BitMatrix bitMatrix = qrCodeWriter.encode(wifiData, BarcodeFormat.QR_CODE, qrSize, qrSize);
+        BufferedImage qrImage = MatrixToImageWriter.toBufferedImage(bitMatrix);
+
+        // 3. Cria imagem maior para caber o texto (400x550) - Fundo Branco
+        int totalHeight = qrSize + 150;
+        BufferedImage combined = new BufferedImage(qrSize, totalHeight, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = combined.createGraphics();
+        g.setColor(Color.WHITE);
+        g.fillRect(0, 0, qrSize, totalHeight);
+
+        // 4. Desenha QR Code
+        g.drawImage(qrImage, 0, 0, null);
+
+        // 5. Configura Texto
+        g.setColor(Color.BLACK);
+        g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+        // Rede
+        g.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        String textRede = "Rede: " + ssid;
+        int xRede = (qrSize - g.getFontMetrics().stringWidth(textRede)) / 2;
+        g.drawString(textRede, xRede, qrSize + 40);
+
+        // Senha (ou aviso de aberta)
+        g.setFont(new Font("Segoe UI", Font.PLAIN, 22));
+        String textSenha;
+        if ("nopass".equals(securityType)) {
+            textSenha = "Rede Aberta (Sem Senha)";
+            g.setColor(new Color(0, 100, 0)); // Verde escuro para destacar
+        } else {
+            textSenha = "Senha: " + password;
+        }
+
+        int xSenha = (qrSize - g.getFontMetrics().stringWidth(textSenha)) / 2;
+        g.drawString(textSenha, xSenha, qrSize + 80);
+
+        // Rodapé
+        g.setFont(new Font("Segoe UI", Font.ITALIC, 14));
+        g.setColor(Color.GRAY);
+        String rodape = "Aponte a câmera do celular";
+        int xRodape = (qrSize - g.getFontMetrics().stringWidth(rodape)) / 2;
+        g.drawString(rodape, xRodape, qrSize + 120);
+
+        g.dispose();
+
+        // 6. Salva
+        String userHome = System.getProperty("user.home");
+        File outputFile = new File(userHome, "Documents/logs/wifi_custom.jpg");
+        outputFile.getParentFile().mkdirs();
+        ImageIO.write(combined, "jpg", outputFile);
     }
 
     private void salvarPortoes(boolean isRF) {

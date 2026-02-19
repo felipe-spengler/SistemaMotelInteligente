@@ -129,6 +129,11 @@
             <artifactId>miglayout-swing</artifactId>
             <version>5.3</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>javase</artifactId>
+            <version>3.5.0</version>
+        </dependency>
     </dependencies>
     <build>
         <finalName>${project.artifactId}-${local.build.timestamp}</finalName>

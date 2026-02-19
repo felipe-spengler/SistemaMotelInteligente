@@ -1,6 +1,5 @@
 package com.motelinteligente.telas.modernas;
 
-import com.formdev.flatlaf.FlatClientProperties;
 import com.motelinteligente.dados.configGlobal;
 import com.motelinteligente.dados.fcaixa;
 import com.motelinteligente.dados.valores;
