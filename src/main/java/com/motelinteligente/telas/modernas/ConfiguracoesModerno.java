@@ -109,6 +109,48 @@ public class ConfiguracoesModerno extends JFrame {
         pnlPortoes.add(botaoCodigos, "span, growx"); // Span across columns
 
         add(pnlPortoes, "growx, wrap");
+
+        // Panel for Customization
+        JPanel pnlPersonaliza = new JPanel(new MigLayout("fillx, insets 0", "[]20[]", "[]"));
+        pnlPersonaliza.setBorder(BorderFactory.createTitledBorder("Personalização"));
+
+        JButton btnUploadWifi = new JButton("Alterar Imagem Wi-Fi");
+        btnUploadWifi.addActionListener(e -> selecionarImagemWifi());
+        pnlPersonaliza.add(new JLabel("Imagem Tela Cliente (Wi-Fi):"));
+        pnlPersonaliza.add(btnUploadWifi);
+
+        add(pnlPersonaliza, "growx, wrap");
+    }
+
+    private void selecionarImagemWifi() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Selecione a imagem do QR Code/Wi-Fi");
+        fileChooser.setFileFilter(
+                new javax.swing.filechooser.FileNameExtensionFilter("Imagens (JPG, PNG)", "jpg", "png", "jpeg"));
+
+        int userSelection = fileChooser.showOpenDialog(this);
+
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            java.io.File fileToCopy = fileChooser.getSelectedFile();
+            try {
+                String userHome = System.getProperty("user.home");
+                java.nio.file.Path destPath = java.nio.file.Paths.get(userHome, "Documents", "logs", "wifi_custom.jpg");
+
+                // Cria diretórios se não existirem
+                java.nio.file.Files.createDirectories(destPath.getParent());
+
+                // Copia substituindo existente
+                java.nio.file.Files.copy(fileToCopy.toPath(), destPath,
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+                JOptionPane.showMessageDialog(this, "Imagem do Wi-Fi atualizada com sucesso!", "Sucesso",
+                        JOptionPane.INFORMATION_MESSAGE);
+            } catch (java.io.IOException ex) {
+                JOptionPane.showMessageDialog(this, "Erro ao salvar imagem: " + ex.getMessage(), "Erro",
+                        JOptionPane.ERROR_MESSAGE);
+                ex.printStackTrace();
+            }
+        }
     }
 
     private void carregarDados() {

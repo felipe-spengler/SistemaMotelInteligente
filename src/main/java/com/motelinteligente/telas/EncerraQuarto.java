@@ -21,6 +21,7 @@ import java.awt.Font;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -2473,12 +2474,31 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 secondaryFrame.setSize(600, 600);
                 secondaryFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-                // Carrega a imagem do Wi-Fi
-                ImageIcon wifiImage = new ImageIcon(getClass().getResource("/imagens/conexaoWifi.jpg"));
+                // Carrega a imagem do Wi-Fi (Prioriza personalizada)
+                String userHome = System.getProperty("user.home");
+                java.io.File customImg = new java.io.File(userHome, "Documents/logs/wifi_custom.jpg");
+
+                ImageIcon wifiImage = null;
+
+                if (customImg.exists()) {
+                    wifiImage = new ImageIcon(customImg.getAbsolutePath());
+                } else {
+                    // Fallback para imagem padrão do JAR
+                    wifiImage = new ImageIcon(getClass().getResource("/imagens/conexaoWifi.jpg"));
+                }
+
+                // Redimensiona se necessário (opcional, para caber na tela)
+                // Vamos assumir que o usuário sobe algo decente, mas podemos limitar
+                if (wifiImage.getIconWidth() > 800) {
+                    Image img = wifiImage.getImage();
+                    Image newImg = img.getScaledInstance(800, -1, Image.SCALE_SMOOTH);
+                    wifiImage = new ImageIcon(newImg);
+                }
 
                 // Verifica se a imagem foi carregada corretamente
                 if (wifiImage.getIconWidth() == -1) {
-                    JOptionPane.showMessageDialog(this, "Imagem não encontrada!", "Erro", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Imagem Wi-Fi não encontrada (Padrão ou Custom)!", "Erro",
+                            JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
