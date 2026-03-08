@@ -35,6 +35,11 @@ public class ReceberNumeroQuartoController {
             String acao = partes[0];
             String numero = partes[1];
 
+            if ("undefined".equals(numero) || "?".equals(numero)) {
+                logger.info("Ignorando comando com numero invalido: '{}'", numero);
+                return new ResponseEntity<>("Comando ignorado", HttpStatus.OK);
+            }
+
             if (acao.equals("abrir")) {
                 switch (numero) {
                     case "entrada" -> new ConectaArduino(888);
@@ -93,7 +98,7 @@ public class ReceberNumeroQuartoController {
                         mudaStatusNaCache(quartoEmFoco, "livre");
                         configGlobal config = configGlobal.getInstance();
                         config.setMudanca(true);
-                        
+
                         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
                             @Override
                             protected Void doInBackground() throws Exception {
@@ -158,7 +163,7 @@ public class ReceberNumeroQuartoController {
         quarto.setStatusQuarto(statusColocar);
         quarto.setHoraStatus(String.valueOf(timestamp));
         dados.getCacheQuarto().put(quartoMudar, quarto);
-        
+
         if (statusColocar.equals("limpeza")) {
             dados.getCacheOcupado().remove(quartoMudar);
         }

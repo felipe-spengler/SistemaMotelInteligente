@@ -30,9 +30,9 @@ public class fazconexao {
             config.setLeakDetectionThreshold(60000);
             // Previne conexões zumbis
             config.setConnectionTestQuery("SELECT 1");
-            config.setValidationTimeout(3000);  // 3s pra testar
-            config.setMaxLifetime(1800000);     // recicla a conexão a cada 30 min
-            config.setKeepaliveTime(300000);    // manda ping a cada 5 min
+            config.setValidationTimeout(3000); // 3s pra testar
+            config.setMaxLifetime(600000); // recicla a conexão a cada 10 min
+            config.setKeepaliveTime(60000); // manda ping a cada 1 min
             dataSource = new HikariDataSource(config);
 
         } catch (Exception e) {
@@ -50,14 +50,15 @@ public class fazconexao {
     private Connection createConnectionProxy(Connection connection) {
         return (Connection) Proxy.newProxyInstance(
                 connection.getClass().getClassLoader(),
-                new Class[]{Connection.class},
-                new BackupProxyHandler(connection)
-        );
+                new Class[] { Connection.class },
+                new BackupProxyHandler(connection));
     }
 
     public int verificaCaixa() {
         String consultaSQL = "SELECT id FROM caixa WHERE saldofecha IS NULL";
-        try (Connection link = conectar(); PreparedStatement statement = link.prepareStatement(consultaSQL); ResultSet resultado = statement.executeQuery()) {
+        try (Connection link = conectar();
+                PreparedStatement statement = link.prepareStatement(consultaSQL);
+                ResultSet resultado = statement.executeQuery()) {
 
             if (resultado.next()) {
                 return resultado.getInt("id");

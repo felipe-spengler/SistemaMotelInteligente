@@ -24,12 +24,12 @@ public class ConexaoRemota {
             remoteConfig.setJdbcUrl(CarregarVariaveis.getRemoteDbUrl());
             remoteConfig.setUsername(CarregarVariaveis.getUser());
             remoteConfig.setPassword(CarregarVariaveis.getPassword());
-            remoteConfig.setMaximumPoolSize(5);  // menos conexões para remoto
+            remoteConfig.setMaximumPoolSize(5); // menos conexões para remoto
             remoteConfig.setMinimumIdle(0);
-            remoteConfig.setIdleTimeout(15_000); // 15s, menor que os 20s do servidor
-            remoteConfig.setMaxLifetime(18_000); // 18s, também menor que os 20s do servidor
-            remoteConfig.setKeepaliveTime(300_000); // ping a cada 5 min
-            remoteConfig.setConnectionTimeout(10_000); // timeout rápido
+            remoteConfig.setIdleTimeout(300_000); // 5 minutos
+            remoteConfig.setMaxLifetime(600_000); // 10 minutos
+            remoteConfig.setKeepaliveTime(60_000); // ping a cada 1 min
+            remoteConfig.setConnectionTimeout(30_000); // 30s
             remoteConfig.setConnectionTestQuery("SELECT 1");
 
             remoteDataSource = new HikariDataSource(remoteConfig);
