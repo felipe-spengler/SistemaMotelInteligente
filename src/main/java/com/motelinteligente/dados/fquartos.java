@@ -402,7 +402,9 @@ public class fquartos {
     }
 
     public boolean registraLocacao(int numeroQuarto) {
-        String verificaDuplicidadeSQL = "SELECT COUNT(*) FROM registralocado WHERE numquarto = ? AND horainicio = ?";
+        // Trava para evitar Race Condition (Duplo Clique):
+        // Checa se já houve uma locação criada para este quarto nos últimos 10 segundos.
+        String verificaDuplicidadeSQL = "SELECT COUNT(*) FROM registralocado WHERE numquarto = ? AND ABS(TIMESTAMPDIFF(SECOND, horainicio, ?)) < 10";
         String consultaSQL = "INSERT INTO registralocado (numquarto, horainicio, numpessoas) VALUES (?, ?, ?)";
         Date dataAtual = new Date();
         Timestamp timestamp = new Timestamp(dataAtual.getTime());
@@ -410,7 +412,7 @@ public class fquartos {
         // Usa try-with-resources para a Connection (link)
         try (Connection link = new fazconexao().conectar()) {
 
-            // Verificar duplicidade (Statement e ResultSet internos)
+            // Verificar duplicidade
             try (PreparedStatement statementVerifica = link.prepareStatement(verificaDuplicidadeSQL)) {
                 statementVerifica.setInt(1, numeroQuarto);
                 statementVerifica.setTimestamp(2, timestamp);
@@ -418,12 +420,10 @@ public class fquartos {
                 // Usa try-with-resources para o ResultSet de verificação
                 try (ResultSet rs = statementVerifica.executeQuery()) {
                     if (rs.next() && rs.getInt(1) > 0) {
-                        // Registro duplicado encontrado
-                        String mensagemErro = "registro duplicado: Quarto = " + numeroQuarto + ", Horário = "
-                                + timestamp;
-                        logger.error("Erro: Registro duplicado encontrado.\n" + mensagemErro);
-                        JOptionPane.showMessageDialog(null, "Erro: Registro duplicado encontrado.\n" + mensagemErro);
-                        return false;
+                        // Registro duplicado encontrado gerado pelo Duplo Clique no Front-End / Automacao
+                        String mensagemErro = "Tentativa de duplo disparo interceptada! O quarto " + numeroQuarto + " já foi ativado nos últimos segundos.";
+                        logger.error("Aviso: " + mensagemErro);
+                        return false; // Retorna false silenciosamente ou você pode avisar o usuário
                     }
                 }
             }
