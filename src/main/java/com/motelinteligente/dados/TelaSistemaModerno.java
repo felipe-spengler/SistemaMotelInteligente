@@ -88,40 +88,40 @@ public class TelaSistemaModerno extends JFrame {
     }
 
     // Logic copied from TelaSistema.java and adapted
-    private void updateJarIfNecessary(Consumer<String> logger) throws Exception {
-        logger.accept("Buscando arquivos JAR locais...");
-        List<Path> localJars = findAllJarFiles(Paths.get("."), TARGET_FILE_PREFIX);
+    private void updateAppIfNecessary(Consumer<String> logger) throws Exception {
+        logger.accept("Buscando arquivos EXE/JAR locais...");
+        List<Path> localApps = findAllAppFiles(Paths.get("."), TARGET_FILE_PREFIX);
 
-        if (localJars.isEmpty()) {
-            logger.accept("Nenhum arquivo 'MotelInteligente.jar' foi encontrado.");
+        if (localApps.isEmpty()) {
+            logger.accept("Nenhum arquivo executável 'MotelInteligente' foi encontrado na pasta raiz.");
             return;
         }
 
         logger.accept("Arquivos locais encontrados:");
-        for (Path path : localJars) {
+        for (Path path : localApps) {
             logger.accept(" - " + path.toAbsolutePath());
         }
 
-        logger.accept("Buscando URL de download remoto...");
-        String remoteDownloadUrl = getRemoteJarDownloadUrl();
+        logger.accept("Buscando URL de download remoto (EXE/JAR)...");
+        String remoteDownloadUrl = getRemoteAppDownloadUrl();
         String remoteFileName = getFileNameFromUrl(remoteDownloadUrl);
-        String firstLocalFileName = localJars.get(0).getFileName().toString();
+        String firstLocalFileName = localApps.get(0).getFileName().toString();
 
-        logger.accept("Arquivo Remoto: " + remoteFileName);
+        logger.accept("Arquivo Remoto na Nuvem: " + remoteFileName);
 
         if (!firstLocalFileName.equals(remoteFileName)) {
             logger.accept("A versão é diferente. Baixando atualização...");
-            Path tempDownloadPath = Paths.get(localJars.get(0).getParent().toString(), remoteFileName);
+            Path tempDownloadPath = Paths.get(localApps.get(0).getParent().toString(), remoteFileName);
 
             if (Files.exists(tempDownloadPath)) {
                 Files.delete(tempDownloadPath);
             }
 
             downloadFile(new URL(remoteDownloadUrl), tempDownloadPath);
-            logger.accept("Download concluído");
+            logger.accept("Download concluído com sucesso!");
 
-            logger.accept("Aguardando finalização do processo para atualizar os arquivos...");
-            startUpdaterScript(localJars, tempDownloadPath);
+            logger.accept("Aguardando finalização do processo para substituir as versões...");
+            startUpdaterScript(localApps, tempDownloadPath);
             Thread.sleep(1000);
             System.exit(0);
         } else {
@@ -137,7 +137,7 @@ public class TelaSistemaModerno extends JFrame {
         new SwingWorker<Void, String>() {
             @Override
             protected Void doInBackground() throws Exception {
-                updateJarIfNecessary(msg -> publish(msg));
+                updateAppIfNecessary(msg -> publish(msg));
                 return null;
             }
 
@@ -199,16 +199,16 @@ public class TelaSistemaModerno extends JFrame {
         e.printStackTrace();
     }
 
-    private List<Path> findAllJarFiles(Path rootDir, String fileNamePrefix) throws IOException {
-        try (Stream<Path> walk = Files.walk(rootDir)) {
+    private List<Path> findAllAppFiles(Path rootDir, String fileNamePrefix) throws IOException {
+        try (Stream<Path> walk = Files.walk(rootDir, 1)) { // Limita a profundidade 1 (apenas pasta onde está rodando)
             return walk.filter(Files::isRegularFile)
                     .filter(path -> path.getFileName().toString().startsWith(fileNamePrefix))
-                    .filter(path -> path.getFileName().toString().endsWith(".jar"))
+                    .filter(path -> path.getFileName().toString().endsWith(".exe") || path.getFileName().toString().endsWith(".jar"))
                     .collect(Collectors.toList());
         }
     }
 
-    private String getRemoteJarDownloadUrl() throws IOException {
+    private String getRemoteAppDownloadUrl() throws IOException {
         String apiUrl = "https://api.github.com/repos/felipe-spengler/SistemaMotelInteligente/releases/latest";
         HttpURLConnection connection = (HttpURLConnection) new URL(apiUrl).openConnection();
         connection.setRequestProperty("Accept", "application/vnd.github.v3+json");
@@ -218,17 +218,25 @@ public class TelaSistemaModerno extends JFrame {
             JsonObject json = JsonParser.parseString(jsonText).getAsJsonObject();
             JsonArray assets = json.getAsJsonArray("assets");
 
+            // Prioriza baixar .exe. Se não achar, procura .jar.
+            String exeUrl = null;
+            String jarUrl = null;
+
             for (int i = 0; i < assets.size(); i++) {
                 JsonObject asset = assets.get(i).getAsJsonObject();
                 String name = asset.get("name").getAsString();
                 String downloadUrl = asset.get("browser_download_url").getAsString();
 
-                if (name.endsWith(".jar")) {
-                    return downloadUrl;
+                if (name.endsWith(".exe")) {
+                    exeUrl = downloadUrl;
+                } else if (name.endsWith(".jar")) {
+                    jarUrl = downloadUrl;
                 }
             }
+            if(exeUrl != null) return exeUrl;
+            if(jarUrl != null) return jarUrl;
         }
-        throw new IOException("Nenhum arquivo JAR encontrado na release.");
+        throw new IOException("Nenhum arquivo EXE ou JAR encontrado na release do GitHub.");
     }
 
     private String getFileNameFromUrl(String urlString) {
@@ -260,51 +268,62 @@ public class TelaSistemaModerno extends JFrame {
         }
     }
 
-    private void startUpdaterScript(List<Path> oldJars, Path newJar) throws IOException {
+    private void startUpdaterScript(List<Path> oldApps, Path newApp) throws IOException {
         Path logsDirectory = Paths.get(System.getProperty("user.home"), "Documents", "logs");
         if (!Files.exists(logsDirectory)) {
             Files.createDirectories(logsDirectory);
         }
 
         Path updaterScriptPath = logsDirectory.resolve("updater.bat");
-        Path newJarInLogs = logsDirectory.resolve(newJar.getFileName());
+        Path newAppInLogs = logsDirectory.resolve(newApp.getFileName());
 
-        Files.copy(newJar, newJarInLogs, StandardCopyOption.REPLACE_EXISTING);
+        Files.copy(newApp, newAppInLogs, StandardCopyOption.REPLACE_EXISTING);
 
         StringBuilder scriptContent = new StringBuilder();
         scriptContent.append("@echo off\n")
                 .append("setlocal enabledelayedexpansion\n\n")
-                .append("echo Encerrando processo javaw.exe...\n")
+                .append("echo Encerrando processos legados...\n")
                 .append("taskkill /IM javaw.exe /F >nul 2>&1\n")
-                .append(":waitJavaw\n")
-                .append("tasklist /FI \"IMAGENAME eq javaw.exe\" | find /I \"javaw.exe\" >nul\n")
-                .append("if %ERRORLEVEL% equ 0 (\n")
-                .append("    timeout /t 2 >nul\n")
-                .append("    goto waitJavaw\n")
-                .append(")\n\n");
+                // Loop to kill all old names
+                .append("for %%I in (");
+        for (Path old : oldApps) {
+            scriptContent.append("\"").append(old.getFileName().toString()).append("\" ");
+        }
+        scriptContent.append(") do taskkill /IM %%I /F >nul 2>&1\n\n")
+                .append(":waitLoop\n")
+                .append("timeout /t 2 >nul\n\n");
 
-        for (Path oldJarPath : oldJars) {
-            scriptContent.append("if exist \"").append(oldJarPath.toAbsolutePath()).append("\" (\n")
-                    .append("    del /f /q \"").append(oldJarPath.toAbsolutePath()).append("\"\n")
+        for (Path oldAppPath : oldApps) {
+            scriptContent.append("if exist \"").append(oldAppPath.toAbsolutePath()).append("\" (\n")
+                    .append("    del /f /q \"").append(oldAppPath.toAbsolutePath()).append("\"\n")
                     .append(")\n");
         }
 
         scriptContent.append("\n");
 
-        for (Path oldJarPath : oldJars) {
-            Path targetPath = oldJarPath.getParent().resolve(newJar.getFileName());
+        for (Path oldAppPath : oldApps) {
+            Path targetPath = oldAppPath.getParent().resolve(newApp.getFileName());
             // Important: Use double quotes around paths to handle spaces
-            scriptContent.append("copy /y \"").append(newJarInLogs.toAbsolutePath()).append("\" \"")
+            scriptContent.append("copy /y \"").append(newAppInLogs.toAbsolutePath()).append("\" \"")
                     .append(targetPath.toAbsolutePath()).append("\" >nul\n");
+            // Se houver mais de um executável na raiz e só copiamos para o mesmo lugar um deles já basta,
+            // então paramos aqui para não gerar duplicatas com o mesmo novo nome.
+            break;
         }
 
-        scriptContent.append("del /f /q \"").append(newJarInLogs.toAbsolutePath()).append("\" >nul\n");
+        scriptContent.append("del /f /q \"").append(newAppInLogs.toAbsolutePath()).append("\" >nul\n");
 
-        Path firstTarget = oldJars.get(0).getParent().resolve(newJar.getFileName());
+        Path firstTarget = oldApps.get(0).getParent().resolve(newApp.getFileName());
         scriptContent.append("\n")
-                .append("echo Iniciando nova versão...\n")
-                .append("start \"\" /D \"").append(firstTarget.getParent()).append("\" javaw -jar \"")
+                .append("echo Iniciando nova versão do sistema...\n");
+        
+        if (newApp.getFileName().toString().endsWith(".jar")) {
+             scriptContent.append("start \"\" /D \"").append(firstTarget.getParent()).append("\" javaw -jar \"")
                 .append(firstTarget.toAbsolutePath()).append("\"\n");
+        } else {
+             scriptContent.append("start \"\" /D \"").append(firstTarget.getParent()).append("\" \"")
+                .append(firstTarget.toAbsolutePath()).append("\"\n");
+        }
 
         scriptContent.append("timeout /t 2 >nul\n");
         scriptContent.append("del \"%~f0\" >nul 2>&1\n")
@@ -312,7 +331,7 @@ public class TelaSistemaModerno extends JFrame {
                 .append("exit\n");
 
         Files.write(updaterScriptPath, scriptContent.toString().getBytes(StandardCharsets.UTF_8));
-        Files.deleteIfExists(newJar);
+        Files.deleteIfExists(newApp);
 
         new ProcessBuilder("cmd", "/c", "start", "/b", updaterScriptPath.toString())
                 .directory(logsDirectory.toFile())
