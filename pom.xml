@@ -199,9 +199,6 @@
                             <jar>${project.build.directory}/${project.build.finalName}.jar</jar>
                             <outfile>${project.build.directory}/${project.build.finalName}.exe</outfile>
                             <downloadUrl>https://java.com/download</downloadUrl>
-                            <classPath>
-                                <mainClass>com.motelinteligente.telas.TelaLogin</mainClass>
-                            </classPath>
                             <icon>${project.basedir}/src/main/resources/imagens/real_logo.ico</icon>
                             <jre>
                                 <minVersion>17.0.0</minVersion>
