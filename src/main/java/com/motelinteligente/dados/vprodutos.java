@@ -1,14 +1,6 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.motelinteligente.dados;
 import java.sql.Timestamp;
 
-/**
- *
- * @author MOTEL
- */
 public class vprodutos {
     int idProduto;
     String descricao;
@@ -60,13 +52,12 @@ public class vprodutos {
         this.dataCompra = dataCompra;
     }
 
-    public vprodutos(int idProduto, String descricao, float valor, String estoque, Timestamp dataCompra) {
-        this.idProduto = idProduto;
-        this.descricao = descricao;
-        this.valor = valor;
-        this.estoque = estoque;
-        this.dataCompra = dataCompra;
-        this.categoria = "Diversos";
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
     }
 
     public vprodutos(int idProduto, String descricao, float valor, String estoque, Timestamp dataCompra, String categoria) {
@@ -78,12 +69,7 @@ public class vprodutos {
         this.categoria = categoria;
     }
 
-    public String getCategoria() {
-        return categoria;
+    public vprodutos(int idProduto, String descricao, float valor, String estoque, Timestamp dataCompra) {
+        this(idProduto, descricao, valor, estoque, dataCompra, "Diversos");
     }
-
-    public void setCategoria(String categoria) {
-        this.categoria = categoria;
-    }
-
 }

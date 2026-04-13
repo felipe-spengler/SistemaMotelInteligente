@@ -19,13 +19,13 @@ public class ConfiguracoesModerno extends JFrame {
 
     private JCheckBox checkLogoff;
     private JCheckBox checkEstoque;
+    private JCheckBox checkPedidos;
     private JTextField txtLimiteDesconto;
     private JComboBox<String> jComboBoxTelas;
     private JRadioButton botaoRF;
     private JRadioButton botaoBotoeira;
     private JButton botaoCodigos;
     private ButtonGroup portoesGroup;
-    private String telaMostrar;
     private boolean isInitializing = false;
 
     public ConfiguracoesModerno() {
@@ -56,6 +56,10 @@ public class ConfiguracoesModerno extends JFrame {
         checkEstoque = new JCheckBox("Controlar Estoque");
         checkEstoque.addActionListener(e -> salvarCheckEstoque());
         pnlGeral.add(checkEstoque, "wrap");
+
+        checkPedidos = new JCheckBox("Ativar Pedidos Online");
+        checkPedidos.addActionListener(e -> salvarCheckPedidos());
+        pnlGeral.add(checkPedidos, "wrap");
 
         // Discount
         JPanel pnlDesconto = new JPanel(new MigLayout("insets 0", "[]10[]5[]"));
@@ -164,6 +168,7 @@ public class ConfiguracoesModerno extends JFrame {
         // Checkboxes
         checkLogoff.setSelected(config.getLogoffecharcaixa());
         checkEstoque.setSelected(config.getControlaEstoque());
+        checkPedidos.setSelected(config.isPedidosOnlineAtivo());
 
         // Discount
         txtLimiteDesconto.setText(String.valueOf(config.getLimiteDesconto()));
@@ -209,6 +214,12 @@ public class ConfiguracoesModerno extends JFrame {
         boolean selected = checkEstoque.isSelected();
         configGlobal.getInstance().setControlaEstoque(selected);
         funcaoSet("estoque", selected);
+    }
+
+    private void salvarCheckPedidos() {
+        boolean selected = checkPedidos.isSelected();
+        configGlobal.getInstance().setPedidosOnlineAtivo(selected);
+        funcaoSet("pedidos_online", selected);
     }
 
     private void salvarLimiteDesconto() {

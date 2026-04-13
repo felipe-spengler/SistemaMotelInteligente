@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+import java.awt.Frame;
 import java.sql.Timestamp;
 import java.util.Date;
 
@@ -177,6 +179,40 @@ public class ReceberNumeroQuartoController {
             logger.error("Erro ao processar receberNumeroQuarto: {}", numeroQuarto, e);
             return new ResponseEntity<>("Erro interno", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @PostMapping(value = "/receberPedido", consumes = "application/json")
+    public ResponseEntity<String> receberPedido(@RequestBody PedidoDTO pedido) {
+        try {
+            logger.info("Novo pedido recebido via API: Suíte {}", pedido.getQuarto());
+            
+            SwingUtilities.invokeLater(() -> {
+                for (Frame frame : Frame.getFrames()) {
+                    if (frame instanceof com.motelinteligente.telas.TelaPrincipal) {
+                        ((com.motelinteligente.telas.TelaPrincipal) frame).mostrarAlertaPedidoExterno(
+                            pedido.getQuarto(), 
+                            pedido.getItens(), 
+                            new java.text.SimpleDateFormat("HH:mm").format(new java.util.Date())
+                        );
+                        break;
+                    }
+                }
+            });
+
+            return new ResponseEntity<>("Pedido recebido", HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error("Erro ao processar receberPedido", e);
+            return new ResponseEntity<>("Erro", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public static class PedidoDTO {
+        private int quarto;
+        private String itens;
+        public int getQuarto() { return quarto; }
+        public void setQuarto(int quarto) { this.quarto = quarto; }
+        public String getItens() { return itens; }
+        public void setItens(String itens) { this.itens = itens; }
     }
 
     public boolean mudaStatusNaCache(int quartoMudar, String statusColocar) {

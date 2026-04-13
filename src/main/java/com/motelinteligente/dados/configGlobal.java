@@ -30,6 +30,7 @@ public class configGlobal {
     private String caminhoAudio;
     private boolean clienteSeleciona;
     private boolean subtelaAtiva;
+    private boolean pedidosOnlineAtivo;
 
     // Construtor privado para evitar a criação de múltiplas instâncias
     public configGlobal() {
@@ -149,6 +150,7 @@ public class configGlobal {
                     this.caminhoAudio = resultado.getString("caminhoAudio");
                     this.clienteSeleciona = resultado.getBoolean("clienteSeleciona");
                     this.subtelaAtiva = resultado.getBoolean("subtelaAtiva");
+                    this.pedidosOnlineAtivo = resultado.getBoolean("pedidos_online");
                 } catch (Exception ex) {
                     // Colunas podem não existir ainda
                 }
@@ -257,5 +259,13 @@ public class configGlobal {
 
     public void setSubtelaAtiva(boolean subtelaAtiva) {
         this.subtelaAtiva = subtelaAtiva;
+    }
+
+    public boolean isPedidosOnlineAtivo() {
+        return pedidosOnlineAtivo;
+    }
+
+    public void setPedidosOnlineAtivo(boolean pedidosOnlineAtivo) {
+        this.pedidosOnlineAtivo = pedidosOnlineAtivo;
     }
 }

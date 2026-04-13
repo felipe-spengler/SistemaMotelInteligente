@@ -17,5 +17,18 @@ CREATE TABLE IF NOT EXISTS `periodos_quarto` (
 -- 2. Adiciona a coluna para saber qual periodo o cliente usou na locacao (para os periodos dinamicos)
 ALTER TABLE `registralocado` ADD COLUMN `periodo_locado` VARCHAR(50) DEFAULT NULL;
 
--- 3. Adiciona categorias na tabela de produtos para montar o cardápio digital / vitrine
+-- 3. Adiciona categorias na tabela de produtos para montar o cardápio digital
 ALTER TABLE `produtos` ADD COLUMN `categoria` VARCHAR(50) DEFAULT 'Diversos';
+
+-- 4. Suporte a Pedidos Online via Cardápio
+CREATE TABLE IF NOT EXISTS `pedidos_online` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `numeroquarto` int NOT NULL,
+  `itens` text NOT NULL, -- JSON ou lista de itens: "2x Coca, 1x X-Tudo"
+  `valor_total` float DEFAULT 0,
+  `status` varchar(20) DEFAULT 'pendente', -- pendente, visualizado, entregue, cancelado
+  `hora_pedido` timestamp DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE `configuracoes` ADD COLUMN `pedidos_online` tinyint(1) DEFAULT '0';

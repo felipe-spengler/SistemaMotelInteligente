@@ -13,6 +13,7 @@ import com.motelinteligente.dados.ConexaoRemota;
 import com.motelinteligente.dados.DadosOcupados;
 import com.motelinteligente.dados.configGlobal;
 import com.motelinteligente.dados.fazconexao;
+import com.motelinteligente.dados.fpedidos;
 import com.motelinteligente.dados.fprodutos;
 import com.motelinteligente.dados.fquartos;
 import com.motelinteligente.dados.playSound;
@@ -106,11 +107,10 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private String user = null;
     private String cargo = null;
     private int quartoEmFoco = 0;
-    private int numeroQuartos = 0;
     private JPopupMenu popupMenu;
     private boolean isClickable = true;
-    private Timer alarmTimer; // Timer para verificar os alarmes
     private Timer refreshTimer; // Timer para atualizar a tela
+    private Timer pedidosTimer; // Timer para pedidos online
     private long lastUpdate = 0;
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(TelaPrincipal.class);
     private EncerraQuarto encerraQuarto;
@@ -159,6 +159,17 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 }
             }
         }, 5000, 20000); // Inicia após 5s, repete a cada 20s
+
+        // Timer para verificar pedidos online a cada 10 segundos
+        pedidosTimer = new Timer();
+        pedidosTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if (configGlobal.getInstance().isPedidosOnlineAtivo()) {
+                    verificarPedidosOnline();
+                }
+            }
+        }, 10000, 10000);
 
         setExtendedState(MAXIMIZED_BOTH);
         iniciar();
@@ -289,11 +300,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         }
     }
 
-    private boolean isTimeToRing(Time alarmTime) {
-        Time currentTime = new Time(System.currentTimeMillis());
-        return currentTime.equals(alarmTime); // Verifica se a hora atual é igual à do alarme
-    }
-
     private void showAlarmAlert(int idAlarme, String description) {
         playSound soundPlayer = new playSound();
         soundPlayer.playSoundLoop("som/despertador.mp3"); // Caminho relativo
@@ -306,6 +312,55 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         soundPlayer.stopSound(); // Para o som quando o alerta é fechado
         new FAlarmes().removeAlarmFromDatabase(idAlarme);
+    }
+
+    private void verificarPedidosOnline() {
+        fpedidos dao = new fpedidos();
+        List<fpedidos.PedidoOnline> novos = dao.buscarNovosPedidos();
+
+        if (!novos.isEmpty()) {
+            for (fpedidos.PedidoOnline p : novos) {
+                // Toca o alarme e mostra notificação para cada pedido pendente
+                SwingUtilities.invokeLater(() -> mostrarAlertaPedido(p));
+            }
+        }
+    }
+
+    public void mostrarAlertaPedidoExterno(int quarto, String itens, String hora) {
+        fpedidos.PedidoOnline p = new fpedidos.PedidoOnline();
+        p.id = -1; // Pedido via Push não tem ID de banco imediato (ou não precisa dele para o alerta)
+        p.numeroQuarto = quarto;
+        p.itens = itens;
+        p.hora = hora;
+        mostrarAlertaPedido(p);
+    }
+
+    private void mostrarAlertaPedido(fpedidos.PedidoOnline p) {
+        playSound soundPlayer = new playSound();
+        soundPlayer.playSoundLoop("som/despertador.mp3");
+
+        String mensagem = "<html><body style='width: 300px; padding: 10px;'>"
+                + "<h2 style='color: #e11d48; margin: 0;'>NOVO PEDIDO ONLINE!</h2>"
+                + "<hr>"
+                + "<p style='font-size: 16px; margin: 10px 0;'><b>Suíte:</b> " + p.numeroQuarto + "</p>"
+                + "<p style='font-size: 14px; margin: 10px 0;'><b>Itens:</b><br>" + p.itens + "</p>"
+                + "<p style='font-size: 12px; color: #666;'>Recebido em: " + p.hora + "</p>"
+                + "</body></html>";
+
+        int opcao = JOptionPane.showOptionDialog(this,
+                mensagem,
+                "Pedido Online - Suíte " + p.numeroQuarto,
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.INFORMATION_MESSAGE,
+                null, 
+                new Object[]{"Marcar como Visto", "Fechar"}, 
+                "Marcar como Visto");
+
+        soundPlayer.stopSound();
+
+        if (opcao == 0) { // Marcar como Visto
+            new fpedidos().marcarComoVisto(p.id);
+        }
     }
 
     public void setaLabel() {
@@ -334,7 +389,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             modelo.setNumRows(0);
             txtDescontoNegociado.setText("0,00");
             txtAntecipado.setText("0,00");
-            fquartos quartodao = new fquartos();
             if (!status.equals("ocupado")) {
                 setaLabel();
                 botaoTroca.setVisible(false);
