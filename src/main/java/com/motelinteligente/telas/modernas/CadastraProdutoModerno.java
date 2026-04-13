@@ -260,6 +260,7 @@ public class CadastraProdutoModerno extends JDialog {
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setDoOutput(true);
         conn.setRequestMethod("POST");
+        conn.setRequestProperty("X-Api-Key", "MotelInteligente_Secret_Key_2024");
         conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
 
         try (OutputStream out = conn.getOutputStream();
@@ -293,6 +294,7 @@ public class CadastraProdutoModerno extends JDialog {
                 URL urlObj = new URL("https://motelinteligente.com/api/listar_fotos.php");
                 HttpURLConnection conn = (HttpURLConnection) urlObj.openConnection();
                 conn.setRequestMethod("GET");
+                conn.setRequestProperty("X-Api-Key", "MotelInteligente_Secret_Key_2024");
 
                 BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 StringBuilder response = new StringBuilder();
