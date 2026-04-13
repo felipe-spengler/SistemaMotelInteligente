@@ -16,8 +16,9 @@ import java.net.URL;
 import java.util.Date;
 import javax.imageio.ImageIO;
 import java.nio.file.Files;
-import javax.swing.SwingUtilities;
 import java.awt.Cursor;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class CadastraProdutoModerno extends JDialog {
 
@@ -71,7 +72,7 @@ public class CadastraProdutoModerno extends JDialog {
         pnlPrincipal.add(txtCategoria);
 
         pnlPrincipal.add(EstiloModerno.criarLabel("Imagem (URL ou Upload)"));
-        JPanel imgPanel = new JPanel(new MigLayout("insets 0", "[grow]10[]", "[]"));
+        JPanel imgPanel = new JPanel(new MigLayout("insets 0", "[grow]10[]10[]", "[]"));
         imgPanel.setOpaque(false);
         txtImagem = EstiloModerno.criarInput();
         imgPanel.add(txtImagem, "growx");
@@ -79,6 +80,11 @@ public class CadastraProdutoModerno extends JDialog {
         JButton btnUpload = EstiloModerno.criarBotaoPrincipal("Subir Foto", null);
         btnUpload.addActionListener(e -> selecionarFazerUpload());
         imgPanel.add(btnUpload);
+
+        JButton btnBiblioteca = EstiloModerno.criarBotaoSecundario("Biblioteca", null);
+        btnBiblioteca.addActionListener(e -> abrirGaleria());
+        imgPanel.add(btnBiblioteca);
+
         pnlPrincipal.add(imgPanel);
 
         pnlPrincipal.add(EstiloModerno.criarLabel("Descrição Detalhada / Detalhes"));
@@ -209,16 +215,14 @@ public class CadastraProdutoModerno extends JDialog {
     private void selecionarFazerUpload() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Selecionar Foto do Produto");
-        fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Imagens", "jpg", "jpeg", "png", "webp"));
+        fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Imagens", "jpg", "jpeg", "png", "webp", "jfif"));
 
         if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
             
-            // Pergunta a URL do site (pode ser automatizado depois)
-            String siteUrl = JOptionPane.showInputDialog(this, "Confirme a URL do Site (ex: http://motel.com.br):", "Configuração de Upload", JOptionPane.QUESTION_MESSAGE);
-            if (siteUrl == null || siteUrl.isEmpty()) return;
-            if (!siteUrl.endsWith("/")) siteUrl += "/";
-
+            // Define a URL base automaticamente ou usa o padrão
+            String siteUrl = "https://motelinteligente.com/";
+            
             final String finalUrl = siteUrl + "api/upload_foto.php";
             
             // Mostra loading
@@ -227,21 +231,23 @@ public class CadastraProdutoModerno extends JDialog {
             new Thread(() -> {
                 try {
                     String response = uploadImage(finalUrl, selectedFile);
+                    JSONObject json = new JSONObject(response);
+                    
                     SwingUtilities.invokeLater(() -> {
                         setCursor(Cursor.getDefaultCursor());
-                        if (response != null && response.contains("\"success\":true")) {
-                            // Extrai URL do JSON (simplificado)
-                            String url = response.split("\"url\":\"")[1].split("\"")[0];
+                        if (json.optBoolean("success")) {
+                            String url = json.getString("url");
                             txtImagem.setText(url);
-                            JOptionPane.showMessageDialog(this, "Foto enviada e otimizada com sucesso!");
+                            JOptionPane.showMessageDialog(this, "Foto enviada e compartilhada com sucesso!");
                         } else {
-                            JOptionPane.showMessageDialog(this, "Erro no upload: " + response);
+                            String errorMsg = json.optString("message", "Erro desconhecido no servidor.");
+                            JOptionPane.showMessageDialog(this, "Erro no upload:\n" + errorMsg, "Houve um Problema", JOptionPane.ERROR_MESSAGE);
                         }
                     });
                 } catch (Exception ex) {
                     SwingUtilities.invokeLater(() -> {
                         setCursor(Cursor.getDefaultCursor());
-                        JOptionPane.showMessageDialog(this, "Erro técnico: " + ex.getMessage());
+                        JOptionPane.showMessageDialog(this, "Erro técnico na conexão:\n" + ex.getMessage());
                     });
                 }
             }).start();
@@ -278,5 +284,60 @@ public class CadastraProdutoModerno extends JDialog {
             while ((line = reader.readLine()) != null) response.append(line);
         }
         return response.toString();
+    }
+
+    private void abrirGaleria() {
+        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        new Thread(() -> {
+            try {
+                URL urlObj = new URL("https://motelinteligente.com/api/listar_fotos.php");
+                HttpURLConnection conn = (HttpURLConnection) urlObj.openConnection();
+                conn.setRequestMethod("GET");
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = in.readLine()) != null) response.append(line);
+                in.close();
+
+                JSONObject json = new JSONObject(response.toString());
+                if (json.getBoolean("success")) {
+                    JSONArray fotos = json.getJSONArray("fotos");
+                    String[] listaNomes = new String[fotos.length()];
+                    for (int i = 0; i < fotos.length(); i++) {
+                        listaNomes[i] = fotos.getJSONObject(i).getString("nome");
+                    }
+
+                    SwingUtilities.invokeLater(() -> {
+                        setCursor(Cursor.getDefaultCursor());
+                        if (listaNomes.length == 0) {
+                            JOptionPane.showMessageDialog(this, "A biblioteca está vazia. Suba uma foto primeiro!");
+                            return;
+                        }
+                        
+                        String selecionada = (String) JOptionPane.showInputDialog(this, 
+                            "Selecione uma imagem já enviada:", 
+                            "Biblioteca Compartilhada", 
+                            JOptionPane.PLAIN_MESSAGE, 
+                            null, listaNomes, listaNomes[0]);
+                        
+                        if (selecionada != null) {
+                            for (int i = 0; i < fotos.length(); i++) {
+                                JSONObject f = fotos.getJSONObject(i);
+                                if (f.getString("nome").equals(selecionada)) {
+                                    txtImagem.setText(f.getString("url"));
+                                    break;
+                                }
+                            }
+                        }
+                    });
+                }
+            } catch (Exception e) {
+                SwingUtilities.invokeLater(() -> {
+                    setCursor(Cursor.getDefaultCursor());
+                    JOptionPane.showMessageDialog(this, "Erro ao carregar biblioteca: " + e.getMessage());
+                });
+            }
+        }).start();
     }
 }
