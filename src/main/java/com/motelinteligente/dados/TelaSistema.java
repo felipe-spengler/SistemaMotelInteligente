@@ -246,15 +246,21 @@ public class TelaSistema extends JFrame {
                 scriptContent.append("@echo off\n")
                         .append("setlocal enabledelayedexpansion\n\n")
                         .append("echo Aguardando fechamento do sistema...\n")
-                        .append("timeout /t 2 >nul\n")
-                        // Encerra qualquer versão do MotelInteligente que esteja rodando
-                        .append("taskkill /IM MotelInteligente* /F >nul 2>&1\n")
-                        .append("timeout /t 1 >nul\n");
+                        .append("timeout /t 3 >nul\n")
+                        // Encerra qualquer processo que comece com MotelInteligente usando filtro
+                        .append("taskkill /F /FI \"IMAGENAME eq MotelInteligente*\" >nul 2>&1\n")
+                        .append("timeout /t 2 >nul\n");
 
-                // Deleta os EXEs antigos
+                // Loop para tentar deletar os EXEs antigos (tenta 3 vezes se tiver travado)
                 for (Path oldPath : oldExes) {
-                    scriptContent.append("if exist \"").append(oldPath.toAbsolutePath()).append("\" (\n")
-                            .append("    del /f /q \"").append(oldPath.toAbsolutePath()).append("\"\n")
+                    String absPath = oldPath.toAbsolutePath().toString();
+                    scriptContent.append(":retry_").append(oldPath.getFileName().hashCode()).append("\n")
+                            .append("if exist \"").append(absPath).append("\" (\n")
+                            .append("    del /f /q \"").append(absPath).append("\" >nul 2>&1\n")
+                            .append("    if exist \"").append(absPath).append("\" (\n")
+                            .append("        timeout /t 1 >nul\n")
+                            .append("        goto retry_").append(oldPath.getFileName().hashCode()).append("\n")
+                            .append("    )\n")
                             .append(")\n");
                 }
 
