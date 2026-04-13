@@ -337,13 +337,15 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private void mostrarAlertaPedido(fpedidos.PedidoOnline p) {
         playSound soundPlayer = new playSound();
         soundPlayer.playSoundLoop("som/despertador.mp3");
-
         String mensagem = "<html><body style='width: 300px; padding: 10px;'>"
                 + "<h2 style='color: #e11d48; margin: 0;'>NOVO PEDIDO ONLINE!</h2>"
-                + "<hr>"
-                + "<p style='font-size: 16px; margin: 10px 0;'><b>Suíte:</b> " + p.numeroQuarto + "</p>"
-                + "<p style='font-size: 14px; margin: 10px 0;'><b>Itens:</b><br>" + p.itens + "</p>"
-                + "<p style='font-size: 12px; color: #666;'>Recebido em: " + p.hora + "</p>"
+                + "<hr style='border: 0; border-top: 1px solid #ddd; margin: 10px 0;'>"
+                + "<p style='font-size: 1.1em;'><b>Suíte:</b> " + p.numeroQuarto + "</p>"
+                + "<p style='font-size: 1.1em;'><b>Itens:</b><br>" + p.itens + "</p>";
+        
+        // Adiciona detalhes se houver (opcional, já que 'itens' costuma ter tudo)
+        
+        mensagem += "<p style='font-size: 1.1em; color: #2563eb;'><b>Valor Total:</b> R$ " + String.format("%.2f", p.valorTotal) + "</p>"
                 + "</body></html>";
 
         int opcao = JOptionPane.showOptionDialog(this,

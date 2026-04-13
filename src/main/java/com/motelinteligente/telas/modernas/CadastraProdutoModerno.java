@@ -19,6 +19,8 @@ public class CadastraProdutoModerno extends JDialog {
     private JTextField txtEstoque;
     private JCheckBox chkControlarEstoque;
     private JTextField txtCategoria;
+    private JTextField txtImagem;
+    private JTextArea txtDetalhes;
     private boolean atualizar = false;
 
     public CadastraProdutoModerno(Window parent, int idPassado) { // Aceita Window (JFrame ou JDialog)
@@ -37,7 +39,7 @@ public class CadastraProdutoModerno extends JDialog {
         EstiloModerno.aplicarEstiloDialog(this);
 
         JPanel mainPanel = new JPanel(
-                new MigLayout("fillx, insets 30, wrap 1", "[grow, fill]", "[]20[]5[]15[]5[]15[]5[]15[]5[]30[]"));
+                new MigLayout("fillx, insets 30, wrap 1", "[grow, fill]", "[]15[]5[]12[]5[]12[]5[]12[]5[]12[]5[]12[]5[grow]20[]"));
         mainPanel.setBackground(EstiloModerno.BG_BACKGROUND); // Garante fundo correto
 
         mainPanel.add(EstiloModerno.criarTitulo("Detalhes do Produto"), "center");
@@ -59,6 +61,17 @@ public class CadastraProdutoModerno extends JDialog {
         txtCategoria = EstiloModerno.criarInput();
         txtCategoria.setText("Diversos");
         mainPanel.add(txtCategoria);
+
+        mainPanel.add(EstiloModerno.criarLabel("URL da Imagem (Opcional)"));
+        txtImagem = EstiloModerno.criarInput();
+        mainPanel.add(txtImagem);
+
+        mainPanel.add(EstiloModerno.criarLabel("Descrição Detalhada / Detalhes"));
+        txtDetalhes = new JTextArea(4, 20);
+        txtDetalhes.setLineWrap(true);
+        txtDetalhes.setWrapStyleWord(true);
+        JScrollPane scrollDetalhes = new JScrollPane(txtDetalhes);
+        mainPanel.add(scrollDetalhes, "growx, height 80!");
 
         JPanel stockPanel = new JPanel(new MigLayout("insets 0", "[]10[grow]", "[]"));
         stockPanel.setOpaque(false);
@@ -113,6 +126,8 @@ public class CadastraProdutoModerno extends JDialog {
             txtValor.setText(String.valueOf(produto.getValor()));
             txtEstoque.setText(String.valueOf(produto.getEstoque()));
             txtCategoria.setText(produto.getCategoria() != null ? produto.getCategoria() : "Diversos");
+            txtImagem.setText(produto.getImagem());
+            txtDetalhes.setText(produto.getDetalhes());
 
             if (!produto.getEstoque().equals("-")) {
                 chkControlarEstoque.setSelected(true);
@@ -137,6 +152,8 @@ public class CadastraProdutoModerno extends JDialog {
         float valor = 0;
         String estoque = txtEstoque.getText();
         String categoria = txtCategoria.getText();
+        String imagem = txtImagem.getText();
+        String detalhes = txtDetalhes.getText();
 
         if (descricao.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Descrição obrigatória");
@@ -163,7 +180,7 @@ public class CadastraProdutoModerno extends JDialog {
         java.sql.Timestamp data = new java.sql.Timestamp(dataAtual.getTime());
         dao.exclusao(idProduto); // Remove anterior (logica legado)
 
-        vprodutos novo = new vprodutos(idProduto, descricao, valor, estoque, data, categoria);
+        vprodutos novo = new vprodutos(idProduto, descricao, valor, estoque, data, categoria, imagem, detalhes);
         if (dao.insercao(novo)) {
             JOptionPane.showMessageDialog(this, "Salvo com sucesso!");
             dispose();

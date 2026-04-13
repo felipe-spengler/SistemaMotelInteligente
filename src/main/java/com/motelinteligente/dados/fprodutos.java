@@ -41,8 +41,11 @@ public class fprodutos {
                     produto.setDataCompra(resultado.getTimestamp("ultimacompra"));
                     try {
                         produto.setCategoria(resultado.getString("categoria"));
+                        produto.setImagem(resultado.getString("imagem"));
+                        produto.setDetalhes(resultado.getString("detalhes"));
                     } catch (SQLException ex) {
-                        produto.setCategoria("Diversos");
+                        // Fallback se as colunas não existirem
+                        if (produto.getCategoria() == null) produto.setCategoria("Diversos");
                     }
                     produtos.add(produto);
                 }
@@ -158,8 +161,8 @@ public class fprodutos {
 
     public boolean insercao(vprodutos dados) {
 
-        String sql = "INSERT INTO produtos (idproduto, descricao, valorproduto, estoque, ultimacompra, categoria) "
-                + "VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO produtos (idproduto, descricao, valorproduto, estoque, ultimacompra, categoria, imagem, detalhes) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection link = new fazconexao().conectar();
                 PreparedStatement st = link.prepareStatement(sql)) {
@@ -170,6 +173,8 @@ public class fprodutos {
             st.setString(4, dados.getEstoque());
             st.setTimestamp(5, dados.getDataCompra());
             st.setString(6, dados.getCategoria() != null ? dados.getCategoria() : "Diversos");
+            st.setString(7, dados.getImagem());
+            st.setString(8, dados.getDetalhes());
 
             boolean result = st.executeUpdate() > 0;
             if (result)
@@ -223,8 +228,10 @@ public class fprodutos {
                     produto.setEstoque(rs.getString("estoque"));
                     try {
                         produto.setCategoria(rs.getString("categoria"));
+                        produto.setImagem(rs.getString("imagem"));
+                        produto.setDetalhes(rs.getString("detalhes"));
                     } catch (SQLException ex) {
-                        produto.setCategoria("Diversos");
+                        if (produto.getCategoria() == null) produto.setCategoria("Diversos");
                     }
                 }
             }

@@ -8,6 +8,8 @@ public class vprodutos {
     String estoque;
     Timestamp dataCompra;
     String categoria;
+    String imagem;
+    String detalhes;
 
     public vprodutos() {
     }
@@ -60,16 +62,34 @@ public class vprodutos {
         this.categoria = categoria;
     }
 
-    public vprodutos(int idProduto, String descricao, float valor, String estoque, Timestamp dataCompra, String categoria) {
+    public String getImagem() {
+        return imagem;
+    }
+
+    public void setImagem(String imagem) {
+        this.imagem = imagem;
+    }
+
+    public String getDetalhes() {
+        return detalhes;
+    }
+
+    public void setDetalhes(String detalhes) {
+        this.detalhes = detalhes;
+    }
+
+    public vprodutos(int idProduto, String descricao, float valor, String estoque, Timestamp dataCompra, String categoria, String imagem, String detalhes) {
         this.idProduto = idProduto;
         this.descricao = descricao;
         this.valor = valor;
         this.estoque = estoque;
         this.dataCompra = dataCompra;
         this.categoria = categoria;
+        this.imagem = imagem;
+        this.detalhes = detalhes;
     }
 
     public vprodutos(int idProduto, String descricao, float valor, String estoque, Timestamp dataCompra) {
-        this(idProduto, descricao, valor, estoque, dataCompra, "Diversos");
+        this(idProduto, descricao, valor, estoque, dataCompra, "Diversos", null, null);
     }
 }
