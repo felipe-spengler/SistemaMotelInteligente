@@ -71,17 +71,13 @@ public class CadastraProdutoModerno extends JDialog {
         txtCategoria.setText("Diversos");
         pnlPrincipal.add(txtCategoria);
 
-        pnlPrincipal.add(EstiloModerno.criarLabel("Imagem (URL ou Upload)"));
-        JPanel imgPanel = new JPanel(new MigLayout("insets 0", "[grow]10[]10[]", "[]"));
+        pnlPrincipal.add(EstiloModerno.criarLabel("Imagem (URL ou Biblioteca)"));
+        JPanel imgPanel = new JPanel(new MigLayout("insets 0", "[grow]10[]", "[]"));
         imgPanel.setOpaque(false);
         txtImagem = EstiloModerno.criarInput();
         imgPanel.add(txtImagem, "growx");
 
-        JButton btnUpload = EstiloModerno.criarBotaoPrincipal("Subir Foto", null);
-        btnUpload.addActionListener(e -> selecionarFazerUpload());
-        imgPanel.add(btnUpload);
-
-        JButton btnBiblioteca = EstiloModerno.criarBotaoSecundario("Biblioteca", null);
+        JButton btnBiblioteca = EstiloModerno.criarBotaoPrincipal("Visualizar Biblioteca", null);
         btnBiblioteca.addActionListener(e -> abrirGaleria());
         imgPanel.add(btnBiblioteca);
 
@@ -288,58 +284,19 @@ public class CadastraProdutoModerno extends JDialog {
     }
 
     private void abrirGaleria() {
-        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-        new Thread(() -> {
-            try {
-                URL urlObj = new URL("https://motelinteligente.com/api/listar_fotos.php");
-                HttpURLConnection conn = (HttpURLConnection) urlObj.openConnection();
-                conn.setRequestMethod("GET");
-                conn.setRequestProperty("X-Api-Key", "MotelInteligente_Secret_Key_2024");
+        JanelaGaleria galeria = new JanelaGaleria(this);
+        galeria.setVisible(true);
+        
+        String selecionada = galeria.getUrlSelecionada();
+        if (selecionada != null) {
+            txtImagem.setText(selecionada);
+        }
+    }
 
-                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                StringBuilder response = new StringBuilder();
-                String line;
-                while ((line = in.readLine()) != null) response.append(line);
-                in.close();
-
-                JSONObject json = new JSONObject(response.toString());
-                if (json.getBoolean("success")) {
-                    JSONArray fotos = json.getJSONArray("fotos");
-                    String[] listaNomes = new String[fotos.length()];
-                    for (int i = 0; i < fotos.length(); i++) {
-                        listaNomes[i] = fotos.getJSONObject(i).getString("nome");
-                    }
-
-                    SwingUtilities.invokeLater(() -> {
-                        setCursor(Cursor.getDefaultCursor());
-                        if (listaNomes.length == 0) {
-                            JOptionPane.showMessageDialog(this, "A biblioteca está vazia. Suba uma foto primeiro!");
-                            return;
-                        }
-                        
-                        String selecionada = (String) JOptionPane.showInputDialog(this, 
-                            "Selecione uma imagem já enviada:", 
-                            "Biblioteca Compartilhada", 
-                            JOptionPane.PLAIN_MESSAGE, 
-                            null, listaNomes, listaNomes[0]);
-                        
-                        if (selecionada != null) {
-                            for (int i = 0; i < fotos.length(); i++) {
-                                JSONObject f = fotos.getJSONObject(i);
-                                if (f.getString("nome").equals(selecionada)) {
-                                    txtImagem.setText(f.getString("url"));
-                                    break;
-                                }
-                            }
-                        }
-                    });
-                }
-            } catch (Exception e) {
-                SwingUtilities.invokeLater(() -> {
-                    setCursor(Cursor.getDefaultCursor());
-                    JOptionPane.showMessageDialog(this, "Erro ao carregar biblioteca: " + e.getMessage());
-                });
-            }
-        }).start();
+    // Método auxiliar para a JanelaGaleria chamar
+    public String executarUploadDireto(File selectedFile) throws Exception {
+        String siteUrl = "https://motelinteligente.com/";
+        String finalUrl = siteUrl + "api/upload_foto.php";
+        return uploadImage(finalUrl, selectedFile);
     }
 }
