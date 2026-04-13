@@ -16,6 +16,8 @@ import java.net.URL;
 import java.util.Date;
 import javax.imageio.ImageIO;
 import java.nio.file.Files;
+import javax.swing.SwingUtilities;
+import java.awt.Cursor;
 
 public class CadastraProdutoModerno extends JDialog {
 
@@ -44,31 +46,31 @@ public class CadastraProdutoModerno extends JDialog {
         setLocationRelativeTo(getParent());
         EstiloModerno.aplicarEstiloDialog(this);
 
-        JPanel mainPanel = new JPanel(
-                new MigLayout("fillx, insets 30, wrap 1", "[grow, fill]", "[]15[]5[]10[]5[]10[]5[]10[]5[]10[]5[]10[]5[grow]20[]"));
-        mainPanel.setBackground(EstiloModerno.BG_BACKGROUND); // Garante fundo correto
+        JPanel pnlPrincipal = new JPanel(
+                new MigLayout("fillx, insets 30, wrap 1", "[grow, fill]", "[]15[]5[]10[]5[]10[]5[]10[]5[]10[]5[]10[]5[]10[]5[]10[]5[grow]15[]10[]20[]"));
+        pnlPrincipal.setBackground(EstiloModerno.BG_BACKGROUND); // Garante fundo correto
 
-        mainPanel.add(EstiloModerno.criarTitulo("Detalhes do Produto"), "center");
+        pnlPrincipal.add(EstiloModerno.criarTitulo("Detalhes do Produto"), "center");
 
         // Campos
-        mainPanel.add(EstiloModerno.criarLabel("Código (ID)"));
+        pnlPrincipal.add(EstiloModerno.criarLabel("Código (ID)"));
         txtId = EstiloModerno.criarInput();
-        mainPanel.add(txtId);
+        pnlPrincipal.add(txtId);
 
-        mainPanel.add(EstiloModerno.criarLabel("Descrição / Nome"));
+        pnlPrincipal.add(EstiloModerno.criarLabel("Descrição / Nome"));
         txtDescricao = EstiloModerno.criarInput();
-        mainPanel.add(txtDescricao);
+        pnlPrincipal.add(txtDescricao);
 
-        mainPanel.add(EstiloModerno.criarLabel("Valor Unitário (R$)"));
+        pnlPrincipal.add(EstiloModerno.criarLabel("Valor Unitário (R$)"));
         txtValor = EstiloModerno.criarInput();
-        mainPanel.add(txtValor);
+        pnlPrincipal.add(txtValor);
 
-        mainPanel.add(EstiloModerno.criarLabel("Categoria"));
+        pnlPrincipal.add(EstiloModerno.criarLabel("Categoria"));
         txtCategoria = EstiloModerno.criarInput();
         txtCategoria.setText("Diversos");
-        mainPanel.add(txtCategoria);
+        pnlPrincipal.add(txtCategoria);
 
-        mainPanel.add(EstiloModerno.criarLabel("Imagem (URL ou Upload)"));
+        pnlPrincipal.add(EstiloModerno.criarLabel("Imagem (URL ou Upload)"));
         JPanel imgPanel = new JPanel(new MigLayout("insets 0", "[grow]10[]", "[]"));
         imgPanel.setOpaque(false);
         txtImagem = EstiloModerno.criarInput();
@@ -77,14 +79,14 @@ public class CadastraProdutoModerno extends JDialog {
         JButton btnUpload = EstiloModerno.criarBotaoPrincipal("Subir Foto", null);
         btnUpload.addActionListener(e -> selecionarFazerUpload());
         imgPanel.add(btnUpload);
-        mainPanel.add(imgPanel);
+        pnlPrincipal.add(imgPanel);
 
-        mainPanel.add(EstiloModerno.criarLabel("Descrição Detalhada / Detalhes"));
+        pnlPrincipal.add(EstiloModerno.criarLabel("Descrição Detalhada / Detalhes"));
         txtDetalhes = new JTextArea(4, 20);
         txtDetalhes.setLineWrap(true);
         txtDetalhes.setWrapStyleWord(true);
         JScrollPane scrollDetalhes = new JScrollPane(txtDetalhes);
-        mainPanel.add(scrollDetalhes, "growx, height 80!");
+        pnlPrincipal.add(scrollDetalhes, "growx, height 80!");
 
         JPanel stockPanel = new JPanel(new MigLayout("insets 0", "[]10[grow]", "[]"));
         stockPanel.setOpaque(false);
@@ -97,8 +99,8 @@ public class CadastraProdutoModerno extends JDialog {
         txtEstoque.setEnabled(false);
         stockPanel.add(txtEstoque, "growx");
 
-        mainPanel.add(EstiloModerno.criarLabel("Estoque Disponível"));
-        mainPanel.add(stockPanel, "growx");
+        pnlPrincipal.add(EstiloModerno.criarLabel("Estoque Disponível"));
+        pnlPrincipal.add(stockPanel, "growx");
 
         // Logic for Checkbox
         chkControlarEstoque.addActionListener(e -> {
@@ -126,9 +128,9 @@ public class CadastraProdutoModerno extends JDialog {
         btnPanel.add(btnVoltar, "growx");
         btnPanel.add(btnSalvar, "growx");
 
-        mainPanel.add(btnPanel, "growx, pushy, bottom");
+        pnlPrincipal.add(btnPanel, "growx, pushy, bottom");
 
-        add(mainPanel);
+        add(pnlPrincipal);
     }
 
     private void carregarDados(int id) {
@@ -209,7 +211,7 @@ public class CadastraProdutoModerno extends JDialog {
         fileChooser.setDialogTitle("Selecionar Foto do Produto");
         fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Imagens", "jpg", "jpeg", "png", "webp"));
 
-        if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_VALUE) {
+        if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
             
             // Pergunta a URL do site (pode ser automatizado depois)

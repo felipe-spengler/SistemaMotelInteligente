@@ -21,7 +21,7 @@ ALTER TABLE `registralocado` ADD COLUMN `periodo_locado` VARCHAR(50) DEFAULT NUL
 UPDATE configuracoes SET pedidos_online = 0;
 ALTER TABLE produtos ADD COLUMN categoria VARCHAR(100) DEFAULT 'Diversos';
 ALTER TABLE produtos ADD COLUMN imagem VARCHAR(255) DEFAULT NULL;
-ALTER TABLE produtos ADD COLUMN descricao TEXT DEFAULT NULL;
+ALTER TABLE produtos ADD COLUMN detalhes TEXT DEFAULT NULL;
 
 -- 4. Suporte a Pedidos Online via Cardápio
 CREATE TABLE IF NOT EXISTS `pedidos_online` (
