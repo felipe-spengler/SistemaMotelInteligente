@@ -18,6 +18,7 @@ public class CadastraProdutoModerno extends JDialog {
     private JTextField txtValor;
     private JTextField txtEstoque;
     private JCheckBox chkControlarEstoque;
+    private JTextField txtCategoria;
     private boolean atualizar = false;
 
     public CadastraProdutoModerno(Window parent, int idPassado) { // Aceita Window (JFrame ou JDialog)
@@ -53,6 +54,11 @@ public class CadastraProdutoModerno extends JDialog {
         mainPanel.add(EstiloModerno.criarLabel("Valor Unitário (R$)"));
         txtValor = EstiloModerno.criarInput();
         mainPanel.add(txtValor);
+
+        mainPanel.add(EstiloModerno.criarLabel("Categoria"));
+        txtCategoria = EstiloModerno.criarInput();
+        txtCategoria.setText("Diversos");
+        mainPanel.add(txtCategoria);
 
         JPanel stockPanel = new JPanel(new MigLayout("insets 0", "[]10[grow]", "[]"));
         stockPanel.setOpaque(false);
@@ -106,6 +112,7 @@ public class CadastraProdutoModerno extends JDialog {
             txtDescricao.setText(produto.getDescricao());
             txtValor.setText(String.valueOf(produto.getValor()));
             txtEstoque.setText(String.valueOf(produto.getEstoque()));
+            txtCategoria.setText(produto.getCategoria() != null ? produto.getCategoria() : "Diversos");
 
             if (!produto.getEstoque().equals("-")) {
                 chkControlarEstoque.setSelected(true);
@@ -129,6 +136,7 @@ public class CadastraProdutoModerno extends JDialog {
         String descricao = txtDescricao.getText();
         float valor = 0;
         String estoque = txtEstoque.getText();
+        String categoria = txtCategoria.getText();
 
         if (descricao.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Descrição obrigatória");
@@ -155,7 +163,7 @@ public class CadastraProdutoModerno extends JDialog {
         java.sql.Timestamp data = new java.sql.Timestamp(dataAtual.getTime());
         dao.exclusao(idProduto); // Remove anterior (logica legado)
 
-        vprodutos novo = new vprodutos(idProduto, descricao, valor, estoque, data);
+        vprodutos novo = new vprodutos(idProduto, descricao, valor, estoque, data, categoria);
         if (dao.insercao(novo)) {
             JOptionPane.showMessageDialog(this, "Salvo com sucesso!");
             dispose();

@@ -2455,10 +2455,10 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         dados.getCacheQuarto().put(quartoMudar, quarto);
         if (statusColocar.contains("ocupado")) {
             dados.carregarOcupado(quartoMudar);
-        }
-        if (statusColocar.equals("limpeza")) {
+        } else {
             dados.getCacheOcupado().remove(quartoMudar);
         }
+        
         return true;
 
     }

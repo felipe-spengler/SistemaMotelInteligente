@@ -53,6 +53,14 @@ public class ReceberNumeroQuartoController {
                     new playSound().playSound("som/mensagem conferencia.wav");
                 } else if (acao.equals("reservar")) {
                     if (quartoEmFoco != 0) {
+                        CacheDados cache = CacheDados.getInstancia();
+                        String statusAtual = cache.getCacheQuarto().get(quartoEmFoco).getStatusQuarto();
+                        
+                        if (statusAtual != null && statusAtual.startsWith("ocupado")) {
+                            logger.warn("Tentativa de reservar quarto ocupado bloqueada: {}", quartoEmFoco);
+                            return new ResponseEntity<>("Quarto ocupado, não é possível reservar.", HttpStatus.FORBIDDEN);
+                        }
+
                         mudaStatusNaCache(quartoEmFoco, "reservado");
                         configGlobal config = configGlobal.getInstance();
                         config.setMudanca(true);
@@ -74,6 +82,14 @@ public class ReceberNumeroQuartoController {
                     }
                 } else if (acao.equals("manutencao")) {
                     if (quartoEmFoco != 0) {
+                        CacheDados cache = CacheDados.getInstancia();
+                        String statusAtual = cache.getCacheQuarto().get(quartoEmFoco).getStatusQuarto();
+                        
+                        if (statusAtual != null && statusAtual.startsWith("ocupado")) {
+                            logger.warn("Tentativa de colocar quarto ocupado em manutenção bloqueada: {}", quartoEmFoco);
+                            return new ResponseEntity<>("Quarto ocupado, não é possível alterar para manutenção.", HttpStatus.FORBIDDEN);
+                        }
+
                         mudaStatusNaCache(quartoEmFoco, "manutencao");
                         configGlobal config = configGlobal.getInstance();
                         config.setMudanca(true);
@@ -95,6 +111,14 @@ public class ReceberNumeroQuartoController {
                     }
                 } else if (acao.equals("disponibilizar")) {
                     if (quartoEmFoco != 0) {
+                        CacheDados cache = CacheDados.getInstancia();
+                        String statusAtual = cache.getCacheQuarto().get(quartoEmFoco).getStatusQuarto();
+                        
+                        if (statusAtual != null && statusAtual.startsWith("ocupado")) {
+                            logger.warn("Tentativa de disponibilizar quarto ocupado bloqueada para evitar a perda da locação: {}", quartoEmFoco);
+                            return new ResponseEntity<>("Quarto ocupado, não é possível disponibilizar.", HttpStatus.FORBIDDEN);
+                        }
+                        
                         mudaStatusNaCache(quartoEmFoco, "livre");
                         configGlobal config = configGlobal.getInstance();
                         config.setMudanca(true);
@@ -164,7 +188,9 @@ public class ReceberNumeroQuartoController {
         quarto.setHoraStatus(String.valueOf(timestamp));
         dados.getCacheQuarto().put(quartoMudar, quarto);
 
-        if (statusColocar.equals("limpeza")) {
+        if (statusColocar.contains("ocupado")) {
+            dados.carregarOcupado(quartoMudar);
+        } else {
             dados.getCacheOcupado().remove(quartoMudar);
         }
         return true;

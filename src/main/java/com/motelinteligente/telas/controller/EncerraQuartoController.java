@@ -10,6 +10,7 @@ import com.motelinteligente.dados.configGlobal;
 import com.motelinteligente.dados.fazconexao;
 import com.motelinteligente.dados.fprodutos;
 import com.motelinteligente.dados.fquartos;
+import com.motelinteligente.dados.PeriodoQuarto;
 import com.motelinteligente.dados.playSound;
 import com.motelinteligente.dados.vendaProdutos;
 
@@ -45,6 +46,7 @@ public class EncerraQuartoController {
     private float valorAcrescimo = 0;
     private float valorRecebidoAntecipado = 0; // Valor já recebido anteriormente (ex: entrada)
     private float valorRecebidoAgora = 0; // Valor digitado no campo de recebimento manual
+    private String periodoFinalStr = "Periodo Padrão"; // Armazena a descrição do periodo final cobrado
 
     // Valores de pagamento processados no JOP
     private float valD = 0; // Dinheiro
@@ -86,21 +88,69 @@ public class EncerraQuartoController {
             // Adicional por Pessoa
             valorAdicionalPessoa = calculaAdicionalPessoa(ocupado.getNumeroPessoas());
 
-            // Adicional por Período ou Pernoite
-            if (partes.length > 1) {
-                if (partes[1].equals("pernoite")) {
-                    valorQuarto = ocupado.getValorPernoite();
-                    int numeroAdicionais = subtrairHora(numeroDoQuarto, horarioQuarto, "pernoite");
-                    valorAdicionalPeriodo = (float) numeroAdicionais * ocupado.getValorAdicional();
-                } else if (partes[1].equals("periodo")) {
-                    valorQuarto = ocupado.getValorPeriodo();
-                    int numeroAdicionais = subtrairHora(numeroDoQuarto, horarioQuarto, ocupado.getTempoPeriodo());
-                    valorAdicionalPeriodo = (float) numeroAdicionais * ocupado.getValorAdicional();
+            List<PeriodoQuarto> periodos = quartodao.getPeriodos(numeroDoQuarto);
+
+            if (periodos != null && !periodos.isEmpty()) {
+                // NOVO MODELO (DINAMICO E CONTINUO)
+                String diferenca = calculaData(horarioQuarto);
+                String[] partesDif = diferenca.split(":");
+                int horasPassadas = Integer.parseInt(partesDif[0]);
+                int minutosPassados = Integer.parseInt(partesDif[1]);
+                int totalMinutosPassados = (horasPassadas * 60) + minutosPassados;
+
+                valorQuarto = periodos.get(0).getValor();
+                PeriodoQuarto periodoEncontrado = periodos.get(0);
+
+                if (partes.length > 1 && partes[1].equals("pernoite")) {
+                    for (PeriodoQuarto p : periodos) {
+                        if (p.isPernoite()) {
+                            periodoEncontrado = p;
+                            break;
+                        }
+                    }
+                } else {
+                    for (PeriodoQuarto p : periodos) {
+                        if (totalMinutosPassados > p.getTempoMinutos() && !p.isPernoite()) {
+                            continue;
+                        }
+                        periodoEncontrado = p;
+                        break;
+                    }
                 }
+
+                valorQuarto = periodoEncontrado.getValor();
+                periodoFinalStr = periodoEncontrado.getDescricao();
+                valorAdicionalPeriodo = 0;
+
+                // Horas adicionais (caso ultrapasse o pernoite ou ultimo maior periodo)
+                if (totalMinutosPassados > periodoEncontrado.getTempoMinutos()) {
+                    int sobraMinutos = totalMinutosPassados - periodoEncontrado.getTempoMinutos();
+                    int add = 0;
+                    while (sobraMinutos > 0) {
+                        add++;
+                        sobraMinutos -= 60;
+                    }
+                    valorAdicionalPeriodo = (float) add * ocupado.getValorAdicional();
+                }
+
             } else {
-                // Caso fallback se status não tiver hifen (ex "ocupado")
-                // Assumindo periodo por padrão ou logica antiga
-                valorQuarto = ocupado.getValorPeriodo();
+                // MODELO ANTIGO (FALLBACK)
+                if (partes.length > 1) {
+                    if (partes[1].equals("pernoite")) {
+                        valorQuarto = ocupado.getValorPernoite();
+                        periodoFinalStr = "Pernoite";
+                        int numeroAdicionais = subtrairHora(numeroDoQuarto, horarioQuarto, "pernoite");
+                        valorAdicionalPeriodo = (float) numeroAdicionais * ocupado.getValorAdicional();
+                    } else if (partes[1].equals("periodo")) {
+                        valorQuarto = ocupado.getValorPeriodo();
+                        periodoFinalStr = "Período Base";
+                        int numeroAdicionais = subtrairHora(numeroDoQuarto, horarioQuarto, ocupado.getTempoPeriodo());
+                        valorAdicionalPeriodo = (float) numeroAdicionais * ocupado.getValorAdicional();
+                    }
+                } else {
+                    valorQuarto = ocupado.getValorPeriodo();
+                    periodoFinalStr = "Período Base";
+                }
             }
         }
     }
@@ -333,7 +383,7 @@ public class EncerraQuartoController {
         Timestamp tsFim = new Timestamp(System.currentTimeMillis());
         Timestamp tsInicio = (dataInicio != null && !dataInicio.equals("N/A")) ? Timestamp.valueOf(dataInicio) : tsFim;
 
-        quartodao.salvaLocacao(idLocacao, tsInicio, tsFim, valorTotalQuarto, valorConsumo, valD, valP, valC);
+        quartodao.salvaLocacao(idLocacao, tsInicio, tsFim, valorTotalQuarto, valorConsumo, valD, valP, valC, periodoFinalStr);
 
         // 5. Sons e Hardware
         new playSound().playSound("som/agradecemosPreferencia.wav");

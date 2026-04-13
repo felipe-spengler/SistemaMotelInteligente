@@ -103,6 +103,24 @@ public class CadastraQuartoModerno extends JFrame {
 
         cardForm.add(pnlTempo, "span 2, wrap");
 
+        // Botao Períodos Dinâmicos (NOVO MODELO)
+        JButton btnPeriodosDinamicos = EstiloModerno.criarBotaoSecundario("Configurar Períodos (Novo Modelo)", null);
+        btnPeriodosDinamicos.setBackground(new Color(99, 102, 241));
+        btnPeriodosDinamicos.setForeground(Color.WHITE);
+        btnPeriodosDinamicos.addActionListener(e -> {
+            String numStr = txtNumero.getText().trim();
+            if(numStr.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Selecione ou digite o número do quarto primeiro!");
+                return;
+            }
+            try {
+                int quartoSel = Integer.parseInt(numStr);
+                DialogPeriodosModerno dialog = new DialogPeriodosModerno(this, quartoSel);
+                dialog.setVisible(true);
+            } catch (Exception ex) {}
+        });
+        cardForm.add(btnPeriodosDinamicos, "span 2, growx, wrap");
+
         // Botões
         JButton btnSalvar = EstiloModerno.criarBotaoPrincipal("Salvar Quarto", null);
         btnSalvar.addActionListener(e -> salvarQuarto());

@@ -373,9 +373,9 @@ public class fquartos {
     }
 
     public void salvaLocacao(int idPassado, Timestamp horaInicio, Timestamp horaFim, float valorDoQuarto,
-            float valorConsumo, float valD, float valP, float valC) {
+            float valorConsumo, float valD, float valP, float valC, String periodoLocado) {
         int idCaixa = configGlobal.getInstance().getCaixa();
-        String consultaSQL = "UPDATE registralocado SET horafim=?, horainicio=?, valorquarto=?, valorconsumo=?, pagodinheiro=?, pagopix=?, pagocartao=?, idcaixaatual=? WHERE idlocacao=?";
+        String consultaSQL = "UPDATE registralocado SET horafim=?, horainicio=?, valorquarto=?, valorconsumo=?, pagodinheiro=?, pagopix=?, pagocartao=?, idcaixaatual=?, periodo_locado=? WHERE idlocacao=?";
         try (Connection link = conexao.conectar(); PreparedStatement statement = link.prepareStatement(consultaSQL)) {
             statement.setTimestamp(1, horaFim);
             statement.setTimestamp(2, horaInicio);
@@ -385,7 +385,8 @@ public class fquartos {
             statement.setFloat(6, valP);
             statement.setFloat(7, valC);
             statement.setInt(8, idCaixa);
-            statement.setInt(9, idPassado);
+            statement.setString(9, periodoLocado);
+            statement.setInt(10, idPassado);
             int rows = statement.executeUpdate();
             if (rows > 0) {
                 logger.info("Locação encerrada. ID: " + idPassado + ", Vl. Quarto: " + valorDoQuarto + ", Vl. Consumo: "
@@ -794,5 +795,30 @@ public class fquartos {
         }
 
         return null;
+    }
+
+    public List<PeriodoQuarto> getPeriodos(int numeroQuarto) {
+        List<PeriodoQuarto> periodos = new ArrayList<>();
+        String consultaSQL = "SELECT * FROM periodos_quarto WHERE numeroquarto = ? ORDER BY ordem";
+        try (Connection link = conexao.conectar(); PreparedStatement statement = link.prepareStatement(consultaSQL)) {
+            statement.setInt(1, numeroQuarto);
+            try (ResultSet resultado = statement.executeQuery()) {
+                while (resultado.next()) {
+                    PeriodoQuarto pq = new PeriodoQuarto();
+                    pq.setId(resultado.getInt("id"));
+                    pq.setNumeroQuarto(resultado.getInt("numeroquarto"));
+                    pq.setDescricao(resultado.getString("descricao"));
+                    pq.setTempoMinutos(resultado.getInt("tempo_minutos"));
+                    pq.setValor(resultado.getFloat("valor"));
+                    pq.setIsPernoite(resultado.getInt("is_pernoite") == 1);
+                    pq.setOrdem(resultado.getInt("ordem"));
+                    periodos.add(pq);
+                }
+            }
+        } catch (SQLException e) {
+            // Se tabela não existe ignorar para fallback no antigo
+            logger.warn("Tabela periodos_quarto pode não existir. Usando fallback.");
+        }
+        return periodos;
     }
 }

@@ -15,6 +15,7 @@ public class vprodutos {
     float valor;
     String estoque;
     Timestamp dataCompra;
+    String categoria;
 
     public vprodutos() {
     }
@@ -65,6 +66,24 @@ public class vprodutos {
         this.valor = valor;
         this.estoque = estoque;
         this.dataCompra = dataCompra;
+        this.categoria = "Diversos";
+    }
+
+    public vprodutos(int idProduto, String descricao, float valor, String estoque, Timestamp dataCompra, String categoria) {
+        this.idProduto = idProduto;
+        this.descricao = descricao;
+        this.valor = valor;
+        this.estoque = estoque;
+        this.dataCompra = dataCompra;
+        this.categoria = categoria;
+    }
+
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
     }
 
 }

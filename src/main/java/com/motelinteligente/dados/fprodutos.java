@@ -39,6 +39,11 @@ public class fprodutos {
                     produto.setValor(resultado.getFloat("valorproduto"));
                     produto.setEstoque(resultado.getString("estoque"));
                     produto.setDataCompra(resultado.getTimestamp("ultimacompra"));
+                    try {
+                        produto.setCategoria(resultado.getString("categoria"));
+                    } catch (SQLException ex) {
+                        produto.setCategoria("Diversos");
+                    }
                     produtos.add(produto);
                 }
             }
@@ -153,8 +158,8 @@ public class fprodutos {
 
     public boolean insercao(vprodutos dados) {
 
-        String sql = "INSERT INTO produtos (idproduto, descricao, valorproduto, estoque, ultimacompra) "
-                + "VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO produtos (idproduto, descricao, valorproduto, estoque, ultimacompra, categoria) "
+                + "VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection link = new fazconexao().conectar();
                 PreparedStatement st = link.prepareStatement(sql)) {
@@ -164,6 +169,7 @@ public class fprodutos {
             st.setFloat(3, dados.getValor());
             st.setString(4, dados.getEstoque());
             st.setTimestamp(5, dados.getDataCompra());
+            st.setString(6, dados.getCategoria() != null ? dados.getCategoria() : "Diversos");
 
             boolean result = st.executeUpdate() > 0;
             if (result)
@@ -215,6 +221,11 @@ public class fprodutos {
                     produto.setDescricao(rs.getString("descricao"));
                     produto.setValor(rs.getFloat("valorproduto"));
                     produto.setEstoque(rs.getString("estoque"));
+                    try {
+                        produto.setCategoria(rs.getString("categoria"));
+                    } catch (SQLException ex) {
+                        produto.setCategoria("Diversos");
+                    }
                 }
             }
 
