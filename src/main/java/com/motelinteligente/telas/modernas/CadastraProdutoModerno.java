@@ -9,7 +9,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Date;
+import javax.imageio.ImageIO;
+import java.nio.file.Files;
 
 public class CadastraProdutoModerno extends JDialog {
 
@@ -39,7 +45,7 @@ public class CadastraProdutoModerno extends JDialog {
         EstiloModerno.aplicarEstiloDialog(this);
 
         JPanel mainPanel = new JPanel(
-                new MigLayout("fillx, insets 30, wrap 1", "[grow, fill]", "[]15[]5[]12[]5[]12[]5[]12[]5[]12[]5[]12[]5[grow]20[]"));
+                new MigLayout("fillx, insets 30, wrap 1", "[grow, fill]", "[]15[]5[]10[]5[]10[]5[]10[]5[]10[]5[]10[]5[grow]20[]"));
         mainPanel.setBackground(EstiloModerno.BG_BACKGROUND); // Garante fundo correto
 
         mainPanel.add(EstiloModerno.criarTitulo("Detalhes do Produto"), "center");
@@ -62,9 +68,16 @@ public class CadastraProdutoModerno extends JDialog {
         txtCategoria.setText("Diversos");
         mainPanel.add(txtCategoria);
 
-        mainPanel.add(EstiloModerno.criarLabel("URL da Imagem (Opcional)"));
+        mainPanel.add(EstiloModerno.criarLabel("Imagem (URL ou Upload)"));
+        JPanel imgPanel = new JPanel(new MigLayout("insets 0", "[grow]10[]", "[]"));
+        imgPanel.setOpaque(false);
         txtImagem = EstiloModerno.criarInput();
-        mainPanel.add(txtImagem);
+        imgPanel.add(txtImagem, "growx");
+
+        JButton btnUpload = EstiloModerno.criarBotaoPrincipal("Subir Foto", null);
+        btnUpload.addActionListener(e -> selecionarFazerUpload());
+        imgPanel.add(btnUpload);
+        mainPanel.add(imgPanel);
 
         mainPanel.add(EstiloModerno.criarLabel("Descrição Detalhada / Detalhes"));
         txtDetalhes = new JTextArea(4, 20);
@@ -190,5 +203,78 @@ public class CadastraProdutoModerno extends JDialog {
                 ((ProdutoModerno) parent).atualizarTela();
             }
         }
+    }
+    private void selecionarFazerUpload() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Selecionar Foto do Produto");
+        fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Imagens", "jpg", "jpeg", "png", "webp"));
+
+        if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_VALUE) {
+            File selectedFile = fileChooser.getSelectedFile();
+            
+            // Pergunta a URL do site (pode ser automatizado depois)
+            String siteUrl = JOptionPane.showInputDialog(this, "Confirme a URL do Site (ex: http://motel.com.br):", "Configuração de Upload", JOptionPane.QUESTION_MESSAGE);
+            if (siteUrl == null || siteUrl.isEmpty()) return;
+            if (!siteUrl.endsWith("/")) siteUrl += "/";
+
+            final String finalUrl = siteUrl + "api/upload_foto.php";
+            
+            // Mostra loading
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+
+            new Thread(() -> {
+                try {
+                    String response = uploadImage(finalUrl, selectedFile);
+                    SwingUtilities.invokeLater(() -> {
+                        setCursor(Cursor.getDefaultCursor());
+                        if (response != null && response.contains("\"success\":true")) {
+                            // Extrai URL do JSON (simplificado)
+                            String url = response.split("\"url\":\"")[1].split("\"")[0];
+                            txtImagem.setText(url);
+                            JOptionPane.showMessageDialog(this, "Foto enviada e otimizada com sucesso!");
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Erro no upload: " + response);
+                        }
+                    });
+                } catch (Exception ex) {
+                    SwingUtilities.invokeLater(() -> {
+                        setCursor(Cursor.getDefaultCursor());
+                        JOptionPane.showMessageDialog(this, "Erro técnico: " + ex.getMessage());
+                    });
+                }
+            }).start();
+        }
+    }
+
+    private String uploadImage(String targetURL, File file) throws Exception {
+        String boundary = "---" + System.currentTimeMillis() + "---";
+        URL url = new URL(targetURL);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setDoOutput(true);
+        conn.setRequestMethod("POST");
+        conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
+
+        try (OutputStream out = conn.getOutputStream();
+             PrintWriter writer = new PrintWriter(new OutputStreamWriter(out, "UTF-8"), true)) {
+            
+            writer.println("--" + boundary);
+            writer.println("Content-Disposition: form-data; name=\"foto\"; filename=\"" + file.getName() + "\"");
+            writer.println("Content-Type: image/jpeg");
+            writer.println();
+            writer.flush();
+
+            Files.copy(file.toPath(), out);
+            out.flush();
+            
+            writer.println();
+            writer.println("--" + boundary + "--");
+        }
+
+        StringBuilder response = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+            String line;
+            while ((line = reader.readLine()) != null) response.append(line);
+        }
+        return response.toString();
     }
 }
