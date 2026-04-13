@@ -815,8 +815,9 @@ public class fquartos {
                     periodos.add(pq);
                 }
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             // Se tabela não existe ignorar para fallback no antigo
+            // Usamos Exception genérica pois o driver/proxy pode jogar UndeclaredThrowableException
             logger.warn("Tabela periodos_quarto pode não existir. Usando fallback.");
         }
         return periodos;

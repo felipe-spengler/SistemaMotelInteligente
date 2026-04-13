@@ -49,7 +49,7 @@ public class ProdutoModerno extends JFrame {
         JPanel cardTable = EstiloModerno.criarCard(); // Fundo branco arredondado
         cardTable.setLayout(new BorderLayout()); // Usa todo espaço do card
 
-        String[] cols = { "ID", "Produto / Serviço", "Valor (R$)", "Estoque", "Última Compra" };
+        String[] cols = { "ID", "Categoria", "Produto / Serviço", "Valor (R$)", "Estoque", "Última Compra" };
         tableModel = new DefaultTableModel(cols, 0) {
             @Override
             public boolean isCellEditable(int row, int col) {
@@ -65,10 +65,10 @@ public class ProdutoModerno extends JFrame {
         tabela.getTableHeader().putClientProperty("FlatLaf.style",
                 "font:bold; background:#F9FAFB; border: 0,0,1,0, #E5E7EB");
 
-        // Center the "Valor (R$)" column (index 2)
+        // Center the "Valor (R$)" column (index 3 agora)
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(JLabel.CENTER);
-        tabela.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
+        tabela.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
 
         JScrollPane scroll = new JScrollPane(tabela);
         scroll.setBorder(BorderFactory.createEmptyBorder());
@@ -105,6 +105,7 @@ public class ProdutoModerno extends JFrame {
         for (vprodutos p : new fprodutos().mostrarProduto()) {
             tableModel.addRow(new Object[] {
                     p.getIdProduto(),
+                    p.getCategoria(),
                     p.getDescricao(),
                     p.getValor(),
                     p.getEstoque(),

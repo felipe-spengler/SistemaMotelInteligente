@@ -32,7 +32,7 @@ public class CadastraProdutoModerno extends JDialog {
 
     private void initUI() {
         setTitle(atualizar ? "Editar Produto" : "Novo Produto");
-        setSize(450, 500);
+        setSize(500, 650);
         setLocationRelativeTo(getParent());
         EstiloModerno.aplicarEstiloDialog(this);
 
