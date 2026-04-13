@@ -178,7 +178,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         tabela1.getColumn(tabela1.getColumnName(1)).setPreferredWidth(80);
         tabela1.getColumn(tabela1.getColumnName(2)).setPreferredWidth(35);
         tabela1.getColumn(tabela1.getColumnName(3)).setPreferredWidth(70);
-        numeroQuartos = new fquartos().numeroQuartos();
         txtPessoas.setDocument(new NumOnly());
 
         this.setVisible(true);

@@ -200,7 +200,6 @@ public class ConfiguracoesModerno extends JFrame {
 
         if (devices.length > 0) {
             jComboBoxTelas.setSelectedIndex(devices.length - 1);
-            telaMostrar = devices[devices.length - 1].getIDstring();
         }
     }
 
