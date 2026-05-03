@@ -49,109 +49,104 @@ public class TelaPrincipalController {
         this.mapaQuadrados = mapaQuadrados;
     }
 
+    private final Object lock = new Object();
+
     public void atualizarQuartos(javax.swing.JComponent srPane) {
-        // Removido debounce para garantir resposta imediata da UI conforme solicitado
-        CacheDados cacheDados = CacheDados.getInstancia();
-        int totalQuartos = cacheDados.getCacheQuarto().size();
-        
-        // Força rebuild se o container estiver vazio ou o número de quartos mudou
-        boolean precisaRebuild = mapaQuadrados.isEmpty() 
-                || mapaQuadrados.size() != totalQuartos
-                || srPane.getComponentCount() == 0;
-
-        if (precisaRebuild) {
-            srPane.removeAll();
+        synchronized (lock) {
+            CacheDados cacheDados = CacheDados.getInstancia();
+            int totalQuartos = cacheDados.getCacheQuarto().size();
             
-            // Lógica dinâmica de colunas baseada no número de quartos
-            int colunas = 3;
-            if (totalQuartos > 24) {
-                colunas = 5;
-            } else if (totalQuartos > 10) {
-                colunas = 4;
-            }
-            
-            srPane.setLayout(new GridLayout(0, colunas, 0, 0)); 
-            srPane.removeAll(); // LIMPA OS QUARTOS ANTIGOS ANTES DE ADICIONAR OS NOVOS
-            mapaQuadrados.clear();
-            
-            // Ajusta o tamanho máximo e preferido vertical do srPane para não esticar os quadrados demais
-            // Teste com 180px para ver a diferença
-            int linhas = (int) Math.ceil((double) totalQuartos / colunas);
-            int alturaMaxima = linhas * 180; 
-            
-            srPane.setPreferredSize(new Dimension(srPane.getPreferredSize().width, alturaMaxima));
-            srPane.setMaximumSize(new Dimension(Short.MAX_VALUE, alturaMaxima));
-            
-            System.out.println("DEBUG: Altura maxima calculada para " + linhas + " linhas: " + alturaMaxima + "px (" + (alturaMaxima/linhas) + "px por quarto)");
-        }
+            // Força rebuild se o container estiver vazio, o número de quartos mudou 
+            // ou se detectarmos duplicação (mais componentes que quartos)
+            boolean precisaRebuild = mapaQuadrados.isEmpty() 
+                    || mapaQuadrados.size() != totalQuartos
+                    || srPane.getComponentCount() != totalQuartos;
 
-        Color outroVerde = new Color(0, 200, 0);
-        Color meuVerde = new Color(30, 255, 50);
-        Color meuAmarelo = new Color(238, 243, 96);
-        Color outroAmarelo = new Color(238, 213, 0);
-        Color meuCinza = new Color(204, 204, 204);
-        Color outroCinza = new Color(155, 155, 155);
-        Color meuVermelho = new Color(255, 70, 72);
-        Color outroVermelho = new Color(213, 0, 30);
-        Color outroAzul = new Color(0, 21, 111);
-
-        for (Map.Entry<Integer, CarregaQuarto> entry : cacheDados.getCacheQuarto().entrySet()) {
-            CarregaQuarto q = entry.getValue();
-            int num = q.getNumeroQuarto();
-            String status = q.getStatusQuarto();
-
-            Quadrado quadrado = mapaQuadrados.get(num);
-            boolean novo = (quadrado == null);
-
-            String labelExtra = null;
-            Color corFundo = meuVerde;
-            Color corBorda = outroVerde;
-            boolean auto = false;
-
-            if (status.equals("livre")) {
-                corFundo = meuVerde;
-                corBorda = outroVerde;
-            } else if (status.equals("manutencao")) {
-                labelExtra = "MANUTENÇÃO";
-                corFundo = meuCinza;
-                corBorda = outroCinza;
-            } else if (status.equals("limpeza")) {
-                labelExtra = "LIMPEZA";
-                corFundo = meuAmarelo;
-                corBorda = outroAmarelo;
-            } else if (status.equals("reservado")) {
-                labelExtra = "RESERVADO";
-                corFundo = Color.cyan;
-                corBorda = outroAzul;
-            } else if (status.contains("-")) {
-                labelExtra = calculaData(q.getHoraStatus());
-                corBorda = outroVermelho;
-                auto = cacheDados.getCacheOcupado().containsKey(num)
-                        && cacheDados.getCacheOcupado().get(num).isAutoAtendimento();
-                if (status.split("-")[1].equals("pernoite"))
-                    corFundo = new Color(153, 51, 153);
-                else
-                    corFundo = meuVermelho;
+            if (precisaRebuild) {
+                srPane.removeAll();
+                
+                int colunas = 3;
+                if (totalQuartos > 24) {
+                    colunas = 5;
+                } else if (totalQuartos > 10) {
+                    colunas = 4;
+                }
+                
+                srPane.setLayout(new GridLayout(0, colunas, 0, 0)); 
+                mapaQuadrados.clear();
+                
+                int linhas = (int) Math.ceil((double) totalQuartos / colunas);
+                int alturaMaxima = linhas * 180; 
+                
+                srPane.setPreferredSize(new Dimension(srPane.getPreferredSize().width, alturaMaxima));
+                srPane.setMaximumSize(new Dimension(Short.MAX_VALUE, alturaMaxima));
             }
 
-            if (novo) {
-                quadrado = new Quadrado(num, q.getTipoQuarto(), labelExtra, corBorda, auto);
-                quadrado.setQuartoClickListener(view);
-                mapaQuadrados.put(num, quadrado);
-                srPane.add(quadrado);
-            } else if (quadrado != null) {
-                quadrado.atualizar(labelExtra, corBorda, auto);
-            }
+            Color meuVerde = new Color(30, 255, 50);
+            Color meuAmarelo = new Color(238, 243, 96);
+            Color meuCinza = new Color(204, 204, 204);
+            Color meuVermelho = new Color(255, 70, 72);
+            Color outroVerde = new Color(0, 200, 0);
+            Color outroAmarelo = new Color(238, 213, 0);
+            Color outroCinza = new Color(155, 155, 155);
+            Color outroVermelho = new Color(213, 0, 30);
+            Color outroAzul = new Color(0, 21, 111);
 
-            if (quadrado != null) {
+            for (Map.Entry<Integer, CarregaQuarto> entry : cacheDados.getCacheQuarto().entrySet()) {
+                CarregaQuarto q = entry.getValue();
+                int num = q.getNumeroQuarto();
+                String status = q.getStatusQuarto();
+
+                Quadrado quadrado = mapaQuadrados.get(num);
+                boolean novo = (quadrado == null);
+
+                String labelExtra = null;
+                Color corFundo = meuVerde;
+                Color corBorda = outroVerde;
+                boolean auto = false;
+
+                if (status.equals("livre")) {
+                    corFundo = meuVerde;
+                    corBorda = outroVerde;
+                } else if (status.equals("manutencao")) {
+                    labelExtra = "MANUTENÇÃO";
+                    corFundo = meuCinza;
+                    corBorda = outroCinza;
+                } else if (status.equals("limpeza")) {
+                    labelExtra = "LIMPEZA";
+                    corFundo = meuAmarelo;
+                    corBorda = outroAmarelo;
+                } else if (status.equals("reservado")) {
+                    labelExtra = "RESERVADO";
+                    corFundo = Color.cyan;
+                    corBorda = outroAzul;
+                } else if (status.contains("-")) {
+                    labelExtra = calculaData(q.getHoraStatus());
+                    corBorda = outroVermelho;
+                    auto = cacheDados.getCacheOcupado().containsKey(num)
+                            && cacheDados.getCacheOcupado().get(num).isAutoAtendimento();
+                    if (status.split("-")[1].equals("pernoite"))
+                        corFundo = new Color(153, 51, 153);
+                    else
+                        corFundo = meuVermelho;
+                }
+
+                if (novo) {
+                    quadrado = new Quadrado(num, q.getTipoQuarto(), labelExtra, corBorda, auto);
+                    quadrado.setQuartoClickListener(view);
+                    mapaQuadrados.put(num, quadrado);
+                    srPane.add(quadrado);
+                } else {
+                    quadrado.atualizar(labelExtra, corBorda, auto);
+                }
                 quadrado.setBackground(corFundo);
             }
-        }
 
-        if (precisaRebuild) {
-            srPane.revalidate();
+            if (precisaRebuild) {
+                srPane.revalidate();
+            }
+            srPane.repaint();
         }
-        srPane.repaint();
     }
 
     public void verificarAlarmes() {
