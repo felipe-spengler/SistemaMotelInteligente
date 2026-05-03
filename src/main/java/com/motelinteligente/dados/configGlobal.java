@@ -11,6 +11,7 @@ public class configGlobal {
     private static final Logger logger = LoggerFactory.getLogger(fquartos.class);
     private static configGlobal instancia;
     private String usuario;
+    private String senhaTemporaria;
     private String cargoUsuario;
     private int caixaAberto;
     private String telaMostrar;
@@ -172,6 +173,14 @@ public class configGlobal {
 
     public void setUsuario(String usuario) {
         this.usuario = usuario;
+    }
+
+    public String getSenhaTemporaria() {
+        return senhaTemporaria;
+    }
+
+    public void setSenhaTemporaria(String senhaTemporaria) {
+        this.senhaTemporaria = senhaTemporaria;
     }
 
     public String getCargoUsuario() {

@@ -369,7 +369,18 @@ public class TelaSistemaModerno extends JFrame {
     private void salvarSessaoAtual() {
         try {
             com.motelinteligente.dados.configGlobal config = com.motelinteligente.dados.configGlobal.getInstance();
-            logger.info("Sessão preparada para o usuário: " + config.getUsuario());
+            String user = config.getUsuario();
+            String pass = config.getSenhaTemporaria();
+            
+            if (user != null && pass != null) {
+                java.util.Properties props = new java.util.Properties();
+                props.setProperty("user", user);
+                props.setProperty("pass", pass);
+                try (java.io.FileOutputStream out = new java.io.FileOutputStream("session.tmp")) {
+                    props.store(out, "Sessao recuperada antes do update");
+                }
+                logger.info("Sessão salva com sucesso para o usuário: " + user);
+            }
         } catch (Exception e) {
             logger.error("Erro ao preparar sessão: " + e.getMessage());
         }

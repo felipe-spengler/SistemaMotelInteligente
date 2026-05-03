@@ -249,6 +249,7 @@ public class TelaLogin extends javax.swing.JFrame {
             dispose();
 
             // Salvar sessão para caso de atualização automática
+            configuracoes.setSenhaTemporaria(texto_senha);
             salvarSessaoTemp(texto_login, texto_senha);
         } else {
             JOptionPane.showMessageDialog(null, "Erro no login!!");
@@ -325,19 +326,10 @@ public class TelaLogin extends javax.swing.JFrame {
                             txt_senha.setText(props.getProperty("pass"));
                             bt_entrar.doClick();
 
-                            // Deleta o arquivo após usar por segurança
-                            sessionFile.delete();
-                        } else {
-                            // Fallback para admin se não houver arquivo
-                            txt_login.setText("admin");
-                            txt_senha.setText("admin");
-                            bt_entrar.doClick();
+                             // Se não houver arquivo, não tenta logar sozinho para não logar errado
                         }
                     } catch (Exception e) {
-                        // Fallback em caso de erro
-                        txt_login.setText("admin");
-                        txt_senha.setText("admin");
-                        bt_entrar.doClick();
+                        // Ignora erro
                     }
                     break;
                 }
