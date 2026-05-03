@@ -247,10 +247,26 @@ public class TelaLogin extends javax.swing.JFrame {
 
             // Fechar a tela de login
             dispose();
+
+            // Salvar sessão para caso de atualização automática
+            salvarSessaoTemp(texto_login, texto_senha);
         } else {
             JOptionPane.showMessageDialog(null, "Erro no login!!");
         }
     }// GEN-LAST:event_bt_entrarActionPerformed
+
+    private void salvarSessaoTemp(String user, String pass) {
+        try {
+            java.util.Properties props = new java.util.Properties();
+            props.setProperty("user", user);
+            props.setProperty("pass", pass);
+            java.io.FileOutputStream out = new java.io.FileOutputStream("session.tmp");
+            props.store(out, "Sessao temporaria para auto-login apos atualizacao");
+            out.close();
+        } catch (Exception e) {
+            // Ignora erro ao salvar sessão
+        }
+    }
 
     private void txt_loginActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_txt_loginActionPerformed
         // TODO add your handling code here:
@@ -280,14 +296,53 @@ public class TelaLogin extends javax.swing.JFrame {
         }
 
         /* Create and display the form */
+        final String[] arguments = args;
         java.awt.EventQueue.invokeLater(() -> {
             try {
-                new TelaLogin().setVisible(true);
+                TelaLogin login = new TelaLogin();
+                login.setVisible(true);
+                login.checkAutoLogin(arguments);
             } catch (IOException ex) {
                 java.util.logging.Logger.getLogger(TelaLogin.class.getName()).log(java.util.logging.Level.SEVERE, null,
                         ex);
             }
         });
+    }
+
+    private void checkAutoLogin(String[] args) {
+        if (args != null) {
+            for (String arg : args) {
+                if ("--after-update".equals(arg)) {
+                    try {
+                        java.io.File sessionFile = new java.io.File("session.tmp");
+                        if (sessionFile.exists()) {
+                            java.util.Properties props = new java.util.Properties();
+                            java.io.FileInputStream in = new java.io.FileInputStream(sessionFile);
+                            props.load(in);
+                            in.close();
+
+                            txt_login.setText(props.getProperty("user"));
+                            txt_senha.setText(props.getProperty("pass"));
+                            bt_entrar.doClick();
+
+                            // Deleta o arquivo após usar por segurança
+                            sessionFile.delete();
+                        } else {
+                            // Fallback para admin se não houver arquivo
+                            txt_login.setText("admin");
+                            txt_senha.setText("admin");
+                            bt_entrar.doClick();
+                        }
+                    } catch (Exception e) {
+                        // Fallback em caso de erro
+                        txt_login.setText("admin");
+                        txt_senha.setText("admin");
+                        bt_entrar.doClick();
+                    }
+                    break;
+                }
+            }
+        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

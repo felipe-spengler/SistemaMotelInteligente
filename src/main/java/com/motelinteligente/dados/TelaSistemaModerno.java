@@ -358,10 +358,10 @@ public class TelaSistemaModerno extends JFrame {
         
         if (newApp.getFileName().toString().endsWith(".jar")) {
              scriptContent.append("start \"\" /D \"").append(firstTarget.getParent()).append("\" javaw -jar \"")
-                .append(firstTarget.toAbsolutePath()).append("\"\n");
+                .append(firstTarget.toAbsolutePath()).append("\" --after-update\n");
         } else {
              scriptContent.append("start \"\" /D \"").append(firstTarget.getParent()).append("\" \"")
-                .append(firstTarget.toAbsolutePath()).append("\"\n");
+                .append(firstTarget.toAbsolutePath()).append("\" --after-update\n");
         }
 
         scriptContent.append("timeout /t 2 >nul\n");
