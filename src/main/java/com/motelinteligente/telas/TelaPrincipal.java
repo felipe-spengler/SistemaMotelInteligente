@@ -1709,8 +1709,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                                                 .addComponent(srPane, 0,
                                                         javax.swing.GroupLayout.DEFAULT_SIZE,
                                                         Short.MAX_VALUE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED,
-                                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                 .addComponent(painelQuartos, javax.swing.GroupLayout.PREFERRED_SIZE,
                                                         javax.swing.GroupLayout.DEFAULT_SIZE,
                                                         javax.swing.GroupLayout.PREFERRED_SIZE)
