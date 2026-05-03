@@ -1,0 +1,49 @@
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+# Ignorar arquivos específicos
+src/main/java/Telas/MinhaClasse.java
+nbactions.xml
+src/main/java/com/motelinteligente/dados/DatabaseSynchronizer.java
+src/main/resources/application.properties
+
+# Pastas de outros projetos e dados sensíveis
+AutoAtend JS/
+site-motel/
+db_/
+*.sql
+*.ps1
+logo-branco.png
+compile_errors.txt
+mudancas.txt
