@@ -28,7 +28,9 @@ import com.google.gson.JsonParser;
 import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
+@Component
 public class TelaSistemaModerno extends JFrame {
 
     private static final Logger logger = LoggerFactory.getLogger(TelaSistemaModerno.class);
