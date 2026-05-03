@@ -71,6 +71,7 @@ public class TelaPrincipalController {
             }
             
             srPane.setLayout(new GridLayout(0, colunas, 0, 0)); 
+            srPane.removeAll(); // LIMPA OS QUARTOS ANTIGOS ANTES DE ADICIONAR OS NOVOS
             mapaQuadrados.clear();
             
             // Ajusta o tamanho máximo e preferido vertical do srPane para não esticar os quadrados demais
