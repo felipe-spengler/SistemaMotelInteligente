@@ -168,7 +168,7 @@ public class TelaSistemaModerno extends JFrame {
         }
     }
 
-    private void iniciarVerificacao() {
+    public void iniciarVerificacao() {
         startButton.setEnabled(false);
         progressBar.setVisible(true);
         logMessage("Iniciando verificação de atualização...");

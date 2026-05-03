@@ -84,47 +84,22 @@ class Agendamentos {
     @Autowired
     private DatabaseSynchronizer databaseSynchronizer;
     @Autowired
-    private TelaSistema telaSistema;
+    private TelaSistemaModerno telaSistema;
 
-    // Agendar para as 03:00 da manhã
     @Scheduled(cron = "0 0 3 * * ?")
     public void agendarTresDaManha() {
-        logger.info("Executando a tarefa agendada para 03:00.");
+        logger.info("Executando tarefas agendadas das 03:00.");
         try {
-            // 2. Chame o método a partir da instância injetada
             databaseSynchronizer.sincronizarBanco(null);
-            logger.info("Sincronização agendada concluída com sucesso.");
-        } catch (SQLException e) {
-            logger.error("Erro durante a sincronização agendada: " + e.getMessage(), e);
-        }
-    }
-
-    // Agendar para o meio-dia (12:00)
-    @Scheduled(cron = "0 0 12 * * ?")
-    public void agendarMeioDia() {
-        logger.info("Verificando se há nova versão do sistema...");
-
-        // Verifica antes de abrir a tela
-        boolean precisaAtualizar = false;
-        try {
-            precisaAtualizar = telaSistema.temNovaVersaoDisponivel();
+            if (telaSistema.temNovaVersaoDisponivel()) {
+                SwingUtilities.invokeLater(() -> {
+                    telaSistema.setVisible(true);
+                    telaSistema.iniciarVerificacao();
+                });
+            }
         } catch (Exception e) {
-            logger.error("Erro ao verificar atualização: ", e);
-        }
-
-        if (precisaAtualizar) {
-            logger.info("Nova versão detectada. Exibindo tela de atualização...");
-            SwingUtilities.invokeLater(() -> {
-                JOptionPane.showMessageDialog(null,
-                        "Uma nova versão do sistema foi encontrada! Iniciando atualização...",
-                        "Atualização Disponível",
-                        JOptionPane.INFORMATION_MESSAGE);
-
-                telaSistema.setVisible(true);
-                telaSistema.getStartButton().doClick();
-            });
-        } else {
-            logger.info("Nenhuma atualização disponível no momento.");
+            logger.error("Erro nas tarefas agendadas: " + e.getMessage());
         }
     }
+
 }
