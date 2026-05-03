@@ -1496,6 +1496,26 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         });
         jMenu2.add(menuVerProdutos);
 
+        menuCardapio = new javax.swing.JMenuItem();
+        menuCardapio.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_produtos.png"))); 
+        menuCardapio.setText("Cardápio Online");
+        menuCardapio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                abrirUrl("https://motelinteligente.com/cardapio.php?filial=" + com.motelinteligente.dados.CarregarVariaveis.getFilial());
+            }
+        });
+        jMenu2.add(menuCardapio);
+
+        menuQrCodeCardapio = new javax.swing.JMenuItem();
+        menuQrCodeCardapio.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_hospede.png"))); 
+        menuQrCodeCardapio.setText("Gerar QR Code Cardápio");
+        menuQrCodeCardapio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                abrirUrl("https://motelinteligente.com/qrcode.php?filial=" + com.motelinteligente.dados.CarregarVariaveis.getFilial());
+            }
+        });
+        jMenu2.add(menuQrCodeCardapio);
+
         jMenuBar1.add(jMenu2);
 
         menuCaixaBt.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/financeiro.png"))); // NOI18N
@@ -3082,6 +3102,14 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         return controller.alteraOcupadoCache(quartoMudar, statusColocar);
     }
 
+    private void abrirUrl(String url) {
+        try {
+            java.awt.Desktop.getDesktop().browse(new java.net.URI(url));
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Erro ao abrir navegador: " + e.getMessage());
+        }
+    }
+
     // Aplica o DefaultListSelectionModel personalizado à tabela
     /**
      * @param args the command line arguments
@@ -3187,6 +3215,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private javax.swing.JDesktopPane srPane;
     private javax.swing.JPanel tabela;
     private javax.swing.JTable tabela1;
+    private javax.swing.JMenuItem menuCardapio;
+    private javax.swing.JMenuItem menuQrCodeCardapio;
     private javax.swing.JTextField txtAntecipado;
     private javax.swing.JTextField txtDescontoNegociado;
     private javax.swing.JTextField txtPessoas;
