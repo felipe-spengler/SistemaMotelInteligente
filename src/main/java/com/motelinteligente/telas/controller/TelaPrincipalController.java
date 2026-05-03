@@ -10,6 +10,7 @@ import com.motelinteligente.telas.Quadrado;
 import com.motelinteligente.telas.TelaPrincipal;
 import java.awt.Color;
 import java.awt.Desktop;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.net.URI;
 import java.sql.Connection;
