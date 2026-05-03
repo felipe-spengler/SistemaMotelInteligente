@@ -26,9 +26,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.util.function.Consumer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TelaSistemaModerno extends JFrame {
 
+    private static final Logger logger = LoggerFactory.getLogger(TelaSistemaModerno.class);
     private static final String TARGET_FILE_PREFIX = "MotelInteligente";
 
     private JTextArea logTextArea;
@@ -308,6 +311,9 @@ public class TelaSistemaModerno extends JFrame {
     }
 
     private void startUpdaterScript(List<Path> oldApps, Path newApp) throws IOException {
+        // SALVA A SESSÃO ATUAL ANTES DE FECHAR PARA O AUTO-LOGIN FUNCIONAR
+        salvarSessaoAtual();
+
         Path logsDirectory = Paths.get(System.getProperty("user.home"), "Documents", "logs");
         if (!Files.exists(logsDirectory)) {
             Files.createDirectories(logsDirectory);
@@ -321,15 +327,8 @@ public class TelaSistemaModerno extends JFrame {
         StringBuilder scriptContent = new StringBuilder();
         scriptContent.append("@echo off\n")
                 .append("setlocal enabledelayedexpansion\n\n")
-                .append("echo Encerrando processos legados...\n")
-                .append("taskkill /IM javaw.exe /F >nul 2>&1\n")
-                // Loop to kill all old names
-                .append("for %%I in (");
-        for (Path old : oldApps) {
-            scriptContent.append("\"").append(old.getFileName().toString()).append("\" ");
-        }
-        scriptContent.append(") do taskkill /IM %%I /F >nul 2>&1\n\n")
-                .append(":waitLoop\n")
+                .append("echo Encerrando Motel Inteligente...\n")
+                .append("taskkill /F /IM \"MotelInteligente*\" /T >nul 2>&1\n")
                 .append("timeout /t 2 >nul\n\n");
 
         for (Path oldAppPath : oldApps) {
@@ -340,40 +339,37 @@ public class TelaSistemaModerno extends JFrame {
 
         scriptContent.append("\n");
 
-        for (Path oldAppPath : oldApps) {
-            Path targetPath = oldAppPath.getParent().resolve(newApp.getFileName());
-            // Important: Use double quotes around paths to handle spaces
-            scriptContent.append("copy /y \"").append(newAppInLogs.toAbsolutePath()).append("\" \"")
-                    .append(targetPath.toAbsolutePath()).append("\" >nul\n");
-            // Se houver mais de um executável na raiz e só copiamos para o mesmo lugar um deles já basta,
-            // então paramos aqui para não gerar duplicatas com o mesmo novo nome.
-            break;
-        }
+        // Pega o caminho do primeiro executável para reiniciar
+        Path targetPath = oldApps.get(0).getParent().resolve(newApp.getFileName());
+        scriptContent.append("copy /y \"").append(newAppInLogs.toAbsolutePath()).append("\" \"")
+                .append(targetPath.toAbsolutePath()).append("\" >nul\n");
 
-        scriptContent.append("del /f /q \"").append(newAppInLogs.toAbsolutePath()).append("\" >nul\n");
-
-        Path firstTarget = oldApps.get(0).getParent().resolve(newApp.getFileName());
         scriptContent.append("\n")
-                .append("echo Iniciando nova versão do sistema...\n");
+                .append("echo Iniciando nova versao...\n");
         
-        if (newApp.getFileName().toString().endsWith(".jar")) {
-             scriptContent.append("start \"\" /D \"").append(firstTarget.getParent()).append("\" javaw -jar \"")
-                .append(firstTarget.toAbsolutePath()).append("\" --after-update\n");
-        } else {
-             scriptContent.append("start \"\" /D \"").append(firstTarget.getParent()).append("\" \"")
-                .append(firstTarget.toAbsolutePath()).append("\" --after-update\n");
-        }
-
-        scriptContent.append("timeout /t 2 >nul\n");
+        String command = targetPath.getFileName().toString().endsWith(".jar")
+            ? "start \"\" javaw -jar \"" + targetPath.toAbsolutePath() + "\" --after-update"
+            : "start \"\" \"" + targetPath.toAbsolutePath() + "\" --after-update";
+        
+        scriptContent.append(command).append("\n");
         scriptContent.append("del \"%~f0\" >nul 2>&1\n")
-                .append("endlocal\n")
                 .append("exit\n");
 
         Files.write(updaterScriptPath, scriptContent.toString().getBytes(StandardCharsets.UTF_8));
-        Files.deleteIfExists(newApp);
-
+        
         new ProcessBuilder("cmd", "/c", "start", "/b", updaterScriptPath.toString())
                 .directory(logsDirectory.toFile())
                 .start();
+        
+        System.exit(0);
+    }
+
+    private void salvarSessaoAtual() {
+        try {
+            com.motelinteligente.dados.configGlobal config = com.motelinteligente.dados.configGlobal.getInstance();
+            logger.info("Sessão preparada para o usuário: " + config.getUsuario());
+        } catch (Exception e) {
+            logger.error("Erro ao preparar sessão: " + e.getMessage());
+        }
     }
 }
