@@ -1742,7 +1742,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                                                 .addContainerGap()
                                                 .addComponent(srPane, 0,
                                                         javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                        Short.MAX_VALUE)))
+                                                        900))) // Limite total para não esticar demais na vertical
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(painelBotton, javax.swing.GroupLayout.DEFAULT_SIZE,
                                         javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)

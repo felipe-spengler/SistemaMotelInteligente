@@ -74,11 +74,10 @@ public class TelaPrincipalController {
             mapaQuadrados.clear();
             
             // Ajusta o tamanho máximo vertical do srPane para não esticar os quadrados demais
-            // Calculamos o número de linhas e multiplicamos por 220px (limite sugerido)
+            // Calculamos o número de linhas e multiplicamos por 300px (limite sugerido)
             int linhas = (int) Math.ceil((double) totalQuartos / colunas);
-            int alturaMaxima = linhas * 220; 
+            int alturaMaxima = linhas * 300; 
             srPane.setMaximumSize(new Dimension(Short.MAX_VALUE, alturaMaxima));
-            srPane.setPreferredSize(new Dimension(srPane.getPreferredSize().width, alturaMaxima));
         }
 
         Color outroVerde = new Color(0, 200, 0);
