@@ -373,13 +373,10 @@ public class TelaSistemaModerno extends JFrame {
             String pass = config.getSenhaTemporaria();
             
             if (user != null && pass != null) {
-                java.util.Properties props = new java.util.Properties();
-                props.setProperty("user", user);
-                props.setProperty("pass", pass);
-                try (java.io.FileOutputStream out = new java.io.FileOutputStream("session.tmp")) {
-                    props.store(out, "Sessao recuperada antes do update");
-                }
-                logger.info("Sessão salva com sucesso para o usuário: " + user);
+                String combined = user + ":" + pass;
+                String encoded = java.util.Base64.getEncoder().encodeToString(combined.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                java.nio.file.Files.write(java.nio.file.Paths.get("session.tmp"), encoded.getBytes());
+                logger.info("Sessão salva com sucesso (Base64) para o usuário: " + user);
             }
         } catch (Exception e) {
             logger.error("Erro ao preparar sessão: " + e.getMessage());

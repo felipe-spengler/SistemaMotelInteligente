@@ -258,12 +258,9 @@ public class TelaLogin extends javax.swing.JFrame {
 
     private void salvarSessaoTemp(String user, String pass) {
         try {
-            java.util.Properties props = new java.util.Properties();
-            props.setProperty("user", user);
-            props.setProperty("pass", pass);
-            java.io.FileOutputStream out = new java.io.FileOutputStream("session.tmp");
-            props.store(out, "Sessao temporaria para auto-login apos atualizacao");
-            out.close();
+            String combined = user + ":" + pass;
+            String encoded = java.util.Base64.getEncoder().encodeToString(combined.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            java.nio.file.Files.write(java.nio.file.Paths.get("session.tmp"), encoded.getBytes());
         } catch (Exception e) {
             // Ignora erro ao salvar sessão
         }
@@ -337,16 +334,15 @@ public class TelaLogin extends javax.swing.JFrame {
                     try {
                         java.io.File sessionFile = new java.io.File("session.tmp");
                         if (sessionFile.exists()) {
-                            java.util.Properties props = new java.util.Properties();
-                            java.io.FileInputStream in = new java.io.FileInputStream(sessionFile);
-                            props.load(in);
-                            in.close();
-
-                            txt_login.setText(props.getProperty("user"));
-                            txt_senha.setText(props.getProperty("pass"));
-                            bt_entrar.doClick();
-
-                             // Se não houver arquivo, não tenta logar sozinho para não logar errado
+                            byte[] encodedBytes = java.nio.file.Files.readAllBytes(sessionFile.toPath());
+                            String decoded = new String(java.util.Base64.getDecoder().decode(encodedBytes), java.nio.charset.StandardCharsets.UTF_8);
+                            String[] parts = decoded.split(":");
+                            
+                            if (parts.length == 2) {
+                                txt_login.setText(parts[0]);
+                                txt_senha.setText(parts[1]);
+                                bt_entrar.doClick();
+                            }
                         }
                         
                         // Apaga o arquivo após a tentativa (seja sucesso ou erro, para não ficar senha no disco)
