@@ -301,8 +301,28 @@ public class TelaLogin extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(() -> {
             try {
                 TelaLogin login = new TelaLogin();
-                login.setVisible(true);
+                
+                // Se for auto-login, mantém a tela invisível até tentar logar
+                boolean isAuto = false;
+                if (arguments != null) {
+                    for (String arg : arguments) {
+                        if ("--after-update".equals(arg)) isAuto = true;
+                    }
+                }
+                
+                if (!isAuto) {
+                    login.setVisible(true);
+                }
+                
                 login.checkAutoLogin(arguments);
+                
+                // Se o auto-login falhar (não fechar a tela), aí sim mostramos
+                if (isAuto && login.isVisible() == false && !login.isDisplayable()) {
+                    // Já logou e deu dispose, sucesso!
+                } else if (isAuto) {
+                    login.setVisible(true);
+                }
+                
             } catch (IOException ex) {
                 java.util.logging.Logger.getLogger(TelaLogin.class.getName()).log(java.util.logging.Level.SEVERE, null,
                         ex);
@@ -327,6 +347,11 @@ public class TelaLogin extends javax.swing.JFrame {
                             bt_entrar.doClick();
 
                              // Se não houver arquivo, não tenta logar sozinho para não logar errado
+                        }
+                        
+                        // Apaga o arquivo após a tentativa (seja sucesso ou erro, para não ficar senha no disco)
+                        if (sessionFile.exists()) {
+                            sessionFile.delete();
                         }
                     } catch (Exception e) {
                         // Ignora erro
