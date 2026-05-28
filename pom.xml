@@ -9,7 +9,7 @@
   </parent>
   <groupId>com.motelinteligente</groupId>
   <artifactId>MotelInteligente</artifactId>
-  <version>1.0.23</version>
+  <version>1.0.24</version>
   <name>MotelInteligente</name>
   <properties>
     <java.version>17</java.version>
