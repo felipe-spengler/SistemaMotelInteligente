@@ -191,7 +191,7 @@ public class VerificaComandosRemotos extends Thread implements MqttCallback {
     private void processarComando(String comando) {
         try {
             String[] partes = comando.split(" ");
-            if (partes.length != 2) {
+            if (partes.length < 2) {
                 logger.warn("Formato inválido do comando: " + comando);
                 return;
             }
@@ -220,11 +220,26 @@ public class VerificaComandosRemotos extends Thread implements MqttCallback {
                     String statusAtual = cache.getCacheQuarto().get(quartoEmFoco).getStatusQuarto();
 
                     if (statusAtual.equals("livre")) {
-                        mudaStatusNaCache(quartoEmFoco, "ocupado-periodo");
-                        if (new fquartos().registraLocacao(quartoEmFoco)) {
-                            if (!new fquartos().setStatus(quartoEmFoco, "ocupado-periodo")) {
+                        String periodo = (partes.length > 2) ? partes[2].replace("-", " ") : null;
+                        float desconto = (partes.length > 3) ? Float.parseFloat(partes[3]) : 0;
+                        
+                        // Define se o status final será periodo ou pernoite
+                        String statusALocar = (periodo != null && periodo.toLowerCase().contains("pernoite")) 
+                                              ? "ocupado-pernoite" : "ocupado-periodo";
+
+                        mudaStatusNaCache(quartoEmFoco, statusALocar);
+                        fquartos dao = new fquartos();
+                        
+                        if (dao.registraLocacao(quartoEmFoco, periodo)) {
+                            if (!dao.setStatus(quartoEmFoco, statusALocar)) {
                                 JOptionPane.showMessageDialog(null, "Falha ao iniciar locação no banco!");
                             } else {
+                                if (desconto > 0) {
+                                    int idLocacao = dao.getIdLocacao(quartoEmFoco);
+                                    int idCaixa = configGlobal.getInstance().getCaixa();
+                                    dao.salvaAntecipado(idLocacao, "desconto", desconto, idCaixa);
+                                }
+
                                 configGlobal config = configGlobal.getInstance();
                                 config.setMudanca(true);
                                 new Thread(() -> {
