@@ -1390,6 +1390,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
                             salvaJustifica("acrescimo", valorAcrescimo);
                         }
                         salvaVendidos(numeroDoQuarto);
+                        new com.motelinteligente.dados.FiscalService().emitirNota(idLocacao);
                     }
                 }
 
@@ -1397,6 +1398,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 // nao precisa justificativa
                 if (chamaJOP()) {
                     salvaVendidos(numeroDoQuarto);
+                    new com.motelinteligente.dados.FiscalService().emitirNota(idLocacao);
 
                 }
             }

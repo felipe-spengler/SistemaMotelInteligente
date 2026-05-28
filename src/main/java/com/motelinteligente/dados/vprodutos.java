@@ -10,6 +10,9 @@ public class vprodutos {
     String categoria;
     String imagem;
     String detalhes;
+    String ncm;
+    String cest;
+    String csosn;
 
     public vprodutos() {
     }
@@ -77,6 +80,15 @@ public class vprodutos {
     public void setDetalhes(String detalhes) {
         this.detalhes = detalhes;
     }
+
+    public String getNcm() { return ncm; }
+    public void setNcm(String ncm) { this.ncm = ncm; }
+
+    public String getCest() { return cest; }
+    public void setCest(String cest) { this.cest = cest; }
+
+    public String getCsosn() { return csosn; }
+    public void setCsosn(String csosn) { this.csosn = csosn; }
 
     public vprodutos(int idProduto, String descricao, float valor, String estoque, Timestamp dataCompra, String categoria, String imagem, String detalhes) {
         this.idProduto = idProduto;

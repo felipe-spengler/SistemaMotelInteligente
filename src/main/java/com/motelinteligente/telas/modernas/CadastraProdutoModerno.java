@@ -30,6 +30,9 @@ public class CadastraProdutoModerno extends JDialog {
     private JTextField txtCategoria;
     private JTextField txtImagem;
     private JTextArea txtDetalhes;
+    private JTextField txtNCM;
+    private JTextField txtCEST;
+    private JTextField txtCSOSN;
     private boolean atualizar = false;
 
     public CadastraProdutoModerno(Window parent, int idPassado) { // Aceita Window (JFrame ou JDialog)
@@ -90,6 +93,21 @@ public class CadastraProdutoModerno extends JDialog {
         JScrollPane scrollDetalhes = new JScrollPane(txtDetalhes);
         pnlPrincipal.add(scrollDetalhes, "growx, height 80!");
 
+        JPanel pnlFiscal = new JPanel(new MigLayout("insets 0", "[grow]10[grow]10[grow]", "[][]"));
+        pnlFiscal.setOpaque(false);
+        pnlFiscal.add(EstiloModerno.criarLabel("NCM"));
+        pnlFiscal.add(EstiloModerno.criarLabel("CEST"));
+        pnlFiscal.add(EstiloModerno.criarLabel("CSOSN"), "wrap");
+        
+        txtNCM = EstiloModerno.criarInput();
+        txtCEST = EstiloModerno.criarInput();
+        txtCSOSN = EstiloModerno.criarInput();
+        
+        pnlFiscal.add(txtNCM, "growx");
+        pnlFiscal.add(txtCEST, "growx");
+        pnlFiscal.add(txtCSOSN, "growx");
+        pnlPrincipal.add(pnlFiscal, "growx");
+
         JPanel stockPanel = new JPanel(new MigLayout("insets 0", "[]10[grow]", "[]"));
         stockPanel.setOpaque(false);
 
@@ -145,6 +163,9 @@ public class CadastraProdutoModerno extends JDialog {
             txtCategoria.setText(produto.getCategoria() != null ? produto.getCategoria() : "Diversos");
             txtImagem.setText(produto.getImagem());
             txtDetalhes.setText(produto.getDetalhes());
+            txtNCM.setText(produto.getNcm() != null ? produto.getNcm() : "");
+            txtCEST.setText(produto.getCest() != null ? produto.getCest() : "");
+            txtCSOSN.setText(produto.getCsosn() != null ? produto.getCsosn() : "");
 
             if (!produto.getEstoque().equals("-")) {
                 chkControlarEstoque.setSelected(true);
@@ -171,6 +192,9 @@ public class CadastraProdutoModerno extends JDialog {
         String categoria = txtCategoria.getText();
         String imagem = txtImagem.getText();
         String detalhes = txtDetalhes.getText();
+        String ncm = txtNCM.getText();
+        String cest = txtCEST.getText();
+        String csosn = txtCSOSN.getText();
 
         if (descricao.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Descrição obrigatória");
@@ -198,6 +222,9 @@ public class CadastraProdutoModerno extends JDialog {
         dao.exclusao(idProduto); // Remove anterior (logica legado)
 
         vprodutos novo = new vprodutos(idProduto, descricao, valor, estoque, data, categoria, imagem, detalhes);
+        novo.setNcm(ncm);
+        novo.setCest(cest);
+        novo.setCsosn(csosn);
         if (dao.insercao(novo)) {
             JOptionPane.showMessageDialog(this, "Salvo com sucesso!");
             dispose();

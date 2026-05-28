@@ -49,7 +49,7 @@ public class ProdutoModerno extends JFrame {
         JPanel cardTable = EstiloModerno.criarCard(); // Fundo branco arredondado
         cardTable.setLayout(new BorderLayout()); // Usa todo espaço do card
 
-        String[] cols = { "ID", "Categoria", "Produto / Serviço", "Valor (R$)", "Estoque", "Última Compra" };
+        String[] cols = { "ID", "Categoria", "Produto / Serviço", "Valor (R$)", "Estoque", "Última Compra", "NCM", "CEST", "CSOSN" };
         tableModel = new DefaultTableModel(cols, 0) {
             @Override
             public boolean isCellEditable(int row, int col) {
@@ -109,7 +109,10 @@ public class ProdutoModerno extends JFrame {
                     p.getDescricao(),
                     p.getValor(),
                     p.getEstoque(),
-                    p.getDataCompra()
+                    p.getDataCompra(),
+                    p.getNcm(),
+                    p.getCest(),
+                    p.getCsosn()
             });
         }
     }

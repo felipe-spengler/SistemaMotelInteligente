@@ -43,6 +43,9 @@ public class fprodutos {
                         produto.setCategoria(resultado.getString("categoria"));
                         produto.setImagem(resultado.getString("imagem"));
                         produto.setDetalhes(resultado.getString("detalhes"));
+                        produto.setNcm(resultado.getString("ncm"));
+                        produto.setCest(resultado.getString("cest"));
+                        produto.setCsosn(resultado.getString("csosn"));
                     } catch (SQLException ex) {
                         // Fallback se as colunas não existirem
                         if (produto.getCategoria() == null) produto.setCategoria("Diversos");
@@ -161,8 +164,8 @@ public class fprodutos {
 
     public boolean insercao(vprodutos dados) {
 
-        String sql = "INSERT INTO produtos (idproduto, descricao, valorproduto, estoque, ultimacompra, categoria, imagem, detalhes) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO produtos (idproduto, descricao, valorproduto, estoque, ultimacompra, categoria, imagem, detalhes, ncm, cest, csosn) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection link = new fazconexao().conectar();
                 PreparedStatement st = link.prepareStatement(sql)) {
@@ -175,6 +178,9 @@ public class fprodutos {
             st.setString(6, dados.getCategoria() != null ? dados.getCategoria() : "Diversos");
             st.setString(7, dados.getImagem());
             st.setString(8, dados.getDetalhes());
+            st.setString(9, dados.getNcm());
+            st.setString(10, dados.getCest());
+            st.setString(11, dados.getCsosn());
 
             boolean result = st.executeUpdate() > 0;
             if (result)
@@ -230,6 +236,9 @@ public class fprodutos {
                         produto.setCategoria(rs.getString("categoria"));
                         produto.setImagem(rs.getString("imagem"));
                         produto.setDetalhes(rs.getString("detalhes"));
+                        produto.setNcm(rs.getString("ncm"));
+                        produto.setCest(rs.getString("cest"));
+                        produto.setCsosn(rs.getString("csosn"));
                     } catch (SQLException ex) {
                         if (produto.getCategoria() == null) produto.setCategoria("Diversos");
                     }

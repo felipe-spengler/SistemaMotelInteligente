@@ -1621,6 +1621,15 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             }
         });
         btFerramentas.add(menuConfigAd);
+        
+        javax.swing.JMenuItem menuFiscais = new javax.swing.JMenuItem("Fiscais");
+        menuFiscais.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_editar.png")));
+        menuFiscais.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                new ConfiguracaoFiscal().setVisible(true);
+            }
+        });
+        menuConfigAd.add(menuFiscais);
 
         menuSobSistema.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_entrar.png"))); // NOI18N
         menuSobSistema.setText("Auto Atendimento");
@@ -1833,7 +1842,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 }
             }
         }, 0, 1000);
-
         Timer alarmeTimer = new Timer();
         alarmeTimer.scheduleAtFixedRate(new TimerTask() {
 
@@ -1881,6 +1889,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             verificarMensalidade();
         }, 0, 3, TimeUnit.HOURS);
 
+        verificarPopupFiscal();
     }
 
     private String getSistemaProperty() {
@@ -1967,6 +1976,27 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         } catch (Exception e) {
             logger.error("Erro ao verificar mensalidade: " + e);
         }
+    }
+
+    private void verificarPopupFiscal() {
+        new Thread(() -> {
+            try {
+                Thread.sleep(5000); // Wait 5 seconds after startup
+                try (java.sql.Connection link = new com.motelinteligente.dados.fazconexao().conectar()) {
+                    String sqlConfig = "SELECT status_modulo_fiscal FROM configuracoes LIMIT 1";
+                    try (java.sql.PreparedStatement stmt = link.prepareStatement(sqlConfig); java.sql.ResultSet rs = stmt.executeQuery()) {
+                        if (rs.next()) {
+                            boolean ativo = rs.getBoolean("status_modulo_fiscal");
+                            SwingUtilities.invokeLater(() -> {
+                                com.motelinteligente.telas.PopupFiscalAd.verificarExibicao(this, ativo);
+                            });
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
     private void adicionarMenuMensalidade() {
