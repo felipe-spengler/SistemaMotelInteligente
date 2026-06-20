@@ -14,20 +14,38 @@ public class FiscalWebhookController {
     @PostMapping("/webhook/nfe")
     public ResponseEntity<String> receiveWebhook(@RequestBody Map<String, Object> payload) {
         try {
-            // Exemplo de payload vindo da Focus NFe / PlugNotas:
-            // { "id_nota_api": "123", "status": "autorizado", "xml_url": "...", "pdf_url": "..." }
+            Map<String, Object> data = (Map<String, Object>) payload.get("data");
+            if (data == null) {
+                return ResponseEntity.badRequest().body("Payload inválido: objeto data ausente");
+            }
             
-            String idNotaApi = (String) payload.get("id_nota_api");
-            String status = (String) payload.get("status");
-            String xmlUrl = (String) payload.get("xml_url");
-            String pdfUrl = (String) payload.get("pdf_url");
+            String idNotaApi = (String) data.get("id");
+            String status = (String) data.get("status");
+            String model = (String) data.get("model");
+            String environmentType = (String) data.get("environmentType");
 
-            if (idNotaApi != null && status != null) {
+            if (idNotaApi != null && status != null && model != null) {
+                boolean isService = "serviceInvoice".equalsIgnoreCase(model);
+                
+                String domain = "development".equalsIgnoreCase(environmentType) 
+                    ? "https://sandbox-api.spedy.com.br" 
+                    : "https://api.spedy.com.br";
+                    
+                String xmlUrl = domain + "/v1/" + (isService ? "service-invoices" : "consumer-invoices") + "/" + idNotaApi + "/xml";
+                String pdfUrl = domain + "/v1/" + (isService ? "service-invoices" : "consumer-invoices") + "/" + idNotaApi + "/pdf";
+
                 try (Connection link = new fazconexao().conectar()) {
-                    String sql = "UPDATE registralocado SET nfe_status = ? WHERE nfe_chave = ?";
+                    String colStatus = isService ? "nfse_status" : "nfce_status";
+                    String colId = isService ? "nfse_id_api" : "nfce_id_api";
+                    String colXml = isService ? "nfse_xml_url" : "nfce_xml_url";
+                    String colPdf = isService ? "nfse_pdf_url" : "nfce_pdf_url";
+                    
+                    String sql = "UPDATE registralocado SET " + colStatus + " = ?, " + colXml + " = ?, " + colPdf + " = ? WHERE " + colId + " = ?";
                     try (PreparedStatement stmt = link.prepareStatement(sql)) {
                         stmt.setString(1, status);
-                        stmt.setString(2, idNotaApi);
+                        stmt.setString(2, xmlUrl);
+                        stmt.setString(3, pdfUrl);
+                        stmt.setString(4, idNotaApi);
                         stmt.executeUpdate();
                     }
                 }
