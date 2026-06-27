@@ -356,6 +356,9 @@ public class VerificaComandosRemotos extends Thread implements MqttCallback {
                             ImpressoraService.imprimirExtratoLocacaoPorId(idLoc);
                         }
                     }
+                } else if (acao.equals("imprimir_previa") || acao.equals("previa")) {
+                    int idLoc = Integer.parseInt(numero);
+                    ImpressoraService.imprimirExtratoLocacaoPorId(idLoc);
                 } else if (acao.equals("reproduzir")) {
                     new playSound().playSound("som/mensagem conferencia.wav");
                 }

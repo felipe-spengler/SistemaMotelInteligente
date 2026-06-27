@@ -431,17 +431,19 @@ public class ImpressoraService {
 
             // Calcula tempo total locado
             String tempoTotalLocado = "N/A";
-            if (dataInicioTs != null && dataFimTs != null) {
-                long diff = dataFimTs.getTime() - dataInicioTs.getTime();
+            if (dataInicioTs != null) {
+                long endTime = dataFimTs != null ? dataFimTs.getTime() : System.currentTimeMillis();
+                long diff = endTime - dataInicioTs.getTime();
                 long diffMinutes = diff / (60 * 1000) % 60;
                 long diffHours = diff / (60 * 60 * 1000) % 24;
                 long diffDays = diff / (24 * 60 * 60 * 1000);
+                String tagPrevia = dataFimTs == null ? " (Pre-via)" : "";
                 if (diffDays > 0) {
-                    tempoTotalLocado = String.format("%d d, %d h, %d m", diffDays, diffHours, diffMinutes);
+                    tempoTotalLocado = String.format("%d d, %d h, %d m%s", diffDays, diffHours, diffMinutes, tagPrevia);
                 } else if (diffHours > 0) {
-                    tempoTotalLocado = String.format("%d h, %d m", diffHours, diffMinutes);
+                    tempoTotalLocado = String.format("%d h, %d m%s", diffHours, diffMinutes, tagPrevia);
                 } else {
-                    tempoTotalLocado = String.format("%d min", diffMinutes);
+                    tempoTotalLocado = String.format("%d min%s", diffMinutes, tagPrevia);
                 }
             }
 
@@ -474,9 +476,15 @@ public class ImpressoraService {
             sb.append("HOSPEDAGEM:\n");
             sb.append(String.format("Valor Quarto:              R$ %,.2f\n", valorQuarto));
 
-            // 3. Obter produtos vendidos da tabela registravendido
-            String sqlProd = "SELECT p.nomeproduto, v.quantidade, v.valorunidade, v.valortotal " +
-                             "FROM registravendido v JOIN produtos p ON v.idproduto = p.idproduto WHERE v.idlocacao = ?";
+            // 3. Obter produtos (da tabela prevendidos se for pré-via, ou registravendido se finalizado)
+            String sqlProd;
+            if (dataFimTs == null) {
+                sqlProd = "SELECT p.descricao AS nomeproduto, pv.quantidade, p.valorproduto AS valorunidade, (pv.quantidade * p.valorproduto) AS valortotal " +
+                          "FROM prevendidos pv JOIN produtos p ON pv.idproduto = p.idproduto WHERE pv.idlocacao = ?";
+            } else {
+                sqlProd = "SELECT p.descricao AS nomeproduto, v.quantidade, v.valorunidade, v.valortotal " +
+                          "FROM registravendido v JOIN produtos p ON v.idproduto = p.idproduto WHERE v.idlocacao = ?";
+            }
             PreparedStatement stmtProd = link.prepareStatement(sqlProd);
             stmtProd.setInt(1, idLocacao);
             ResultSet rsProd = stmtProd.executeQuery();
