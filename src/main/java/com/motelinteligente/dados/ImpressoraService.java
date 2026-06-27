@@ -354,4 +354,187 @@ public class ImpressoraService {
 
         imprimirTexto(sb.toString());
     }
+
+    /**
+     * Carrega todos os dados de uma locação do banco de dados e realiza a impressão do extrato.
+     */
+    public static void imprimirExtratoLocacaoPorId(int idLocacao) {
+        if (!configGlobal.getInstance().isImpressoraAtiva()) return;
+
+        try (Connection link = new fazconexao().conectar()) {
+            // 1. Obter dados da locação e quarto
+            String sqlLoc = "SELECT * FROM registralocado WHERE idlocacao = ?";
+            PreparedStatement stmtLoc = link.prepareStatement(sqlLoc);
+            stmtLoc.setInt(1, idLocacao);
+            ResultSet rsLoc = stmtLoc.executeQuery();
+
+            if (!rsLoc.next()) {
+                logger.error("Locacao ID " + idLocacao + " nao encontrada para impressao.");
+                return;
+            }
+
+            int numeroQuarto = rsLoc.getInt("numquarto");
+            Timestamp dataInicioTs = rsLoc.getTimestamp("horainicio");
+            Timestamp dataFimTs = rsLoc.getTimestamp("horafim");
+            float valorQuarto = rsLoc.getFloat("valorquarto");
+            float valorConsumo = rsLoc.getFloat("valorconsumo");
+            float valD = rsLoc.getFloat("pagodinheiro");
+            float valP = rsLoc.getFloat("pagopix");
+            float valC = rsLoc.getFloat("pagocartao");
+            String periodoFinalStr = rsLoc.getString("periodo_locado");
+
+            String dataInicio = dataInicioTs != null ? String.valueOf(dataInicioTs) : "N/A";
+            String dataFim = dataFimTs != null ? String.valueOf(dataFimTs) : "N/A";
+
+            // 2. Buscar adicionais por pessoa e período da tabela justificativa/antecipado
+            float valorAdicionalPessoa = 0;
+            float valorAdicionalPeriodo = 0;
+            float valorDesconto = 0;
+            float valorAcrescimo = 0;
+            float valoreRecebido = 0;
+
+            // Busca na tabela justificativa (descontos e acrescimos da locacao)
+            String sqlJust = "SELECT tipo, valor FROM justificativa WHERE idlocacao = ?";
+            try (PreparedStatement stmtJust = link.prepareStatement(sqlJust)) {
+                stmtJust.setInt(1, idLocacao);
+                try (ResultSet rsJust = stmtJust.executeQuery()) {
+                    while (rsJust.next()) {
+                        String tipo = rsJust.getString("tipo");
+                        float val = rsJust.getFloat("valor");
+                        if ("desconto".equalsIgnoreCase(tipo)) {
+                            valorDesconto += val;
+                        } else if ("acrescimo".equalsIgnoreCase(tipo)) {
+                            valorAcrescimo += val;
+                        }
+                    }
+                }
+            }
+
+            // Busca na tabela antecipado (valores pagos antecipados ou descontos inseridos anteriormente)
+            String sqlAnt = "SELECT tipo, valor FROM antecipado WHERE idlocacao = ?";
+            try (PreparedStatement stmtAnt = link.prepareStatement(sqlAnt)) {
+                stmtAnt.setInt(1, idLocacao);
+                try (ResultSet rsAnt = stmtAnt.executeQuery()) {
+                    while (rsAnt.next()) {
+                        String tipo = rsAnt.getString("tipo");
+                        float val = rsAnt.getFloat("valor");
+                        if ("desconto".equalsIgnoreCase(tipo)) {
+                            valorDesconto += val;
+                        } else if ("acrescimo".equalsIgnoreCase(tipo)) {
+                            valorAcrescimo += val;
+                        } else {
+                            valoreRecebido += val;
+                        }
+                    }
+                }
+            }
+
+            // Calcula tempo total locado
+            String tempoTotalLocado = "N/A";
+            if (dataInicioTs != null && dataFimTs != null) {
+                long diff = dataFimTs.getTime() - dataInicioTs.getTime();
+                long diffMinutes = diff / (60 * 1000) % 60;
+                long diffHours = diff / (60 * 60 * 1000) % 24;
+                long diffDays = diff / (24 * 60 * 60 * 1000);
+                if (diffDays > 0) {
+                    tempoTotalLocado = String.format("%d d, %d h, %d m", diffDays, diffHours, diffMinutes);
+                } else if (diffHours > 0) {
+                    tempoTotalLocado = String.format("%d h, %d m", diffHours, diffMinutes);
+                } else {
+                    tempoTotalLocado = String.format("%d min", diffMinutes);
+                }
+            }
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("==========================================\n");
+            sb.append("            EXTRATO DE LOCACAO            \n");
+            sb.append("==========================================\n");
+            sb.append(String.format("Quarto: %02d            Locacao ID: %d\n", numeroQuarto, idLocacao));
+
+            SimpleDateFormat inSdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat outSdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+
+            String entFmt = dataInicio;
+            String saiFmt = dataFim;
+            try {
+                if (dataInicioTs != null) {
+                    entFmt = outSdf.format(dataInicioTs);
+                }
+                if (dataFimTs != null) {
+                    saiFmt = outSdf.format(dataFimTs);
+                }
+            } catch (Exception e) {
+                // Fallback
+            }
+
+            sb.append(String.format("Entrada: %s\n", entFmt));
+            sb.append(String.format("Saida:   %s\n", saiFmt));
+            sb.append(String.format("Duracao: %s\n", tempoTotalLocado));
+            sb.append("------------------------------------------\n");
+            sb.append("HOSPEDAGEM:\n");
+            sb.append(String.format("Valor Quarto:              R$ %,.2f\n", valorQuarto));
+
+            // 3. Obter produtos vendidos da tabela registravendido
+            String sqlProd = "SELECT p.nomeproduto, v.quantidade, v.valorunidade, v.valortotal " +
+                             "FROM registravendido v JOIN produtos p ON v.idproduto = p.idproduto WHERE v.idlocacao = ?";
+            PreparedStatement stmtProd = link.prepareStatement(sqlProd);
+            stmtProd.setInt(1, idLocacao);
+            ResultSet rsProd = stmtProd.executeQuery();
+
+            boolean temProdutos = false;
+            StringBuilder sbProd = new StringBuilder();
+            while (rsProd.next()) {
+                if (!temProdutos) {
+                    sbProd.append("------------------------------------------\n");
+                    sbProd.append("PRODUTOS CONSUMIDOS:\n");
+                    sbProd.append(String.format("Qtd  Produto              V.Unit  V.Total\n"));
+                    sbProd.append("------------------------------------------\n");
+                    temProdutos = true;
+                }
+                int qtd = rsProd.getInt("quantidade");
+                String desc = rsProd.getString("nomeproduto");
+                if (desc != null && desc.length() > 20) {
+                    desc = desc.substring(0, 18) + "..";
+                }
+                float vUnit = rsProd.getFloat("valorunidade");
+                float total = rsProd.getFloat("valortotal");
+
+                sbProd.append(String.format("%3d  %-20s %6.2f %8.2f\n", qtd, desc != null ? desc : "N/A", vUnit, total));
+            }
+            if (temProdutos) {
+                sb.append(sbProd.toString());
+            }
+
+            float subtotal = valorQuarto + valorAdicionalPessoa + valorAdicionalPeriodo + valorConsumo + valorAcrescimo;
+            float totalGeral = subtotal - valorDesconto;
+
+            sb.append("------------------------------------------\n");
+            sb.append(String.format("Subtotal Quarto + Prod:    R$ %,.2f\n", subtotal));
+            if (valorDesconto > 0) {
+                sb.append(String.format("Desconto:                 -R$ %,.2f\n", valorDesconto));
+            }
+            sb.append(String.format("TOTAL GERAL:               R$ %,.2f\n", totalGeral));
+            
+            // Pagamentos realizados
+            float totalPago = valD + valP + valC;
+            if (valD > 0) {
+                sb.append(String.format("Pago em Dinheiro:          R$ %,.2f\n", valD));
+            }
+            if (valP > 0) {
+                sb.append(String.format("Pago em Pix:               R$ %,.2f\n", valP));
+            }
+            if (valC > 0) {
+                sb.append(String.format("Pago em Cartao:            R$ %,.2f\n", valC));
+            }
+
+            float aReceber = totalGeral - valoreRecebido - totalPago;
+            sb.append(String.format("SALDO RESTANTE:            R$ %,.2f\n", aReceber > 0 ? aReceber : 0));
+            sb.append("==========================================\n\n\n\n\n");
+
+            imprimirTexto(sb.toString());
+
+        } catch (Exception e) {
+            logger.error("Erro ao carregar dados da locacao ID " + idLocacao + " para impressao", e);
+        }
+    }
 }

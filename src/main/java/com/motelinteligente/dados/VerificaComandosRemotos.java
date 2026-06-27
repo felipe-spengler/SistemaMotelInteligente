@@ -12,6 +12,10 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
 
@@ -320,6 +324,37 @@ public class VerificaComandosRemotos extends Thread implements MqttCallback {
                             }
                         };
                         worker.execute();
+                    }
+                } else if (acao.equals("encerrar") || acao.equals("checkout")) {
+                    int idLoc = Integer.parseInt(numero);
+                    int quarto = -1;
+                    try (Connection conn = new fazconexao().conectar()) {
+                        try (PreparedStatement st = conn.prepareStatement("SELECT numquarto FROM registralocado WHERE idlocacao = ?")) {
+                            st.setInt(1, idLoc);
+                            try (ResultSet rs = st.executeQuery()) {
+                                if (rs.next()) {
+                                    quarto = rs.getInt("numquarto");
+                                }
+                            }
+                        }
+                    } catch (Exception e) {
+                        logger.error("Erro ao buscar quarto para encerramento remoto", e);
+                    }
+
+                    if (quarto != -1) {
+                        mudaStatusNaCache(quarto, "limpeza");
+                        CacheDados.getInstancia().getCacheOcupado().remove(quarto);
+                        configGlobal.getInstance().setMudanca(true);
+                        
+                        // Executar ações de hardware e som
+                        new playSound().playSound("som/agradecemosPreferencia.wav");
+                        new ConectaArduino(999);
+                        
+                        // Trata impressao opcional
+                        boolean imprimir = (partes.length > 2 && partes[2].equalsIgnoreCase("imprimir"));
+                        if (imprimir) {
+                            ImpressoraService.imprimirExtratoLocacaoPorId(idLoc);
+                        }
                     }
                 } else if (acao.equals("reproduzir")) {
                     new playSound().playSound("som/mensagem conferencia.wav");
