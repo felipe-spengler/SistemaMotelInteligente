@@ -633,65 +633,63 @@ public class UltimaLocacao extends javax.swing.JFrame {
                             valCred = resultStmt.getFloat("valorcredito");
                             valDeb = resultStmt.getFloat("valordebito");
 
-                            if ((valCred + valDeb) != recC) {
-                                // Interface para entrada dos valores
-                                JPanel painel = new JPanel(new GridLayout(3, 2, 10, 10));
-                                painel.setBorder(BorderFactory.createTitledBorder(
-                                        BorderFactory.createEtchedBorder(),
-                                        "Detalhar Pagamento Cartão",
-                                        TitledBorder.CENTER,
-                                        TitledBorder.TOP
-                                ));
+                            // Interface para entrada dos valores
+                            JPanel painel = new JPanel(new GridLayout(3, 2, 10, 10));
+                            painel.setBorder(BorderFactory.createTitledBorder(
+                                    BorderFactory.createEtchedBorder(),
+                                    "Detalhar Pagamento Cartão",
+                                    TitledBorder.CENTER,
+                                    TitledBorder.TOP
+                            ));
 
-                                JTextField txtCredito = new JTextField(String.format("%.2f", valCred));
-                                JTextField txtDebito = new JTextField(String.format("%.2f", valDeb));
+                            JTextField txtCredito = new JTextField(String.format("%.2f", valCred));
+                            JTextField txtDebito = new JTextField(String.format("%.2f", valDeb));
 
-                                painel.add(new JLabel("Valor Crédito:"));
-                                painel.add(txtCredito);
-                                painel.add(new JLabel("Valor Débito:"));
-                                painel.add(txtDebito);
+                            painel.add(new JLabel("Valor Crédito:"));
+                            painel.add(txtCredito);
+                            painel.add(new JLabel("Valor Débito:"));
+                            painel.add(txtDebito);
 
-                                // Teclas Enter e Tab
-                                txtCredito.addKeyListener(new java.awt.event.KeyAdapter() {
-                                    public void keyPressed(java.awt.event.KeyEvent evt) {
-                                        if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER || evt.getKeyCode() == java.awt.event.KeyEvent.VK_TAB) {
-                                            txtDebito.requestFocus();
-                                        }
+                            // Teclas Enter e Tab
+                            txtCredito.addKeyListener(new java.awt.event.KeyAdapter() {
+                                public void keyPressed(java.awt.event.KeyEvent evt) {
+                                    if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER || evt.getKeyCode() == java.awt.event.KeyEvent.VK_TAB) {
+                                        txtDebito.requestFocus();
                                     }
-                                });
-                                txtDebito.addKeyListener(new java.awt.event.KeyAdapter() {
-                                    public void keyPressed(java.awt.event.KeyEvent evt) {
-                                        if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
-                                            txtDebito.transferFocus();
-                                        }
+                                }
+                            });
+                            txtDebito.addKeyListener(new java.awt.event.KeyAdapter() {
+                                public void keyPressed(java.awt.event.KeyEvent evt) {
+                                    if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+                                        txtDebito.transferFocus();
                                     }
-                                });
+                                }
+                            });
 
-                                boolean valoresCorretos = false;
-                                while (!valoresCorretos) {
-                                    int result = JOptionPane.showConfirmDialog(null, painel, "Informe os valores de cartão", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-                                    if (result == JOptionPane.OK_OPTION) {
-                                        try {
-                                            float novoCredito = Float.parseFloat(txtCredito.getText().replace(",", "."));
-                                            float novoDebito = Float.parseFloat(txtDebito.getText().replace(",", "."));
-                                            if ((novoCredito + novoDebito) == recC) {
-                                                PreparedStatement updateStmt = link.prepareStatement("UPDATE valorcartao SET valorcredito = ?, valordebito = ? WHERE idlocacao = ?");
-                                                updateStmt.setFloat(1, novoCredito);
-                                                updateStmt.setFloat(2, novoDebito);
-                                                updateStmt.setInt(3, idLocacao);
-                                                updateStmt.executeUpdate();
-                                                updateStmt.close();
-                                                valoresCorretos = true;
-                                            } else {
-                                                JOptionPane.showMessageDialog(null, "A soma dos valores não bate com o total do cartão (" + recC + "). Tente novamente.");
-                                            }
-                                        } catch (NumberFormatException ex) {
-                                            JOptionPane.showMessageDialog(null, "Digite apenas números válidos.");
+                            boolean valoresCorretos = false;
+                            while (!valoresCorretos) {
+                                int result = JOptionPane.showConfirmDialog(null, painel, "Informe os valores de cartão", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+                                if (result == JOptionPane.OK_OPTION) {
+                                    try {
+                                        float novoCredito = Float.parseFloat(txtCredito.getText().replace(",", "."));
+                                        float novoDebito = Float.parseFloat(txtDebito.getText().replace(",", "."));
+                                        if ((novoCredito + novoDebito) == recC) {
+                                            PreparedStatement updateStmt = link.prepareStatement("UPDATE valorcartao SET valorcredito = ?, valordebito = ? WHERE idlocacao = ?");
+                                            updateStmt.setFloat(1, novoCredito);
+                                            updateStmt.setFloat(2, novoDebito);
+                                            updateStmt.setInt(3, idLocacao);
+                                            updateStmt.executeUpdate();
+                                            updateStmt.close();
+                                            valoresCorretos = true;
+                                        } else {
+                                            JOptionPane.showMessageDialog(null, "A soma dos valores não bate com o total do cartão (" + recC + "). Tente novamente.");
                                         }
-                                    } else {
-                                        JOptionPane.showMessageDialog(null, "Operação cancelada. Valores não atualizados.");
-                                        break;
+                                    } catch (NumberFormatException ex) {
+                                        JOptionPane.showMessageDialog(null, "Digite apenas números válidos.");
                                     }
+                                } else {
+                                    JOptionPane.showMessageDialog(null, "Operação cancelada. Valores não atualizados.");
+                                    break;
                                 }
                             }
                         } else {
