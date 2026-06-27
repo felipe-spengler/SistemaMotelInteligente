@@ -555,7 +555,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         menuSistema = new javax.swing.JMenu();
         menuResBackup = new javax.swing.JMenuItem();
         jMenuItem1 = new javax.swing.JMenuItem();
-        btMenuSair = new javax.swing.JMenu();
+        
 
         javax.swing.GroupLayout jFrame1Layout = new javax.swing.GroupLayout(jFrame1.getContentPane());
         jFrame1.getContentPane().setLayout(jFrame1Layout);
@@ -1621,15 +1621,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             }
         });
         btFerramentas.add(menuConfigAd);
-        
-        javax.swing.JMenuItem menuFiscais = new javax.swing.JMenuItem("Fiscais");
-        menuFiscais.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_editar.png")));
-        menuFiscais.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                new ConfiguracaoFiscal().setVisible(true);
-            }
-        });
-        menuConfigAd.add(menuFiscais);
 
         menuSobSistema.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_entrar.png"))); // NOI18N
         menuSobSistema.setText("Auto Atendimento");
@@ -1710,20 +1701,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         jMenuBar1.add(menuSistema);
 
-        btMenuSair.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/sair.png"))); // NOI18N
-        btMenuSair.setText("Sair");
-        btMenuSair.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        btMenuSair.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                btMenuSairMouseClicked(evt);
-            }
-        });
-        btMenuSair.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btMenuSairActionPerformed(evt);
-            }
-        });
-        jMenuBar1.add(btMenuSair);
+        
 
         setJMenuBar(jMenuBar1);
 
@@ -1889,7 +1867,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             verificarMensalidade();
         }, 0, 3, TimeUnit.HOURS);
 
-        verificarPopupFiscal();
+        // verificarPopupFiscal();
     }
 
     private String getSistemaProperty() {
@@ -3074,26 +3052,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         abrirCaixaFrame();
     }// GEN-LAST:event_menuCaixaBtMouseClicked
 
-    private void btMenuSairMouseClicked(java.awt.event.MouseEvent evt) {// GEN-FIRST:event_btMenuSairMouseClicked
-        // CODIGO PARA LOGGOF
-        try {
-            CacheDados cacheDados = CacheDados.getInstancia();
-            cacheDados.limparCaches();
-
-            // Para as threads background para não ficarem "zumbis"
-            CheckSincronia.stop();
-            ConexaoRemota.fecharPool();
-            // fazconexao.fecharPool(); // Se implementado
-
-            fecharTela();
-        } catch (IOException ex) {
-            Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }// GEN-LAST:event_btMenuSairMouseClicked
-
-    private void btMenuSairActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btMenuSairActionPerformed
-
-    }// GEN-LAST:event_btMenuSairActionPerformed
 
     private void menuSistemaMouseClicked(java.awt.event.MouseEvent evt) {// GEN-FIRST:event_menuSistemaMouseClicked
 
@@ -3163,7 +3121,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private javax.swing.JMenu btDespertador;
     private javax.swing.JMenu btFerramentas;
     private javax.swing.JMenu btFuncionario;
-    private javax.swing.JMenu btMenuSair;
     private javax.swing.JButton btNegociar;
     private javax.swing.JMenu btQuartos;
     private javax.swing.JButton bt_Antecipado;

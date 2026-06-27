@@ -211,7 +211,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         labelEncerramento.setFont(new Font("Segoe UI", Font.BOLD, 28));
 
         // Botões da Barra de Cima
-        JButton[] topButtons = { btSalvar, btVoltar, btDebito, btConferencia, btDesistencia, btWifi };
+        JButton[] topButtons = { btSalvar, btVoltar, btDebito, btConferencia, btDesistencia, btWifi, btImprimirExtrato };
         for (JButton b : topButtons) {
             if (b != null) {
                 b.putClientProperty("JButton.buttonType", "roundRect");
@@ -225,7 +225,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         btSalvar.setForeground(Color.WHITE);
 
         // Botões de Ação
-        JButton[] actionButtons = { btInserir, btApagar };
+        JButton[] actionButtons = { btInserir, btApagar, btBuscar };
         for (JButton b : actionButtons) {
             if (b != null) {
                 b.putClientProperty("JButton.buttonType", "roundRect");
@@ -313,6 +313,24 @@ public class EncerraQuarto extends javax.swing.JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 btDesistencia.doClick(); // Simula o clique no botão "Desistência"
+            }
+        });
+
+        // Mapeia a tecla F11 para imprimir extrato
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F11, 0), "F11");
+        actionMap.put("F11", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btImprimirExtrato.doClick();
+            }
+        });
+
+        // Mapeia a tecla F3 para buscar produto
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0), "F3");
+        actionMap.put("F3", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                btBuscar.doClick();
             }
         });
 
@@ -475,6 +493,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
         btConferencia = new javax.swing.JButton();
         btDesistencia = new javax.swing.JButton();
         btWifi = new javax.swing.JButton();
+        btImprimirExtrato = new javax.swing.JButton();
+        btBuscar = new javax.swing.JButton();
         painelProdutos = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
@@ -637,6 +657,22 @@ public class EncerraQuarto extends javax.swing.JFrame {
             }
         });
 
+        btImprimirExtrato.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        btImprimirExtrato.setForeground(new java.awt.Color(204, 51, 0));
+        btImprimirExtrato.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/pdf_icon.png"))); // NOI18N
+        btImprimirExtrato.setText("Extrato (F11)");
+        btImprimirExtrato.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btImprimirExtrato.setIconTextGap(1);
+        btImprimirExtrato.setMaximumSize(new java.awt.Dimension(130, 79));
+        btImprimirExtrato.setMinimumSize(new java.awt.Dimension(130, 79));
+        btImprimirExtrato.setPreferredSize(new java.awt.Dimension(130, 79));
+        btImprimirExtrato.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btImprimirExtrato.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btImprimirExtratoActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout barraCimaLayout = new javax.swing.GroupLayout(barraCima);
         barraCima.setLayout(barraCimaLayout);
         barraCimaLayout.setHorizontalGroup(
@@ -660,6 +696,9 @@ public class EncerraQuarto extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btWifi, javax.swing.GroupLayout.PREFERRED_SIZE,
                                         javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btImprimirExtrato, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
         barraCimaLayout.setVerticalGroup(
                 barraCimaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -667,6 +706,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addGroup(barraCimaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addComponent(btWifi, javax.swing.GroupLayout.PREFERRED_SIZE, 76,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(btImprimirExtrato, javax.swing.GroupLayout.PREFERRED_SIZE, 76,
                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addComponent(btDesistencia, javax.swing.GroupLayout.PREFERRED_SIZE, 76,
                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -744,6 +785,15 @@ public class EncerraQuarto extends javax.swing.JFrame {
             }
         });
 
+        btBuscar.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        btBuscar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/buscar.png"))); // NOI18N
+        btBuscar.setText("Buscar (F3)");
+        btBuscar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btBuscarActionPerformed(evt);
+            }
+        });
+
         btInserir.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btInserir.setText("Inserir");
         btInserir.addActionListener(new java.awt.event.ActionListener() {
@@ -777,6 +827,9 @@ public class EncerraQuarto extends javax.swing.JFrame {
                                 painelProdutosLayout.createSequentialGroup()
                                         .addGap(18, 18, 18)
                                         .addComponent(btApagar, javax.swing.GroupLayout.PREFERRED_SIZE, 125,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(btBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 125,
                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED,
                                                 javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -847,8 +900,11 @@ public class EncerraQuarto extends javax.swing.JFrame {
                                                 .createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                                 .addComponent(jLabel11)
                                                 .addComponent(lblValorConsumo))
-                                        .addComponent(btApagar, javax.swing.GroupLayout.PREFERRED_SIZE, 33,
-                                                javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addGroup(painelProdutosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                .addComponent(btApagar, javax.swing.GroupLayout.PREFERRED_SIZE, 33,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(btBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 33,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE)))
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
 
         painelInfo.setBackground(new java.awt.Color(204, 204, 204));
@@ -1390,7 +1446,6 @@ public class EncerraQuarto extends javax.swing.JFrame {
                             salvaJustifica("acrescimo", valorAcrescimo);
                         }
                         salvaVendidos(numeroDoQuarto);
-                        new com.motelinteligente.dados.FiscalService().emitirNota(idLocacao);
                     }
                 }
 
@@ -1398,8 +1453,6 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 // nao precisa justificativa
                 if (chamaJOP()) {
                     salvaVendidos(numeroDoQuarto);
-                    new com.motelinteligente.dados.FiscalService().emitirNota(idLocacao);
-
                 }
             }
         }
@@ -2624,6 +2677,59 @@ public class EncerraQuarto extends javax.swing.JFrame {
         }
     }// GEN-LAST:event_btWifiActionPerformed
 
+    private void btImprimirExtratoActionPerformed(java.awt.event.ActionEvent evt) {
+        float valorAntecipadoSoma = 0;
+        if (antecipados != null) {
+            for (Antecipado a : antecipados) {
+                if (!"desconto".equals(a.getTipo())) {
+                    valorAntecipadoSoma += a.getValor();
+                }
+            }
+        }
+        
+        com.motelinteligente.dados.ImpressoraService.imprimirExtratoLocacao(
+            numeroDoQuarto, idLocacao, dataInicio, dataFim, tempoTotalLocado,
+            valorQuarto, valorAdicionalPessoa, valorAdicionalPeriodo, valorConsumo,
+            valorAcrescimo, valorDesconto, valorAntecipadoSoma, valorRecebidoAgora,
+            (DefaultTableModel) tabela.getModel()
+        );
+        JOptionPane.showMessageDialog(this, "Extrato de locação enviado para a impressora!");
+        txtIdProduto.grabFocus();
+    }
+
+    private void btBuscarActionPerformed(java.awt.event.ActionEvent evt) {
+        DialogBuscaProduto dialog = new DialogBuscaProduto(this);
+        dialog.setVisible(true);
+        if (dialog.isConfirmado()) {
+            int id = dialog.getIdProdutoSelecionado();
+            int qtd = dialog.getQuantidadeSelecionada();
+            adicionarProdutoPorId(id, qtd);
+        }
+    }
+
+    public void adicionarProdutoPorId(int idProduto, int quantidade) {
+        fprodutos produtodao = new fprodutos();
+        String texto = produtodao.getDescicao(String.valueOf(idProduto));
+
+        if (texto != null) {
+            DefaultTableModel modelo = (DefaultTableModel) tabela.getModel();
+            float valor = produtodao.getValorProduto(idProduto);
+            float valorSoma = valor * quantidade;
+
+            modelo.addRow(new Object[] {
+                    idProduto,
+                    quantidade,
+                    texto,
+                    valor,
+                    valorSoma
+            });
+            outraTela.adicionaTabela(String.valueOf(idProduto), String.valueOf(quantidade), texto, valor, valorSoma);
+            atualizaConsumo();
+        } else {
+            JOptionPane.showMessageDialog(this, "Produto não encontrado!");
+        }
+    }
+
     private void formWindowActivated(java.awt.event.WindowEvent evt) {// GEN-FIRST:event_formWindowActivated
         // TODO add your handling code here:
     }// GEN-LAST:event_formWindowActivated
@@ -2644,6 +2750,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
     private javax.swing.JButton btSalvar;
     private javax.swing.JButton btVoltar;
     private javax.swing.JButton btWifi;
+    private javax.swing.JButton btImprimirExtrato;
+    private javax.swing.JButton btBuscar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;

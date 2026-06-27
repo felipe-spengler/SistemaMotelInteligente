@@ -11,6 +11,7 @@ import java.sql.Statement;
 import java.sql.SQLException;
 import com.motelinteligente.dados.fazconexao;
 import com.motelinteligente.dados.CarregarVariaveis;
+import com.motelinteligente.dados.ConexaoRemota;
 
 public class ConfiguracaoFiscal extends JFrame {
 
@@ -191,6 +192,35 @@ public class ConfiguracaoFiscal extends JFrame {
 
                     String accessToken = rs.getString("bling_access_token");
                     java.sql.Timestamp expiresAt = rs.getTimestamp("bling_token_expires_at");
+
+                    if (accessToken == null || accessToken.trim().isEmpty() || expiresAt == null || expiresAt.before(new java.util.Date())) {
+                        try (Connection remoteLink = ConexaoRemota.getConnection()) {
+                            if (remoteLink != null) {
+                                String remoteSql = "SELECT bling_access_token, bling_refresh_token, bling_token_expires_at FROM configuracoes LIMIT 1";
+                                try (PreparedStatement remoteStmt = remoteLink.prepareStatement(remoteSql); ResultSet remoteRs = remoteStmt.executeQuery()) {
+                                    if (remoteRs.next()) {
+                                        String rAccess = remoteRs.getString("bling_access_token");
+                                        String rRefresh = remoteRs.getString("bling_refresh_token");
+                                        java.sql.Timestamp rExpires = remoteRs.getTimestamp("bling_token_expires_at");
+                                        if (rAccess != null && !rAccess.trim().isEmpty()) {
+                                            String updateSql = "UPDATE configuracoes SET bling_access_token = ?, bling_refresh_token = ?, bling_token_expires_at = ?";
+                                            try (PreparedStatement updateStmt = link.prepareStatement(updateSql)) {
+                                                updateStmt.setString(1, rAccess);
+                                                updateStmt.setString(2, rRefresh);
+                                                updateStmt.setTimestamp(3, rExpires);
+                                                updateStmt.executeUpdate();
+                                            }
+                                            accessToken = rAccess;
+                                            expiresAt = rExpires;
+                                        }
+                                    }
+                                }
+                            }
+                        } catch (Exception e) {
+                            System.err.println("Erro ao buscar tokens do banco remoto: " + e.getMessage());
+                        }
+                    }
+
                     if (accessToken != null && !accessToken.trim().isEmpty()) {
                         if (expiresAt != null && expiresAt.after(new java.util.Date())) {
                             lblStatusConexao.setText("<html><font color='green'>● Conectado (Válido)</font></html>");

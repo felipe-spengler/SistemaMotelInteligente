@@ -185,8 +185,35 @@ public class FiscalService {
             return null;
         }
 
-        // Se expirou ou vai expirar nos próximos 5 minutos, renova
+        // Se expirou ou vai expirar nos próximos 5 minutos, tenta renovar ou buscar do remoto
         if (expiresAt == null || expiresAt.before(new java.util.Date(System.currentTimeMillis() + 300_000))) {
+            // Tenta buscar do remoto antes (caso tenha sido atualizado via oauth_callback)
+            try (Connection remoteLink = ConexaoRemota.getConnection()) {
+                if (remoteLink != null) {
+                    String remoteSql = "SELECT bling_access_token, bling_refresh_token, bling_token_expires_at FROM configuracoes LIMIT 1";
+                    try (PreparedStatement remoteStmt = remoteLink.prepareStatement(remoteSql); ResultSet remoteRs = remoteStmt.executeQuery()) {
+                        if (remoteRs.next()) {
+                            java.sql.Timestamp rExpires = remoteRs.getTimestamp("bling_token_expires_at");
+                            if (rExpires != null && rExpires.after(new java.util.Date(System.currentTimeMillis() + 300_000))) {
+                                String rAccess = remoteRs.getString("bling_access_token");
+                                String rRefresh = remoteRs.getString("bling_refresh_token");
+                                String updateSql = "UPDATE configuracoes SET bling_access_token = ?, bling_refresh_token = ?, bling_token_expires_at = ?";
+                                try (PreparedStatement updateStmt = link.prepareStatement(updateSql)) {
+                                    updateStmt.setString(1, rAccess);
+                                    updateStmt.setString(2, rRefresh);
+                                    updateStmt.setTimestamp(3, rExpires);
+                                    updateStmt.executeUpdate();
+                                }
+                                logger.info("Token do Bling atualizado com sucesso a partir do banco remoto.");
+                                return rAccess;
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                logger.error("Erro ao buscar token do Bling no banco remoto: ", e);
+            }
+
             if (refreshToken == null || refreshToken.isEmpty()) {
                 logger.warn("Refresh token do Bling ausente. É necessário autorizar a integração novamente.");
                 return null;

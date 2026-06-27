@@ -1,7 +1,9 @@
 package com.motelinteligente.dados;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.JOptionPane;
 import org.slf4j.Logger;
@@ -32,6 +34,8 @@ public class configGlobal {
     private boolean clienteSeleciona;
     private boolean subtelaAtiva;
     private boolean pedidosOnlineAtivo;
+    private boolean impressoraAtiva;
+    private String impressoraNome;
 
     // Construtor privado para evitar a criação de múltiplas instâncias
     public configGlobal() {
@@ -44,6 +48,8 @@ public class configGlobal {
         controlaEstoque = false;
         flagSistemaSpring = flagArduino = false;
         telaMostrar = null;
+        impressoraAtiva = false;
+        impressoraNome = null;
 
     }
 
@@ -129,35 +135,61 @@ public class configGlobal {
         carregarConfiguracoesAdicionais();
     }
 
+    private void verificarColunasImpressora(Connection link) {
+        String[] colunas = {
+            "impressora_ativa TINYINT(1) DEFAULT 0",
+            "impressora_nome VARCHAR(255) DEFAULT NULL"
+        };
+        for (String col : colunas) {
+            String nomeColuna = col.split(" ")[0];
+            try (PreparedStatement testStmt = link.prepareStatement("SELECT " + nomeColuna + " FROM configuracoes LIMIT 1")) {
+                testStmt.executeQuery();
+            } catch (SQLException ex) {
+                try (Statement alterStmt = link.createStatement()) {
+                    alterStmt.executeUpdate("ALTER TABLE configuracoes ADD COLUMN " + col);
+                    logger.info("Coluna " + nomeColuna + " adicionada com sucesso na tabela configuracoes.");
+                } catch (SQLException alterEx) {
+                    logger.error("Erro ao adicionar coluna " + nomeColuna + " em configuracoes: ", alterEx);
+                }
+            }
+        }
+    }
+
     public void carregarConfiguracoesAdicionais() {
         String consultaSQL = "SELECT * FROM configuracoes";
 
-        // O try-with-resources garante que todos os recursos entre parênteses
-        // (Connection, Statement, e ResultSet) serão fechados automaticamente.
-        try (Connection link = new fazconexao().conectar();
-                Statement statement = link.createStatement();
-                ResultSet resultado = statement.executeQuery(consultaSQL)) {
+        try (Connection link = new fazconexao().conectar()) {
+            verificarColunasImpressora(link);
 
-            if (resultado.next()) {
-                // Carrega as configurações do banco de dados
-                this.logoffecharcaixa = resultado.getBoolean("logoffcaixa");
-                this.controlaEstoque = resultado.getBoolean("estoque");
-                this.flagMesmoUserCaixa = resultado.getBoolean("flagMesmoUserCaixa");
-                this.limiteDesconto = resultado.getInt("limitadesconto");
-                this.telaMostrar = resultado.getString("telaMostrar");
-                this.telaMostrar = resultado.getString("telaMostrar");
-                this.portoesRF = resultado.getBoolean("portoesrf");
-                try {
-                    this.caminhoAudio = resultado.getString("caminhoAudio");
-                    this.clienteSeleciona = resultado.getBoolean("clienteSeleciona");
-                    this.subtelaAtiva = resultado.getBoolean("subtelaAtiva");
-                    this.pedidosOnlineAtivo = resultado.getBoolean("pedidos_online");
-                } catch (Exception ex) {
-                    // Colunas podem não existir ainda
+            try (Statement statement = link.createStatement();
+                    ResultSet resultado = statement.executeQuery(consultaSQL)) {
+
+                if (resultado.next()) {
+                    // Carrega as configurações do banco de dados
+                    this.logoffecharcaixa = resultado.getBoolean("logoffcaixa");
+                    this.controlaEstoque = resultado.getBoolean("estoque");
+                    this.flagMesmoUserCaixa = resultado.getBoolean("flagMesmoUserCaixa");
+                    this.limiteDesconto = resultado.getInt("limitadesconto");
+                    this.telaMostrar = resultado.getString("telaMostrar");
+                    this.portoesRF = resultado.getBoolean("portoesrf");
+                    try {
+                        this.caminhoAudio = resultado.getString("caminhoAudio");
+                        this.clienteSeleciona = resultado.getBoolean("clienteSeleciona");
+                        this.subtelaAtiva = resultado.getBoolean("subtelaAtiva");
+                        this.pedidosOnlineAtivo = resultado.getBoolean("pedidos_online");
+                    } catch (Exception ex) {
+                        // Colunas podem não existir ainda
+                    }
+                    try {
+                        this.impressoraAtiva = resultado.getBoolean("impressora_ativa");
+                        this.impressoraNome = resultado.getString("impressora_nome");
+                    } catch (Exception ex) {
+                        // Colunas podem não existir ainda
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(null,
+                            "Erro ao carregar Informações Adicionais. Nenhuma configuração encontrada.");
                 }
-            } else {
-                JOptionPane.showMessageDialog(null,
-                        "Erro ao carregar Informações Adicionais. Nenhuma configuração encontrada.");
             }
 
         } catch (Exception e) {
@@ -276,5 +308,21 @@ public class configGlobal {
 
     public void setPedidosOnlineAtivo(boolean pedidosOnlineAtivo) {
         this.pedidosOnlineAtivo = pedidosOnlineAtivo;
+    }
+
+    public boolean isImpressoraAtiva() {
+        return impressoraAtiva;
+    }
+
+    public void setImpressoraAtiva(boolean impressoraAtiva) {
+        this.impressoraAtiva = impressoraAtiva;
+    }
+
+    public String getImpressoraNome() {
+        return impressoraNome;
+    }
+
+    public void setImpressoraNome(String impressoraNome) {
+        this.impressoraNome = impressoraNome;
     }
 }

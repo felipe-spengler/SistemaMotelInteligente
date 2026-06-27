@@ -106,7 +106,7 @@ public class CadastraProdutoModerno extends JDialog {
         pnlFiscal.add(txtNCM, "growx");
         pnlFiscal.add(txtCEST, "growx");
         pnlFiscal.add(txtCSOSN, "growx");
-        pnlPrincipal.add(pnlFiscal, "growx");
+        // pnlPrincipal.add(pnlFiscal, "growx"); // Ocultado módulo fiscal do cadastro de produtos
 
         JPanel stockPanel = new JPanel(new MigLayout("insets 0", "[]10[grow]", "[]"));
         stockPanel.setOpaque(false);

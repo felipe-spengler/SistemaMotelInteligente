@@ -26,6 +26,8 @@ public class ConfiguracoesModerno extends JFrame {
     private JRadioButton botaoBotoeira;
     private JButton botaoCodigos;
     private ButtonGroup portoesGroup;
+    private JCheckBox checkImpressora;
+    private JComboBox<String> jComboBoxImpressoras;
     private boolean isInitializing = false;
 
     public ConfiguracoesModerno() {
@@ -114,6 +116,25 @@ public class ConfiguracoesModerno extends JFrame {
 
         add(pnlPortoes, "growx, wrap");
 
+        // Panel for Printer Settings
+        JPanel pnlImpressora = new JPanel(new MigLayout("fillx, insets 0", "[]10[grow]", "[]10[]"));
+        pnlImpressora.setBorder(BorderFactory.createTitledBorder("Impressora de Cupom"));
+
+        checkImpressora = new JCheckBox("Ativar Impressões automáticas");
+        checkImpressora.addActionListener(e -> salvarCheckImpressora());
+        pnlImpressora.add(checkImpressora, "span 2, wrap");
+
+        pnlImpressora.add(new JLabel("Selecionar Impressora:"));
+        jComboBoxImpressoras = new JComboBox<>();
+        jComboBoxImpressoras.addItemListener(e -> {
+            if (!isInitializing && e.getStateChange() == java.awt.event.ItemEvent.SELECTED) {
+                salvarImpressoraSelecionada();
+            }
+        });
+        pnlImpressora.add(jComboBoxImpressoras, "growx");
+
+        add(pnlImpressora, "growx, wrap");
+
         // Panel for Customization
         JPanel pnlPersonaliza = new JPanel(new MigLayout("fillx, insets 0", "[grow]10[grow]", "[]"));
         pnlPersonaliza.setBorder(BorderFactory.createTitledBorder("Personalização Wi-Fi"));
@@ -184,6 +205,17 @@ public class ConfiguracoesModerno extends JFrame {
 
         // Load Screens
         carregarTelas();
+
+        // Impressora
+        checkImpressora.setSelected(config.isImpressoraAtiva());
+        jComboBoxImpressoras.removeAllItems();
+        java.util.List<String> imps = com.motelinteligente.dados.ImpressoraService.listarImpressoras();
+        for (String imp : imps) {
+            jComboBoxImpressoras.addItem(imp);
+        }
+        if (config.getImpressoraNome() != null) {
+            jComboBoxImpressoras.setSelectedItem(config.getImpressoraNome());
+        }
 
         isInitializing = false;
     }
@@ -279,6 +311,28 @@ public class ConfiguracoesModerno extends JFrame {
             // too annoying? Original had it.
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Erro ao salvar tela: " + e.getMessage());
+        }
+    }
+
+    private void salvarCheckImpressora() {
+        if (isInitializing) return;
+        boolean selected = checkImpressora.isSelected();
+        configGlobal.getInstance().setImpressoraAtiva(selected);
+        funcaoSet("impressora_ativa", selected);
+    }
+
+    private void salvarImpressoraSelecionada() {
+        if (isInitializing) return;
+        String imp = (String) jComboBoxImpressoras.getSelectedItem();
+        if (imp != null) {
+            configGlobal.getInstance().setImpressoraNome(imp);
+            try (Connection link = new fazconexao().conectar();
+                    PreparedStatement stmt = link.prepareStatement("UPDATE configuracoes SET impressora_nome = ?")) {
+                stmt.setString(1, imp);
+                stmt.executeUpdate();
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(this, "Erro ao salvar impressora: " + e.getMessage());
+            }
         }
     }
 

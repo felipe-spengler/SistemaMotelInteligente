@@ -553,6 +553,12 @@ public class CaixaFrameModerno extends JFrame {
             // e o Saldo Final (Físico) é apenas para conferência visual.
 
             if (new fcaixa().fecharCaixa(entradaNet)) {
+                // Impressão dos cupons térmicos antes de limpar o ID do caixa da configGlobal
+                com.motelinteligente.dados.ImpressoraService.imprimirFechamentoCaixa(
+                    idCaixa, v, saldoIni, antecipadoOutro, antecipadoDetalhado, totalJustificativas
+                );
+                com.motelinteligente.dados.ImpressoraService.imprimirProdutosVendidos(idCaixa);
+
                 JOptionPane.showMessageDialog(this,
                         "Caixa fechado com sucesso!",
                         "Sucesso",

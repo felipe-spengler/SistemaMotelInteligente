@@ -47,3 +47,7 @@ db_/
 logo-branco.png
 compile_errors.txt
 mudancas.txt
+
+# SSH Key and secrets
+secrets/
+
