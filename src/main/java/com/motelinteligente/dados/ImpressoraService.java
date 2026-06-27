@@ -60,7 +60,7 @@ public class ImpressoraService {
 
         try {
             if (printerName != null && !printerName.trim().isEmpty()) {
-                PrintService[] printServices = PrinterJob.lookupPrintServices();
+                PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
                 for (PrintService service : printServices) {
                     if (service.getName().equalsIgnoreCase(printerName.trim())) {
                         selectedService = service;
@@ -78,21 +78,45 @@ public class ImpressoraService {
                 return;
             }
 
+            logger.info("Tentando imprimir via modo RAW (Texto Direto) na impressora: {}", selectedService.getName());
+            
+            try {
+                // Tenta impressão direta por bytes (modo RAW) - Altamente compatível com bobinas térmicas e "Generic/Text Only"
+                javax.print.DocFlavor flavor = javax.print.DocFlavor.BYTE_ARRAY.AUTOSENSE;
+                javax.print.DocPrintJob docJob = selectedService.createPrintJob();
+                
+                // Converter para bytes usando encoding Cp850 (acentuação compatível com a maioria das impressoras térmicas brasileiras)
+                byte[] textBytes = texto.getBytes("Cp850");
+                
+                // Comandos ESC/POS básicos:
+                // ESC @ (0x1B, 0x40) - Inicializa a impressora
+                byte[] escInit = new byte[]{0x1B, 0x40};
+                // Avanço de papel (5 linhas) e corte parcial (GS V 66 0 -> 0x1D, 0x56, 0x42, 0x00)
+                byte[] escCut = new byte[]{0x0A, 0x0A, 0x0A, 0x0A, 0x0A, 0x1D, 0x56, 0x42, 0x00};
+                
+                byte[] finalBytes = new byte[escInit.length + textBytes.length + escCut.length];
+                System.arraycopy(escInit, 0, finalBytes, 0, escInit.length);
+                System.arraycopy(textBytes, 0, finalBytes, escInit.length, textBytes.length);
+                System.arraycopy(escCut, 0, finalBytes, escInit.length + textBytes.length, escCut.length);
+                
+                javax.print.Doc doc = new javax.print.SimpleDoc(finalBytes, flavor, null);
+                docJob.print(doc, null);
+                logger.info("Cupom impresso via modo RAW com sucesso!");
+                return; // Impressão concluída com sucesso, encerra o método
+            } catch (Exception rawException) {
+                logger.warn("Falha ao imprimir em modo RAW. Tentando fallback para modo AWT Graphics...", rawException);
+            }
+
+            // FALLBACK: Modo Gráfico AWT (caso o modo RAW falhe por restrição de Driver)
             PrinterJob job = PrinterJob.getPrinterJob();
             job.setPrintService(selectedService);
 
             final String textToPrint = texto;
-
-            // Formatação do papel de cupom térmico (geralmente ~72mm/80mm de largura útil)
-            // 1 polegada = 72 pontos. 80mm de papel térmico dá ~226 pontos de largura.
-            // Área de impressão útil ideal: 200 pontos. Margem esquerda: 10 pontos.
-            PageFormat pf = job.defaultPage();
-            Paper paper = new Paper();
-            
-            // Calcula altura aproximada com base no número de linhas (12 pontos por linha + folga)
             String[] lines = textToPrint.split("\n");
             double calculatedHeight = (lines.length + 6) * 12;
 
+            PageFormat pf = job.defaultPage();
+            Paper paper = new Paper();
             paper.setSize(220, calculatedHeight);
             paper.setImageableArea(10, 10, 200, calculatedHeight - 20);
             pf.setPaper(paper);
@@ -107,8 +131,6 @@ public class ImpressoraService {
 
                     Graphics2D g2d = (Graphics2D) graphics;
                     g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
-                    
-                    // Fonte monoespaçada de tamanho pequeno (8) para alinhar colunas perfeitamente no cupom
                     g2d.setFont(new Font("Monospaced", Font.PLAIN, 8));
                     g2d.setColor(Color.BLACK);
 
@@ -126,9 +148,9 @@ public class ImpressoraService {
             }, pf);
 
             job.print();
-            logger.info("Cupom enviado com sucesso para a impressora: {}", selectedService.getName());
+            logger.info("Cupom enviado via modo Gráfico AWT com sucesso para a impressora: {}", selectedService.getName());
         } catch (Exception e) {
-            logger.error("Erro durante o processo de impressão del cupom: ", e);
+            logger.error("Erro durante o processo de impressão do cupom: ", e);
         }
     }
 
