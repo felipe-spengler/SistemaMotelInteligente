@@ -108,6 +108,7 @@ public class TelaSistemaModerno extends JFrame {
             String apiUrl = "https://api.github.com/repos/felipe-spengler/SistemaMotelInteligente/releases/latest";
             HttpURLConnection connection = (HttpURLConnection) new URL(apiUrl).openConnection();
             connection.setRequestProperty("Accept", "application/vnd.github.v3+json");
+            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
 
             try (InputStream inputStream = connection.getInputStream()) {
                 String jsonText = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
@@ -256,6 +257,7 @@ public class TelaSistemaModerno extends JFrame {
         String apiUrl = "https://api.github.com/repos/felipe-spengler/SistemaMotelInteligente/releases/latest";
         HttpURLConnection connection = (HttpURLConnection) new URL(apiUrl).openConnection();
         connection.setRequestProperty("Accept", "application/vnd.github.v3+json");
+        connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
 
         try (InputStream inputStream = connection.getInputStream()) {
             String jsonText = new String(inputStream.readAllBytes());
@@ -296,6 +298,7 @@ public class TelaSistemaModerno extends JFrame {
 
     private void downloadFile(URL url, Path dest) throws IOException {
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
         int fileSize = connection.getContentLength();
         int totalBytesRead = 0;
 
