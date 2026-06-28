@@ -135,7 +135,18 @@ public class TelaSistemaModerno extends JFrame {
     // Logic copied from TelaSistema.java and adapted
     private void updateAppIfNecessary(Consumer<String> logger) throws Exception {
         logger.accept("Buscando arquivos EXE/JAR locais...");
-        List<Path> localApps = findAllAppFiles(Paths.get("."), TARGET_FILE_PREFIX);
+        String exeDir = System.getProperty("launch4j.exedir");
+        Path rootDir;
+        if (exeDir != null && !exeDir.isEmpty()) {
+            rootDir = Paths.get(exeDir);
+        } else {
+            try {
+                rootDir = Paths.get(TelaSistemaModerno.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent();
+            } catch (Exception e) {
+                rootDir = Paths.get(".").toAbsolutePath().normalize();
+            }
+        }
+        List<Path> localApps = findAllAppFiles(rootDir, TARGET_FILE_PREFIX);
 
         if (localApps.isEmpty()) {
             logger.accept("Nenhum arquivo executável 'MotelInteligente' foi encontrado na pasta raiz.");
@@ -329,49 +340,71 @@ public class TelaSistemaModerno extends JFrame {
 
         Files.copy(newApp, newAppInLogs, StandardCopyOption.REPLACE_EXISTING);
 
+        long pid = ProcessHandle.current().pid();
+
         StringBuilder scriptContent = new StringBuilder();
         scriptContent.append("@echo off\n")
                 .append("setlocal enabledelayedexpansion\n\n")
-                .append("echo Encerrando Motel Inteligente...\n")
-                .append("taskkill /F /IM \"MotelInteligente*\" /T >nul 2>&1\n")
+                .append("set LOG_FILE=update_log.txt\n")
+                .append("echo ======================================== > \"!LOG_FILE!\"\n")
+                .append("echo [%%DATE%% %%TIME%%] Iniciando processo de atualizacao... >> \"!LOG_FILE!\"\n\n")
+                .append("echo Aguardando encerramento natural do processo original... >> \"!LOG_FILE!\"\n")
+                .append("timeout /t 3 >nul\n\n")
+                .append("echo Forcando encerramento do PID ").append(pid).append(" e processos MotelInteligente... >> \"!LOG_FILE!\"\n")
+                .append("taskkill /F /PID ").append(pid).append(" /T >> \"!LOG_FILE!\" 2>&1\n")
+                .append("taskkill /F /IM \"MotelInteligente*\" /T >> \"!LOG_FILE!\" 2>&1\n")
                 .append("timeout /t 2 >nul\n\n");
 
-        for (Path oldAppPath : oldApps) {
-            scriptContent.append(":: Loop com tentativas para remover arquivo antigo e evitar travas do Windows\n")
-                    .append("for /l %%i in (1,1,5) do (\n")
+        for (int idx = 0; idx < oldApps.size(); idx++) {
+            Path oldAppPath = oldApps.get(idx);
+            scriptContent.append("echo Tentando excluir versao antiga: \"").append(oldAppPath.toAbsolutePath()).append("\" >> \"!LOG_FILE!\"\n")
+                    .append("for /l %%i in (1,1,10) do (\n")
                     .append("    if exist \"").append(oldAppPath.toAbsolutePath()).append("\" (\n")
-                    .append("        del /f /q \"").append(oldAppPath.toAbsolutePath()).append("\" >nul 2>&1\n")
-                    .append("        if not exist \"").append(oldAppPath.toAbsolutePath()).append("\" goto del_ok_%%i\n")
+                    .append("        del /f /q \"").append(oldAppPath.toAbsolutePath()).append("\" >> \"!LOG_FILE!\" 2>&1\n")
+                    .append("        if not exist \"").append(oldAppPath.toAbsolutePath()).append("\" (\n")
+                    .append("            echo [%%DATE%% %%TIME%%] Versao antiga excluida com sucesso na tentativa %%i. >> \"!LOG_FILE!\"\n")
+                    .append("            goto del_ok_").append(idx).append("_%%i\n")
+                    .append("        )\n")
                     .append("        timeout /t 1 >nul\n")
                     .append("    ) else (\n")
-                    .append("        goto del_ok_%%i\n")
+                    .append("        echo [%%DATE%% %%TIME%%] Arquivo antigo nao encontrado ou ja excluido. >> \"!LOG_FILE!\"\n")
+                    .append("        goto del_ok_").append(idx).append("_%%i\n")
                     .append("    )\n")
                     .append(")\n")
-                    .append(":del_ok_1\n:del_ok_2\n:del_ok_3\n:del_ok_4\n:del_ok_5\n\n");
+                    .append("echo [WARNING] Nao foi possivel excluir a versao antiga \"").append(oldAppPath.toAbsolutePath()).append("\" apos 10 tentativas. >> \"!LOG_FILE!\"\n");
+            for (int i = 1; i <= 10; i++) {
+                scriptContent.append(":del_ok_").append(idx).append("_").append(i).append("\n");
+            }
+            scriptContent.append("\n");
         }
 
         scriptContent.append("\n");
 
         // Pega o caminho do primeiro executável para reiniciar
         Path targetPath = oldApps.get(0).getParent().resolve(newApp.getFileName());
-        scriptContent.append(":: Loop com tentativas para copiar o novo arquivo e evitar travas\n")
-                .append("for /l %%i in (1,1,5) do (\n")
+        scriptContent.append("echo Copiando nova versao para: \"").append(targetPath.toAbsolutePath()).append("\" >> \"!LOG_FILE!\"\n")
+                .append("for /l %%i in (1,1,10) do (\n")
                 .append("    copy /y \"").append(newAppInLogs.toAbsolutePath()).append("\" \"")
-                .append(targetPath.toAbsolutePath()).append("\" >nul 2>&1\n")
-                .append("    if !errorlevel! equ 0 goto copy_ok\n")
+                .append(targetPath.toAbsolutePath()).append("\" >> \"!LOG_FILE!\" 2>&1\n")
+                .append("    if !errorlevel! equ 0 (\n")
+                .append("        echo [%%DATE%% %%TIME%%] Copia concluida com sucesso na tentativa %%i. >> \"!LOG_FILE!\"\n")
+                .append("        goto copy_ok\n")
+                .append("    )\n")
                 .append("    timeout /t 1 >nul\n")
                 .append(")\n")
+                .append("echo [ERROR] Falha ao copiar nova versao para \"").append(targetPath.toAbsolutePath()).append("\" apos 10 tentativas. >> \"!LOG_FILE!\"\n")
                 .append(":copy_ok\n\n");
 
         scriptContent.append("\n")
-                .append("echo Iniciando nova versao...\n");
+                .append("echo Iniciando nova versao em \"").append(targetPath.toAbsolutePath()).append("\"... >> \"!LOG_FILE!\"\n");
         
         String command = targetPath.getFileName().toString().endsWith(".jar")
             ? "start \"\" javaw -jar \"" + targetPath.toAbsolutePath() + "\" --after-update"
             : "start \"\" \"" + targetPath.toAbsolutePath() + "\" --after-update";
         
-        scriptContent.append(command).append("\n");
-        scriptContent.append("del \"%~f0\" >nul 2>&1\n")
+        scriptContent.append(command).append(" >> \"!LOG_FILE!\" 2>&1\n")
+                .append("echo [%%DATE%% %%TIME%%] Processo de atualizacao finalizado. >> \"!LOG_FILE!\"\n")
+                .append("del \"%~f0\" >nul 2>&1\n")
                 .append("exit\n");
 
         Files.write(updaterScriptPath, scriptContent.toString().getBytes(StandardCharsets.UTF_8));
