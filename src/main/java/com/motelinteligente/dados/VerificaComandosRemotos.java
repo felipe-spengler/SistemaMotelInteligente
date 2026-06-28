@@ -359,6 +359,39 @@ public class VerificaComandosRemotos extends Thread implements MqttCallback {
                 } else if (acao.equals("imprimir_previa") || acao.equals("previa")) {
                     int idLoc = Integer.parseInt(numero);
                     ImpressoraService.imprimirExtratoLocacaoPorId(idLoc);
+                } else if (acao.equals("abrir_checkout")) {
+                    try {
+                        int numQuarto = Integer.parseInt(numero);
+                        com.motelinteligente.telas.TelaPrincipal principal = null;
+                        for (java.awt.Frame frame : java.awt.Frame.getFrames()) {
+                            if (frame instanceof com.motelinteligente.telas.TelaPrincipal && frame.isVisible()) {
+                                principal = (com.motelinteligente.telas.TelaPrincipal) frame;
+                                break;
+                            }
+                        }
+                        if (principal != null) {
+                            final com.motelinteligente.telas.TelaPrincipal fPrincipal = principal;
+                            SwingUtilities.invokeLater(() -> {
+                                fPrincipal.abrirEncerraQuarto(numQuarto);
+                            });
+                        }
+                    } catch (Exception ex) {
+                        logger.error("Erro ao abrir checkout remoto: ", ex);
+                    }
+                } else if (acao.equals("atualizar_produtos")) {
+                    try {
+                        int idLoc = Integer.parseInt(numero);
+                        for (java.awt.Frame frame : java.awt.Frame.getFrames()) {
+                            if (frame instanceof com.motelinteligente.telas.EncerraQuarto && frame.isVisible()) {
+                                com.motelinteligente.telas.EncerraQuarto eq = (com.motelinteligente.telas.EncerraQuarto) frame;
+                                if (eq.getIdLocacao() == idLoc) {
+                                    eq.sincronizarProdutosRemotamente();
+                                }
+                            }
+                        }
+                    } catch (Exception ex) {
+                        logger.error("Erro ao atualizar produtos remotamente: ", ex);
+                    }
                 } else if (acao.equals("reproduzir")) {
                     new playSound().playSound("som/mensagem conferencia.wav");
                 }

@@ -295,6 +295,12 @@ public class ClienteEncerraModerno extends JFrame {
         });
     }
 
+    public void limparTabela() {
+        SwingUtilities.invokeLater(() -> {
+            tableModel.setRowCount(0);
+        });
+    }
+
     // === HELPER METHODS ===
 
     private void addInfoRow(JPanel p, String label, JLabel value) {

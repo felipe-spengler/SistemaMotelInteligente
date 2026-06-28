@@ -107,6 +107,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
     int numeroDoQuarto;
     String motivo = null;
     private Timer timer;
+    private javax.swing.Timer timerAtividade;
 
     List<Antecipado> antecipados;
     private EncerraQuartoController controller;
@@ -185,6 +186,49 @@ public class EncerraQuarto extends javax.swing.JFrame {
         }
         txtIdProduto.grabFocus();
         aplicarEstiloModerno();
+        inicializarTimerAtividadeRemota();
+    }
+
+    private void inicializarTimerAtividadeRemota() {
+        // Garante que a tabela exista
+        try (java.sql.Connection conn = new com.motelinteligente.dados.fazconexao().conectar()) {
+            try (java.sql.Statement st = conn.createStatement()) {
+                st.executeUpdate("CREATE TABLE IF NOT EXISTS checkout_session_ping (numeroquarto INT PRIMARY KEY, ultima_atividade TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)");
+            }
+        } catch (Exception e) {
+            logger.error("Erro ao criar tabela de pings: ", e);
+        }
+
+        // Inicia o ping de atividade a cada 10 segundos
+        timerAtividade = new javax.swing.Timer(10000, new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                try (java.sql.Connection conn = new com.motelinteligente.dados.fazconexao().conectar()) {
+                    try (java.sql.PreparedStatement ps = conn.prepareStatement("SELECT ultima_atividade FROM checkout_session_ping WHERE numeroquarto = ?")) {
+                        ps.setInt(1, numeroDoQuarto);
+                        try (java.sql.ResultSet rs = ps.executeQuery()) {
+                            if (rs.next()) {
+                                java.sql.Timestamp ultimaAtividade = rs.getTimestamp("ultima_atividade");
+                                long diff = System.currentTimeMillis() - ultimaAtividade.getTime();
+                                if (diff > 25000) { // Se inativo há mais de 25s, fecha
+                                    logger.info("Checkout remoto inativo para o quarto {}. Fechando tela local.", numeroDoQuarto);
+                                    timerAtividade.stop();
+                                    dispose();
+                                }
+                            } else {
+                                // Sem registro de ping, fecha
+                                logger.info("Nenhum ping de atividade encontrado para o quarto {}. Fechando tela local.", numeroDoQuarto);
+                                timerAtividade.stop();
+                                dispose();
+                            }
+                        }
+                    }
+                } catch (Exception ex) {
+                    logger.error("Erro ao verificar atividade remota: ", ex);
+                }
+            }
+        });
+        timerAtividade.start();
     }
 
     private void aplicarEstiloModerno() {
@@ -434,6 +478,36 @@ public class EncerraQuarto extends javax.swing.JFrame {
         atualizaConsumo();
     }
 
+    public int getIdLocacao() {
+        return this.idLocacao;
+    }
+
+    public void sincronizarProdutosRemotamente() {
+        SwingUtilities.invokeLater(() -> {
+            try {
+                // 1. Limpa a tabela local do JTable
+                DefaultTableModel modelo = (DefaultTableModel) tabela.getModel();
+                modelo.setRowCount(0);
+                
+                // 2. Limpa a tabela da tela do cliente
+                if (outraTela != null) {
+                    outraTela.limparTabela();
+                }
+                
+                // 3. Reseta o valor de consumo na tela
+                valorConsumo = 0;
+                
+                // 4. Recarrega os pré-vendidos do banco usando o buscarPreVendidos original
+                List<vendaProdutos> vendidos = controller.buscarPreVendidos();
+                for (vendaProdutos vp : vendidos) {
+                    adicionarProdutoPorId(vp.idProduto, vp.quantidade);
+                }
+            } catch (Exception e) {
+                logger.error("Erro ao sincronizar produtos remotamente: ", e);
+            }
+        });
+    }
+
     public List<Antecipado> verAntecipado(int locacao) {
         List<Antecipado> antecipados = controller.buscarAntecipados();
         this.valoreRecebido = controller.getValorRecebidoAntecipado();
@@ -459,7 +533,9 @@ public class EncerraQuarto extends javax.swing.JFrame {
         super.dispose();
         outraTela.dispose();
         stopRecording();
-
+        if (timerAtividade != null) {
+            timerAtividade.stop();
+        }
     }
 
     public String calculaData(String dataBanco) {
