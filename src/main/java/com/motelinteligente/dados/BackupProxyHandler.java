@@ -69,9 +69,14 @@ public class BackupProxyHandler implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        Object result = method.invoke(originalConnection, args);
+        Object result;
+        try {
+            result = method.invoke(originalConnection, args);
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            throw e.getCause();
+        }
 
-        if ("prepareStatement".equals(method.getName())) {
+        if ("prepareStatement".equals(method.getName()) && args != null && args.length > 0) {
             String sql = (String) args[0];
             PreparedStatement preparedStatement = (PreparedStatement) result;
 
@@ -83,7 +88,7 @@ public class BackupProxyHandler implements InvocationHandler {
         }
         // 2. Intercepta a criação de Statement
         if ("createStatement".equals(method.getName())) {
-            Statement statement = (Statement) method.invoke(originalConnection, args);
+            Statement statement = (Statement) result;
 
             return Proxy.newProxyInstance(
                     statement.getClass().getClassLoader(),
@@ -109,7 +114,12 @@ class StatementProxyHandler implements InvocationHandler {
         String methodName = method.getName();
 
         // 1. Executa o comando original primeiro
-        Object result = method.invoke(originalStatement, args);
+        Object result;
+        try {
+            result = method.invoke(originalStatement, args);
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            throw e.getCause();
+        }
 
         // 2. Após sucesso, verifica necessidade de backup/sync
         if ("execute".equals(methodName) || "executeQuery".equals(methodName) || "executeUpdate".equals(methodName)) {
@@ -166,7 +176,12 @@ class PreparedStatementProxyHandler implements InvocationHandler {
         }
 
         // 1. Executa o comando original primeiro
-        Object result = method.invoke(originalPreparedStatement, args);
+        Object result;
+        try {
+            result = method.invoke(originalPreparedStatement, args);
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            throw e.getCause();
+        }
 
         // 2. Após sucesso, verifica necessidade de backup/sync
         if ("execute".equals(method.getName()) || "executeQuery".equals(method.getName())
