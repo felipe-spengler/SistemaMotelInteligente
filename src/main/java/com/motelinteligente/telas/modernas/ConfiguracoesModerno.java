@@ -286,6 +286,7 @@ public class ConfiguracoesModerno extends JFrame {
 
     private void salvarPortoes(boolean isRF) {
         botaoCodigos.setVisible(isRF);
+        configGlobal.getInstance().setPortoesRF(isRF);
         funcaoSet("portoesrf", isRF);
         // We don't need to manually verify botoes state as ButtonGroup handles visual
         // toggle, but we set DB.
