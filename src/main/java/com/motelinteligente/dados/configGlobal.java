@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class configGlobal {
-    private static final Logger logger = LoggerFactory.getLogger(fquartos.class);
+    private static final Logger logger = LoggerFactory.getLogger(configGlobal.class);
     private static configGlobal instancia;
     private String usuario;
     private String senhaTemporaria;
@@ -194,7 +194,7 @@ public class configGlobal {
 
         } catch (Exception e) {
             logger.error("Erro ao carregar configurações adicionais", e);
-            JOptionPane.showMessageDialog(null, "Erro ao conectar e carregar informações: " + e.getMessage(),
+            JOptionPane.showMessageDialog(null, "Erro ao conectar e carregar informações: " + e.toString(),
                     "Erro de Conexão", JOptionPane.ERROR_MESSAGE);
         }
     }

@@ -317,33 +317,36 @@ public class TelaLogin extends javax.swing.JFrame {
     }
 
     private void checkAutoLogin(String[] args) {
+        boolean afterUpdate = false;
         if (args != null) {
             for (String arg : args) {
                 if ("--after-update".equals(arg)) {
-                    try {
-                        java.io.File sessionFile = new java.io.File("session.tmp");
-                        if (sessionFile.exists()) {
-                            byte[] encodedBytes = java.nio.file.Files.readAllBytes(sessionFile.toPath());
-                            String decoded = new String(java.util.Base64.getDecoder().decode(encodedBytes), java.nio.charset.StandardCharsets.UTF_8);
-                            String[] parts = decoded.split(":");
-                            
-                            if (parts.length == 2) {
-                                txt_login.setText(parts[0]);
-                                txt_senha.setText(parts[1]);
-                                bt_entrar.doClick();
-                            }
-                        }
-                        
-                        // Apaga o arquivo após a tentativa (seja sucesso ou erro, para não ficar senha no disco)
-                        if (sessionFile.exists()) {
-                            sessionFile.delete();
-                        }
-                    } catch (Exception e) {
-                        // Ignora erro
-                    }
+                    afterUpdate = true;
                     break;
                 }
             }
+        }
+
+        try {
+            java.io.File sessionFile = new java.io.File("session.tmp");
+            if (sessionFile.exists()) {
+                if (afterUpdate) {
+                    byte[] encodedBytes = java.nio.file.Files.readAllBytes(sessionFile.toPath());
+                    String decoded = new String(java.util.Base64.getDecoder().decode(encodedBytes), java.nio.charset.StandardCharsets.UTF_8);
+                    String[] parts = decoded.split(":");
+                    
+                    if (parts.length == 2) {
+                        txt_login.setText(parts[0]);
+                        txt_senha.setText(parts[1]);
+                        bt_entrar.doClick();
+                    }
+                }
+                
+                // Sempre remove o arquivo temporário para não deixar resíduos de sessão no disco
+                sessionFile.delete();
+            }
+        } catch (Exception e) {
+            // Ignora erro
         }
     }
 

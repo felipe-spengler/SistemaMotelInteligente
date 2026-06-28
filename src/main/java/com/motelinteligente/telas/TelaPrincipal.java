@@ -2271,9 +2271,14 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     }
 
     public void abrirEncerraQuarto(int quartoEmFoco) {
+        abrirEncerraQuarto(quartoEmFoco, false);
+    }
+
+    public void abrirEncerraQuarto(int quartoEmFoco, boolean remoto) {
         if (encerraQuarto == null || !encerraQuarto.isVisible()) {
             // Criar nova instância se não houver tela aberta
             encerraQuarto = new EncerraQuarto(this, quartoEmFoco);
+            encerraQuarto.setAbertoRemotamente(remoto);
             encerraQuarto.setVisible(true);
         } else {
             Icon iconeAlerta = UIManager.getIcon("OptionPane.warningIcon");

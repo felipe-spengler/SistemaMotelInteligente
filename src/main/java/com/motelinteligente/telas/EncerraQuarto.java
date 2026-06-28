@@ -189,6 +189,15 @@ public class EncerraQuarto extends javax.swing.JFrame {
         inicializarTimerAtividadeRemota();
     }
 
+    private boolean abertoRemotamente = false;
+
+    public void setAbertoRemotamente(boolean remoto) {
+        this.abertoRemotamente = remoto;
+        if (!remoto && timerAtividade != null) {
+            timerAtividade.stop();
+        }
+    }
+
     private void inicializarTimerAtividadeRemota() {
         // Garante que a tabela exista
         try (java.sql.Connection conn = new com.motelinteligente.dados.fazconexao().conectar()) {
@@ -203,6 +212,10 @@ public class EncerraQuarto extends javax.swing.JFrame {
         timerAtividade = new javax.swing.Timer(10000, new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
+                if (!abertoRemotamente) {
+                    timerAtividade.stop();
+                    return;
+                }
                 try (java.sql.Connection conn = new com.motelinteligente.dados.fazconexao().conectar()) {
                     try (java.sql.PreparedStatement ps = conn.prepareStatement("SELECT ultima_atividade FROM checkout_session_ping WHERE numeroquarto = ?")) {
                         ps.setInt(1, numeroDoQuarto);

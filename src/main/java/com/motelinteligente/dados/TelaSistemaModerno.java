@@ -337,17 +337,31 @@ public class TelaSistemaModerno extends JFrame {
                 .append("timeout /t 2 >nul\n\n");
 
         for (Path oldAppPath : oldApps) {
-            scriptContent.append("if exist \"").append(oldAppPath.toAbsolutePath()).append("\" (\n")
-                    .append("    del /f /q \"").append(oldAppPath.toAbsolutePath()).append("\"\n")
-                    .append(")\n");
+            scriptContent.append(":: Loop com tentativas para remover arquivo antigo e evitar travas do Windows\n")
+                    .append("for /l %%i in (1,1,5) do (\n")
+                    .append("    if exist \"").append(oldAppPath.toAbsolutePath()).append("\" (\n")
+                    .append("        del /f /q \"").append(oldAppPath.toAbsolutePath()).append("\" >nul 2>&1\n")
+                    .append("        if not exist \"").append(oldAppPath.toAbsolutePath()).append("\" goto del_ok_%%i\n")
+                    .append("        timeout /t 1 >nul\n")
+                    .append("    ) else (\n")
+                    .append("        goto del_ok_%%i\n")
+                    .append("    )\n")
+                    .append(")\n")
+                    .append(":del_ok_1\n:del_ok_2\n:del_ok_3\n:del_ok_4\n:del_ok_5\n\n");
         }
 
         scriptContent.append("\n");
 
         // Pega o caminho do primeiro executável para reiniciar
         Path targetPath = oldApps.get(0).getParent().resolve(newApp.getFileName());
-        scriptContent.append("copy /y \"").append(newAppInLogs.toAbsolutePath()).append("\" \"")
-                .append(targetPath.toAbsolutePath()).append("\" >nul\n");
+        scriptContent.append(":: Loop com tentativas para copiar o novo arquivo e evitar travas\n")
+                .append("for /l %%i in (1,1,5) do (\n")
+                .append("    copy /y \"").append(newAppInLogs.toAbsolutePath()).append("\" \"")
+                .append(targetPath.toAbsolutePath()).append("\" >nul 2>&1\n")
+                .append("    if !errorlevel! equ 0 goto copy_ok\n")
+                .append("    timeout /t 1 >nul\n")
+                .append(")\n")
+                .append(":copy_ok\n\n");
 
         scriptContent.append("\n")
                 .append("echo Iniciando nova versao...\n");

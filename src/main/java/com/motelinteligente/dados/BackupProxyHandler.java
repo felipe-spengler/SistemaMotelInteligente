@@ -113,7 +113,7 @@ class StatementProxyHandler implements InvocationHandler {
 
         // 2. Após sucesso, verifica necessidade de backup/sync
         if ("execute".equals(methodName) || "executeQuery".equals(methodName) || "executeUpdate".equals(methodName)) {
-            if (args.length > 0 && args[0] instanceof String) {
+            if (args != null && args.length > 0 && args[0] instanceof String) {
                 String sql = (String) args[0];
 
                 if (isWriteOperation(sql)) {
@@ -154,7 +154,7 @@ class PreparedStatementProxyHandler implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        if (method.getName().startsWith("set") && args.length >= 2) {
+        if (method.getName().startsWith("set") && args != null && args.length >= 2) {
             try {
                 int parameterIndex = (Integer) args[0] - 1;
                 if (parameterIndex >= 0 && parameterIndex < parameters.length) {

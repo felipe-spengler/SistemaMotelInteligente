@@ -372,7 +372,7 @@ public class VerificaComandosRemotos extends Thread implements MqttCallback {
                         if (principal != null) {
                             final com.motelinteligente.telas.TelaPrincipal fPrincipal = principal;
                             SwingUtilities.invokeLater(() -> {
-                                fPrincipal.abrirEncerraQuarto(numQuarto);
+                                fPrincipal.abrirEncerraQuarto(numQuarto, true);
                             });
                         }
                     } catch (Exception ex) {
