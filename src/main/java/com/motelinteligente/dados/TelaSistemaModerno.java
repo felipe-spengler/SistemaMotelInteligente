@@ -98,9 +98,29 @@ public class TelaSistemaModerno extends JFrame {
         backupButton.setForeground(Color.WHITE);
     }
 
+    private Path getRootDir() {
+        String exeDir = System.getProperty("launch4j.exedir");
+        Path rootDir = null;
+        if (exeDir != null && !exeDir.isEmpty()) {
+            rootDir = Paths.get(exeDir);
+        } else {
+            try {
+                java.net.URI uri = TelaSistemaModerno.class.getProtectionDomain().getCodeSource().getLocation().toURI();
+                Path codeSourcePath = Paths.get(uri).toAbsolutePath();
+                rootDir = codeSourcePath.getParent();
+            } catch (Exception e) {
+                // fallback
+            }
+        }
+        if (rootDir == null) {
+            rootDir = Paths.get(".").toAbsolutePath().normalize();
+        }
+        return rootDir.toAbsolutePath().normalize();
+    }
+
     public boolean temNovaVersaoDisponivel() {
         try {
-            List<Path> localExes = findAllAppFiles(Paths.get("."), TARGET_FILE_PREFIX);
+            List<Path> localExes = findAllAppFiles(getRootDir(), TARGET_FILE_PREFIX);
             if (localExes.isEmpty()) {
                 return false;
             }
@@ -135,17 +155,7 @@ public class TelaSistemaModerno extends JFrame {
     // Logic copied from TelaSistema.java and adapted
     private void updateAppIfNecessary(Consumer<String> logger) throws Exception {
         logger.accept("Buscando arquivos EXE/JAR locais...");
-        String exeDir = System.getProperty("launch4j.exedir");
-        Path rootDir;
-        if (exeDir != null && !exeDir.isEmpty()) {
-            rootDir = Paths.get(exeDir);
-        } else {
-            try {
-                rootDir = Paths.get(TelaSistemaModerno.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent();
-            } catch (Exception e) {
-                rootDir = Paths.get(".").toAbsolutePath().normalize();
-            }
-        }
+        Path rootDir = getRootDir();
         List<Path> localApps = findAllAppFiles(rootDir, TARGET_FILE_PREFIX);
 
         if (localApps.isEmpty()) {
@@ -167,7 +177,7 @@ public class TelaSistemaModerno extends JFrame {
 
         if (!firstLocalFileName.equals(remoteFileName)) {
             logger.accept("A versão é diferente. Baixando atualização...");
-            Path tempDownloadPath = Paths.get(localApps.get(0).getParent().toString(), remoteFileName);
+            Path tempDownloadPath = localApps.get(0).toAbsolutePath().getParent().resolve(remoteFileName);
 
             if (Files.exists(tempDownloadPath)) {
                 Files.delete(tempDownloadPath);
@@ -258,6 +268,7 @@ public class TelaSistemaModerno extends JFrame {
     private List<Path> findAllAppFiles(Path rootDir, String fileNamePrefix) throws IOException {
         try (Stream<Path> walk = Files.walk(rootDir, 1)) { // Limita a profundidade 1 (apenas pasta onde está rodando)
             return walk.filter(Files::isRegularFile)
+                    .filter(path -> path.getFileName() != null)
                     .filter(path -> path.getFileName().toString().startsWith(fileNamePrefix))
                     .filter(path -> path.getFileName().toString().endsWith(".exe") || path.getFileName().toString().endsWith(".jar"))
                     .collect(Collectors.toList());
@@ -381,7 +392,7 @@ public class TelaSistemaModerno extends JFrame {
         scriptContent.append("\n");
 
         // Pega o caminho do primeiro executável para reiniciar
-        Path targetPath = oldApps.get(0).getParent().resolve(newApp.getFileName());
+        Path targetPath = oldApps.get(0).toAbsolutePath().getParent().resolve(newApp.getFileName());
         scriptContent.append("echo Copiando nova versao para: \"").append(targetPath.toAbsolutePath()).append("\" >> \"!LOG_FILE!\"\n")
                 .append("for /l %%i in (1,1,10) do (\n")
                 .append("    copy /y \"").append(newAppInLogs.toAbsolutePath()).append("\" \"")
