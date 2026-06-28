@@ -250,21 +250,10 @@ public class TelaLogin extends javax.swing.JFrame {
 
             // Salvar sessão para caso de atualização automática
             configuracoes.setSenhaTemporaria(texto_senha);
-            salvarSessaoTemp(texto_login, texto_senha);
         } else {
             JOptionPane.showMessageDialog(null, "Erro no login!!");
         }
     }// GEN-LAST:event_bt_entrarActionPerformed
-
-    private void salvarSessaoTemp(String user, String pass) {
-        try {
-            String combined = user + ":" + pass;
-            String encoded = java.util.Base64.getEncoder().encodeToString(combined.getBytes(java.nio.charset.StandardCharsets.UTF_8));
-            java.nio.file.Files.write(java.nio.file.Paths.get("session.tmp"), encoded.getBytes());
-        } catch (Exception e) {
-            // Ignora erro ao salvar sessão
-        }
-    }
 
     private void txt_loginActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_txt_loginActionPerformed
         // TODO add your handling code here:
