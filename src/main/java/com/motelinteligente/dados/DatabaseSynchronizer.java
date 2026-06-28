@@ -65,15 +65,35 @@ public class DatabaseSynchronizer {
         return tableList.toArray(new String[0]);
     }
 
+    private static class ColumnDef {
+        String name;
+        String type;
+        boolean nullable;
+        String defaultValue;
+        String extra;
+    }
+
     private boolean sincronizarTabela(String tabela, Connection conexaoLocal, Connection conexaoRemoto) throws SQLException {
         System.out.printf("Iniciando sincronização para a tabela: %s%n", tabela);
         if (exibirLogs != null) {
             exibirLogs.append(String.format("Iniciando sincronização para a tabela: %s%n", tabela));
         }
-        if (!tableExists(tabela, conexaoLocal) || !tableExists(tabela, conexaoRemoto)) {
-            System.out.printf("A tabela %s não existe em um dos bancos de dados.%n", tabela);
+
+        boolean localExists = tableExists(tabela, conexaoLocal);
+        boolean remoteExists = tableExists(tabela, conexaoRemoto);
+
+        // Se a tabela não existe em um dos bancos, cria-a dinamicamente
+        if (!localExists && remoteExists) {
+            criarTabelaAusente(tabela, conexaoRemoto, conexaoLocal);
+        } else if (localExists && !remoteExists) {
+            criarTabelaAusente(tabela, conexaoLocal, conexaoRemoto);
+        } else if (!localExists && !remoteExists) {
+            System.out.printf("A tabela %s não existe em nenhum dos bancos de dados.%n", tabela);
             return false;
         }
+
+        // Sincroniza a estrutura das colunas (Auto-healing de campos ausentes como impressora_ativa)
+        sincronizarColunas(tabela, conexaoLocal, conexaoRemoto);
 
         String pkColumnName = getPrimaryKeyColumn(tabela, conexaoLocal);
         if (pkColumnName == null) {
@@ -92,6 +112,98 @@ public class DatabaseSynchronizer {
 
         return true;
     }
+
+    private void criarTabelaAusente(String tabela, Connection origem, Connection destino) throws SQLException {
+        String showCreate = "SHOW CREATE TABLE " + tabela;
+        String createSql = null;
+        try (Statement stmt = origem.createStatement(); ResultSet rs = stmt.executeQuery(showCreate)) {
+            if (rs.next()) {
+                createSql = rs.getString(2);
+            }
+        }
+        if (createSql != null) {
+            System.out.println("Criando tabela ausente com SQL: " + createSql);
+            if (exibirLogs != null) {
+                exibirLogs.append(String.format("Criando tabela ausente '%s' no destino...%n", tabela));
+            }
+            try (Statement stmt = destino.createStatement()) {
+                stmt.executeUpdate(createSql);
+            }
+        }
+    }
+
+    private void sincronizarColunas(String tabela, Connection local, Connection remoto) throws SQLException {
+        List<ColumnDef> localCols = getColumns(tabela, local);
+        List<ColumnDef> remoteCols = getColumns(tabela, remoto);
+
+        // Colunas locais que não existem no remoto -> Adiciona no remoto
+        for (ColumnDef col : localCols) {
+            if (!hasColumn(remoteCols, col.name)) {
+                adicionarColuna(tabela, col, remoto);
+            }
+        }
+
+        // Colunas remotas que não existem no local -> Adiciona no local
+        for (ColumnDef col : remoteCols) {
+            if (!hasColumn(localCols, col.name)) {
+                adicionarColuna(tabela, col, local);
+            }
+        }
+    }
+
+    private List<ColumnDef> getColumns(String tabela, Connection conn) throws SQLException {
+        List<ColumnDef> list = new ArrayList<>();
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SHOW COLUMNS FROM " + tabela)) {
+            while (rs.next()) {
+                ColumnDef col = new ColumnDef();
+                col.name = rs.getString("Field");
+                col.type = rs.getString("Type");
+                col.nullable = "YES".equalsIgnoreCase(rs.getString("Null"));
+                col.defaultValue = rs.getString("Default");
+                col.extra = rs.getString("Extra");
+                list.add(col);
+            }
+        }
+        return list;
+     }
+
+     private boolean hasColumn(List<ColumnDef> list, String name) {
+         for (ColumnDef col : list) {
+             if (col.name.equalsIgnoreCase(name)) {
+                 return true;
+             }
+         }
+         return false;
+     }
+
+     private void adicionarColuna(String tabela, ColumnDef col, Connection conn) throws SQLException {
+         StringBuilder sql = new StringBuilder("ALTER TABLE " + tabela + " ADD COLUMN `" + col.name + "` " + col.type);
+         if (!col.nullable) {
+             sql.append(" NOT NULL");
+         } else {
+             sql.append(" NULL");
+         }
+         if (col.defaultValue != null) {
+             if (col.defaultValue.equalsIgnoreCase("CURRENT_TIMESTAMP") || col.defaultValue.equalsIgnoreCase("NULL")) {
+                 sql.append(" DEFAULT ").append(col.defaultValue);
+             } else {
+                 sql.append(" DEFAULT '").append(col.defaultValue.replace("'", "''")).append("'");
+             }
+         }
+         if (col.extra != null && !col.extra.isEmpty()) {
+             sql.append(" ").append(col.extra);
+         }
+         
+         String alterSql = sql.toString();
+         System.out.println("Executando: " + alterSql);
+         if (exibirLogs != null) {
+             exibirLogs.append(String.format("Adicionando coluna ausente '%s' na tabela '%s'...%n", col.name, tabela));
+         }
+         try (Statement stmt = conn.createStatement()) {
+             stmt.executeUpdate(alterSql);
+         }
+     }
 
     private boolean tableExists(String tableName, Connection conexao) throws SQLException {
         DatabaseMetaData metaData = conexao.getMetaData();
