@@ -528,8 +528,57 @@ public class EncerraQuarto extends javax.swing.JFrame {
         return controller.calculaAdicionalPessoa(numeroPessoas);
     }
 
+    private void salvarPreVendidosAntesDeFechar() {
+        DefaultTableModel modelo = (DefaultTableModel) tabela.getModel();
+        int qtdLinhas = modelo.getRowCount();
+        if (qtdLinhas > 0) {
+            int resposta = JOptionPane.showConfirmDialog(this,
+                "Deseja salvar os produtos adicionados como rascunho de consumo (Pré-venda)?",
+                "Salvar Pré-venda",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+                
+            if (resposta == JOptionPane.YES_OPTION) {
+                // Grava no banco na tabela prevendidos
+                try (java.sql.Connection conn = new com.motelinteligente.dados.fazconexao().conectar()) {
+                    conn.setAutoCommit(false);
+                    try {
+                        // 1. Limpa os pré-vendidos anteriores
+                        try (java.sql.PreparedStatement del = conn.prepareStatement("DELETE FROM prevendidos WHERE idlocacao = ?")) {
+                            del.setInt(1, idLocacao);
+                            del.executeUpdate();
+                        }
+                        
+                        // 2. Insere a lista atual da tabela
+                        try (java.sql.PreparedStatement ins = conn.prepareStatement("INSERT INTO prevendidos (idlocacao, idproduto, quantidade) VALUES (?, ?, ?)")) {
+                            for (int i = 0; i < qtdLinhas; i++) {
+                                int idProd = Integer.parseInt(modelo.getValueAt(i, 0).toString());
+                                int quantidade = Integer.parseInt(modelo.getValueAt(i, 1).toString());
+                                
+                                ins.setInt(1, idLocacao);
+                                ins.setInt(2, idProd);
+                                ins.setInt(3, quantidade);
+                                ins.addBatch();
+                            }
+                            ins.executeBatch();
+                        }
+                        conn.commit();
+                    } catch (Exception ex) {
+                        conn.rollback();
+                        logger.error("Erro ao salvar prevendidos no fechamento: ", ex);
+                    }
+                } catch (Exception e) {
+                    logger.error("Erro de conexao ao salvar prevendidos: ", e);
+                }
+            }
+        }
+    }
+
     @Override
     public void dispose() {
+        if (!salvouLocacao) {
+            salvarPreVendidosAntesDeFechar();
+        }
         super.dispose();
         outraTela.dispose();
         stopRecording();
