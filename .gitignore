@@ -51,3 +51,6 @@ mudancas.txt
 # SSH Key and secrets
 secrets/
 
+# Outro sistema para integração (Infobac)
+/outroSistema/
+

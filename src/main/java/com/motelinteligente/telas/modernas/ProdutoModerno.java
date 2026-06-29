@@ -49,7 +49,7 @@ public class ProdutoModerno extends JFrame {
         JPanel cardTable = EstiloModerno.criarCard(); // Fundo branco arredondado
         cardTable.setLayout(new BorderLayout()); // Usa todo espaço do card
 
-        String[] cols = { "ID", "Categoria", "Produto / Serviço", "Valor (R$)", "Estoque", "Última Compra", "NCM", "CEST", "CSOSN" };
+        String[] cols = { "ID", "Categoria", "Produto / Serviço", "Valor (R$)", "Estoque", "Última Compra" };
         tableModel = new DefaultTableModel(cols, 0) {
             @Override
             public boolean isCellEditable(int row, int col) {
@@ -109,10 +109,7 @@ public class ProdutoModerno extends JFrame {
                     p.getDescricao(),
                     p.getValor(),
                     p.getEstoque(),
-                    p.getDataCompra(),
-                    p.getNcm(),
-                    p.getCest(),
-                    p.getCsosn()
+                    p.getDataCompra()
             });
         }
     }
@@ -133,8 +130,7 @@ public class ProdutoModerno extends JFrame {
         int row = tabela.getSelectedRow();
         if (row != -1) {
             int id = Integer.parseInt(tabela.getValueAt(row, 0).toString());
-            if (JOptionPane.showConfirmDialog(this, "Apagar este produto?", "Confirmar",
-                    JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+            if (EstiloModerno.confirmarSimNao(this, "Confirmar Exclusão", "Deseja realmente apagar este produto?")) {
                 new fprodutos().exclusao(id);
                 carregaTabela();
             }

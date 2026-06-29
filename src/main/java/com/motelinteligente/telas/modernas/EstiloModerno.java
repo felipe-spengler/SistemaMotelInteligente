@@ -101,4 +101,35 @@ public class EstiloModerno {
                 "arc: 8; borderColor: #D1D5DB; focusWidth: 2; focusColor: #3B82F6; margin: 6,10,6,10");
         return txt;
     }
+
+    // --- Modern JOptionPanes (Diálogos Estilizados) ---
+
+    public static void mensagemSucesso(Component parent, String titulo, String msg) {
+        String html = "<html><body style='font-family: sans-serif; font-size: 12px; width: 280px;'>"
+                + "<span style='font-size: 14px; font-weight: bold; color: #10B981;'>✓ " + titulo + "</span><br><br>"
+                + msg + "</body></html>";
+        JOptionPane.showMessageDialog(parent, html, titulo, JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public static void mensagemErro(Component parent, String titulo, String msg) {
+        String html = "<html><body style='font-family: sans-serif; font-size: 12px; width: 280px;'>"
+                + "<span style='font-size: 14px; font-weight: bold; color: #DC2626;'>✗ " + titulo + "</span><br><br>"
+                + msg + "</body></html>";
+        JOptionPane.showMessageDialog(parent, html, titulo, JOptionPane.ERROR_MESSAGE);
+    }
+
+    public static void mensagemAviso(Component parent, String titulo, String msg) {
+        String html = "<html><body style='font-family: sans-serif; font-size: 12px; width: 280px;'>"
+                + "<span style='font-size: 14px; font-weight: bold; color: #D97706;'>⚠ " + titulo + "</span><br><br>"
+                + msg + "</body></html>";
+        JOptionPane.showMessageDialog(parent, html, titulo, JOptionPane.WARNING_MESSAGE);
+    }
+
+    public static boolean confirmarSimNao(Component parent, String titulo, String msg) {
+        String html = "<html><body style='font-family: sans-serif; font-size: 12px; width: 280px;'>"
+                + "<span style='font-size: 14px; font-weight: bold; color: #2563EB;'>? " + titulo + "</span><br><br>"
+                + msg + "</body></html>";
+        int resposta = JOptionPane.showConfirmDialog(parent, html, titulo, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+        return resposta == JOptionPane.YES_OPTION;
+    }
 }

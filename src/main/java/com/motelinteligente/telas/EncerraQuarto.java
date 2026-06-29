@@ -544,25 +544,57 @@ public class EncerraQuarto extends javax.swing.JFrame {
     private void salvarPreVendidosAntesDeFechar() {
         DefaultTableModel modelo = (DefaultTableModel) tabela.getModel();
         int qtdLinhas = modelo.getRowCount();
-        if (qtdLinhas > 0) {
-            int resposta = JOptionPane.showConfirmDialog(this,
-                "Deseja salvar os produtos adicionados como rascunho de consumo (Pré-venda)?",
-                "Salvar Pré-venda",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE);
-                
-            if (resposta == JOptionPane.YES_OPTION) {
-                // Grava no banco na tabela prevendidos
-                try (java.sql.Connection conn = new com.motelinteligente.dados.fazconexao().conectar()) {
-                    conn.setAutoCommit(false);
-                    try {
-                        // 1. Limpa os pré-vendidos anteriores
-                        try (java.sql.PreparedStatement del = conn.prepareStatement("DELETE FROM prevendidos WHERE idlocacao = ?")) {
-                            del.setInt(1, idLocacao);
-                            del.executeUpdate();
-                        }
-                        
-                        // 2. Insere a lista atual da tabela
+        
+        // 1. Carrega os pré-vendidos atuais do banco para comparação
+        java.util.Map<Integer, Integer> dbMap = new java.util.HashMap<>();
+        try {
+            java.util.List<vendaProdutos> dbVendidos = controller.buscarPreVendidos();
+            if (dbVendidos != null) {
+                for (vendaProdutos vp : dbVendidos) {
+                    dbMap.put(vp.idProduto, vp.quantidade);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Erro ao carregar prevendidos para comparacao: ", e);
+        }
+
+        // 2. Mapeia os produtos atualmente exibidos na JTable
+        java.util.Map<Integer, Integer> tableMap = new java.util.HashMap<>();
+        for (int i = 0; i < qtdLinhas; i++) {
+            try {
+                int idProd = Integer.parseInt(modelo.getValueAt(i, 0).toString());
+                int quantidade = Integer.parseInt(modelo.getValueAt(i, 1).toString());
+                tableMap.put(idProd, quantidade);
+            } catch (Exception e) {
+                // ignora erros de conversão
+            }
+        }
+
+        // 3. Se os itens do banco forem idênticos aos da tela, fecha direto
+        if (dbMap.equals(tableMap)) {
+            return;
+        }
+
+        // 4. Só pergunta se de fato houver diferença nos itens/quantidades
+        boolean salvar = com.motelinteligente.telas.modernas.EstiloModerno.confirmarSimNao(
+            this,
+            "Salvar Pré-venda",
+            "Há modificações pendentes no rascunho de consumo (Pré-venda). Deseja salvar as alterações antes de fechar a tela?"
+        );
+            
+        if (salvar) {
+            // Grava no banco na tabela prevendidos
+            try (java.sql.Connection conn = new com.motelinteligente.dados.fazconexao().conectar()) {
+                conn.setAutoCommit(false);
+                try {
+                    // 1. Limpa os pré-vendidos anteriores
+                    try (java.sql.PreparedStatement del = conn.prepareStatement("DELETE FROM prevendidos WHERE idlocacao = ?")) {
+                        del.setInt(1, idLocacao);
+                        del.executeUpdate();
+                    }
+                    
+                    // 2. Insere a lista atual da tabela
+                    if (qtdLinhas > 0) {
                         try (java.sql.PreparedStatement ins = conn.prepareStatement("INSERT INTO prevendidos (idlocacao, idproduto, quantidade) VALUES (?, ?, ?)")) {
                             for (int i = 0; i < qtdLinhas; i++) {
                                 int idProd = Integer.parseInt(modelo.getValueAt(i, 0).toString());
@@ -575,14 +607,14 @@ public class EncerraQuarto extends javax.swing.JFrame {
                             }
                             ins.executeBatch();
                         }
-                        conn.commit();
-                    } catch (Exception ex) {
-                        conn.rollback();
-                        logger.error("Erro ao salvar prevendidos no fechamento: ", ex);
                     }
-                } catch (Exception e) {
-                    logger.error("Erro de conexao ao salvar prevendidos: ", e);
+                    conn.commit();
+                } catch (Exception ex) {
+                    conn.rollback();
+                    logger.error("Erro ao salvar prevendidos no fechamento: ", ex);
                 }
+            } catch (Exception e) {
+                logger.error("Erro de conexao ao salvar prevendidos: ", e);
             }
         }
     }

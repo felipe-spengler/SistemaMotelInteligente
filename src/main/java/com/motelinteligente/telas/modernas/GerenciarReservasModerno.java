@@ -98,26 +98,23 @@ public class GerenciarReservasModerno extends JFrame {
             NovaReserva novaReserva = new NovaReserva(idReserva);
             novaReserva.setVisible(true);
         } else {
-            JOptionPane.showMessageDialog(this, "Selecione uma reserva para modificar.", "Aviso",
-                    JOptionPane.WARNING_MESSAGE);
+            EstiloModerno.mensagemAviso(this, "Aviso", "Selecione uma reserva para modificar.");
         }
     }
 
     private void excluirReserva() {
         int linhaSelecionada = tabelaReservas.getSelectedRow();
         if (linhaSelecionada != -1) {
-            int resposta = JOptionPane.showConfirmDialog(this, "Tem certeza que deseja excluir esta reserva?",
-                    "Confirmar Exclusão", JOptionPane.YES_NO_OPTION);
-            if (resposta == JOptionPane.YES_OPTION) {
+            boolean confirmar = EstiloModerno.confirmarSimNao(this, "Confirmar Exclusão", "Tem certeza que deseja excluir esta reserva?");
+            if (confirmar) {
                 int idReserva = (int) modeloTabela.getValueAt(linhaSelecionada, 0);
                 if (executarExclusao(idReserva)) {
                     modeloTabela.removeRow(linhaSelecionada);
-                    JOptionPane.showMessageDialog(this, "Reserva excluída com sucesso!");
+                    EstiloModerno.mensagemSucesso(this, "Sucesso", "Reserva excluída com sucesso!");
                 }
             }
         } else {
-            JOptionPane.showMessageDialog(this, "Selecione uma reserva para excluir.", "Aviso",
-                    JOptionPane.WARNING_MESSAGE);
+            EstiloModerno.mensagemAviso(this, "Aviso", "Selecione uma reserva para excluir.");
         }
     }
 
@@ -130,8 +127,7 @@ public class GerenciarReservasModerno extends JFrame {
             stmt.executeUpdate();
             return true;
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Erro ao excluir reserva: " + e.getMessage(), "Erro",
-                    JOptionPane.ERROR_MESSAGE);
+            EstiloModerno.mensagemErro(this, "Erro", "Erro ao excluir reserva: " + e.getMessage());
             return false;
         }
     }

@@ -221,9 +221,8 @@ public class TelaSistemaModerno extends JFrame {
                     logMessage("Processo de verificação concluído.");
                 } catch (Exception e) {
                     logError(e);
-                    JOptionPane.showMessageDialog(TelaSistemaModerno.this,
-                            "Erro durante a atualização: " + e.getMessage(),
-                            "Erro", JOptionPane.ERROR_MESSAGE);
+                    com.motelinteligente.telas.modernas.EstiloModerno.mensagemErro(TelaSistemaModerno.this,
+                            "Erro na Atualização", "Ocorreu um erro durante o processo de verificação/atualização: " + e.getMessage());
                 } finally {
                     startButton.setEnabled(true);
                     progressBar.setVisible(false);

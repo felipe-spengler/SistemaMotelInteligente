@@ -101,23 +101,21 @@ public class GerarQrCodeDialog extends JDialog {
             securityType = "nopass";
 
         if (rede.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Preencha o Nome da Rede!", "Atenção", JOptionPane.WARNING_MESSAGE);
+            EstiloModerno.mensagemAviso(this, "Atenção", "Preencha o Nome da Rede!");
             return;
         }
 
         if (!securityType.equals("nopass") && senha.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Preencha a Senha!", "Atenção", JOptionPane.WARNING_MESSAGE);
+            EstiloModerno.mensagemAviso(this, "Atenção", "Preencha a Senha!");
             return;
         }
 
         try {
             gerarSalvarQrCode(rede, senha, securityType);
-            JOptionPane.showMessageDialog(this, "QR Code gerado e salvo com sucesso!", "Sucesso",
-                    JOptionPane.INFORMATION_MESSAGE);
+            EstiloModerno.mensagemSucesso(this, "Sucesso", "QR Code gerado e salvo com sucesso!");
             dispose();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Erro ao gerar QR Code: " + ex.getMessage(), "Erro",
-                    JOptionPane.ERROR_MESSAGE);
+            EstiloModerno.mensagemErro(this, "Erro", "Erro ao gerar QR Code: " + ex.getMessage());
             ex.printStackTrace();
         }
     }

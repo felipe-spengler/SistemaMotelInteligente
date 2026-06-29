@@ -468,7 +468,7 @@ public class EncerraQuartoModerno extends JFrame {
 
     private void desistir() {
         if (controller.podeFazerDesistencia()) {
-            String m = JOptionPane.showInputDialog(this, "Motivo da Desistência:");
+            String m = JOptionPane.showInputDialog(this, "<html><body style='font-family: sans-serif; font-size: 12px;'><b style='color: #2563EB; font-size: 13px;'>Motivo da Desistência:</b></body></html>");
             if (m != null) { controller.registrarDesistencia(m); dispose(); }
         }
     }
@@ -487,7 +487,11 @@ public class EncerraQuartoModerno extends JFrame {
     private void salvar() {
         float pendente = controller.calcularValorAReceber();
         String[] options = {"DINHEIRO", "PIX", "CARTÃO", "CANCELAR"};
-        int x = JOptionPane.showOptionDialog(this, "Total: " + currencyFormat.format(pendente) + "\nSelecione o método:", "Pagamento", 0, 1, null, options, options[0]);
+        String msg = "<html><body style='font-family: sans-serif; font-size: 12px; width: 280px;'>"
+                + "<span style='font-size: 14px; font-weight: bold; color: #2563EB;'>Efetuar Pagamento</span><br><br>"
+                + "Valor Total: <b>" + currencyFormat.format(pendente) + "</b><br><br>"
+                + "Selecione a forma de pagamento desejada:</body></html>";
+        int x = JOptionPane.showOptionDialog(this, msg, "Pagamento", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
         if (x >= 3 || x == -1) return;
         float d=0, p=0, c=0;
         if (x == 0) d = pendente; if (x == 1) p = pendente; if (x == 2) c = pendente;

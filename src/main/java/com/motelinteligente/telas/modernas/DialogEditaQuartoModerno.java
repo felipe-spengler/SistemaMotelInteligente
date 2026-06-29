@@ -114,8 +114,8 @@ public class DialogEditaQuartoModerno extends JDialog {
         
         btnDefault.addActionListener(e -> {
             if (modeloTabela.getRowCount() > 0) {
-                int opt = JOptionPane.showConfirmDialog(this, "Isso irá limpar os períodos atuais e gerar o padrão (2h e Pernoite). Continuar?", "Gerar Padrão", JOptionPane.YES_NO_OPTION);
-                if (opt != JOptionPane.YES_OPTION) return;
+                boolean continuar = EstiloModerno.confirmarSimNao(this, "Gerar Padrão", "Isso irá limpar os períodos atuais e gerar o padrão (2h e Pernoite). Continuar?");
+                if (!continuar) return;
             }
             modeloTabela.setRowCount(0);
             modeloTabela.addRow(new Object[]{1, "2 Horas", 120, 0.0f, false});
@@ -131,7 +131,7 @@ public class DialogEditaQuartoModerno extends JDialog {
                     modeloTabela.setValueAt(i + 1, i, 0);
                 }
             } else {
-                JOptionPane.showMessageDialog(this, "Selecione um período na tabela para remover.");
+                EstiloModerno.mensagemAviso(this, "Atenção", "Selecione um período na tabela para remover.");
             }
         });
         
@@ -186,7 +186,7 @@ public class DialogEditaQuartoModerno extends JDialog {
         String tipo = txtTipo.getText().trim();
 
         if (numStr.isEmpty() || tipo.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Número e Tipo são obrigatórios!");
+            EstiloModerno.mensagemAviso(this, "Atenção", "Número e Tipo são obrigatórios!");
             return;
         }
 
@@ -220,7 +220,7 @@ public class DialogEditaQuartoModerno extends JDialog {
                 ok = dao.fazOUp(model, vAdd, tempo);
             } else {
                 if (dao.verExiste(num)) {
-                    JOptionPane.showMessageDialog(this, "Quarto já existe!");
+                    EstiloModerno.mensagemErro(this, "Erro", "Quarto já existe!");
                     return;
                 }
                 ok = dao.insercao(model, vAdd, tempo);
@@ -228,15 +228,15 @@ public class DialogEditaQuartoModerno extends JDialog {
 
             if (ok) {
                 salvarPeriodosBanco(num); // Salva os períodos dinâmicos após o quarto
-                JOptionPane.showMessageDialog(this, "Salvo com sucesso!");
+                EstiloModerno.mensagemSucesso(this, "Sucesso", "Salvo com sucesso!");
                 configGlobal.getInstance().setMudanca(true);
                 dispose();
             } else {
-                JOptionPane.showMessageDialog(this, "Erro ao salvar.");
+                EstiloModerno.mensagemErro(this, "Erro", "Erro ao salvar.");
             }
 
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Erro: " + e.getMessage());
+            EstiloModerno.mensagemErro(this, "Erro", "Erro: " + e.getMessage());
         }
     }
 

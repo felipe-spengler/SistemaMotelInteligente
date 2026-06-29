@@ -167,12 +167,12 @@ public class TelaCadFuncionarioModerno extends JFrame {
         String cargo = (String) comboCargo.getSelectedItem();
 
         if (nome.isEmpty() || login.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Preencha Nome e Login!", "Atenção", JOptionPane.WARNING_MESSAGE);
+            EstiloModerno.mensagemAviso(this, "Atenção", "Preencha Nome e Login!");
             return;
         }
 
         if (!senha1.equals(senha2)) {
-            JOptionPane.showMessageDialog(this, "As senhas não conferem!", "Erro", JOptionPane.ERROR_MESSAGE);
+            EstiloModerno.mensagemErro(this, "Erro", "As senhas não conferem!");
             return;
         }
 
@@ -186,18 +186,18 @@ public class TelaCadFuncionarioModerno extends JFrame {
             sqlUpdate += " WHERE loginfuncionario='" + loginOriginal + "'";
 
             if (funcDao.fazUpdate(sqlUpdate)) {
-                JOptionPane.showMessageDialog(this, "Atualizado com sucesso!");
+                EstiloModerno.mensagemSucesso(this, "Sucesso", "Atualizado com sucesso!");
                 limparCampos();
                 carregaTabela();
             }
         } else {
             if (senha1.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Senha é obrigatória.", "Erro", JOptionPane.ERROR_MESSAGE);
+                EstiloModerno.mensagemErro(this, "Erro", "Senha é obrigatória.");
                 return;
             }
             vfuncionario novo = new vfuncionario(1, nome, cargo, login, senha1);
             if (funcDao.insercao(novo)) {
-                JOptionPane.showMessageDialog(this, "Cadastrado com sucesso!");
+                EstiloModerno.mensagemSucesso(this, "Sucesso", "Cadastrado com sucesso!");
                 limparCampos();
                 carregaTabela();
             }
@@ -237,8 +237,7 @@ public class TelaCadFuncionarioModerno extends JFrame {
         int id = funcDao.getIdFuncionario(nome, cargo, login);
 
         if (id != -1) {
-            if (JOptionPane.showConfirmDialog(this, "Excluir " + nome + "?", "Confirmar",
-                    JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+            if (EstiloModerno.confirmarSimNao(this, "Confirmar Exclusão", "Deseja realmente excluir " + nome + "?")) {
                 funcDao.excluirFuncionario(id);
                 carregaTabela();
                 limparCampos();

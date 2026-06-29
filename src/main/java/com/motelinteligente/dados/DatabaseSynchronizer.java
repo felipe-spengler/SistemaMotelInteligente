@@ -55,11 +55,12 @@ public class DatabaseSynchronizer {
         List<String> tableList = new ArrayList<>();
         try (Connection conexao = new fazconexao().conectar()) {
             DatabaseMetaData metaData = conexao.getMetaData();
-            ResultSet tables = metaData.getTables(null, null, "%", new String[]{"TABLE"});
-
-            while (tables.next()) {
-                String tableName = tables.getString("TABLE_NAME");
-                tableList.add(tableName);
+            String catalog = conexao.getCatalog();
+            try (ResultSet tables = metaData.getTables(catalog, null, "%", new String[]{"TABLE"})) {
+                while (tables.next()) {
+                    String tableName = tables.getString("TABLE_NAME");
+                    tableList.add(tableName);
+                }
             }
         }
         return tableList.toArray(new String[0]);
@@ -207,14 +208,16 @@ public class DatabaseSynchronizer {
 
     private boolean tableExists(String tableName, Connection conexao) throws SQLException {
         DatabaseMetaData metaData = conexao.getMetaData();
-        try (ResultSet rs = metaData.getTables(null, null, tableName, new String[]{"TABLE"})) {
+        String catalog = conexao.getCatalog();
+        try (ResultSet rs = metaData.getTables(catalog, null, tableName, new String[]{"TABLE"})) {
             return rs.next();
         }
     }
 
     private String getPrimaryKeyColumn(String tabela, Connection conexao) throws SQLException {
         DatabaseMetaData metaData = conexao.getMetaData();
-        try (ResultSet pkResultSet = metaData.getPrimaryKeys(null, null, tabela)) {
+        String catalog = conexao.getCatalog();
+        try (ResultSet pkResultSet = metaData.getPrimaryKeys(catalog, null, tabela)) {
             if (pkResultSet.next()) {
                 return pkResultSet.getString("COLUMN_NAME");
             }
@@ -321,7 +324,8 @@ public class DatabaseSynchronizer {
     private String buildInsertQuery(String tabela, Connection conexao) throws SQLException {
         List<String> columns = new ArrayList<>();
         DatabaseMetaData metaData = conexao.getMetaData();
-        try (ResultSet resultSet = metaData.getColumns(null, null, tabela, null)) {
+        String catalog = conexao.getCatalog();
+        try (ResultSet resultSet = metaData.getColumns(catalog, null, tabela, null)) {
             while (resultSet.next()) {
                 columns.add(resultSet.getString("COLUMN_NAME"));
             }
@@ -334,7 +338,8 @@ public class DatabaseSynchronizer {
     private String buildUpdateQuery(String tabela, String pkColumnName, Connection conexao) throws SQLException {
         List<String> columns = new ArrayList<>();
         DatabaseMetaData metaData = conexao.getMetaData();
-        try (ResultSet resultSet = metaData.getColumns(null, null, tabela, null)) {
+        String catalog = conexao.getCatalog();
+        try (ResultSet resultSet = metaData.getColumns(catalog, null, tabela, null)) {
             while (resultSet.next()) {
                 String columnName = resultSet.getString("COLUMN_NAME");
                 if (!columnName.equalsIgnoreCase(pkColumnName)) {

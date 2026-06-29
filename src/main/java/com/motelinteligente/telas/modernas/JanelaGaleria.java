@@ -183,7 +183,7 @@ public class JanelaGaleria extends JDialog {
                     } else {
                         SwingUtilities.invokeLater(() -> {
                             setCursor(Cursor.getDefaultCursor());
-                            JOptionPane.showMessageDialog(this, "Erro: " + json.optString("message"));
+                             EstiloModerno.mensagemErro(this, "Erro", "Não foi possível realizar o upload: " + json.optString("message"));
                         });
                     }
                 } catch (Exception ex) {

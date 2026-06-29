@@ -194,10 +194,7 @@ public class TelaLoginModerno extends JFrame {
         String senha = new String(txtSenha.getPassword());
 
         if (login.isEmpty() || senha.isEmpty()) {
-            JOptionPane.showMessageDialog(this,
-                    "Por favor, preencha todos os campos!",
-                    "Atenção",
-                    JOptionPane.WARNING_MESSAGE);
+            EstiloModerno.mensagemAviso(this, "Atenção", "Por favor, preencha todos os campos!");
             return;
         }
 
@@ -264,20 +261,14 @@ public class TelaLoginModerno extends JFrame {
                             } catch (Exception ex) {
                                 System.err.println("[LOGIN] Erro ao abrir tela principal: " + ex.getMessage());
                                 ex.printStackTrace();
-                                JOptionPane.showMessageDialog(TelaLoginModerno.this,
-                                        "Erro ao abrir tela principal: " + ex.getMessage(),
-                                        "Erro",
-                                        JOptionPane.ERROR_MESSAGE);
+                                EstiloModerno.mensagemErro(TelaLoginModerno.this, "Erro", "Erro ao abrir tela principal: " + ex.getMessage());
                                 btnEntrar.setEnabled(true);
                                 btnEntrar.setText("ENTRAR");
                             }
                         });
                     } else {
                         System.out.println("[LOGIN] Credenciais inválidas");
-                        JOptionPane.showMessageDialog(TelaLoginModerno.this,
-                                "Usuário ou senha incorretos!",
-                                "Erro no Login",
-                                JOptionPane.ERROR_MESSAGE);
+                        EstiloModerno.mensagemErro(TelaLoginModerno.this, "Erro no Login", "Usuário ou senha incorretos!");
                         btnEntrar.setEnabled(true);
                         btnEntrar.setText("ENTRAR");
                         txtSenha.setText("");
@@ -286,10 +277,7 @@ public class TelaLoginModerno extends JFrame {
                 } catch (Exception ex) {
                     System.err.println("[LOGIN] Exceção durante login: " + ex.getMessage());
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog(TelaLoginModerno.this,
-                            "Erro ao realizar login: " + ex.getMessage(),
-                            "Erro",
-                            JOptionPane.ERROR_MESSAGE);
+                    EstiloModerno.mensagemErro(TelaLoginModerno.this, "Erro", "Erro ao realizar login: " + ex.getMessage());
                     btnEntrar.setEnabled(true);
                     btnEntrar.setText("ENTRAR");
                 }

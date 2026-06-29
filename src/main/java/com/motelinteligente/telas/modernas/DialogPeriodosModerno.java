@@ -127,11 +127,11 @@ public class DialogPeriodosModerno extends JDialog {
             }
 
             link.commit();
-            JOptionPane.showMessageDialog(this, "Períodos salvos com sucesso!");
+            EstiloModerno.mensagemSucesso(this, "Sucesso", "Períodos salvos com sucesso!");
             dispose();
 
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Erro ao salvar períodos: " + ex.getMessage());
+            EstiloModerno.mensagemErro(this, "Erro", "Erro ao salvar períodos: " + ex.getMessage());
         }
     }
 }
