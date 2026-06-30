@@ -1,6 +1,6 @@
 package com.motelinteligente.dados;
 
-import com.fazecast.jserialcomm.SerialPort;
+import com.fazecast.jSerialComm.SerialPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

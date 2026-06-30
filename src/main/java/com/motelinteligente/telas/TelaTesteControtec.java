@@ -1,6 +1,6 @@
 package com.motelinteligente.telas;
 
-import com.fazecast.jserialcomm.SerialPort;
+import com.fazecast.jSerialComm.SerialPort;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
