@@ -208,8 +208,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
             logger.error("Erro ao criar tabela de pings: ", e);
         }
 
-        // Inicia o ping de atividade a cada 10 segundos
-        timerAtividade = new javax.swing.Timer(10000, new java.awt.event.ActionListener() {
+        // Inicia o ping de atividade a cada 30 segundos
+        timerAtividade = new javax.swing.Timer(30000, new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent e) {
                 if (!abertoRemotamente) {
@@ -223,7 +223,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
                             if (rs.next()) {
                                 java.sql.Timestamp ultimaAtividade = rs.getTimestamp("ultima_atividade");
                                 long diff = System.currentTimeMillis() - ultimaAtividade.getTime();
-                                if (diff > 25000) { // Se inativo há mais de 25s, fecha
+                                if (diff > 90000) { // Se inativo há mais de 90s, fecha
                                     logger.info("Checkout remoto inativo para o quarto {}. Fechando tela local.", numeroDoQuarto);
                                     timerAtividade.stop();
                                     dispose();
@@ -2865,6 +2865,24 @@ public class EncerraQuarto extends javax.swing.JFrame {
         );
         JOptionPane.showMessageDialog(this, "Extrato de locação enviado para a impressora!");
         txtIdProduto.grabFocus();
+    }
+
+    public void imprimirExtratoPelaTela() {
+        float valorAntecipadoSoma = 0;
+        if (antecipados != null) {
+            for (Antecipado a : antecipados) {
+                if (!"desconto".equals(a.getTipo())) {
+                    valorAntecipadoSoma += a.getValor();
+                }
+            }
+        }
+        
+        com.motelinteligente.dados.ImpressoraService.imprimirExtratoLocacao(
+            numeroDoQuarto, idLocacao, dataInicio, dataFim, tempoTotalLocado,
+            valorQuarto, valorAdicionalPessoa, valorAdicionalPeriodo, valorConsumo,
+            valorAcrescimo, valorDesconto, valorAntecipadoSoma, valorRecebidoAgora,
+            (DefaultTableModel) tabela.getModel()
+        );
     }
 
     private void btBuscarActionPerformed(java.awt.event.ActionEvent evt) {

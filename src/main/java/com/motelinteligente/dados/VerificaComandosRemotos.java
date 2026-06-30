@@ -358,7 +358,24 @@ public class VerificaComandosRemotos extends Thread implements MqttCallback {
                     }
                 } else if (acao.equals("imprimir_previa") || acao.equals("previa")) {
                     int idLoc = Integer.parseInt(numero);
-                    ImpressoraService.imprimirExtratoLocacaoPorId(idLoc);
+                    // Procura a tela de encerramento aberta para esse idLocacao e chama o método
+                    // idêntico ao botão "Extrato" — assim tudo (horaSaida, produtos, etc.) sai correto
+                    boolean impressoPelaTela = false;
+                    for (java.awt.Frame frame : java.awt.Frame.getFrames()) {
+                        if (frame instanceof com.motelinteligente.telas.EncerraQuarto && frame.isVisible()) {
+                            com.motelinteligente.telas.EncerraQuarto eq =
+                                (com.motelinteligente.telas.EncerraQuarto) frame;
+                            if (eq.getIdLocacao() == idLoc) {
+                                SwingUtilities.invokeLater(() -> eq.imprimirExtratoPelaTela());
+                                impressoPelaTela = true;
+                                break;
+                            }
+                        }
+                    }
+                    // Fallback: se a tela não estiver aberta, lê do banco
+                    if (!impressoPelaTela) {
+                        ImpressoraService.imprimirExtratoLocacaoPorId(idLoc);
+                    }
                 } else if (acao.equals("abrir_checkout")) {
                     try {
                         int numQuarto = Integer.parseInt(numero);
