@@ -169,6 +169,24 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             }
         }, 20000, 20000); // Já carregamos acima, então inicia após 20s
 
+        // Timer dedicado para detectar logoff imediato após fechamento do caixa (a cada 2s)
+        Timer logoffTimer = new Timer(true);
+        logoffTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if (configGlobal.getInstance().getFlagFechar()) {
+                    configGlobal.getInstance().setFlagFechar(false);
+                    SwingUtilities.invokeLater(() -> {
+                        try {
+                            fecharTela();
+                        } catch (Exception ex) {
+                            logger.error("Erro ao fazer logoff após fechamento de caixa", ex);
+                        }
+                    });
+                }
+            }
+        }, 2000, 2000);
+
         // Timer para verificar pedidos online a cada 10 segundos
         pedidosTimer = new Timer();
         pedidosTimer.scheduleAtFixedRate(new TimerTask() {

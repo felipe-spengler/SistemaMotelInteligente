@@ -564,7 +564,9 @@ public class CaixaFrameModerno extends JFrame {
                         "Sucesso",
                         JOptionPane.INFORMATION_MESSAGE);
                 configGlobal.getInstance().setCaixa(0);
-                configGlobal.getInstance().setFlagFechar(true); // Logoff
+                if (configGlobal.getInstance().getLogoffecharcaixa()) {
+                    configGlobal.getInstance().setFlagFechar(true); // Logoff solicitado pela config
+                }
                 dispose();
             }
         }
