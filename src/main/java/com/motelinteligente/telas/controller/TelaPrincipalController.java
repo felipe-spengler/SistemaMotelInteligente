@@ -5,6 +5,8 @@ import com.motelinteligente.dados.CarregaQuarto;
 import com.motelinteligente.dados.DadosOcupados;
 import com.motelinteligente.dados.fazconexao;
 import com.motelinteligente.dados.fpedidos;
+import com.motelinteligente.dados.fquartos;
+import com.motelinteligente.dados.PeriodoQuarto;
 import com.motelinteligente.dados.configGlobal;
 import com.motelinteligente.telas.Quadrado;
 import com.motelinteligente.telas.TelaPrincipal;
@@ -583,37 +585,82 @@ public class TelaPrincipalController {
         Map<String, Object> resumo = new java.util.HashMap<>();
         CacheDados cache = CacheDados.getInstancia();
         DadosOcupados ocupado = cache.getCacheOcupado().get(quartoEmFoco);
+        CarregaQuarto quartoCache = cache.getCacheQuarto().get(quartoEmFoco);
 
-        if (ocupado == null)
+        if (ocupado == null || quartoCache == null)
             return resumo;
 
         fquartos dao = new fquartos();
-        PeriodoQuarto pAtual = dao.getPeriodoAtual(quartoEmFoco);
+        String status = quartoCache.getStatusQuarto();
 
+        // Calcula o tempo total passado desde o início da locação
+        String diferenca = calculaData(horarioQuarto);
+        String[] partesDif = diferenca.split(":");
+        int totalMinutosPassados = (Integer.parseInt(partesDif[0]) * 60) + Integer.parseInt(partesDif[1]);
+
+        float valorAdicionalPessoa = calculaAdicionalPessoa(numPessoas);
         float valorBase = 0;
-        int tempoMinutos = 120;
-        boolean isPernoite = false;
+        float valorExcedente = 0;
 
-        if (pAtual != null) {
-            valorBase = pAtual.getValor();
-            tempoMinutos = pAtual.getTempoMinutos();
-            isPernoite = pAtual.isPernoite();
+        List<PeriodoQuarto> periodos = dao.getPeriodos(quartoEmFoco);
+
+        if (periodos != null && !periodos.isEmpty()) {
+            PeriodoQuarto periodoEncontrado = null;
+
+            // 1. Tenta localizar pelo período gravado na locação (Totem)
+            int idLocacao = ocupado.getIdLoca();
+            String periodoGravado = dao.getPeriodoLocado(idLocacao);
+            if (periodoGravado != null && !periodoGravado.isEmpty()) {
+                for (PeriodoQuarto p : periodos) {
+                    if (p.getDescricao().equalsIgnoreCase(periodoGravado)) {
+                        boolean statusEhPernoite = status.contains("pernoite");
+                        if (statusEhPernoite != p.isPernoite()) continue;
+                        periodoEncontrado = p;
+                        break;
+                    }
+                }
+            }
+
+            // 2. Se não achou pelo período gravado, usa upgrade automático por tempo
+            if (periodoEncontrado == null) {
+                if (status.contains("pernoite")) {
+                    for (PeriodoQuarto p : periodos) {
+                        if (p.isPernoite()) { periodoEncontrado = p; break; }
+                    }
+                } else {
+                    for (PeriodoQuarto p : periodos) {
+                        if (!p.isPernoite() && totalMinutosPassados <= p.getTempoMinutos() + 10) {
+                            periodoEncontrado = p;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // 3. Fallback: pega o maior período não-pernoite
+            if (periodoEncontrado == null) {
+                for (int i = periodos.size() - 1; i >= 0; i--) {
+                    if (!periodos.get(i).isPernoite()) { periodoEncontrado = periodos.get(i); break; }
+                }
+            }
+
+            // 4. Ultimo fallback: primeiro da lista
+            if (periodoEncontrado == null) periodoEncontrado = periodos.get(0);
+
+            valorBase = periodoEncontrado.getValor();
+
+            // Calcula horas adicionais se passou do tempo do período
+            if (totalMinutosPassados > periodoEncontrado.getTempoMinutos() + 10) {
+                int sobraMinutos = totalMinutosPassados - periodoEncontrado.getTempoMinutos();
+                int add = (int) Math.ceil(sobraMinutos / 60.0);
+                valorExcedente = (float) add * ocupado.getValorAdicional();
+            }
         } else {
+            // Sem períodos configurados, usa o valor do cache
             valorBase = ocupado.getValorPeriodo();
         }
 
-        float valorAdicionalPessoa = calculaAdicionalPessoa(numPessoas);
         float valorTotalQuarto = valorBase + valorAdicionalPessoa;
-
-        int numeroAdicionais = 0;
-        if (isPernoite) {
-            numeroAdicionais = subtrairHora(quartoEmFoco, horarioQuarto, "pernoite");
-        } else {
-            String tempoStr = String.format("%02d:%02d", tempoMinutos / 60, tempoMinutos % 60);
-            numeroAdicionais = subtrairHora(quartoEmFoco, horarioQuarto, tempoStr);
-        }
-
-        float valorExcedente = (float) numeroAdicionais * ocupado.getValorAdicional();
 
         resumo.put("valorBase", valorBase);
         resumo.put("valorTotalQuarto", valorTotalQuarto);

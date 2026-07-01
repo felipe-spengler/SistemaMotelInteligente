@@ -9,7 +9,7 @@
   </parent>
   <groupId>com.motelinteligente</groupId>
   <artifactId>MotelInteligente</artifactId>
-  <version>1.0.59</version>
+  <version>1.0.60</version>
   <name>MotelInteligente</name>
   <properties>
     <java.version>17</java.version>
@@ -204,12 +204,12 @@
                 <jdkPreference>preferJre</jdkPreference>
               </jre>
               <versionInfo>
-                <fileVersion>1.0.59.0</fileVersion>
-                <txtFileVersion>1.0.59.0</txtFileVersion>
+                <fileVersion>1.0.60.0</fileVersion>
+                <txtFileVersion>1.0.60.0</txtFileVersion>
                 <fileDescription>Sistema Inteligente de Motel</fileDescription>
                 <copyright>Felipe Spengler</copyright>
-                <productVersion>1.0.59.0</productVersion>
-                <txtProductVersion>1.0.59.0</txtProductVersion>
+                <productVersion>1.0.60.0</productVersion>
+                <txtProductVersion>1.0.60.0</txtProductVersion>
                 <productName>Motel Inteligente</productName>
                 <internalName>MotelInteligente</internalName>
                 <originalFilename>${project.build.finalName}.exe</originalFilename>
