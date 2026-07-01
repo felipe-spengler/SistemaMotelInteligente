@@ -255,8 +255,79 @@ public class ImpressoraService {
     }
 
     /**
+     * Imprime o extrato de produtos vendidos detalhado por quarto (para reposição de estoque).
+     */
+    public static void imprimirProdutosVendidosPorQuarto(int idCaixa) {
+        if (!configGlobal.getInstance().isImpressoraAtiva()) return;
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("==========================================\n");
+        sb.append("    PRODUTOS VENDIDOS - POR QUARTO        \n");
+        sb.append("==========================================\n");
+        sb.append(String.format("Caixa ID: %d\n", idCaixa));
+        sb.append("------------------------------------------\n");
+
+        // Consulta agrupada por quarto + produto para facilitar reposição
+        String sql =
+            "SELECT rl.numquarto, p.descricao, SUM(rv.quantidade) as qtd, rv.valorunidade, SUM(rv.valortotal) as total " +
+            "FROM registravendido rv " +
+            "INNER JOIN produtos p ON rv.idproduto = p.idproduto " +
+            "LEFT JOIN registralocado rl ON rv.idlocacao = rl.idlocacao " +
+            "WHERE rv.idcaixaatual = ? " +
+            "ORDER BY rl.numquarto, p.descricao";
+
+        float totalGeral = 0;
+        int quartoAtual = -1;
+        float totalQuarto = 0;
+
+        try (Connection link = new fazconexao().conectar();
+             PreparedStatement stmt = link.prepareStatement(sql)) {
+            stmt.setInt(1, idCaixa);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    int quarto = rs.getInt("numquarto");
+                    String desc = rs.getString("descricao");
+                    if (desc != null && desc.length() > 18) desc = desc.substring(0, 16) + "..";
+                    int qtd = rs.getInt("qtd");
+                    float vUnit = rs.getFloat("valorunidade");
+                    float total = rs.getFloat("total");
+
+                    // Cabeçalho do quarto quando muda
+                    if (quarto != quartoAtual) {
+                        if (quartoAtual != -1) {
+                            sb.append(String.format("  Subtotal Qto %02d:       R$ %,.2f\n", quartoAtual, totalQuarto));
+                        }
+                        quartoAtual = quarto;
+                        totalQuarto = 0;
+                        sb.append(String.format("--- Quarto %02d ---\n", quarto > 0 ? quarto : 0));
+                        sb.append(String.format("Qtd  Produto              V.Unit  V.Total\n"));
+                    }
+
+                    totalQuarto += total;
+                    totalGeral += total;
+                    sb.append(String.format("%3d  %-18s %6.2f %8.2f\n", qtd, desc != null ? desc : "N/A", vUnit, total));
+                }
+                // Fecha último quarto
+                if (quartoAtual != -1) {
+                    sb.append(String.format("  Subtotal Qto %02d:       R$ %,.2f\n", quartoAtual, totalQuarto));
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Erro ao buscar produtos por quarto: ", e);
+            return;
+        }
+
+        sb.append("------------------------------------------\n");
+        sb.append(String.format("TOTAL GERAL PRODUTOS:      R$ %,.2f\n", totalGeral));
+        sb.append("==========================================\n\n\n\n\n");
+
+        imprimirTexto(sb.toString());
+    }
+
+    /**
      * Imprime o cupom do extrato de locação para entrega ao cliente.
      */
+
     public static void imprimirExtratoLocacao(
             int numeroQuarto, int idLocacao, String dataInicio, String dataFim, String tempoTotalLocado,
             float valorQuarto, float valorAdicionalPessoa, float valorAdicionalPeriodo, float valorConsumo,

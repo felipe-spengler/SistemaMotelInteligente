@@ -23,7 +23,8 @@ public class CaixaFrameModerno extends JFrame {
     private JLabel lblDataAbre;
     private JTextField txtValorInicial;
 
-    private JButton btnAbrir, btnFechar;
+    private JButton btnAbrir, btnFechar, btnImprimirExtrato;
+    private boolean jaImprimiu = false; // evita reimpressão ao fechar
 
     // Cards de Resumo
     private JLabel lblEntradaTotal;
@@ -110,8 +111,12 @@ public class CaixaFrameModerno extends JFrame {
         btnFechar = EstiloModerno.criarBotaoPerigo("FECHAR CAIXA", null);
         btnFechar.addActionListener(e -> fecharCaixa());
 
+        btnImprimirExtrato = EstiloModerno.criarBotaoSecundario("🖨 Imprimir Extrato", null);
+        btnImprimirExtrato.addActionListener(e -> imprimirExtratoManual());
+
         actionCard.add(btnAbrir);
         actionCard.add(btnFechar);
+        actionCard.add(btnImprimirExtrato);
 
         main.add(actionCard, "growx, wrap");
 
@@ -520,6 +525,29 @@ public class CaixaFrameModerno extends JFrame {
         }
     }
 
+    private void imprimirExtratoManual() {
+        configGlobal config = configGlobal.getInstance();
+        int idCaixa = config.getCaixa();
+        if (idCaixa == 0) {
+            JOptionPane.showMessageDialog(this, "Nenhum caixa aberto.");
+            return;
+        }
+        fcaixa dao = new fcaixa();
+        valores v = dao.getValores(idCaixa);
+        float saldoIni = dao.getValorAbriu(idCaixa);
+        float antecipadoOutro = dao.getOutrosCaixas(idCaixa);
+        valores antecipadoDetalhado = dao.getAntecipadoDetalhado(idCaixa);
+        List<Integer> ids = dao.getIdsLocacoes(idCaixa);
+        float[] justif = dao.getTotaisJustificativas(ids);
+        float totalJustificativas = justif[1] - justif[0];
+
+        com.motelinteligente.dados.ImpressoraService.imprimirFechamentoCaixa(
+            idCaixa, v, saldoIni, antecipadoOutro, antecipadoDetalhado, totalJustificativas);
+        com.motelinteligente.dados.ImpressoraService.imprimirProdutosVendidosPorQuarto(idCaixa);
+        jaImprimiu = true;
+        JOptionPane.showMessageDialog(this, "Extrato enviado para a impressora!");
+    }
+
     private void fecharCaixa() {
         // Carregar dados frescos para garantia
         configGlobal config = configGlobal.getInstance();
@@ -553,11 +581,15 @@ public class CaixaFrameModerno extends JFrame {
             // e o Saldo Final (Físico) é apenas para conferência visual.
 
             if (new fcaixa().fecharCaixa(entradaNet)) {
-                // Impressão dos cupons térmicos antes de limpar o ID do caixa da configGlobal
-                com.motelinteligente.dados.ImpressoraService.imprimirFechamentoCaixa(
-                    idCaixa, v, saldoIni, antecipadoOutro, antecipadoDetalhado, totalJustificativas
-                );
-                com.motelinteligente.dados.ImpressoraService.imprimirProdutosVendidos(idCaixa);
+                // Imprime apenas se ainda não imprimiu manualmente
+                if (!jaImprimiu) {
+                    com.motelinteligente.dados.ImpressoraService.imprimirFechamentoCaixa(
+                        idCaixa, v, saldoIni, antecipadoOutro, antecipadoDetalhado, totalJustificativas
+                    );
+                    com.motelinteligente.dados.ImpressoraService.imprimirProdutosVendidosPorQuarto(idCaixa);
+                } else {
+                    com.motelinteligente.dados.ImpressoraService.imprimirProdutosVendidosPorQuarto(idCaixa);
+                }
 
                 JOptionPane.showMessageDialog(this,
                         "Caixa fechado com sucesso!",

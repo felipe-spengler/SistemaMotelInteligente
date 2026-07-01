@@ -13,7 +13,9 @@ import com.motelinteligente.dados.playSound;
 import com.motelinteligente.dados.vendaProdutos;
 import com.motelinteligente.telas.controller.EncerraQuartoController;
 import java.awt.Color;
+import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -54,6 +56,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JButton;
@@ -63,11 +66,13 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
@@ -100,6 +105,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
     private boolean jopAberto = false;
     String dataInicio, dataFim, tempoTotalLocado;
     float valorAcrescimo = 0, valorDesconto = 0;
+    // true = desconto no total; false = desconto só na locação
+    private boolean descontoNoTotal = true;
     float valoreRecebido = 0, valorDivida = 0, valorRecebidoAgora = 0;
     float valorConsumo = 0, valorQuarto = 0, valorAdicionalPeriodo = 0, valorAdicionalPessoa = 0;
     float valD = 0, valP = 0, valC = 0;
@@ -1604,21 +1611,31 @@ public class EncerraQuarto extends javax.swing.JFrame {
             salvaDesistencia();
         } else {
             if (valorDesconto > 0 || valorAcrescimo > 0) {
-                // precisa de justificativa
-                if (txtJustifica.getText().isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Precisa Justificativa!");
-                } else {
-                    if (chamaJOP()) {
-                        if (valorDesconto > 0) {
-                            salvaJustifica("desconto", valorDesconto);
-                        }
-                        if (valorAcrescimo > 0) {
-                            salvaJustifica("acrescimo", valorAcrescimo);
-                        }
-                        salvaVendidos(numeroDoQuarto);
+                // precisa de justificativa - se vazio, pede inline
+                if (txtJustifica.getText().trim().isEmpty()) {
+                    JTextField campojust = new JTextField(30);
+                    campojust.putClientProperty("JTextField.placeholderText", "Digite a justificativa aqui...");
+                    Object[] msg = {
+                        "Informe a justificativa para desconto/acréscimo:",
+                        campojust
+                    };
+                    int resp = JOptionPane.showConfirmDialog(this, msg, "Justificativa",
+                            JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+                    if (resp != JOptionPane.OK_OPTION || campojust.getText().trim().isEmpty()) {
+                        JOptionPane.showMessageDialog(this, "Justificativa obrigatória!");
+                        return;
                     }
+                    txtJustifica.setText(campojust.getText().trim());
                 }
-
+                if (chamaJOP()) {
+                    if (valorDesconto > 0) {
+                        salvaJustifica("desconto", valorDesconto);
+                    }
+                    if (valorAcrescimo > 0) {
+                        salvaJustifica("acrescimo", valorAcrescimo);
+                    }
+                    salvaVendidos(numeroDoQuarto);
+                }
             } else {
                 // nao precisa justificativa
                 if (chamaJOP()) {
@@ -2188,8 +2205,9 @@ public class EncerraQuarto extends javax.swing.JFrame {
     public void salvaVendidos(int numero) {
         salvouLocacao = true;
 
-        List<vendaProdutos> produtosParaSalvar = new ArrayList<>();
+        // Captura dados de impressão ANTES do dispose (tabela e valores de pagamento)
         DefaultTableModel model = (DefaultTableModel) tabela.getModel();
+        List<vendaProdutos> produtosParaSalvar = new ArrayList<>();
         int rowCount = model.getRowCount();
         for (int i = 0; i < rowCount; i++) {
             int idProduto = objectToInt(i, 0);
@@ -2199,8 +2217,43 @@ public class EncerraQuarto extends javax.swing.JFrame {
             produtosParaSalvar.add(new vendaProdutos(idProduto, quantidade, valUnd, valtotal));
         }
 
+        // Snapshot dos valores para impressão pós-fechamento
+        final int snapshotQuarto = numeroDoQuarto;
+        final int snapshotLocacao = idLocacao;
+        final String snapshotInicio = dataInicio;
+        final String snapshotFim = dataFim;
+        final String snapshotTempo = tempoTotalLocado;
+        final float snapshotQuartoVal = valorQuarto;
+        final float snapshotPessoa = valorAdicionalPessoa;
+        final float snapshotPeriodo = valorAdicionalPeriodo;
+        final float snapshotConsumo = valorConsumo;
+        final float snapshotAcrescimo = valorAcrescimo;
+        final float snapshotDesconto = valorDesconto;
+        final float snapshotValD = valD;
+        final float snapshotValP = valP;
+        final float snapshotValC = valC;
+        final float snapshotRecebidoAnt = valoreRecebido;
+        final float snapshotRecebidoAgora = valorRecebidoAgora;
+
+        // Copia o model para impressão
+        DefaultTableModel modelCopia = new DefaultTableModel(
+            new Object[]{"ID","Qtd","Descricao","ValUnit","Total"}, 0);
+        for (int i = 0; i < rowCount; i++) {
+            modelCopia.addRow(new Object[]{
+                model.getValueAt(i, 0), model.getValueAt(i, 1),
+                model.getValueAt(i, 2), model.getValueAt(i, 3), model.getValueAt(i, 4)
+            });
+        }
+        float totalAntecipadoSoma = 0;
+        if (antecipados != null) {
+            for (Antecipado a : antecipados) {
+                if (!"desconto".equals(a.getTipo())) totalAntecipadoSoma += a.getValor();
+            }
+        }
+        final float snapshotAntecipado = totalAntecipadoSoma;
+
         controller.setValorConsumo(valorConsumo);
-        controller.salvarLocacao(produtosParaSalvar, valD, valP, valC, 0); // Cartão assumindo valC
+        controller.salvarLocacao(produtosParaSalvar, valD, valP, valC, 0);
 
         outraTela.dispose();
         if (principal != null) {
@@ -2208,48 +2261,64 @@ public class EncerraQuarto extends javax.swing.JFrame {
         }
         this.dispose();
 
-        // Exibe mensagem com Timer e contagem no console
-        JOptionPane optionPane = new JOptionPane("Registro salvo com sucesso!", JOptionPane.INFORMATION_MESSAGE);
-        JDialog dialog = optionPane.createDialog((java.awt.Frame) null, "Mensagem");
+        // Dialog de sucesso com botão imprimir
+        JDialog dialog = new JDialog((java.awt.Frame) null, "Locação Encerrada", false);
+        dialog.setSize(420, 190);
+        dialog.setLocationRelativeTo(null);
+        dialog.setLayout(new BorderLayout(10, 10));
 
-        final boolean[] fechadoPorTempo = { false };
-        final int tempoTotal = 15; // segundos
-        final int[] tempoRestante = { tempoTotal };
+        final int[] tempoRestante = { 15 };
+        final JLabel lblMsg = new JLabel(
+            "<html><center>✅ Registro salvo com sucesso!<br>Fechando em 15s...</center></html>",
+            SwingConstants.CENTER);
+        lblMsg.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblMsg.setBorder(BorderFactory.createEmptyBorder(15, 10, 5, 10));
+        dialog.add(lblMsg, BorderLayout.CENTER);
 
-        // Timer para fechar o diálogo após 15 segundos
-        Timer timerFechar = new Timer(tempoTotal * 1000, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (dialog.isShowing()) {
-                    fechadoPorTempo[0] = true;
-                    dialog.dispose();
-                    System.out.println("⏱ Fechado automaticamente após 15 segundos.");
-                }
-            }
+        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 8));
+        JButton btnImprimir = new JButton("🖨 Imprimir Extrato");
+        JButton btnOk = new JButton("OK / Fechar");
+        btnImprimir.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        btnOk.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        btnPanel.add(btnImprimir);
+        btnPanel.add(btnOk);
+        dialog.add(btnPanel, BorderLayout.SOUTH);
+
+        final boolean[] jaImprimiuLocal = { false };
+
+        btnImprimir.addActionListener(ev -> {
+            jaImprimiuLocal[0] = true;
+            com.motelinteligente.dados.ImpressoraService.imprimirExtratoLocacao(
+                snapshotQuarto, snapshotLocacao, snapshotInicio, snapshotFim, snapshotTempo,
+                snapshotQuartoVal, snapshotPessoa, snapshotPeriodo, snapshotConsumo,
+                snapshotAcrescimo, snapshotDesconto, snapshotAntecipado, snapshotRecebidoAgora,
+                modelCopia
+            );
+            JOptionPane.showMessageDialog(dialog, "Extrato enviado para a impressora!");
         });
+        btnOk.addActionListener(ev -> dialog.dispose());
+
+        Timer timerFechar = new Timer(15 * 1000, ev -> dialog.dispose());
         timerFechar.setRepeats(false);
         timerFechar.start();
 
-        // Timer para imprimir contagem regressiva
-        Timer timerContagem = new Timer(1000, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                tempoRestante[0]--;
-                if (tempoRestante[0] > 0) {
-                    System.out.println("⏳ Tempo restante: " + tempoRestante[0] + "s");
-                }
+        Timer timerLabel = new Timer(1000, null);
+        timerLabel.addActionListener(ev -> {
+            tempoRestante[0]--;
+            if (tempoRestante[0] <= 0) {
+                timerLabel.stop();
+            } else {
+                lblMsg.setText("<html><center>✅ Registro salvo com sucesso!<br>Fechando em " + tempoRestante[0] + "s...</center></html>");
             }
         });
-        timerContagem.setRepeats(true);
-        timerContagem.start();
+        timerLabel.setRepeats(true);
+        timerLabel.start();
 
         dialog.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
             public void windowClosed(java.awt.event.WindowEvent e) {
-                timerContagem.stop(); // Para o contador
-                if (!fechadoPorTempo[0]) {
-                    System.out.println("✅ Fechado manualmente pelo botão OK.");
-                }
+                timerFechar.stop();
+                timerLabel.stop();
             }
         });
 
@@ -2364,7 +2433,20 @@ public class EncerraQuarto extends javax.swing.JFrame {
     }
 
     private void txtDescontoActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_txtDescontoActionPerformed
-        verificaDesconto(2);
+        // Pergunta tipo de desconto antes de calcular
+        JRadioButton rbTotal = new JRadioButton("Desconto no Total", descontoNoTotal);
+        JRadioButton rbLocacao = new JRadioButton("Desconto só na Locação (quarto)", !descontoNoTotal);
+        ButtonGroup bg = new ButtonGroup();
+        bg.add(rbTotal); bg.add(rbLocacao);
+        JPanel pnTipo = new JPanel(new java.awt.GridLayout(2, 1, 0, 4));
+        pnTipo.add(rbTotal); pnTipo.add(rbLocacao);
+        Object[] msg = { "Onde aplicar o desconto?", pnTipo };
+        int resp = JOptionPane.showConfirmDialog(this, msg, "Tipo de Desconto",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+        if (resp == JOptionPane.OK_OPTION) {
+            descontoNoTotal = rbTotal.isSelected();
+            verificaDesconto(2);
+        }
         txtJustifica.requestFocus();
     }// GEN-LAST:event_txtDescontoActionPerformed
 
@@ -2379,11 +2461,16 @@ public class EncerraQuarto extends javax.swing.JFrame {
 
         configGlobal config = configGlobal.getInstance();
         int limiteDesconto = config.getLimiteDesconto();
+
+        // Base de cálculo depende do tipo de desconto
+        float baseCalculo = descontoNoTotal ? valorDivida : (valorQuarto + valorAdicionalPessoa + valorAdicionalPeriodo);
+        if (baseCalculo <= 0) baseCalculo = valorDivida;
+
         if (numero == 1) {
             try {
                 String semPorcentagem = txtDescontoPorcento.getText().replace("%", "");
                 valorPorcento = Float.valueOf(semPorcentagem);
-                valorDesconto = (valorPorcento / 100) * valorDivida;
+                valorDesconto = (valorPorcento / 100) * baseCalculo;
                 txtDesconto.setText("" + valorDesconto);
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(null, "Digite um valor válido");
@@ -2391,8 +2478,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
 
         } else {
             valorDesconto = Float.valueOf(txtDesconto.getText());
-            valorPorcento = (valorDesconto / valorDivida) * 100;
-            txtDescontoPorcento.setText(valorPorcento + "%");
+            valorPorcento = (valorDesconto / baseCalculo) * 100;
+            txtDescontoPorcento.setText(String.format("%.1f%%", valorPorcento));
         }
 
         if (valorDesconto >= 0) {
