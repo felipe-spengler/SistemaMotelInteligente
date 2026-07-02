@@ -269,12 +269,13 @@ public class ImpressoraService {
 
         // Consulta agrupada por quarto + produto para facilitar reposição
         String sql =
-            "SELECT rl.numquarto, p.descricao, SUM(rv.quantidade) as qtd, rv.valorunidade, SUM(rv.valortotal) as total " +
-            "FROM registravendido rv " +
-            "INNER JOIN produtos p ON rv.idproduto = p.idproduto " +
-            "LEFT JOIN registralocado rl ON rv.idlocacao = rl.idlocacao " +
-            "WHERE rv.idcaixaatual = ? " +
-            "ORDER BY rl.numquarto, p.descricao";
+    "SELECT rl.numquarto, p.descricao, SUM(rv.quantidade) as qtd, rv.valorunidade, SUM(rv.valortotal) as total " +
+    "FROM registravendido rv " +
+    "INNER JOIN produtos p ON rv.idproduto = p.idproduto " +
+    "LEFT JOIN registralocado rl ON rv.idlocacao = rl.idlocacao " +
+    "WHERE rv.idcaixaatual = ? " +
+    "GROUP BY rl.numquarto, p.descricao, rv.valorunidade " + // <-- Adicionado isso aqui
+    "ORDER BY rl.numquarto, p.descricao";
 
         float totalGeral = 0;
         int quartoAtual = -1;

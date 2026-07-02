@@ -376,4 +376,116 @@ public class fcaixa {
         }
         return lista;
     }
+
+    // ===== RETIRADAS DO CAIXA =====
+
+    public boolean salvarRetirada(int idCaixa, float valor, String quem, String justificativa) {
+        String sql = "INSERT INTO retiradas_caixa (idcaixa, valor, quem, justificativa, usuario) VALUES (?, ?, ?, ?, ?)";
+        try (Connection link = new fazconexao().conectar();
+             PreparedStatement stmt = link.prepareStatement(sql)) {
+            stmt.setInt(1, idCaixa);
+            stmt.setFloat(2, valor);
+            stmt.setString(3, quem);
+            stmt.setString(4, justificativa);
+            stmt.setString(5, configGlobal.getInstance().getUsuario());
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            logger.error("Erro ao salvar retirada: ", e);
+            return false;
+        }
+    }
+
+    public float getTotalRetiradas(int idCaixa) {
+        String sql = "SELECT COALESCE(SUM(valor), 0) FROM retiradas_caixa WHERE idcaixa = ?";
+        try (Connection link = new fazconexao().conectar();
+             PreparedStatement stmt = link.prepareStatement(sql)) {
+            stmt.setInt(1, idCaixa);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return rs.getFloat(1);
+            }
+        } catch (SQLException e) {
+            logger.error("Erro ao somar retiradas: ", e);
+        }
+        return 0f;
+    }
+
+    public List<Object[]> getListaRetiradas(int idCaixa) {
+        List<Object[]> lista = new ArrayList<>();
+        String sql = "SELECT horario, quem, valor, justificativa FROM retiradas_caixa WHERE idcaixa = ? ORDER BY horario";
+        SimpleDateFormat fmt = new SimpleDateFormat("dd/MM HH:mm");
+        try (Connection link = new fazconexao().conectar();
+             PreparedStatement stmt = link.prepareStatement(sql)) {
+            stmt.setInt(1, idCaixa);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    String hora = rs.getTimestamp("horario") != null
+                        ? fmt.format(new Date(rs.getTimestamp("horario").getTime())) : "";
+                    lista.add(new Object[]{ hora, rs.getString("quem"), rs.getFloat("valor"), rs.getString("justificativa") });
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Erro ao listar retiradas: ", e);
+        }
+        return lista;
+    }
+
+    // ===== VENDAS AVULSAS =====
+
+    public boolean salvarVendaAvulsa(int idCaixa, int idProduto, String descricao,
+            int quantidade, float valorUnd, float valorTotal, String tipo, String formaPgto) {
+        String sql = "INSERT INTO vendas_avulsas (idcaixa, idproduto, descricao, quantidade, valorunidade, valortotal, tipo, formapagamento, usuario) VALUES (?,?,?,?,?,?,?,?,?)";
+        try (Connection link = new fazconexao().conectar();
+             PreparedStatement stmt = link.prepareStatement(sql)) {
+            stmt.setInt(1, idCaixa);
+            stmt.setInt(2, idProduto);
+            stmt.setString(3, descricao);
+            stmt.setInt(4, quantidade);
+            stmt.setFloat(5, valorUnd);
+            stmt.setFloat(6, valorTotal);
+            stmt.setString(7, tipo);
+            stmt.setString(8, formaPgto);
+            stmt.setString(9, configGlobal.getInstance().getUsuario());
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            logger.error("Erro ao salvar venda avulsa: ", e);
+            return false;
+        }
+    }
+
+    public float getTotalVendasAvulsas(int idCaixa) {
+        String sql = "SELECT COALESCE(SUM(valortotal), 0) FROM vendas_avulsas WHERE idcaixa = ?";
+        try (Connection link = new fazconexao().conectar();
+             PreparedStatement stmt = link.prepareStatement(sql)) {
+            stmt.setInt(1, idCaixa);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return rs.getFloat(1);
+            }
+        } catch (SQLException e) {
+            logger.error("Erro ao somar vendas avulsas: ", e);
+        }
+        return 0f;
+    }
+
+    public List<Object[]> getListaVendasAvulsas(int idCaixa) {
+        List<Object[]> lista = new ArrayList<>();
+        String sql = "SELECT horario, descricao, quantidade, valorunidade, valortotal, tipo, formapagamento FROM vendas_avulsas WHERE idcaixa = ? ORDER BY horario";
+        SimpleDateFormat fmt = new SimpleDateFormat("dd/MM HH:mm");
+        try (Connection link = new fazconexao().conectar();
+             PreparedStatement stmt = link.prepareStatement(sql)) {
+            stmt.setInt(1, idCaixa);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    String hora = rs.getTimestamp("horario") != null
+                        ? fmt.format(new Date(rs.getTimestamp("horario").getTime())) : "";
+                    lista.add(new Object[]{ hora, rs.getString("descricao"), rs.getInt("quantidade"),
+                        rs.getFloat("valorunidade"), rs.getFloat("valortotal"),
+                        rs.getString("tipo"), rs.getString("formapagamento") });
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Erro ao listar vendas avulsas: ", e);
+        }
+        return lista;
+    }
 }
+
