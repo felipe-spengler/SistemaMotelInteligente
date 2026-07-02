@@ -242,10 +242,16 @@ public class TelaLogin extends javax.swing.JFrame {
 
             // Carrega Arduino, se necessário
             if (!configuracoes.isFlagArduino()) {
-                logger.info("[LOGIN] Antes de carregaArduino");
-                cache.carregaArduino();
-                configuracoes.setFlagArduino(true);
-                logger.info("[LOGIN] Depois de carregaArduino");
+                logger.info("[LOGIN] Lançando inicialização do Arduino em thread de fundo");
+                new Thread(() -> {
+                    try {
+                        cache.carregaArduino();
+                        configuracoes.setFlagArduino(true);
+                        logger.info("[LOGIN] carregaArduino concluído");
+                    } catch (Exception ex) {
+                        logger.error("[LOGIN] Erro ao carregar Arduino em background", ex);
+                    }
+                }, "ArduinoInit").start();
             }
 
             // Iniciar sistema Spring, se ainda não foi iniciado

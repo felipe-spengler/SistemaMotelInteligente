@@ -45,47 +45,66 @@ public class CacheDados {
     }
 
     public static void carregaArduino() {
+        logger.info("[ARDUINO] Iniciando carregaArduino");
         if (arduinoPort != null && arduinoPort.isOpen()) {
+            logger.info("[ARDUINO] Porta já aberta: {}", arduinoPort.getSystemPortName());
             return; // A conexão já está aberta
         }
 
-        SerialPort[] portas = SerialPort.getCommPorts();
-        System.out.println("Portas seriais disponíveis:");
+        try {
+            logger.info("[ARDUINO] Antes de SerialPort.getCommPorts()");
+            SerialPort[] portas = SerialPort.getCommPorts();
+            logger.info("[ARDUINO] Depois de SerialPort.getCommPorts() - total: {}", portas.length);
 
-        for (SerialPort porta : portas) {
-            String descricao = porta.getDescriptivePortName().toLowerCase();
-
-            System.out.println("Nome: " + porta.getSystemPortName() + ", Descrição: " + porta.getDescriptivePortName());
-
-            // =========================================================================
-            // === MUDANÇA AQUI: Adicionar verificações para todos os chips conhecidos ===
-            // =========================================================================
-            boolean isCh340 = descricao.contains("usb-serial ch340");
-            boolean isFt232 = descricao.contains("ft232r usb uart") || descricao.contains("usb serial port");
-
-            if (isCh340 || isFt232) {
-                String tipo = isCh340 ? "CH340" : "FT232R/Genérico";
-                System.out.println("Arduino (" + tipo + ") encontrado na porta: " + porta.getSystemPortName());
-                arduinoPort = porta; // Define a porta do Arduino
-                break; // Para o loop assim que encontrar o primeiro
+            if (portas.length == 0) {
+                logger.warn("[ARDUINO] Nenhuma porta serial encontrada.");
             }
+
+            for (SerialPort porta : portas) {
+                String descricao = porta.getDescriptivePortName().toLowerCase();
+                logger.info("[ARDUINO] Nome: {}, Descrição: {}", porta.getSystemPortName(), porta.getDescriptivePortName());
+
+                boolean isCh340 = descricao.contains("usb-serial ch340");
+                boolean isFt232 = descricao.contains("ft232r usb uart") || descricao.contains("usb serial port");
+
+                if (isCh340 || isFt232) {
+                    String tipo = isCh340 ? "CH340" : "FT232R/Genérico";
+                    logger.info("[ARDUINO] Arduino ({}) encontrado na porta: {}", tipo, porta.getSystemPortName());
+                    arduinoPort = porta; // Define a porta do Arduino
+                    break; // Para o loop assim que encontrar o primeiro
+                }
+            }
+        } catch (Exception ex) {
+            logger.error("[ARDUINO] Erro ao enumerar portas seriais", ex);
+            return;
         }
 
         if (arduinoPort == null) {
-            JOptionPane.showMessageDialog(null, "Nenhum Arduino (CH340, FT232R, etc.) encontrado.");
+            logger.warn("[ARDUINO] Nenhum Arduino encontrado.");
             return;
         }
 
-        if (!arduinoPort.openPort()) {
-            JOptionPane.showMessageDialog(null, "Falha ao abrir a porta " + arduinoPort.getSystemPortName() + " - Conecte o Arduino.");
+        try {
+            logger.info("[ARDUINO] Tentando abrir porta {}", arduinoPort.getSystemPortName());
+            if (!arduinoPort.openPort()) {
+                logger.error("[ARDUINO] Falha ao abrir a porta {}", arduinoPort.getSystemPortName());
+                return;
+            }
+        } catch (Exception ex) {
+            logger.error("[ARDUINO] Exceção ao abrir a porta serial", ex);
             return;
         }
 
-        // Configura os parâmetros de comunicação
-        arduinoPort.setBaudRate(9600); // Taxa de transmissão
-        arduinoPort.setNumDataBits(8); // Bits de dados
-        arduinoPort.setNumStopBits(1); // Bits de parada
-        arduinoPort.setParity(SerialPort.NO_PARITY); // Paridade
+        try {
+            // Configura os parâmetros de comunicação
+            arduinoPort.setBaudRate(9600); // Taxa de transmissão
+            arduinoPort.setNumDataBits(8); // Bits de dados
+            arduinoPort.setNumStopBits(1); // Bits de parada
+            arduinoPort.setParity(SerialPort.NO_PARITY); // Paridade
+            logger.info("[ARDUINO] Porta serial configurada: {}", arduinoPort.getSystemPortName());
+        } catch (Exception ex) {
+            logger.error("[ARDUINO] Exceção ao configurar a porta serial", ex);
+        }
     }
 
     public static SerialPort getArduinoPort() {
