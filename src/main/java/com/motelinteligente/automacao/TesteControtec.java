@@ -1,5 +1,5 @@
 package com.motelinteligente.automacao;
-
+/*
 import com.fazecast.jSerialComm.SerialPort;
 import java.util.concurrent.TimeUnit;
 
@@ -106,3 +106,4 @@ public class TesteControtec {
         }
     }
 }
+*/

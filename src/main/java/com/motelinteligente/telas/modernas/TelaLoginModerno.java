@@ -234,10 +234,8 @@ public class TelaLoginModerno extends JFrame {
                         cache.carregarDadosQuarto();
                         logger.info("[LOGIN] Dados carregados");
 
-                        // Carrega Arduino apenas para SISTEMA=venus
-                        String sistema = CarregarVariaveis.getFilial();
-                        boolean isVenus = "venus".equalsIgnoreCase(sistema);
-                        if (!configuracoes.isFlagArduino() && isVenus) {
+                        // Carrega Arduino em todas as filiais. O filtro venus era incorreto.
+                        if (!configuracoes.isFlagArduino()) {
                             try {
                                 cache.carregaArduino();
                                 configuracoes.setFlagArduino(true);
@@ -245,8 +243,6 @@ public class TelaLoginModerno extends JFrame {
                             } catch (Exception ex) {
                                 logger.error("[LOGIN] Erro ao carregar Arduino", ex);
                             }
-                        } else if (!isVenus) {
-                            logger.info("[LOGIN] Pulando carregaArduino porque SISTEMA='{}' não é venus", sistema);
                         }
 
                         // Iniciar sistema Spring se necessário
