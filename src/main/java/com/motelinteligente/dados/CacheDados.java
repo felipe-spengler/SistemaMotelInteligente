@@ -74,6 +74,7 @@ public class CacheDados {
     }
 
     public static void carregaArduino() {
+        System.setProperty("jSerialComm.library.path", "C:\\Windows\\System32");
         logger.info("[ARDUINO] Iniciando carregaArduino");
         // Fecha qualquer conexão anterior mantida pela JVM para forçar reconexão limpa
         if (arduinoPort != null) {
