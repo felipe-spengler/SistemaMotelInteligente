@@ -3,6 +3,7 @@ package com.motelinteligente.telas.modernas;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.motelinteligente.dados.CacheDados;
+import com.motelinteligente.dados.LoggingInitializer;
 import com.motelinteligente.dados.MotelInteligenteApplication;
 import com.motelinteligente.dados.configGlobal;
 import com.motelinteligente.dados.ffuncionario;
@@ -289,6 +290,8 @@ public class TelaLoginModerno extends JFrame {
     }
 
     public static void main(String[] args) {
+        LoggingInitializer.init();
+
         // Configuração do tema moderno
         try {
             FlatIntelliJLaf.setup();

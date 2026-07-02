@@ -2,6 +2,7 @@ package com.motelinteligente.telas;
 
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.motelinteligente.dados.CacheDados;
+import com.motelinteligente.dados.LoggingInitializer;
 import com.motelinteligente.dados.MotelInteligenteApplication;
 import com.motelinteligente.dados.configGlobal;
 import com.motelinteligente.dados.ffuncionario;
@@ -279,6 +280,8 @@ public class TelaLogin extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) throws IOException {
+        LoggingInitializer.init();
+
         // Configuração do Tema Moderno (FlatLaf IntelliJ)
         try {
             FlatIntelliJLaf.setup();
