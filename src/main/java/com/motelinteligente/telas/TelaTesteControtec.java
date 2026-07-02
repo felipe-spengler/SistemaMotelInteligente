@@ -1,4 +1,4 @@
-package com.motelinteligente.telas;
+/*package com.motelinteligente.telas;
 
 import com.fazecast.jSerialComm.SerialPort;
 import javax.swing.*;
@@ -296,3 +296,4 @@ public class TelaTesteControtec extends javax.swing.JFrame {
         }
     }
 }
+*/

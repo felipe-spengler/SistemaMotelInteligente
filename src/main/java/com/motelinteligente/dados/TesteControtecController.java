@@ -1,4 +1,4 @@
-package com.motelinteligente.dados;
+/*package com.motelinteligente.dados;
 
 import com.fazecast.jSerialComm.SerialPort;
 import org.springframework.http.HttpStatus;
@@ -74,3 +74,4 @@ public class TesteControtecController {
         }
     }
 }
+*/

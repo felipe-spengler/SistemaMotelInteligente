@@ -2015,9 +2015,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         menuSistema.add(itemMensalidade);
 
         // Adiciona atalho para Painel de Testes Físicos da Controtec
-        JMenuItem itemTesteControtec = new JMenuItem("Testes Físicos Controtec");
+        /*JMenuItem itemTesteControtec = new JMenuItem("Testes Físicos Controtec");
         itemTesteControtec.addActionListener(e -> new TelaTesteControtec().setVisible(true));
-        menuSistema.add(itemTesteControtec);
+        menuSistema.add(itemTesteControtec);*/
     }
 
     private void customizarAbas() {

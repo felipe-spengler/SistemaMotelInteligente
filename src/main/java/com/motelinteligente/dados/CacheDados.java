@@ -102,6 +102,7 @@ public class CacheDados {
             arduinoPort.setNumStopBits(1); // Bits de parada
             arduinoPort.setParity(SerialPort.NO_PARITY); // Paridade
             logger.info("[ARDUINO] Porta serial configurada: {}", arduinoPort.getSystemPortName());
+            logger.info("[ARDUINO] carregaArduino finalizado com sucesso");
         } catch (Exception ex) {
             logger.error("[ARDUINO] Exceção ao configurar a porta serial", ex);
         }

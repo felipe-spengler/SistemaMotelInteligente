@@ -2,6 +2,7 @@ package com.motelinteligente.telas.modernas;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.FlatIntelliJLaf;
+import com.motelinteligente.dados.CarregarVariaveis;
 import com.motelinteligente.dados.CacheDados;
 import com.motelinteligente.dados.LoggingInitializer;
 import com.motelinteligente.dados.MotelInteligenteApplication;
@@ -233,8 +234,10 @@ public class TelaLoginModerno extends JFrame {
                         cache.carregarDadosQuarto();
                         logger.info("[LOGIN] Dados carregados");
 
-                        // Carrega Arduino se necessário
-                        if (!configuracoes.isFlagArduino()) {
+                        // Carrega Arduino apenas para SISTEMA=venus
+                        String sistema = CarregarVariaveis.getFilial();
+                        boolean isVenus = "venus".equalsIgnoreCase(sistema);
+                        if (!configuracoes.isFlagArduino() && isVenus) {
                             try {
                                 cache.carregaArduino();
                                 configuracoes.setFlagArduino(true);
@@ -242,6 +245,8 @@ public class TelaLoginModerno extends JFrame {
                             } catch (Exception ex) {
                                 logger.error("[LOGIN] Erro ao carregar Arduino", ex);
                             }
+                        } else if (!isVenus) {
+                            logger.info("[LOGIN] Pulando carregaArduino porque SISTEMA='{}' não é venus", sistema);
                         }
 
                         // Iniciar sistema Spring se necessário

@@ -129,10 +129,12 @@ public class configGlobal {
     }
 
     public void carregarInformacoes(String cargo, String login) {
+        logger.info("[CONFIG] carregarInformacoes iniciado para usuario='{}' cargo='{}'", login, cargo);
         this.setCargoUsuario(cargo);
         this.setUsuario(login);
 
         carregarConfiguracoesAdicionais();
+        logger.info("[CONFIG] carregarInformacoes concluído para usuario='{}' cargo='{}'", login, cargo);
     }
 
     private void verificarColunasImpressora(Connection link) {
@@ -156,6 +158,7 @@ public class configGlobal {
     }
 
     public void carregarConfiguracoesAdicionais() {
+        logger.info("[CONFIG] carregarConfiguracoesAdicionais iniciado");
         String consultaSQL = "SELECT * FROM configuracoes";
 
         try (Connection link = new fazconexao().conectar()) {
@@ -191,6 +194,7 @@ public class configGlobal {
                             "Erro ao carregar Informações Adicionais. Nenhuma configuração encontrada.");
                 }
             }
+            logger.info("[CONFIG] carregarConfiguracoesAdicionais concluído");
 
         } catch (Exception e) {
             logger.error("Erro ao carregar configurações adicionais", e);

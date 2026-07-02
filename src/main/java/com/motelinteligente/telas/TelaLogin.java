@@ -2,6 +2,7 @@ package com.motelinteligente.telas;
 
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.motelinteligente.dados.CacheDados;
+import com.motelinteligente.dados.CarregarVariaveis;
 import com.motelinteligente.dados.LoggingInitializer;
 import com.motelinteligente.dados.MotelInteligenteApplication;
 import com.motelinteligente.dados.configGlobal;
@@ -232,26 +233,28 @@ public class TelaLogin extends javax.swing.JFrame {
             configGlobal configuracoes = configGlobal.getInstance();
 
             // Carrega informações globais de configuração do usuário logado
-            logger.info("[LOGIN] Antes de carregarInformacoes");
+            // logger.info("[LOGIN] Antes de carregarInformacoes");
             configuracoes.carregarInformacoes(cargo, texto_login);
-            logger.info("[LOGIN] Depois de carregarInformacoes");
+            // logger.info("[LOGIN] Depois de carregarInformacoes");
 
-            logger.info("[LOGIN] Antes de carregarDadosQuarto");
+            // logger.info("[LOGIN] Antes de carregarDadosQuarto");
             cache.carregarDadosQuarto();
-            logger.info("[LOGIN] Depois de carregarDadosQuarto");
+            // logger.info("[LOGIN] Depois de carregarDadosQuarto");
 
-            // Carrega Arduino, se necessário
-            if (!configuracoes.isFlagArduino()) {
-                logger.info("[LOGIN] Lançando inicialização do Arduino em thread de fundo");
+            // Carrega Arduino apenas para SISTEMA=venus
+            String sistema = CarregarVariaveis.getFilial();
+            boolean isVenus = "venus".equalsIgnoreCase(sistema);
+            if (!configuracoes.isFlagArduino() && isVenus) {
                 new Thread(() -> {
                     try {
                         cache.carregaArduino();
                         configuracoes.setFlagArduino(true);
-                        logger.info("[LOGIN] carregaArduino concluído");
                     } catch (Exception ex) {
                         logger.error("[LOGIN] Erro ao carregar Arduino em background", ex);
                     }
                 }, "ArduinoInit").start();
+            } else if (!isVenus) {
+                logger.info("[LOGIN] Pulando carregaArduino porque SISTEMA='{}' não é venus", sistema);
             }
 
             // Iniciar sistema Spring, se ainda não foi iniciado
@@ -263,16 +266,16 @@ public class TelaLogin extends javax.swing.JFrame {
             }
 
             // Abrir diretamente a tela principal
-            logger.info("[LOGIN] Abrindo TelaPrincipal...");
+            // logger.info("[LOGIN] Abrindo TelaPrincipal...");
             try {
                 TelaPrincipal tela = new TelaPrincipal();
-                logger.info("[LOGIN] TelaPrincipal instanciada");
+                // logger.info("[LOGIN] TelaPrincipal instanciada");
                 tela.setVisible(true);
-                logger.info("[LOGIN] TelaPrincipal setVisible chamado");
+                // logger.info("[LOGIN] TelaPrincipal setVisible chamado");
 
                 // Fechar a tela de login
                 dispose();
-                logger.info("[LOGIN] Login disposed");
+                // logger.info("[LOGIN] Login disposed");
 
                 // Salvar sessão para caso de atualização automática
                 configuracoes.setSenhaTemporaria(texto_senha);
