@@ -46,9 +46,20 @@ public class CacheDados {
 
     public static void carregaArduino() {
         logger.info("[ARDUINO] Iniciando carregaArduino");
-        if (arduinoPort != null && arduinoPort.isOpen()) {
-            logger.info("[ARDUINO] Porta já aberta: {}", arduinoPort.getSystemPortName());
-            return; // A conexão já está aberta
+        // Fecha qualquer conexão anterior mantida pela JVM para forçar reconexão limpa
+        if (arduinoPort != null) {
+            try {
+                if (arduinoPort.isOpen()) {
+                    logger.info("[ARDUINO] Fechando conexão Arduino existente: {}", arduinoPort.getSystemPortName());
+                    arduinoPort.closePort();
+                } else {
+                    logger.info("[ARDUINO] Referência a arduinoPort encontrada, porém não está aberta. Limpando referência.");
+                }
+            } catch (Exception e) {
+                logger.warn("[ARDUINO] Erro ao fechar conexão anterior: {}", e.toString());
+            } finally {
+                arduinoPort = null;
+            }
         }
 
         try {
