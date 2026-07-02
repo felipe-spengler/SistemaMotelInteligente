@@ -150,20 +150,23 @@ public class ConectaArduino {
                     byte[] dadosRecebidos = new byte[CacheDados.getArduinoPort().bytesAvailable()];
                     CacheDados.getArduinoPort().readBytes(dadosRecebidos, dadosRecebidos.length);
                     resposta += new String(dadosRecebidos);
-                    System.out.println("Resposta parcial do Arduino: " + resposta.trim());
+                    String parcial = resposta.trim();
+                    logger.info("Resposta parcial do Arduino: {}", parcial);
 
-                    if (resposta.trim().equalsIgnoreCase("OK")) {
+                    // Aceita tanto "OK" quanto respostas como "Arduino pronto." (case-insensitive)
+                    String lower = parcial.toLowerCase();
+                    if (parcial.equalsIgnoreCase("OK") || lower.contains("pronto") || lower.contains("ok")) {
                         return true;
                     }
                 }
                 Thread.sleep(100);
             }
 
-            System.out.println("Timeout aguardando resposta do Arduino. Última resposta: " + resposta.trim());
+            logger.warn("Timeout aguardando resposta do Arduino. Última resposta: {}", resposta.trim());
             return false;
 
         } catch (Exception e) {
-            System.out.println("Erro ao aguardar resposta do Arduino: " + e.getMessage());
+            logger.error("Erro ao aguardar resposta do Arduino: {}", e.getMessage(), e);
             return false;
         }
     }
