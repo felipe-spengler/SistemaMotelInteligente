@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.*;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -44,6 +45,34 @@ public class CacheDados {
         return instancia;
     }
 
+    private static SerialPort[] getCommPortsWithTimeout(long timeoutMs) {
+        ExecutorService ex = Executors.newSingleThreadExecutor(r -> {
+            Thread t = new Thread(r, "jserial-getCommPorts");
+            t.setDaemon(true);
+            return t;
+        });
+        Future<SerialPort[]> fut = ex.submit(() -> {
+            try {
+                return SerialPort.getCommPorts();
+            } catch (Throwable t) {
+                logger.error("[ARDUINO] Exceção em SerialPort.getCommPorts(): {}", t.toString());
+                return new SerialPort[0];
+            }
+        });
+        try {
+            return fut.get(timeoutMs, TimeUnit.MILLISECONDS);
+        } catch (TimeoutException te) {
+            logger.error("[ARDUINO] Timeout ao chamar SerialPort.getCommPorts() após {} ms", timeoutMs);
+            fut.cancel(true);
+            return new SerialPort[0];
+        } catch (Exception e) {
+            logger.error("[ARDUINO] Erro ao obter portas seriais: {}", e.toString());
+            return new SerialPort[0];
+        } finally {
+            ex.shutdownNow();
+        }
+    }
+
     public static void carregaArduino() {
         logger.info("[ARDUINO] Iniciando carregaArduino");
         // Fecha qualquer conexão anterior mantida pela JVM para forçar reconexão limpa
@@ -64,7 +93,7 @@ public class CacheDados {
 
         try {
             logger.info("[ARDUINO] Antes de SerialPort.getCommPorts()");
-            SerialPort[] portas = SerialPort.getCommPorts();
+            SerialPort[] portas = getCommPortsWithTimeout(2000); // 2s timeout
             logger.info("[ARDUINO] Depois de SerialPort.getCommPorts() - total: {}", portas.length);
 
             if (portas.length == 0) {
