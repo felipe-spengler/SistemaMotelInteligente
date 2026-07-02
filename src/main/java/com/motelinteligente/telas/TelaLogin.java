@@ -5,6 +5,8 @@ import com.motelinteligente.dados.CacheDados;
 import com.motelinteligente.dados.MotelInteligenteApplication;
 import com.motelinteligente.dados.configGlobal;
 import com.motelinteligente.dados.ffuncionario;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
@@ -24,6 +26,8 @@ import javax.swing.UIManager;
  * @author felipespengler
  */
 public class TelaLogin extends javax.swing.JFrame {
+
+    private static final Logger logger = LoggerFactory.getLogger(TelaLogin.class);
 
     public String cargo = null;
     private String texto_login;
@@ -62,7 +66,7 @@ public class TelaLogin extends javax.swing.JFrame {
         bt_sair = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Motel Intensy - Login\n");
+        setTitle("Motel Inteligente - Login\n");
         setBackground(new java.awt.Color(255, 255, 255));
         setResizable(false);
 
@@ -218,8 +222,10 @@ public class TelaLogin extends javax.swing.JFrame {
         barraProgesso.setValue(0);
 
         texto_senha = txt_senha.getText();
+        logger.info("[LOGIN] Tentativa de login com usuário='{}'", texto_login);
         String cargo = new ffuncionario().verificaLogin(texto_login, texto_senha);
         if (cargo != null) {
+            logger.info("[LOGIN] Login bem-sucedido para usuário='{}', cargo='{}'", texto_login, cargo);
             // Carregar dados diretamente na tela de login
             CacheDados cache = CacheDados.getInstancia();
             configGlobal configuracoes = configGlobal.getInstance();
@@ -251,6 +257,7 @@ public class TelaLogin extends javax.swing.JFrame {
             // Salvar sessão para caso de atualização automática
             configuracoes.setSenhaTemporaria(texto_senha);
         } else {
+            logger.info("[LOGIN] Credenciais inválidas para usuário='{}'", texto_login);
             JOptionPane.showMessageDialog(null, "Erro no login!!");
         }
     }// GEN-LAST:event_bt_entrarActionPerformed

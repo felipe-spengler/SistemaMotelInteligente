@@ -254,7 +254,14 @@ public class VerificaComandosRemotos extends Thread implements MqttCallback {
                                     } catch (InterruptedException ex) {
                                         ex.printStackTrace();
                                     }
-                                    new ConectaArduino(888);
+                                    try {
+                                        Thread.sleep(500);
+                                        new ConectaArduino(888);
+                                        Thread.sleep(800);
+                                    } catch (InterruptedException ex) {
+                                        ex.printStackTrace();
+                                    }
+                                    
                                 }).start();
                             }
                         } else {

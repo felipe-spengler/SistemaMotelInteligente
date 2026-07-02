@@ -8,6 +8,8 @@ import com.motelinteligente.dados.configGlobal;
 import com.motelinteligente.dados.ffuncionario;
 import com.motelinteligente.telas.TelaPrincipal;
 import net.miginfocom.swing.MigLayout;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,6 +18,8 @@ import java.awt.event.KeyEvent;
 import java.io.IOException;
 
 public class TelaLoginModerno extends JFrame {
+
+    private static final Logger logger = LoggerFactory.getLogger(TelaLoginModerno.class);
 
     private JTextField txtLogin;
     private JPasswordField txtSenha;
@@ -28,7 +32,7 @@ public class TelaLoginModerno extends JFrame {
     }
 
     private void initComponents() {
-        setTitle("Motel Intensy - Login");
+        setTitle("Motel Inteligente - Login v2");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(500, 650);
         setLocationRelativeTo(null);
@@ -206,7 +210,7 @@ public class TelaLoginModerno extends JFrame {
         SwingWorker<String, Void> worker = new SwingWorker<>() {
             @Override
             protected String doInBackground() {
-                System.out.println("[LOGIN] Verificando credenciais...");
+                logger.info("[LOGIN] Verificando credenciais...");
                 return new ffuncionario().verificaLogin(login, senha);
             }
 
@@ -214,10 +218,10 @@ public class TelaLoginModerno extends JFrame {
             protected void done() {
                 try {
                     String cargo = get();
-                    System.out.println("[LOGIN] Cargo retornado: " + cargo);
+                    logger.info("[LOGIN] Cargo retornado: {}", cargo);
 
                     if (cargo != null) {
-                        System.out.println("[LOGIN] Login bem-sucedido! Carregando sistema...");
+                        logger.info("[LOGIN] Login bem-sucedido! Carregando sistema...");
 
                         // Carregar dados
                         CacheDados cache = CacheDados.getInstancia();
@@ -226,23 +230,23 @@ public class TelaLoginModerno extends JFrame {
                         // Carrega informações globais
                         configuracoes.carregarInformacoes(cargo, login);
                         cache.carregarDadosQuarto();
-                        System.out.println("[LOGIN] Dados carregados");
+                        logger.info("[LOGIN] Dados carregados");
 
                         // Carrega Arduino se necessário
                         if (!configuracoes.isFlagArduino()) {
                             try {
                                 cache.carregaArduino();
                                 configuracoes.setFlagArduino(true);
-                                System.out.println("[LOGIN] Arduino carregado");
+                                logger.info("[LOGIN] Arduino carregado");
                             } catch (Exception ex) {
-                                System.err.println("[LOGIN] Erro ao carregar Arduino: " + ex.getMessage());
+                                logger.error("[LOGIN] Erro ao carregar Arduino", ex);
                             }
                         }
 
                         // Iniciar sistema Spring se necessário
                         if (!configuracoes.isFlagSistemaSpring()) {
                             new Thread(() -> {
-                                System.out.println("[LOGIN] Iniciando Spring Boot...");
+                                logger.info("[LOGIN] Iniciando Spring Boot...");
                                 MotelInteligenteApplication.main(new String[] {});
                             }).start();
                             configuracoes.setFlagSistemaSpring(true);
@@ -251,23 +255,22 @@ public class TelaLoginModerno extends JFrame {
                         // Abrir tela principal na EDT
                         SwingUtilities.invokeLater(() -> {
                             try {
-                                System.out.println("[LOGIN] Abrindo tela principal...");
+                                logger.info("[LOGIN] Abrindo tela principal...");
                                 TelaPrincipal tela = new TelaPrincipal();
                                 tela.setVisible(true);
-                                System.out.println("[LOGIN] Tela principal aberta!");
+                                logger.info("[LOGIN] Tela principal aberta!");
 
                                 // Fechar login
                                 dispose();
                             } catch (Exception ex) {
-                                System.err.println("[LOGIN] Erro ao abrir tela principal: " + ex.getMessage());
-                                ex.printStackTrace();
+                                logger.error("[LOGIN] Erro ao abrir tela principal", ex);
                                 EstiloModerno.mensagemErro(TelaLoginModerno.this, "Erro", "Erro ao abrir tela principal: " + ex.getMessage());
                                 btnEntrar.setEnabled(true);
                                 btnEntrar.setText("ENTRAR");
                             }
                         });
                     } else {
-                        System.out.println("[LOGIN] Credenciais inválidas");
+                        logger.info("[LOGIN] Credenciais inválidas");
                         EstiloModerno.mensagemErro(TelaLoginModerno.this, "Erro no Login", "Usuário ou senha incorretos!");
                         btnEntrar.setEnabled(true);
                         btnEntrar.setText("ENTRAR");
@@ -275,8 +278,7 @@ public class TelaLoginModerno extends JFrame {
                         txtSenha.requestFocusInWindow();
                     }
                 } catch (Exception ex) {
-                    System.err.println("[LOGIN] Exceção durante login: " + ex.getMessage());
-                    ex.printStackTrace();
+                    logger.error("[LOGIN] Exceção durante login", ex);
                     EstiloModerno.mensagemErro(TelaLoginModerno.this, "Erro", "Erro ao realizar login: " + ex.getMessage());
                     btnEntrar.setEnabled(true);
                     btnEntrar.setText("ENTRAR");
