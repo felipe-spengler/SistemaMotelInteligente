@@ -139,18 +139,27 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
      * Creates new form TelaPrincipal
      */
     public TelaPrincipal() {
+        logger.info("[TELAPRINCIPAL] Iniciando construtor");
         initComponents();
+        logger.info("[TELAPRINCIPAL] initComponents concluído");
         controller = new com.motelinteligente.telas.controller.TelaPrincipalController(this, mapaQuadrados);
+        logger.info("[TELAPRINCIPAL] controller criado");
         inicializarPopupMenu();
+        logger.info("[TELAPRINCIPAL] popup menu inicializado");
 
         // Inicializa o BackupExecutor
         new BackupExecutor().start();
+        logger.info("[TELAPRINCIPAL] BackupExecutor iniciado");
         CheckSincronia.start();
+        logger.info("[TELAPRINCIPAL] CheckSincronia iniciado");
 
         // Carga inicial imediata dos quartos
         try {
+            logger.info("[TELAPRINCIPAL] Antes de carregarDadosQuarto");
             CacheDados.getInstancia().carregarDadosQuarto();
+            logger.info("[TELAPRINCIPAL] Depois de carregarDadosQuarto");
             mostraQuartos();
+            logger.info("[TELAPRINCIPAL] mostraQuartos concluído");
         } catch (Exception e) {
             logger.error("Erro na carga inicial de quartos", e);
         }

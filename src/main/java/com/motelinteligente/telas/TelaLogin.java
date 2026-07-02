@@ -232,12 +232,20 @@ public class TelaLogin extends javax.swing.JFrame {
             configGlobal configuracoes = configGlobal.getInstance();
 
             // Carrega informações globais de configuração do usuário logado
+            logger.info("[LOGIN] Antes de carregarInformacoes");
             configuracoes.carregarInformacoes(cargo, texto_login);
+            logger.info("[LOGIN] Depois de carregarInformacoes");
+
+            logger.info("[LOGIN] Antes de carregarDadosQuarto");
             cache.carregarDadosQuarto();
+            logger.info("[LOGIN] Depois de carregarDadosQuarto");
+
             // Carrega Arduino, se necessário
             if (!configuracoes.isFlagArduino()) {
+                logger.info("[LOGIN] Antes de carregaArduino");
                 cache.carregaArduino();
                 configuracoes.setFlagArduino(true);
+                logger.info("[LOGIN] Depois de carregaArduino");
             }
 
             // Iniciar sistema Spring, se ainda não foi iniciado
@@ -249,14 +257,23 @@ public class TelaLogin extends javax.swing.JFrame {
             }
 
             // Abrir diretamente a tela principal
-            TelaPrincipal tela = new TelaPrincipal();
-            tela.setVisible(true);
+            logger.info("[LOGIN] Abrindo TelaPrincipal...");
+            try {
+                TelaPrincipal tela = new TelaPrincipal();
+                logger.info("[LOGIN] TelaPrincipal instanciada");
+                tela.setVisible(true);
+                logger.info("[LOGIN] TelaPrincipal setVisible chamado");
 
-            // Fechar a tela de login
-            dispose();
+                // Fechar a tela de login
+                dispose();
+                logger.info("[LOGIN] Login disposed");
 
-            // Salvar sessão para caso de atualização automática
-            configuracoes.setSenhaTemporaria(texto_senha);
+                // Salvar sessão para caso de atualização automática
+                configuracoes.setSenhaTemporaria(texto_senha);
+            } catch (Exception ex) {
+                logger.error("[LOGIN] Erro ao abrir tela principal", ex);
+                JOptionPane.showMessageDialog(null, "Erro ao abrir a tela principal: " + ex.getMessage());
+            }
         } else {
             logger.info("[LOGIN] Credenciais inválidas para usuário='{}'", texto_login);
             JOptionPane.showMessageDialog(null, "Erro no login!!");
