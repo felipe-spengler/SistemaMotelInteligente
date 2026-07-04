@@ -682,4 +682,47 @@ public class ImpressoraService {
         
         imprimirTexto(sb.toString());
     }
+
+    public static void imprimirMultiplasVendasAvulsas(List<Object[]> itens, String tipo, String formaPgto, String funcionario) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("========================================\n");
+        sb.append("             VENDA AVULSA               \n");
+        sb.append("========================================\n\n");
+        
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        sb.append("Data: ").append(sdf.format(new Date())).append("\n");
+        sb.append("Usuario: ").append(configGlobal.getInstance().getUsuario()).append("\n");
+        sb.append("Tipo: ").append(tipo.toUpperCase()).append("\n");
+        if (funcionario != null && !funcionario.isEmpty()) {
+            sb.append("Funcionario: ").append(funcionario).append("\n");
+        }
+        sb.append("Forma Pgto: ").append(formaPgto.toUpperCase()).append("\n");
+        sb.append("----------------------------------------\n");
+        
+        float totalGeral = 0f;
+        for (Object[] item : itens) {
+            String produto = String.valueOf(item[0]);
+            int quantidade = (Integer) item[1];
+            float valorUnd = (Float) item[2];
+            float total = (Float) item[3];
+            totalGeral += total;
+            
+            sb.append(produto).append("\n");
+            sb.append("  ").append(quantidade).append(" x R$ ").append(String.format(java.util.Locale.US, "%.2f", valorUnd))
+              .append(" = R$ ").append(String.format(java.util.Locale.US, "%.2f", total)).append("\n");
+        }
+        sb.append("----------------------------------------\n");
+        sb.append("TOTAL GERAL: R$ ").append(String.format(java.util.Locale.US, "%.2f", totalGeral)).append("\n");
+        sb.append("----------------------------------------\n");
+        
+        if ("adiantamento".equalsIgnoreCase(tipo)) {
+            sb.append("\n\n\n\n");
+            sb.append("----------------------------------------\n");
+            sb.append("       Assinatura do Funcionario        \n");
+            sb.append("----------------------------------------\n");
+        }
+        sb.append("\n\n\n\n\n");
+        
+        imprimirTexto(sb.toString());
+    }
 }

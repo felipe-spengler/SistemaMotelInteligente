@@ -312,72 +312,91 @@ public class ConfereCaixa extends JFrame {
     }
 
     public void mostraDetalhes(int idCaixa) throws SQLException {
-        JFrame detalhesFrame = new JFrame("Detalhes do Caixa" + idCaixa);
+        JFrame detalhesFrame = new JFrame("Detalhes do Caixa #" + idCaixa);
         detalhesFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         detalhesFrame.setSize(1200, 800);
+        detalhesFrame.setLocationRelativeTo(this);
 
-        String query = "SELECT * FROM registralocado WHERE idcaixaatual = " + idCaixa;
-        Connection link = new fazconexao().conectar();
-        try (PreparedStatement preparedStatement = link.prepareStatement(query)) {
+        JTabbedPane abas = new JTabbedPane();
 
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            // Cria uma lista para armazenar os resultados
-            List<Object[]> dados = new ArrayList<>();
-
-            // Itera pelos resultados e adiciona os dados à lista
-            while (resultSet.next()) {
-                // Obtém os valores das colunas do ResultSet
-                int idLocacao = resultSet.getInt("idlocacao");
-                int numeroQuarto = resultSet.getInt("numquarto");
-                String horaInicio = resultSet.getString("horainicio");
-                String horaFim = resultSet.getString("horafim");
-                float valorQuarto = resultSet.getFloat("valorquarto");
-                float valorConsumo = resultSet.getFloat("Valorconsumo");
-                float recebidoDinheiro = resultSet.getFloat("pagodinheiro");
-                float recebidoPix = resultSet.getFloat("pagopix");
-                float recebidoCartao = resultSet.getFloat("pagocartao");
-
-                // Adiciona os valores em um array de objetos
-                Object[] linha = { idLocacao, numeroQuarto, horaInicio, horaFim, valorQuarto, valorConsumo,
-                        recebidoDinheiro, recebidoPix, recebidoCartao };
-                dados.add(linha);
-            }
-            String[] colunas = { "ID Locação", "Número Quarto", "Hora Início", "Hora Fim", "Valor Quarto",
-                    "Valor Consumo", "Recebido Dinheiro", "Recebido Pix", "Recebido Cartão" };
-
-            Object[][] data = dados.toArray(new Object[0][]);
-
-            JTable tabelaDetalhes = new JTable(data, colunas);
-            // Define a altura das linhas
-            tabelaDetalhes.setRowHeight(30);
-
-            // Define a largura das colunas
-            tabelaDetalhes.getColumnModel().getColumn(0).setPreferredWidth(60);
-            tabelaDetalhes.getColumnModel().getColumn(1).setPreferredWidth(60);
-            tabelaDetalhes.getColumnModel().getColumn(2).setPreferredWidth(200);
-            tabelaDetalhes.getColumnModel().getColumn(3).setPreferredWidth(200);
-            tabelaDetalhes.getColumnModel().getColumn(4).setPreferredWidth(120);
-            tabelaDetalhes.getColumnModel().getColumn(5).setPreferredWidth(120);
-            tabelaDetalhes.getColumnModel().getColumn(6).setPreferredWidth(120);
-            tabelaDetalhes.getColumnModel().getColumn(7).setPreferredWidth(120);
-            tabelaDetalhes.getColumnModel().getColumn(8).setPreferredWidth(120);
-
-            JScrollPane scrollPane = new JScrollPane(tabelaDetalhes);
-            detalhesFrame.add(scrollPane);
-            detalhesFrame.setVisible(true);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
-                if (link != null && !link.isClosed()) {
-                    link.close();
+        // 1. Aba Locações Concluídas
+        List<Object[]> dadosLoc = new ArrayList<>();
+        String queryLoc = "SELECT idlocacao, numquarto, horainicio, horafim, valorquarto, Valorconsumo, pagodinheiro, pagopix, pagocartao FROM registralocado WHERE idcaixaatual = ?";
+        try (Connection link = new fazconexao().conectar();
+             PreparedStatement stmt = link.prepareStatement(queryLoc)) {
+            stmt.setInt(1, idCaixa);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    dadosLoc.add(new Object[] {
+                        rs.getInt("idlocacao"),
+                        rs.getInt("numquarto"),
+                        rs.getString("horainicio"),
+                        rs.getString("horafim"),
+                        rs.getFloat("valorquarto"),
+                        rs.getFloat("Valorconsumo"),
+                        rs.getFloat("pagodinheiro"),
+                        rs.getFloat("pagopix"),
+                        rs.getFloat("pagocartao")
+                    });
                 }
-            } catch (SQLException e) {
-                e.printStackTrace();
             }
         }
+        String[] colunasLoc = { "ID Locação", "Número Quarto", "Hora Início", "Hora Fim", "Valor Quarto",
+                "Valor Consumo", "Recebido Dinheiro", "Recebido Pix", "Recebido Cartão" };
+        JTable tabelaLoc = new JTable(dadosLoc.toArray(new Object[0][]), colunasLoc);
+        tabelaLoc.setRowHeight(25);
+        abas.addTab("Locações Concluídas", new JScrollPane(tabelaLoc));
+
+        // 2. Aba Retiradas / Sangrias
+        List<Object[]> dadosRet = new ArrayList<>();
+        String queryRet = "SELECT horario, valor, quem, justificativa, usuario FROM retiradas_caixa WHERE idcaixa = ? ORDER BY horario";
+        try (Connection link = new fazconexao().conectar();
+             PreparedStatement stmt = link.prepareStatement(queryRet)) {
+            stmt.setInt(1, idCaixa);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    dadosRet.add(new Object[] {
+                        rs.getTimestamp("horario"),
+                        rs.getFloat("valor"),
+                        rs.getString("quem"),
+                        rs.getString("justificativa"),
+                        rs.getString("usuario")
+                    });
+                }
+            }
+        }
+        String[] colunasRet = { "Data/Hora", "Valor (R$)", "Quem Retirou", "Justificativa", "Operador" };
+        JTable tabelaRet = new JTable(dadosRet.toArray(new Object[0][]), colunasRet);
+        tabelaRet.setRowHeight(25);
+        abas.addTab("Retiradas / Sangrias", new JScrollPane(tabelaRet));
+
+        // 3. Aba Despesas Pagas no Caixa
+        List<Object[]> dadosDesp = new ArrayList<>();
+        String queryDesp = "SELECT horario, descricao, categoria, valor, formapagamento, status, usuario FROM despesas WHERE idcaixa = ? ORDER BY horario";
+        try (Connection link = new fazconexao().conectar();
+             PreparedStatement stmt = link.prepareStatement(queryDesp)) {
+            stmt.setInt(1, idCaixa);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    dadosDesp.add(new Object[] {
+                        rs.getTimestamp("horario"),
+                        rs.getString("descricao"),
+                        rs.getString("categoria"),
+                        rs.getFloat("valor"),
+                        rs.getString("formapagamento").toUpperCase(),
+                        rs.getString("status").toUpperCase(),
+                        rs.getString("usuario")
+                    });
+                }
+            }
+        }
+        String[] colunasDesp = { "Data/Hora", "Descrição", "Categoria", "Valor (R$)", "Forma Pgto", "Status", "Operador" };
+        JTable tabelaDesp = new JTable(dadosDesp.toArray(new Object[0][]), colunasDesp);
+        tabelaDesp.setRowHeight(25);
+        abas.addTab("Despesas no Caixa", new JScrollPane(tabelaDesp));
+
+        detalhesFrame.add(abas);
+        detalhesFrame.setVisible(true);
     }
 
     public static void main(String[] args) {

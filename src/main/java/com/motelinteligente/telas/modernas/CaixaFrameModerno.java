@@ -32,6 +32,7 @@ public class CaixaFrameModerno extends JFrame {
 
     // Labels Detalhados
     private JLabel valDinheiro, valCartao, valPix, valLocacoes, valVendas, valDescontos, valAcrescimos;
+    private JLabel valRetiradas, valDespesasCaixa;
     private JLabel lblAntecipadoOutro, lblAntecipadoEste;
 
     // Tabelas
@@ -129,19 +130,21 @@ public class CaixaFrameModerno extends JFrame {
         detailsCard.setLayout(new MigLayout("fillx, wrap 2", "[grow][grow]", "[]10[]10[]"));
         detailsCard.setBorder(BorderFactory.createTitledBorder(" Detalhamento de Entradas "));
 
-        // Grupo 1: Métodos de Pagamento (Separado visualmente com colunas distintas)
-        // [Label] push [Value] garante que fiquem nos extremos
-        JPanel payPanel = new JPanel(new MigLayout("fillx, insets 0", "[left]push[right]", "[]5[]5[]"));
+        JPanel payPanel = new JPanel(new MigLayout("fillx, insets 0", "[left]push[right]", "[]5[]5[]5[]5[]"));
         payPanel.setOpaque(false);
 
         // Passamos o painel com o layout correto para o addDetailRow
         valDinheiro = createValueLabel();
         valCartao = createValueLabel();
         valPix = createValueLabel();
+        valRetiradas = createValueLabel();
+        valDespesasCaixa = createValueLabel();
 
-        addDetailRow(payPanel, "Dinheiro", valDinheiro, Color.BLACK);
+        addDetailRow(payPanel, "Dinheiro (Entradas)", valDinheiro, Color.BLACK);
         addDetailRow(payPanel, "Cartão", valCartao, Color.BLACK);
         addDetailRow(payPanel, "Pix", valPix, Color.BLACK);
+        addDetailRow(payPanel, "Retiradas (Sangrias) (-)", valRetiradas, Color.RED);
+        addDetailRow(payPanel, "Despesas no Caixa (-)", valDespesasCaixa, Color.RED);
 
         detailsCard.add(payPanel, "span 2, growx, wrap, gapbottom 10");
 
@@ -383,6 +386,8 @@ public class CaixaFrameModerno extends JFrame {
         valDinheiro.setText("R$ 0,00");
         valCartao.setText("R$ 0,00");
         valPix.setText("R$ 0,00");
+        valRetiradas.setText("R$ 0,00");
+        valDespesasCaixa.setText("R$ 0,00");
         lblSaldoFinal.setText("R$ 0,00");
         if (lblAntecipadoOutro != null)
             lblAntecipadoOutro.setText("-");
@@ -403,6 +408,12 @@ public class CaixaFrameModerno extends JFrame {
         valDinheiro.setText(df.format(v.entradaD));
         valCartao.setText(df.format(v.entradaC));
         valPix.setText(df.format(v.entradaP));
+        
+        float totalRetiradas = dao.getTotalRetiradas(idCaixa);
+        float totalDespesasDinheiro = dao.getTotalDespesasCaixa(idCaixa, "dinheiro");
+        valRetiradas.setText(df.format(totalRetiradas));
+        valDespesasCaixa.setText(df.format(totalDespesasDinheiro));
+        
         valLocacoes.setText(df.format(v.entradaQuarto));
         valVendas.setText(df.format(v.entradaConsumo));
 
@@ -421,9 +432,11 @@ public class CaixaFrameModerno extends JFrame {
         // Totais
         float entradaTotal = v.entradaConsumo + v.entradaQuarto + justif[1] - justif[0];
 
-        // Saldo em Caixa = Apenas o que foi movimentado (sem considerar antecipados)
-        // O ajuste dos antecipados será feito apenas no Resumo de Fechamento
-        float saldoEmCaixa = entradaTotal + saldoIni;
+        // Saldo esperado em caixa considerando dinheiro inicial, entradas dinheiro, menos retiradas e despesas em dinheiro.
+        float esperadoDinheiro = saldoIni + v.entradaD - totalRetiradas - totalDespesasDinheiro - (antecipadoOutro > 0 ? antecipadoOutro : 0);
+        float esperadoCartao = v.entradaC;
+        float esperadoPix = v.entradaP;
+        float saldoEmCaixa = esperadoDinheiro + esperadoCartao + esperadoPix;
 
         lblEntradaTotal.setText(df.format(entradaTotal));
         lblSaldoFinal.setText(df.format(saldoEmCaixa));

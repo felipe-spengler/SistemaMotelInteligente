@@ -64,6 +64,10 @@ public class FluxoCaixaDialog extends JDialog {
     private final JTable tabelaDetalhes;
     private final DefaultTableModel modeloDetalhes;
 
+    private final JTable tabelaAdiantamentos;
+    private final DefaultTableModel modeloAdiantamentos;
+    private final JLabel lblTotalAdiantamentos;
+
     private final JLabel lblTotalReceitas;
     private final JLabel lblTotalDespesas;
     private final JLabel lblSaldoLiquido;
@@ -71,7 +75,7 @@ public class FluxoCaixaDialog extends JDialog {
     public FluxoCaixaDialog(JFrame parent) {
         super(parent, "Fluxo de Caixa Mensal", true);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        setSize(850, 600);
+        setSize(880, 600);
         setLocationRelativeTo(parent);
         setLayout(new BorderLayout(10, 10));
 
@@ -158,7 +162,7 @@ public class FluxoCaixaDialog extends JDialog {
         scrollResumo.setBorder(BorderFactory.createEmptyBorder());
         abas.addTab("Resumo Gerencial (DRE)", scrollResumo);
 
-        // Aba 2: Lançamentos Detalhados
+        // Aba 2: Lançamentos Detalhados de Despesas
         modeloDetalhes = new DefaultTableModel(new Object[] {"ID", "Data/Hora", "Tipo", "Descrição", "Valor (R$)", "Forma Pgto", "Status"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -202,6 +206,32 @@ public class FluxoCaixaDialog extends JDialog {
 
         abas.addTab("Lançamentos de Despesas", painelDetalhesTab);
 
+        // Aba 3: Adiantamentos de Funcionários
+        modeloAdiantamentos = new DefaultTableModel(new Object[] {"Data/Hora", "Funcionário", "Produto/Descrição", "Quantidade", "Valor Unit.", "Valor Total"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        tabelaAdiantamentos = new JTable(modeloAdiantamentos);
+        tabelaAdiantamentos.setRowHeight(24);
+        tabelaAdiantamentos.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+        tabelaAdiantamentos.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        JScrollPane scrollAdiantamentos = new JScrollPane(tabelaAdiantamentos);
+        scrollAdiantamentos.setBorder(BorderFactory.createEmptyBorder());
+
+        JPanel painelAdiantamentosTab = new JPanel(new BorderLayout());
+        painelAdiantamentosTab.add(scrollAdiantamentos, BorderLayout.CENTER);
+
+        JPanel painelSummaryAdiantamentos = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 5));
+        painelSummaryAdiantamentos.setBackground(Color.WHITE);
+        lblTotalAdiantamentos = new JLabel("Total Adiantamentos no Período: R$ 0,00");
+        lblTotalAdiantamentos.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        painelSummaryAdiantamentos.add(lblTotalAdiantamentos);
+        painelAdiantamentosTab.add(painelSummaryAdiantamentos, BorderLayout.SOUTH);
+
+        abas.addTab("Adiantamentos de Funcionários", painelAdiantamentosTab);
+
         add(painelFiltros, BorderLayout.NORTH);
         add(abas, BorderLayout.CENTER);
         add(painelResumo, BorderLayout.SOUTH);
@@ -238,6 +268,7 @@ public class FluxoCaixaDialog extends JDialog {
     private void carregarFluxo() {
         modeloResumo.setRowCount(0);
         modeloDetalhes.setRowCount(0);
+        modeloAdiantamentos.setRowCount(0);
 
         String dataIniStr = txtDataInicio.getText().trim();
         String dataFimStr = txtDataFim.getText().trim();
@@ -265,7 +296,7 @@ public class FluxoCaixaDialog extends JDialog {
             Map<String, Float> despesasCategorias = new HashMap<>();
 
             try (Connection link = new fazconexao().conectar()) {
-                // 1. Consultar Locações (Receita para soma total)
+                // 1. Consultar Locações (Receita para soma total) - NO modeloDetalhes.addRow
                 String sqlLocacoes = "SELECT horafim, pagodinheiro, pagopix, pagocartao, numquarto FROM registralocado WHERE horafim >= ? AND horafim <= ? AND valorquarto IS NOT NULL ORDER BY horafim";
                 try (PreparedStatement stmt = link.prepareStatement(sqlLocacoes)) {
                     stmt.setString(1, tInicio);
@@ -285,7 +316,7 @@ public class FluxoCaixaDialog extends JDialog {
                     }
                 }
 
-                // 2. Consultar Vendas Avulsas (Receita para soma total)
+                // 2. Consultar Vendas Avulsas (Receita para soma total) - NO modeloDetalhes.addRow
                 String sqlVendas = "SELECT valortotal, formapagamento FROM vendas_avulsas WHERE horario >= ? AND horario <= ? AND tipo != 'adiantamento'";
                 try (PreparedStatement stmt = link.prepareStatement(sqlVendas)) {
                     stmt.setString(1, tInicio);
@@ -309,7 +340,7 @@ public class FluxoCaixaDialog extends JDialog {
                     }
                 }
 
-                // 3. Consultar Retiradas/Sangrias (Despesa)
+                // 3. Consultar Retiradas/Sangrias (Despesa) - WITH modeloDetalhes.addRow
                 String sqlRetiradas = "SELECT id, horario, valor, quem, justificativa FROM retiradas_caixa WHERE horario >= ? AND horario <= ? ORDER BY horario";
                 try (PreparedStatement stmt = link.prepareStatement(sqlRetiradas)) {
                     stmt.setString(1, tInicio);
@@ -335,7 +366,7 @@ public class FluxoCaixaDialog extends JDialog {
                     }
                 }
 
-                // 4. Consultar Despesas (Despesa)
+                // 4. Consultar Despesas (Despesa) - WITH modeloDetalhes.addRow
                 String sqlDespesas = "SELECT id, horario, valor, descricao, categoria, formapagamento, status FROM despesas WHERE horario >= ? AND horario <= ? ORDER BY horario";
                 try (PreparedStatement stmt = link.prepareStatement(sqlDespesas)) {
                     stmt.setString(1, tInicio);
@@ -361,6 +392,38 @@ public class FluxoCaixaDialog extends JDialog {
                         }
                     }
                 }
+
+                // 5. Consultar Adiantamentos
+                String sqlAdiantamentos = "SELECT horario, descricao, quantidade, valorunidade, valortotal FROM vendas_avulsas WHERE tipo = 'adiantamento' AND horario >= ? AND horario <= ? ORDER BY horario";
+                float totalAdiantamentosVal = 0f;
+                try (PreparedStatement stmt = link.prepareStatement(sqlAdiantamentos)) {
+                    stmt.setString(1, tInicio);
+                    stmt.setString(2, tFim);
+                    try (ResultSet rs = stmt.executeQuery()) {
+                        while (rs.next()) {
+                            String desc = rs.getString("descricao");
+                            int qtd = rs.getInt("quantidade");
+                            float valUnit = rs.getFloat("valorunidade");
+                            float total = rs.getFloat("valortotal");
+                            totalAdiantamentosVal += total;
+
+                            String func = "Desconhecido";
+                            if (desc.contains("[Funcionário: ") && desc.contains("]")) {
+                                func = desc.substring(desc.indexOf("[Funcionário: ") + 14, desc.indexOf("]"));
+                            }
+
+                            modeloAdiantamentos.addRow(new Object[] {
+                                rs.getTimestamp("horario"),
+                                func,
+                                desc,
+                                qtd,
+                                String.format("R$ %.2f", valUnit),
+                                String.format("R$ %.2f", total)
+                            });
+                        }
+                    }
+                }
+                lblTotalAdiantamentos.setText("Total Adiantamentos no Período: R$ " + String.format("%,.2f", totalAdiantamentosVal));
             }
 
             // --- POPULAR ABA 1: RESUMO GERENCIAL (DRE STYLE) ---
@@ -623,7 +686,6 @@ public class FluxoCaixaDialog extends JDialog {
                 
                 doc.add(tableResumo);
                 doc.add(Chunk.NEWLINE);
-                doc.add(Chunk.NEWLINE);
                 
                 // Section 2: Detalhes Despesas
                 doc.add(new Paragraph("Detalhamento de Lançamentos (Despesas e Retiradas)", fontSecao));
@@ -651,6 +713,34 @@ public class FluxoCaixaDialog extends JDialog {
                 }
                 
                 doc.add(tableDesp);
+                doc.add(Chunk.NEWLINE);
+                
+                // Section 3: Adiantamentos
+                doc.add(new Paragraph("Adiantamentos de Funcionários", fontSecao));
+                doc.add(Chunk.NEWLINE);
+                
+                PdfPTable tableAdi = new PdfPTable(6);
+                tableAdi.setWidthPercentage(100);
+                tableAdi.setWidths(new float[]{18, 17, 35, 10, 10, 10});
+                
+                String[] aHeaders = {"Data/Hora", "Funcionário", "Descrição", "Qtd", "Valor Unit.", "Total"};
+                for (String ah : aHeaders) {
+                    PdfPCell h = new PdfPCell(new Phrase(ah, fontTabelaHead));
+                    h.setBackgroundColor(new Color(71, 85, 105));
+                    h.setPadding(6);
+                    tableAdi.addCell(h);
+                }
+                
+                for (int i = 0; i < modeloAdiantamentos.getRowCount(); i++) {
+                    for (int j = 0; j < modeloAdiantamentos.getColumnCount(); j++) {
+                        String val = String.valueOf(modeloAdiantamentos.getValueAt(i, j));
+                        PdfPCell c = new PdfPCell(new Phrase(val, fontTabelaBody));
+                        c.setPadding(4);
+                        tableAdi.addCell(c);
+                    }
+                }
+                
+                doc.add(tableAdi);
                 
                 JOptionPane.showMessageDialog(this, "Relatório exportado com sucesso em PDF!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
                 
