@@ -74,13 +74,77 @@ public class fazconexao {
                 "  KEY idx_despesas_idcaixa (idcaixa)" +
                 ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;";
 
+        String sqlRetiradas = "CREATE TABLE IF NOT EXISTS retiradas_caixa (" +
+                "  id INT NOT NULL AUTO_INCREMENT," +
+                "  idcaixa INT NOT NULL," +
+                "  valor FLOAT NOT NULL," +
+                "  quem VARCHAR(100) NOT NULL," +
+                "  justificativa VARCHAR(255) NOT NULL," +
+                "  usuario VARCHAR(100) NOT NULL," +
+                "  horario TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP," +
+                "  PRIMARY KEY (id)," +
+                "  KEY idx_retiradas_caixa_idcaixa (idcaixa)" +
+                ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;";
+
+        String sqlAuditoria = "CREATE TABLE IF NOT EXISTS auditoria_locacoes (" +
+                "  id INT NOT NULL AUTO_INCREMENT," +
+                "  idlocacao INT NOT NULL," +
+                "  usuario VARCHAR(100) NOT NULL," +
+                "  horario TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP," +
+                "  campo_alterado VARCHAR(100) NOT NULL," +
+                "  valor_antigo VARCHAR(255) DEFAULT NULL," +
+                "  valor_novo VARCHAR(255) DEFAULT NULL," +
+                "  PRIMARY KEY (id)," +
+                "  KEY idx_auditoria_locacoes_idlocacao (idlocacao)" +
+                ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;";
+
         try (Connection link = dataSource.getConnection();
              java.sql.Statement stmt = link.createStatement()) {
             stmt.executeUpdate(sqlVendasAvulsas);
             stmt.executeUpdate(sqlDespesas);
+            stmt.executeUpdate(sqlRetiradas);
+            stmt.executeUpdate(sqlAuditoria);
+
+            // Criar triggers para vendas_avulsas
+            criarTriggerSeNaoExistir(stmt, "trg_vendas_avulsas_insert", "vendas_avulsas", "INSERT", "id");
+            criarTriggerSeNaoExistir(stmt, "trg_vendas_avulsas_update", "vendas_avulsas", "UPDATE", "id");
+            criarTriggerSeNaoExistir(stmt, "trg_vendas_avulsas_delete", "vendas_avulsas", "DELETE", "id");
+
+            // Criar triggers para despesas
+            criarTriggerSeNaoExistir(stmt, "trg_despesas_insert", "despesas", "INSERT", "id");
+            criarTriggerSeNaoExistir(stmt, "trg_despesas_update", "despesas", "UPDATE", "id");
+            criarTriggerSeNaoExistir(stmt, "trg_despesas_delete", "despesas", "DELETE", "id");
+
+            // Criar triggers para retiradas_caixa
+            criarTriggerSeNaoExistir(stmt, "trg_retiradas_caixa_insert", "retiradas_caixa", "INSERT", "id");
+            criarTriggerSeNaoExistir(stmt, "trg_retiradas_caixa_update", "retiradas_caixa", "UPDATE", "id");
+            criarTriggerSeNaoExistir(stmt, "trg_retiradas_caixa_delete", "retiradas_caixa", "DELETE", "id");
+
+            // Criar trigger para auditoria_locacoes
+            criarTriggerSeNaoExistir(stmt, "trg_auditoria_locacoes_insert", "auditoria_locacoes", "INSERT", "id");
+
         } catch (Exception e) {
             System.err.println("Erro ao inicializar tabelas no banco de dados: " + e.getMessage());
             e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Erro ao criar tabelas no banco de dados. " +
+                    "Verifique se o usuário tem privilégios de CREATE.\nErro: " + e.getMessage(), 
+                    "Erro de Inicialização de Banco", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private static void criarTriggerSeNaoExistir(java.sql.Statement stmt, String triggerNome, String tabelaNome, String operacao, String campoId) {
+        try {
+            stmt.executeUpdate("DROP TRIGGER IF EXISTS " + triggerNome);
+            String sqlTrigger = "CREATE TRIGGER " + triggerNome + " " +
+                    "AFTER " + operacao + " ON " + tabelaNome + " " +
+                    "FOR EACH ROW " +
+                    "BEGIN " +
+                    "  INSERT INTO log_sincronizacao (tabela_nome, registro_id) " +
+                    "  VALUES ('" + tabelaNome + "', " + (operacao.equalsIgnoreCase("DELETE") ? "OLD" : "NEW") + "." + campoId + "); " +
+                    "END;";
+            stmt.executeUpdate(sqlTrigger);
+        } catch (Exception e) {
+            System.err.println("Erro ao criar trigger " + triggerNome + ": " + e.getMessage());
         }
     }
 
@@ -100,8 +164,8 @@ public class fazconexao {
     public int verificaCaixa() {
         String consultaSQL = "SELECT id FROM caixa WHERE saldofecha IS NULL";
         try (Connection link = conectar();
-                PreparedStatement statement = link.prepareStatement(consultaSQL);
-                ResultSet resultado = statement.executeQuery()) {
+                 PreparedStatement statement = link.prepareStatement(consultaSQL);
+                 ResultSet resultado = statement.executeQuery()) {
 
             if (resultado.next()) {
                 return resultado.getInt("id");
@@ -110,6 +174,25 @@ public class fazconexao {
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e);
             return 0;
+        }
+    }
+
+    public static void registrarAuditoria(int idLocacao, String campo, String valorAntigo, String valorNovo) {
+        String usuario = configGlobal.getInstance().getUsuario();
+        if (usuario == null || usuario.trim().isEmpty()) {
+            usuario = "Sistema/Desconhecido";
+        }
+        String sql = "INSERT INTO auditoria_locacoes (idlocacao, usuario, campo_alterado, valor_antigo, valor_novo) VALUES (?, ?, ?, ?, ?)";
+        try (Connection link = new fazconexao().conectar();
+             PreparedStatement stmt = link.prepareStatement(sql)) {
+            stmt.setInt(1, idLocacao);
+            stmt.setString(2, usuario);
+            stmt.setString(3, campo);
+            stmt.setString(4, valorAntigo);
+            stmt.setString(5, valorNovo);
+            stmt.executeUpdate();
+        } catch (Exception e) {
+            System.err.println("Erro ao registrar auditoria de locação: " + e.getMessage());
         }
     }
 

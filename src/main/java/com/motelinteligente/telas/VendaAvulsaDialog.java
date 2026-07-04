@@ -82,7 +82,6 @@ public class VendaAvulsaDialog extends JDialog {
         content.add(new JLabel("Funcionário:"), gbc);
         comboFuncionario = new JComboBox<>();
         comboFuncionario.setEnabled(false);
-        atualizarFuncionarioDisponivel();
         gbc.gridx = 1;
         content.add(comboFuncionario, gbc);
 
@@ -93,6 +92,9 @@ public class VendaAvulsaDialog extends JDialog {
         chkAdiantamento.setEnabled(false);
         gbc.gridx = 1;
         content.add(chkAdiantamento, gbc);
+
+        // Chamar após inicializar todos os componentes referenciados
+        atualizarFuncionarioDisponivel();
 
         gbc.gridx = 0;
         gbc.gridy++;

@@ -243,6 +243,7 @@ public class VerDadosLocacao extends javax.swing.JFrame {
         bt_inserirProduto = new javax.swing.JButton();
         bt_voltar = new javax.swing.JButton();
         bt_apagarProduto = new javax.swing.JButton();
+        btImprimirExtrato = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -394,6 +395,14 @@ public class VerDadosLocacao extends javax.swing.JFrame {
                 bt_apagarProdutoActionPerformed(evt);
             }
         });
+
+        btImprimirExtrato.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/pdf_icon.png"))); // NOI18N
+        btImprimirExtrato.setText("Imprimir Extrato");
+        btImprimirExtrato.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                com.motelinteligente.dados.ImpressoraService.imprimirExtratoLocacaoPorId(idLocacao);
+            }
+        });
         txtConsumo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtValorConsumoActionPerformed(evt);
@@ -447,6 +456,8 @@ public class VerDadosLocacao extends javax.swing.JFrame {
                                                                 .addComponent(bt_voltar, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                                 .addGap(18, 18, 18)
                                                                 .addComponent(bt_salvar, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addGap(18, 18, 18)
+                                                                .addComponent(btImprimirExtrato, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                                 .addComponent(bt_inserirProduto)
                                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -545,6 +556,7 @@ public class VerDadosLocacao extends javax.swing.JFrame {
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                                 .addComponent(bt_salvar, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(btImprimirExtrato, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addComponent(bt_inserirProduto, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addComponent(bt_apagarProduto, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE))
                                         .addComponent(bt_voltar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -643,17 +655,69 @@ public class VerDadosLocacao extends javax.swing.JFrame {
         Connection link = null;
         try {
             link = new fazconexao().conectar();
+
+            // Ler dados antigos para auditoria
+            float oldDinheiro = 0, oldPix = 0, oldCartao = 0, oldValorQuarto = 0, oldConsumo = 0;
+            String oldInicio = "", oldFim = "";
+            String sqlSelect = "SELECT pagodinheiro, pagopix, pagocartao, horainicio, horafim, valorquarto, valorconsumo FROM registralocado WHERE idlocacao = ?";
+            try (PreparedStatement stmtSelect = link.prepareStatement(sqlSelect)) {
+                stmtSelect.setInt(1, idLocacao);
+                try (ResultSet rs = stmtSelect.executeQuery()) {
+                    if (rs.next()) {
+                        oldDinheiro = rs.getFloat("pagodinheiro");
+                        oldPix = rs.getFloat("pagopix");
+                        oldCartao = rs.getFloat("pagocartao");
+                        oldInicio = rs.getTimestamp("horainicio") != null ? rs.getTimestamp("horainicio").toString() : "";
+                        oldFim = rs.getTimestamp("horafim") != null ? rs.getTimestamp("horafim").toString() : "";
+                        oldValorQuarto = rs.getFloat("valorquarto");
+                        oldConsumo = rs.getFloat("valorconsumo");
+                    }
+                }
+            }
+
+            float newDinheiro = Float.parseFloat(txtDinheiro.getText().replace(',', '.'));
+            float newPix = Float.parseFloat(txtPix.getText().replace(',', '.'));
+            float newCartao = Float.parseFloat(txtCartao.getText().replace(',', '.'));
+            String newInicio = txtInicio.getText();
+            String newFim = txtFim.getText();
+            float newValorQuarto = Float.parseFloat(txtValorQuarto.getText().replace(',', '.'));
+            float newConsumo = Float.parseFloat(txtConsumo.getText().replace(',', '.'));
+
             String updateRegistralocadoSQL = "UPDATE registralocado SET pagodinheiro = ?, pagopix = ?, pagocartao = ?, horainicio = ?, horafim = ?, valorquarto = ?, valorconsumo = ? WHERE idlocacao = ?";
             PreparedStatement statementRegistralocado = link.prepareStatement(updateRegistralocadoSQL);
-            statementRegistralocado.setFloat(1, Float.parseFloat(txtDinheiro.getText().replace(',', '.')));
-            statementRegistralocado.setFloat(2, Float.parseFloat(txtPix.getText().replace(',', '.')));
-            statementRegistralocado.setFloat(3, Float.parseFloat(txtCartao.getText().replace(',', '.')));
-            statementRegistralocado.setTimestamp(4, Timestamp.valueOf(txtInicio.getText()));
-            statementRegistralocado.setTimestamp(5, Timestamp.valueOf(txtFim.getText()));
-            statementRegistralocado.setFloat(6, Float.parseFloat(txtValorQuarto.getText().replace(',', '.')));
-            statementRegistralocado.setFloat(7, Float.parseFloat(txtConsumo.getText().replace(',', '.')));
+            statementRegistralocado.setFloat(1, newDinheiro);
+            statementRegistralocado.setFloat(2, newPix);
+            statementRegistralocado.setFloat(3, newCartao);
+            statementRegistralocado.setTimestamp(4, Timestamp.valueOf(newInicio));
+            statementRegistralocado.setTimestamp(5, Timestamp.valueOf(newFim));
+            statementRegistralocado.setFloat(6, newValorQuarto);
+            statementRegistralocado.setFloat(7, newConsumo);
             statementRegistralocado.setInt(8, idLocacao); // Substitua idLocacao pelo valor correto da sua lógica
             statementRegistralocado.executeUpdate();
+
+            // Gravar auditoria para as colunas modificadas
+            if (oldDinheiro != newDinheiro) {
+                com.motelinteligente.dados.fazconexao.registrarAuditoria(idLocacao, "pagodinheiro", String.valueOf(oldDinheiro), String.valueOf(newDinheiro));
+            }
+            if (oldPix != newPix) {
+                com.motelinteligente.dados.fazconexao.registrarAuditoria(idLocacao, "pagopix", String.valueOf(oldPix), String.valueOf(newPix));
+            }
+            if (oldCartao != newCartao) {
+                com.motelinteligente.dados.fazconexao.registrarAuditoria(idLocacao, "pagocartao", String.valueOf(oldCartao), String.valueOf(newCartao));
+            }
+            if (!oldInicio.equals(newInicio)) {
+                com.motelinteligente.dados.fazconexao.registrarAuditoria(idLocacao, "horainicio", oldInicio, newInicio);
+            }
+            if (!oldFim.equals(newFim)) {
+                com.motelinteligente.dados.fazconexao.registrarAuditoria(idLocacao, "horafim", oldFim, newFim);
+            }
+            if (oldValorQuarto != newValorQuarto) {
+                com.motelinteligente.dados.fazconexao.registrarAuditoria(idLocacao, "valorquarto", String.valueOf(oldValorQuarto), String.valueOf(newValorQuarto));
+            }
+            if (oldConsumo != newConsumo) {
+                com.motelinteligente.dados.fazconexao.registrarAuditoria(idLocacao, "valorconsumo", String.valueOf(oldConsumo), String.valueOf(newConsumo));
+            }
+
             System.out.println("id da locacao é " + idLocacao);
             String tipo = "";
             float valorSetar = 0;
@@ -971,5 +1035,6 @@ public class VerDadosLocacao extends javax.swing.JFrame {
     private javax.swing.JTextField txtTipo;
     private javax.swing.JTextField txtValorQuarto;
     private javax.swing.JTextField txtValorTotal;
+    private javax.swing.JButton btImprimirExtrato;
     // End of variables declaration//GEN-END:variables
 }

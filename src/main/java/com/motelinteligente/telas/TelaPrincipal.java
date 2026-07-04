@@ -1583,7 +1583,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         jMenu5.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
         menuFinanceiroCaixa = new javax.swing.JMenuItem();
-        menuFinanceiroCaixa.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/financeiro.png"))); // NOI18N
+        menuFinanceiroCaixa.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_registradora.png"))); // NOI18N
         menuFinanceiroCaixa.setText("Caixa");
         menuFinanceiroCaixa.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         menuFinanceiroCaixa.addActionListener(new java.awt.event.ActionListener() {
@@ -1640,7 +1640,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         jMenu16.add(menuRelAuto);
 
         menuFluxoCaixa = new javax.swing.JMenuItem();
-        menuFluxoCaixa.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/financeiro.png"))); // NOI18N
+        menuFluxoCaixa.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_balanco.png"))); // NOI18N
         menuFluxoCaixa.setText("Fluxo de Caixa");
         menuFluxoCaixa.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         menuFluxoCaixa.addActionListener(new java.awt.event.ActionListener() {
@@ -1664,7 +1664,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         jMenu5.add(menuVendaAvulsa);
 
         menuDespesas = new javax.swing.JMenuItem();
-        menuDespesas.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/financeiro.png"))); // NOI18N
+        menuDespesas.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_conta_paga.png"))); // NOI18N
         menuDespesas.setText("Lançar Despesa");
         menuDespesas.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         menuDespesas.addActionListener(new java.awt.event.ActionListener() {
