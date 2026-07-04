@@ -30,6 +30,7 @@ public class DespesaDialog extends JDialog {
     private final JComboBox<String> comboPagamento;
     private final JComboBox<String> comboStatus;
     private final JCheckBox chkCaixaAtual;
+    private Integer idEdicao = null;
 
     public DespesaDialog(JFrame parent) {
         super(parent, "Lançamento de Despesa", true);
@@ -113,6 +114,29 @@ public class DespesaDialog extends JDialog {
         add(buttons, BorderLayout.SOUTH);
     }
 
+    public DespesaDialog(JFrame parent, int id, String descricao, String categoria, float valor, String formaPgto, String status, boolean doCaixa) {
+        this(parent);
+        this.idEdicao = id;
+        setTitle("Editar Despesa");
+        txtDescricao.setText(descricao);
+        comboCategoria.setSelectedItem(categoria);
+        txtValor.setText(String.valueOf(valor));
+        
+        String pgtoText = switch (formaPgto.toLowerCase()) {
+            case "pix" -> "Pix";
+            case "cartao", "cartão" -> "Cartão";
+            case "boleto" -> "Boleto";
+            case "outro" -> "Outro";
+            default -> "Dinheiro";
+        };
+        comboPagamento.setSelectedItem(pgtoText);
+        
+        String statusText = status.substring(0, 1).toUpperCase() + status.substring(1).toLowerCase();
+        comboStatus.setSelectedItem(statusText);
+        
+        chkCaixaAtual.setSelected(doCaixa);
+    }
+
     private void salvarDespesa() {
         String descricao = txtDescricao.getText().trim();
         if (descricao.isEmpty()) {
@@ -152,9 +176,15 @@ public class DespesaDialog extends JDialog {
             idCaixa = caixa;
         }
 
-        boolean sucesso = new fcaixa().salvarDespesa(idCaixa, descricao, categoria, valor, formaPgto, status);
+        boolean sucesso;
+        if (idEdicao != null) {
+            sucesso = new fcaixa().editarDespesa(idEdicao, idCaixa, descricao, categoria, valor, formaPgto, status);
+        } else {
+            sucesso = new fcaixa().salvarDespesa(idCaixa, descricao, categoria, valor, formaPgto, status);
+        }
+        
         if (sucesso) {
-            JOptionPane.showMessageDialog(this, "Despesa lançada com sucesso.", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Despesa salva com sucesso.", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
             dispose();
         } else {
             JOptionPane.showMessageDialog(this, "Erro ao salvar despesa no banco.", "Erro", JOptionPane.ERROR_MESSAGE);

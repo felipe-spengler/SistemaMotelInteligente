@@ -1,6 +1,7 @@
 package com.motelinteligente.telas;
 
 import com.motelinteligente.dados.fazconexao;
+import com.motelinteligente.dados.fcaixa;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -29,10 +30,29 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
+import java.io.FileOutputStream;
+import java.io.File;
+import javax.swing.JFileChooser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+// OpenPDF imports
+import com.lowagie.text.Chunk;
+import com.lowagie.text.Document;
+import com.lowagie.text.Element;
+import com.lowagie.text.PageSize;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.Phrase;
+import com.lowagie.text.pdf.PdfPCell;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
 
 public class FluxoCaixaDialog extends JDialog {
+
+    private static final Logger logger = LoggerFactory.getLogger(FluxoCaixaDialog.class);
 
     private final JTextField txtDataInicio;
     private final JTextField txtDataFim;
@@ -51,7 +71,7 @@ public class FluxoCaixaDialog extends JDialog {
     public FluxoCaixaDialog(JFrame parent) {
         super(parent, "Fluxo de Caixa Mensal", true);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        setSize(800, 580);
+        setSize(850, 600);
         setLocationRelativeTo(parent);
         setLayout(new BorderLayout(10, 10));
 
@@ -81,6 +101,13 @@ public class FluxoCaixaDialog extends JDialog {
         btnFiltrar.setFocusPainted(false);
         btnFiltrar.addActionListener(e -> carregarFluxo());
         painelFiltros.add(btnFiltrar);
+
+        JButton btnExportar = new JButton("Exportar PDF");
+        btnExportar.setBackground(new Color(76, 175, 80));
+        btnExportar.setForeground(Color.WHITE);
+        btnExportar.setFocusPainted(false);
+        btnExportar.addActionListener(e -> exportarParaPdf());
+        painelFiltros.add(btnExportar);
 
         // Preencher datas padrão (Mês Atual)
         Calendar cal = Calendar.getInstance();
@@ -132,7 +159,7 @@ public class FluxoCaixaDialog extends JDialog {
         abas.addTab("Resumo Gerencial (DRE)", scrollResumo);
 
         // Aba 2: Lançamentos Detalhados
-        modeloDetalhes = new DefaultTableModel(new Object[] {"Data/Hora", "Tipo", "Descrição", "Valor (R$)", "Forma Pgto", "Status"}, 0) {
+        modeloDetalhes = new DefaultTableModel(new Object[] {"ID", "Data/Hora", "Tipo", "Descrição", "Valor (R$)", "Forma Pgto", "Status"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -142,9 +169,38 @@ public class FluxoCaixaDialog extends JDialog {
         tabelaDetalhes.setRowHeight(24);
         tabelaDetalhes.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
         tabelaDetalhes.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        
+        // Esconder a coluna ID
+        tabelaDetalhes.getColumnModel().getColumn(0).setMinWidth(0);
+        tabelaDetalhes.getColumnModel().getColumn(0).setMaxWidth(0);
+        tabelaDetalhes.getColumnModel().getColumn(0).setWidth(0);
+
         JScrollPane scrollDetalhes = new JScrollPane(tabelaDetalhes);
         scrollDetalhes.setBorder(BorderFactory.createEmptyBorder());
-        abas.addTab("Lançamentos Detalhados", scrollDetalhes);
+        
+        JPanel painelDetalhesTab = new JPanel(new BorderLayout());
+        painelDetalhesTab.add(scrollDetalhes, BorderLayout.CENTER);
+
+        JPanel painelBotoesTab = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 5));
+        painelBotoesTab.setBackground(Color.WHITE);
+
+        JButton btnEditar = new JButton("Editar Despesa");
+        btnEditar.setBackground(new Color(255, 152, 0));
+        btnEditar.setForeground(Color.WHITE);
+        btnEditar.setFocusPainted(false);
+        btnEditar.addActionListener(e -> editarDespesaSelecionada());
+
+        JButton btnExcluir = new JButton("Excluir Lançamento");
+        btnExcluir.setBackground(new Color(244, 67, 54));
+        btnExcluir.setForeground(Color.WHITE);
+        btnExcluir.setFocusPainted(false);
+        btnExcluir.addActionListener(e -> excluirLancamentoSelecionado());
+
+        painelBotoesTab.add(btnEditar);
+        painelBotoesTab.add(btnExcluir);
+        painelDetalhesTab.add(painelBotoesTab, BorderLayout.SOUTH);
+
+        abas.addTab("Lançamentos de Despesas", painelDetalhesTab);
 
         add(painelFiltros, BorderLayout.NORTH);
         add(abas, BorderLayout.CENTER);
@@ -209,7 +265,7 @@ public class FluxoCaixaDialog extends JDialog {
             Map<String, Float> despesasCategorias = new HashMap<>();
 
             try (Connection link = new fazconexao().conectar()) {
-                // 1. Consultar Locações (Receita)
+                // 1. Consultar Locações (Receita para soma total)
                 String sqlLocacoes = "SELECT horafim, pagodinheiro, pagopix, pagocartao, numquarto FROM registralocado WHERE horafim >= ? AND horafim <= ? AND valorquarto IS NOT NULL ORDER BY horafim";
                 try (PreparedStatement stmt = link.prepareStatement(sqlLocacoes)) {
                     stmt.setString(1, tInicio);
@@ -225,21 +281,12 @@ public class FluxoCaixaDialog extends JDialog {
                             faturamentoMeios.put("Dinheiro", faturamentoMeios.get("Dinheiro") + pgDinheiro);
                             faturamentoMeios.put("Pix", faturamentoMeios.get("Pix") + pgPix);
                             faturamentoMeios.put("Cartão", faturamentoMeios.get("Cartão") + pgCartao);
-
-                            modeloDetalhes.addRow(new Object[] {
-                                rs.getTimestamp("horafim"),
-                                "Locação",
-                                "Quarto #" + rs.getInt("numquarto"),
-                                String.format("+ R$ %.2f", total),
-                                "Múltiplo",
-                                "Concluído"
-                            });
                         }
                     }
                 }
 
-                // 2. Consultar Vendas Avulsas (Receita)
-                String sqlVendas = "SELECT horario, valortotal, descricao, formapagamento FROM vendas_avulsas WHERE horario >= ? AND horario <= ? AND tipo != 'adiantamento' ORDER BY horario";
+                // 2. Consultar Vendas Avulsas (Receita para soma total)
+                String sqlVendas = "SELECT valortotal, formapagamento FROM vendas_avulsas WHERE horario >= ? AND horario <= ? AND tipo != 'adiantamento'";
                 try (PreparedStatement stmt = link.prepareStatement(sqlVendas)) {
                     stmt.setString(1, tInicio);
                     stmt.setString(2, tFim);
@@ -258,32 +305,25 @@ public class FluxoCaixaDialog extends JDialog {
                             } else {
                                 faturamentoMeios.put("Outro", faturamentoMeios.get("Outro") + total);
                             }
-
-                            modeloDetalhes.addRow(new Object[] {
-                                rs.getTimestamp("horario"),
-                                "Venda Avulsa",
-                                rs.getString("descricao"),
-                                String.format("+ R$ %.2f", total),
-                                pgto.toUpperCase(),
-                                "Concluído"
-                            });
                         }
                     }
                 }
 
                 // 3. Consultar Retiradas/Sangrias (Despesa)
-                String sqlRetiradas = "SELECT horario, valor, quem, justificativa FROM retiradas_caixa WHERE horario >= ? AND horario <= ? ORDER BY horario";
+                String sqlRetiradas = "SELECT id, horario, valor, quem, justificativa FROM retiradas_caixa WHERE horario >= ? AND horario <= ? ORDER BY horario";
                 try (PreparedStatement stmt = link.prepareStatement(sqlRetiradas)) {
                     stmt.setString(1, tInicio);
                     stmt.setString(2, tFim);
                     try (ResultSet rs = stmt.executeQuery()) {
                         while (rs.next()) {
+                            int id = rs.getInt("id");
                             float total = rs.getFloat("valor");
                             totalDespesasVal += total;
 
                             despesasCategorias.put("Retiradas/Sangrias", despesasCategorias.getOrDefault("Retiradas/Sangrias", 0f) + total);
 
                             modeloDetalhes.addRow(new Object[] {
+                                id,
                                 rs.getTimestamp("horario"),
                                 "Retirada Caixa",
                                 "Quem: " + rs.getString("quem") + " - " + rs.getString("justificativa"),
@@ -296,12 +336,13 @@ public class FluxoCaixaDialog extends JDialog {
                 }
 
                 // 4. Consultar Despesas (Despesa)
-                String sqlDespesas = "SELECT horario, valor, descricao, categoria, formapagamento, status FROM despesas WHERE horario >= ? AND horario <= ? ORDER BY horario";
+                String sqlDespesas = "SELECT id, horario, valor, descricao, categoria, formapagamento, status FROM despesas WHERE horario >= ? AND horario <= ? ORDER BY horario";
                 try (PreparedStatement stmt = link.prepareStatement(sqlDespesas)) {
                     stmt.setString(1, tInicio);
                     stmt.setString(2, tFim);
                     try (ResultSet rs = stmt.executeQuery()) {
                         while (rs.next()) {
+                            int id = rs.getInt("id");
                             float total = rs.getFloat("valor");
                             String cat = rs.getString("categoria");
                             totalDespesasVal += total;
@@ -309,6 +350,7 @@ public class FluxoCaixaDialog extends JDialog {
                             despesasCategorias.put(cat, despesasCategorias.getOrDefault(cat, 0f) + total);
 
                             modeloDetalhes.addRow(new Object[] {
+                                id,
                                 rs.getTimestamp("horario"),
                                 "Despesa (" + cat + ")",
                                 rs.getString("descricao"),
@@ -407,5 +449,217 @@ public class FluxoCaixaDialog extends JDialog {
         }
 
         carregarFluxo();
+    }
+
+    private void editarDespesaSelecionada() {
+        int selectedRow = tabelaDetalhes.getSelectedRow();
+        if (selectedRow < 0) {
+            JOptionPane.showMessageDialog(this, "Selecione uma despesa para editar.", "Atenção", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        String tipo = String.valueOf(tabelaDetalhes.getValueAt(selectedRow, 2)); // Tipo
+        if (!tipo.startsWith("Despesa")) {
+            JOptionPane.showMessageDialog(this, "Apenas lançamentos do tipo 'Despesa' podem ser editados por aqui.", "Atenção", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        int id = (Integer) tabelaDetalhes.getValueAt(selectedRow, 0);
+        String descricao = String.valueOf(tabelaDetalhes.getValueAt(selectedRow, 3));
+        String valorStr = String.valueOf(tabelaDetalhes.getValueAt(selectedRow, 4))
+                            .replace("- R$ ", "")
+                            .replace("+ R$ ", "")
+                            .replace(",", ".")
+                            .trim();
+        float valor = Float.parseFloat(valorStr);
+        String pgto = String.valueOf(tabelaDetalhes.getValueAt(selectedRow, 5));
+        String status = String.valueOf(tabelaDetalhes.getValueAt(selectedRow, 6));
+        
+        // Extract category from type: "Despesa (Categoria)"
+        String categoria = "Outros";
+        if (tipo.contains("(") && tipo.contains(")")) {
+            categoria = tipo.substring(tipo.indexOf("(") + 1, tipo.indexOf(")"));
+        }
+        
+        // Check if has a caixa (idcaixa)
+        boolean doCaixa = false;
+        try (Connection link = new fazconexao().conectar();
+             PreparedStatement stmt = link.prepareStatement("SELECT idcaixa FROM despesas WHERE id = ?")) {
+            stmt.setInt(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    int cx = rs.getInt("idcaixa");
+                    if (!rs.wasNull() && cx > 0) {
+                        doCaixa = true;
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            logger.error("Erro ao verificar idcaixa: ", ex);
+        }
+        
+        JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+        DespesaDialog dlg = new DespesaDialog(parentFrame, id, descricao, categoria, valor, pgto, status, doCaixa);
+        dlg.setVisible(true);
+        carregarFluxo();
+    }
+
+    private void excluirLancamentoSelecionado() {
+        int selectedRow = tabelaDetalhes.getSelectedRow();
+        if (selectedRow < 0) {
+            JOptionPane.showMessageDialog(this, "Selecione um lançamento para excluir.", "Atenção", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        int id = (Integer) tabelaDetalhes.getValueAt(selectedRow, 0);
+        String tipo = String.valueOf(tabelaDetalhes.getValueAt(selectedRow, 2));
+        
+        int confirm = JOptionPane.showConfirmDialog(this, 
+            "Deseja realmente excluir este lançamento?", 
+            "Confirmar Exclusão", 
+            JOptionPane.YES_NO_OPTION);
+            
+        if (confirm == JOptionPane.YES_OPTION) {
+            boolean sucesso = false;
+            if (tipo.startsWith("Despesa")) {
+                sucesso = new fcaixa().excluirDespesa(id);
+            } else if (tipo.startsWith("Retirada")) {
+                String sql = "DELETE FROM retiradas_caixa WHERE id = ?";
+                try (Connection link = new fazconexao().conectar();
+                     PreparedStatement stmt = link.prepareStatement(sql)) {
+                    stmt.setInt(1, id);
+                    sucesso = stmt.executeUpdate() > 0;
+                } catch (Exception ex) {
+                    logger.error("Erro ao excluir retirada: ", ex);
+                }
+            }
+            
+            if (sucesso) {
+                JOptionPane.showMessageDialog(this, "Lançamento excluído com sucesso.", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                carregarFluxo();
+            } else {
+                JOptionPane.showMessageDialog(this, "Erro ao excluir lançamento do banco.", "Erro", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private void exportarParaPdf() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Salvar PDF do Fluxo de Caixa");
+        fileChooser.setSelectedFile(new File("Fluxo_de_Caixa_" + txtDataInicio.getText().replace("/", "-") + "_a_" + txtDataFim.getText().replace("/", "-") + ".pdf"));
+        
+        int userSelection = fileChooser.showSaveDialog(this);
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File fileToSave = fileChooser.getSelectedFile();
+            String filePath = fileToSave.getAbsolutePath();
+            if (!filePath.toLowerCase().endsWith(".pdf")) {
+                filePath += ".pdf";
+            }
+            
+            Document doc = new Document(PageSize.A4, 40, 40, 40, 40);
+            try {
+                PdfWriter.getInstance(doc, new FileOutputStream(filePath));
+                doc.open();
+                
+                // Styles
+                com.lowagie.text.Font fontTitulo = new com.lowagie.text.Font(com.lowagie.text.Font.HELVETICA, 16, com.lowagie.text.Font.BOLD, Color.DARK_GRAY);
+                com.lowagie.text.Font fontSub = new com.lowagie.text.Font(com.lowagie.text.Font.HELVETICA, 10, com.lowagie.text.Font.ITALIC, Color.GRAY);
+                com.lowagie.text.Font fontSecao = new com.lowagie.text.Font(com.lowagie.text.Font.HELVETICA, 12, com.lowagie.text.Font.BOLD, new Color(33, 150, 243));
+                com.lowagie.text.Font fontTabelaHead = new com.lowagie.text.Font(com.lowagie.text.Font.HELVETICA, 10, com.lowagie.text.Font.BOLD, Color.WHITE);
+                com.lowagie.text.Font fontTabelaBody = new com.lowagie.text.Font(com.lowagie.text.Font.HELVETICA, 9, com.lowagie.text.Font.NORMAL, Color.BLACK);
+                com.lowagie.text.Font fontBold = new com.lowagie.text.Font(com.lowagie.text.Font.HELVETICA, 9, com.lowagie.text.Font.BOLD, Color.BLACK);
+                
+                Paragraph p = new Paragraph("RELATÓRIO DE FLUXO DE CAIXA", fontTitulo);
+                p.setAlignment(Element.ALIGN_CENTER);
+                doc.add(p);
+                
+                Paragraph pSub = new Paragraph("Período: " + txtDataInicio.getText() + " até " + txtDataFim.getText(), fontSub);
+                pSub.setAlignment(Element.ALIGN_CENTER);
+                doc.add(pSub);
+                
+                doc.add(Chunk.NEWLINE);
+                
+                // Section 1: DRE
+                doc.add(new Paragraph("Resumo Gerencial (DRE)", fontSecao));
+                doc.add(Chunk.NEWLINE);
+                
+                PdfPTable tableResumo = new PdfPTable(3);
+                tableResumo.setWidthPercentage(100);
+                tableResumo.setWidths(new float[]{60, 20, 20});
+                
+                PdfPCell h1 = new PdfPCell(new Phrase("Categoria / Centro de Custo", fontTabelaHead));
+                h1.setBackgroundColor(new Color(71, 85, 105));
+                h1.setPadding(6);
+                PdfPCell h2 = new PdfPCell(new Phrase("Valor (R$)", fontTabelaHead));
+                h2.setBackgroundColor(new Color(71, 85, 105));
+                h2.setPadding(6);
+                PdfPCell h3 = new PdfPCell(new Phrase("Participação (%)", fontTabelaHead));
+                h3.setBackgroundColor(new Color(71, 85, 105));
+                h3.setPadding(6);
+                
+                tableResumo.addCell(h1);
+                tableResumo.addCell(h2);
+                tableResumo.addCell(h3);
+                
+                for (int i = 0; i < modeloResumo.getRowCount(); i++) {
+                    String col1 = String.valueOf(modeloResumo.getValueAt(i, 0));
+                    String col2 = String.valueOf(modeloResumo.getValueAt(i, 1));
+                    String col3 = String.valueOf(modeloResumo.getValueAt(i, 2));
+                    
+                    com.lowagie.text.Font rowFont = (col1.contains("TOTAL") || col1.contains("FATURAMENTO") || col1.contains("DESPESAS") || col1.contains("RESULTADO")) ? fontBold : fontTabelaBody;
+                    
+                    PdfPCell c1 = new PdfPCell(new Phrase(col1, rowFont));
+                    PdfPCell c2 = new PdfPCell(new Phrase(col2, rowFont));
+                    PdfPCell c3 = new PdfPCell(new Phrase(col3, rowFont));
+                    
+                    c1.setPadding(4);
+                    c2.setPadding(4);
+                    c3.setPadding(4);
+                    
+                    tableResumo.addCell(c1);
+                    tableResumo.addCell(c2);
+                    tableResumo.addCell(c3);
+                }
+                
+                doc.add(tableResumo);
+                doc.add(Chunk.NEWLINE);
+                doc.add(Chunk.NEWLINE);
+                
+                // Section 2: Detalhes Despesas
+                doc.add(new Paragraph("Detalhamento de Lançamentos (Despesas e Retiradas)", fontSecao));
+                doc.add(Chunk.NEWLINE);
+                
+                PdfPTable tableDesp = new PdfPTable(6);
+                tableDesp.setWidthPercentage(100);
+                tableDesp.setWidths(new float[]{18, 17, 35, 12, 10, 8});
+                
+                String[] dHeaders = {"Data/Hora", "Tipo", "Descrição", "Valor", "Pgto", "Status"};
+                for (String dh : dHeaders) {
+                    PdfPCell h = new PdfPCell(new Phrase(dh, fontTabelaHead));
+                    h.setBackgroundColor(new Color(71, 85, 105));
+                    h.setPadding(6);
+                    tableDesp.addCell(h);
+                }
+                
+                for (int i = 0; i < modeloDetalhes.getRowCount(); i++) {
+                    for (int j = 1; j < modeloDetalhes.getColumnCount(); j++) {
+                        String val = String.valueOf(modeloDetalhes.getValueAt(i, j));
+                        PdfPCell c = new PdfPCell(new Phrase(val, fontTabelaBody));
+                        c.setPadding(4);
+                        tableDesp.addCell(c);
+                    }
+                }
+                
+                doc.add(tableDesp);
+                
+                JOptionPane.showMessageDialog(this, "Relatório exportado com sucesso em PDF!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                
+            } catch (Exception ex) {
+                logger.error("Erro ao exportar PDF: ", ex);
+                JOptionPane.showMessageDialog(this, "Erro ao gerar PDF: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+            } finally {
+                doc.close();
+            }
+        }
     }
 }

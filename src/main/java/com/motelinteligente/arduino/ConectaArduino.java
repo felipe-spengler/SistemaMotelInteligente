@@ -183,4 +183,19 @@ public class ConectaArduino {
         }
     }
 
+    public static void enviarComandoLuz(int numeroQuarto, boolean ligar) {
+        configGlobal config = configGlobal.getInstance();
+        if (config.isFlagArduino() && CacheDados.getArduinoPort() != null) {
+            synchronized (ConectaArduino.class) {
+                String cmd = "LUZ-" + (ligar ? "ON" : "OFF") + "-" + numeroQuarto + "\n";
+                try {
+                    byte[] msg = cmd.getBytes();
+                    CacheDados.getArduinoPort().writeBytes(msg, msg.length);
+                    logger.info("Comando de luz enviado: " + cmd.trim());
+                } catch (Exception e) {
+                    logger.error("Erro ao enviar comando de luz para o Arduino: ", e);
+                }
+            }
+        }
+    }
 }

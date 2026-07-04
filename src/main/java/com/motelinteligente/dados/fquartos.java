@@ -56,14 +56,30 @@ public class fquartos {
     public boolean setStatus(int numero, String status, Timestamp horario) {
         try (Connection link = conexao.conectar(); PreparedStatement stmt = link.prepareStatement("UPDATE status SET atualquarto = ?, horastatus = ? WHERE numeroquarto = ?")) {
             stmt.setString(1, status); stmt.setTimestamp(2, horario); stmt.setInt(3, numero);
-            return stmt.executeUpdate() > 0;
+            boolean ok = stmt.executeUpdate() > 0;
+            if (ok) {
+                if (status.equalsIgnoreCase("manutencao") || status.toLowerCase().contains("ocupado")) {
+                    com.motelinteligente.arduino.ConectaArduino.enviarComandoLuz(numero, true);
+                } else if (status.equalsIgnoreCase("livre") || status.equalsIgnoreCase("limpeza")) {
+                    com.motelinteligente.arduino.ConectaArduino.enviarComandoLuz(numero, false);
+                }
+            }
+            return ok;
         } catch (SQLException e) { logger.error("Erro setStatus", e); return false; }
     }
 
     public boolean alteraOcupado(int numero, String status) {
         try (Connection link = conexao.conectar(); PreparedStatement stmt = link.prepareStatement("UPDATE status SET atualquarto = ? WHERE numeroquarto = ?")) {
             stmt.setString(1, status); stmt.setInt(2, numero);
-            return stmt.executeUpdate() > 0;
+            boolean ok = stmt.executeUpdate() > 0;
+            if (ok) {
+                if (status.equalsIgnoreCase("manutencao") || status.toLowerCase().contains("ocupado")) {
+                    com.motelinteligente.arduino.ConectaArduino.enviarComandoLuz(numero, true);
+                } else if (status.equalsIgnoreCase("livre") || status.equalsIgnoreCase("limpeza")) {
+                    com.motelinteligente.arduino.ConectaArduino.enviarComandoLuz(numero, false);
+                }
+            }
+            return ok;
         } catch (SQLException e) { return false; }
     }
 

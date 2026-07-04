@@ -532,6 +532,40 @@ public class fcaixa {
         }
     }
 
+    public boolean editarDespesa(int id, Integer idCaixa, String descricao, String categoria, float valor, String formaPgto, String status) {
+        String sql = "UPDATE despesas SET idcaixa = ?, descricao = ?, categoria = ?, valor = ?, formapagamento = ?, status = ? WHERE id = ?";
+        try (Connection link = new fazconexao().conectar();
+             PreparedStatement stmt = link.prepareStatement(sql)) {
+            if (idCaixa != null && idCaixa > 0) {
+                stmt.setInt(1, idCaixa);
+            } else {
+                stmt.setNull(1, java.sql.Types.INTEGER);
+            }
+            stmt.setString(2, descricao);
+            stmt.setString(3, categoria);
+            stmt.setFloat(4, valor);
+            stmt.setString(5, formaPgto);
+            stmt.setString(6, status);
+            stmt.setInt(7, id);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            logger.error("Erro ao editar despesa: ", e);
+            return false;
+        }
+    }
+
+    public boolean excluirDespesa(int id) {
+        String sql = "DELETE FROM despesas WHERE id = ?";
+        try (Connection link = new fazconexao().conectar();
+             PreparedStatement stmt = link.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            logger.error("Erro ao excluir despesa: ", e);
+            return false;
+        }
+    }
+
     public float getTotalDespesasCaixa(int idCaixa, String formaPgto) {
         String sql = "SELECT COALESCE(SUM(valor), 0) FROM despesas WHERE idcaixa = ? AND formapagamento = ? AND status = 'pago'";
         try (Connection link = new fazconexao().conectar();

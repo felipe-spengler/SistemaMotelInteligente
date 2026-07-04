@@ -8,48 +8,24 @@
         </encoder>
     </appender>
 
-    <appender name="FILE_WARN_INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_PATH}/app-info.log</file>
+    <appender name="FILE_HTML" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/app-logs.html</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_PATH}/app.%d{yyyy-MM-dd}_info.log</fileNamePattern>
+            <fileNamePattern>${LOG_PATH}/app-logs.%d{yyyy-MM-dd}.html</fileNamePattern>
             <maxHistory>30</maxHistory>
         </rollingPolicy>
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>INFO</level>
-        </filter>
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>ERROR</level>
-            <onMatch>DENY</onMatch>
-            <onMismatch>NEUTRAL</onMismatch>
-        </filter>
-        <encoder>
-            <pattern>${LOG_PATTERN}</pattern>
-        </encoder>
-    </appender>
-
-    <appender name="FILE_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_PATH}/app-error.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_PATH}/app.%d{yyyy-MM-dd}_error.log</fileNamePattern>
-            <maxHistory>30</maxHistory>
-        </rollingPolicy>
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>ERROR</level>
-        </filter>
-        <encoder>
-            <pattern>${LOG_PATTERN}</pattern>
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="com.motelinteligente.dados.HtmlLayout" />
         </encoder>
     </appender>
 
     <logger name="com.motelinteligente" level="DEBUG" additivity="false">
         <appender-ref ref="STDOUT" />
-        <appender-ref ref="FILE_WARN_INFO" />
-        <appender-ref ref="FILE_ERROR" />
+        <appender-ref ref="FILE_HTML" />
     </logger>
 
     <root level="INFO">
         <appender-ref ref="STDOUT" />
-        <appender-ref ref="FILE_WARN_INFO" />
-        <appender-ref ref="FILE_ERROR" />
+        <appender-ref ref="FILE_HTML" />
     </root>
 </configuration>
