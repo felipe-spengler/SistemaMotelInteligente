@@ -33,10 +33,13 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.motelinteligente.dados.fcaixa;
+import com.motelinteligente.dados.ffuncionario;
 import com.motelinteligente.dados.fprodutos;
 import com.motelinteligente.alarme.FAlarmes;
 import com.motelinteligente.dados.PeriodoQuarto;
 import com.motelinteligente.dados.fquartos;
+import com.motelinteligente.dados.vfuncionario;
 import com.motelinteligente.arduino.ConectaArduino;
 
 public class TelaPrincipalController {
@@ -651,8 +654,12 @@ public class TelaPrincipalController {
 
             // Calcula horas adicionais se passou do tempo do período
             if (totalMinutosPassados > periodoEncontrado.getTempoMinutos() + 10) {
-                int sobraMinutos = totalMinutosPassados - periodoEncontrado.getTempoMinutos();
-                int add = (int) Math.ceil(sobraMinutos / 60.0);
+                int add = 0;
+                int totalPeriodo = periodoEncontrado.getTempoMinutos() + 10;
+                while (totalMinutosPassados > totalPeriodo) {
+                    totalPeriodo += 60;
+                    add++;
+                }
                 valorExcedente = (float) add * ocupado.getValorAdicional();
             }
         } else {
@@ -696,6 +703,26 @@ public class TelaPrincipalController {
             logger.error("Erro ao buscar produtos consumidos para locacao {}", idLocacao, e);
         }
         return produtos;
+    }
+
+    public List<vfuncionario> buscarFuncionarios() {
+        return new ffuncionario().mostrar();
+    }
+
+    public boolean salvarVendaAvulsa(int idProduto, String descricao, int quantidade, float valorUnd,
+            float valorTotal, String tipo, String formaPgto) {
+        configGlobal config = configGlobal.getInstance();
+        int idCaixa = config.getCaixa();
+        if (idCaixa == 0) {
+            JOptionPane.showMessageDialog(null, "Não há caixa aberto. Abra um caixa antes de lançar a venda avulsa.", "Caixa fechado", JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+
+        boolean ok = new fcaixa().salvarVendaAvulsa(idCaixa, idProduto, descricao, quantidade, valorUnd, valorTotal, tipo, formaPgto);
+        if (!ok) {
+            JOptionPane.showMessageDialog(null, "Erro ao salvar venda avulsa no caixa.", "Erro", JOptionPane.ERROR_MESSAGE);
+        }
+        return ok;
     }
 
     public void removerAlarme(int idAlarme) {

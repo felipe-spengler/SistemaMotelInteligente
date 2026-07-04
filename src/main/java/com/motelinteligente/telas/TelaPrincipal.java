@@ -539,6 +539,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         jScrollPane2 = new javax.swing.JScrollPane();
         tabela1 = new javax.swing.JTable();
         bt_apagarProduto = new javax.swing.JButton();
+        btBuscarProdutoAntecipado = new javax.swing.JButton();
         bt_inserirProduto = new javax.swing.JButton();
         jPanel6 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -1034,6 +1035,22 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             }
         });
 
+        btBuscarProdutoAntecipado.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/buscar.png"))); // NOI18N
+        btBuscarProdutoAntecipado.setText("Buscar Produto");
+        btBuscarProdutoAntecipado.putClientProperty("FlatLaf.style",
+                "arc: 10; " +
+                        "borderWidth: 0; " +
+                        "background: #2196F3; " +
+                        "foreground: #FFFFFF; " +
+                        "hoverBackground: #1976D2; " +
+                        "pressedBackground: #1565C0; " +
+                        "font: bold");
+        btBuscarProdutoAntecipado.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btBuscarProdutoAntecipadoActionPerformed(evt);
+            }
+        });
+
         bt_inserirProduto.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_bot_editar.png"))); // NOI18N
         bt_inserirProduto.setText("Inserir Produto");
         bt_inserirProduto.putClientProperty("FlatLaf.style",
@@ -1172,6 +1189,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                                 .addGap(10, 10, 10))
                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btBuscarProdutoAntecipado)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(bt_inserirProduto)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(bt_apagarProduto)
@@ -1189,6 +1208,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                                         javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(btBuscarProdutoAntecipado)
                                         .addComponent(bt_inserirProduto)
                                         .addComponent(bt_apagarProduto))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1458,7 +1478,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                                 javax.swing.GroupLayout.DEFAULT_SIZE, 113, Short.MAX_VALUE));
 
         btCadastros.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/cadastro.png"))); // NOI18N
-        btCadastros.setText("Cadastros    |");
+        btCadastros.setText("Geral    |");
         btCadastros.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
         btQuartos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_quarto.png"))); // NOI18N
@@ -1490,6 +1510,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             }
         });
         btCadastros.add(btFuncionario);
+        btCadastros.add(jMenu2);
 
         jMenuBar1.add(btCadastros);
 
@@ -1543,8 +1564,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         });
         jMenu2.add(menuQrCodeCardapio);
 
-        jMenuBar1.add(jMenu2);
-
         menuCaixaBt.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/financeiro.png"))); // NOI18N
         menuCaixaBt.setText("Caixa");
         menuCaixaBt.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -1558,14 +1577,24 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 menuCaixaBtActionPerformed(evt);
             }
         });
-        jMenuBar1.add(menuCaixaBt);
 
         jMenu5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/relatorios.png"))); // NOI18N
-        jMenu5.setText("Relatórios   |");
+        jMenu5.setText("Financeiro   |");
         jMenu5.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
+        menuFinanceiroCaixa = new javax.swing.JMenuItem();
+        menuFinanceiroCaixa.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/financeiro.png"))); // NOI18N
+        menuFinanceiroCaixa.setText("Caixa");
+        menuFinanceiroCaixa.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        menuFinanceiroCaixa.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuFinanceiroCaixaActionPerformed(evt);
+            }
+        });
+        jMenu5.add(menuFinanceiroCaixa);
+
         jMenu16.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_rela_financeiro.png"))); // NOI18N
-        jMenu16.setText("Financeiro");
+        jMenu16.setText("Relatórios");
         jMenu16.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
         btConfereCaixa.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_rela_financeiro.png"))); // NOI18N
@@ -1588,12 +1617,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         });
         jMenu16.add(btConfereLocacao);
 
-        jMenu5.add(jMenu16);
-
-        jMenu18.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_vender.png"))); // NOI18N
-        jMenu18.setText("Produtos");
-        jMenu18.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-
         menuRelaVenProdutos
                 .setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_rela_produto.png"))); // NOI18N
         menuRelaVenProdutos.setText("Relatório Produtos Vendidos");
@@ -1603,9 +1626,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 menuRelaVenProdutosActionPerformed(evt);
             }
         });
-        jMenu18.add(menuRelaVenProdutos);
-
-        jMenu5.add(jMenu18);
+        jMenu16.add(menuRelaVenProdutos);
 
         menuRelAuto = new javax.swing.JMenuItem();
         menuRelAuto.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_produtos.png"))); // NOI18N
@@ -1616,7 +1637,42 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
                 new TelaAutoAtendimento().setVisible(true);
             }
         });
-        jMenu5.add(menuRelAuto);
+        jMenu16.add(menuRelAuto);
+
+        menuFluxoCaixa = new javax.swing.JMenuItem();
+        menuFluxoCaixa.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/financeiro.png"))); // NOI18N
+        menuFluxoCaixa.setText("Fluxo de Caixa");
+        menuFluxoCaixa.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        menuFluxoCaixa.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuFluxoCaixaActionPerformed(evt);
+            }
+        });
+        jMenu16.add(menuFluxoCaixa);
+
+        jMenu5.add(jMenu16);
+
+        menuVendaAvulsa = new javax.swing.JMenuItem();
+        menuVendaAvulsa.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/icon_vender.png"))); // NOI18N
+        menuVendaAvulsa.setText("Venda Avulsa");
+        menuVendaAvulsa.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        menuVendaAvulsa.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuVendaAvulsaActionPerformed(evt);
+            }
+        });
+        jMenu5.add(menuVendaAvulsa);
+
+        menuDespesas = new javax.swing.JMenuItem();
+        menuDespesas.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/financeiro.png"))); // NOI18N
+        menuDespesas.setText("Lançar Despesa");
+        menuDespesas.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        menuDespesas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuDespesasActionPerformed(evt);
+            }
+        });
+        jMenu5.add(menuDespesas);
 
         jMenuBar1.add(jMenu5);
 
@@ -2348,6 +2404,22 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         new com.motelinteligente.telas.modernas.ProdutoModerno().setVisible(true);
     }// GEN-LAST:event_menuVerProdutosActionPerformed
 
+    private void menuFinanceiroCaixaActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuFinanceiroCaixaActionPerformed
+        abrirCaixaFrame();
+    }// GEN-LAST:event_menuFinanceiroCaixaActionPerformed
+
+    private void menuVendaAvulsaActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuVendaAvulsaActionPerformed
+        new VendaAvulsaDialog(this, controller).setVisible(true);
+    }// GEN-LAST:event_menuVendaAvulsaActionPerformed
+
+    private void menuDespesasActionPerformed(java.awt.event.ActionEvent evt) {
+        new DespesaDialog(this).setVisible(true);
+    }
+
+    private void menuFluxoCaixaActionPerformed(java.awt.event.ActionEvent evt) {
+        new FluxoCaixaDialog(this).setVisible(true);
+    }
+
     private void menuCadastraProdutoActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuCadastraProdutoActionPerformed
         new com.motelinteligente.telas.modernas.CadastraProdutoModerno(this, 0).setVisible(true);
     }// GEN-LAST:event_menuCadastraProdutoActionPerformed
@@ -2509,6 +2581,44 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             JOptionPane.showMessageDialog(null, "Nenhum produto selecionado");
         }
     }// GEN-LAST:event_bt_apagarProdutoActionPerformed
+
+    private void btBuscarProdutoAntecipadoActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btBuscarProdutoAntecipadoActionPerformed
+        DialogBuscaProduto dialog = new DialogBuscaProduto(this);
+        dialog.setVisible(true);
+        if (dialog.isConfirmado()) {
+            adicionarProdutoAntecipadoPorId(dialog.getIdProdutoSelecionado(), dialog.getQuantidadeSelecionada());
+        }
+    }// GEN-LAST:event_btBuscarProdutoAntecipadoActionPerformed
+
+    public void adicionarProdutoAntecipadoPorId(int idProduto, int quantidade) {
+        if (quartoEmFoco == 0) {
+            JOptionPane.showMessageDialog(this, "Selecione um quarto ocupado primeiro.", "Atenção", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        CacheDados cache = CacheDados.getInstancia();
+        if (!cache.getCacheOcupado().containsKey(quartoEmFoco)) {
+            JOptionPane.showMessageDialog(this, "Quarto não está marcado como ocupado.", "Atenção", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int idLoca = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
+        if (idLoca == 0) {
+            idLoca = new fquartos().getIdLocacao(quartoEmFoco);
+            cache.getCacheOcupado().get(quartoEmFoco).setIdLoca(idLoca);
+        }
+
+        fprodutos dao = new fprodutos();
+        String descricao = dao.getDescicao(String.valueOf(idProduto));
+        if (descricao == null || descricao.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Produto não encontrado.", "Erro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        dao.inserirPrevendido(idLoca, idProduto, quantidade);
+        populaPrevendidos();
+        JOptionPane.showMessageDialog(this, "Produto adicionado à antecipação.", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+    }
 
     public void atualizaTotalConsumo() {
         float totalVendido = 0;
@@ -3244,5 +3354,10 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private javax.swing.JTextField txtAntecipado;
     private javax.swing.JTextField txtDescontoNegociado;
     private javax.swing.JTextField txtPessoas;
+    private javax.swing.JButton btBuscarProdutoAntecipado;
+    private javax.swing.JMenuItem menuFinanceiroCaixa;
+    private javax.swing.JMenuItem menuVendaAvulsa;
+    private javax.swing.JMenuItem menuDespesas;
+    private javax.swing.JMenuItem menuFluxoCaixa;
     // End of variables declaration//GEN-END:variables
 }

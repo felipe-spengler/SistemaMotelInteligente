@@ -34,9 +34,52 @@ public class fazconexao {
             config.setMaxLifetime(600000); // recicla a conexão a cada 10 min
             config.setKeepaliveTime(60000); // manda ping a cada 1 min
             dataSource = new HikariDataSource(config);
+            inicializarBancoDeDados();
 
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Erro ao inicializar pool de conexões: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private static void inicializarBancoDeDados() {
+        String sqlVendasAvulsas = "CREATE TABLE IF NOT EXISTS vendas_avulsas (" +
+                "  id INT NOT NULL AUTO_INCREMENT," +
+                "  idcaixa INT NOT NULL," +
+                "  idproduto INT NOT NULL," +
+                "  descricao VARCHAR(255) NOT NULL," +
+                "  quantidade INT NOT NULL," +
+                "  valorunidade FLOAT NOT NULL," +
+                "  valortotal FLOAT NOT NULL," +
+                "  tipo VARCHAR(50) NOT NULL," +
+                "  formapagamento VARCHAR(50) NOT NULL," +
+                "  usuario VARCHAR(100) NOT NULL," +
+                "  horario TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP," +
+                "  PRIMARY KEY (id)," +
+                "  KEY idx_vendas_avulsas_idcaixa (idcaixa)," +
+                "  KEY idx_vendas_avulsas_idproduto (idproduto)" +
+                ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;";
+
+        String sqlDespesas = "CREATE TABLE IF NOT EXISTS despesas (" +
+                "  id INT NOT NULL AUTO_INCREMENT," +
+                "  idcaixa INT DEFAULT NULL," +
+                "  descricao VARCHAR(255) NOT NULL," +
+                "  categoria VARCHAR(100) NOT NULL," +
+                "  valor FLOAT NOT NULL," +
+                "  formapagamento VARCHAR(50) NOT NULL," +
+                "  status VARCHAR(20) NOT NULL DEFAULT 'pago'," +
+                "  usuario VARCHAR(100) NOT NULL," +
+                "  horario TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP," +
+                "  PRIMARY KEY (id)," +
+                "  KEY idx_despesas_idcaixa (idcaixa)" +
+                ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;";
+
+        try (Connection link = dataSource.getConnection();
+             java.sql.Statement stmt = link.createStatement()) {
+            stmt.executeUpdate(sqlVendasAvulsas);
+            stmt.executeUpdate(sqlDespesas);
+        } catch (Exception e) {
+            System.err.println("Erro ao inicializar tabelas no banco de dados: " + e.getMessage());
             e.printStackTrace();
         }
     }

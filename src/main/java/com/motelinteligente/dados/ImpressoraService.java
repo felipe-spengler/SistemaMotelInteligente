@@ -168,9 +168,14 @@ public class ImpressoraService {
         String strAbertura = dataAbre != null ? sdf.format(dataAbre) : "N/A";
         String strFechamento = sdf.format(new Date());
 
-        float esperadoDinheiro = saldoIni + v.entradaD - (antecipadoOutro > 0 ? antecipadoOutro : 0);
-        float esperadoCartao = v.entradaC;
-        float esperadoPix = v.entradaP;
+        float totalRetiradas = dao.getTotalRetiradas(idCaixa);
+        float totalDespesasDinheiro = dao.getTotalDespesasCaixa(idCaixa, "dinheiro");
+        float totalDespesasCartao = dao.getTotalDespesasCaixa(idCaixa, "credito") + dao.getTotalDespesasCaixa(idCaixa, "debito") + dao.getTotalDespesasCaixa(idCaixa, "outro");
+        float totalDespesasPix = dao.getTotalDespesasCaixa(idCaixa, "pix");
+
+        float esperadoDinheiro = saldoIni + v.entradaD - totalRetiradas - totalDespesasDinheiro - (antecipadoOutro > 0 ? antecipadoOutro : 0);
+        float esperadoCartao = v.entradaC - totalDespesasCartao;
+        float esperadoPix = v.entradaP - totalDespesasPix;
         float saldoFinal = esperadoDinheiro + esperadoCartao + esperadoPix;
 
         StringBuilder sb = new StringBuilder();
@@ -187,6 +192,12 @@ public class ImpressoraService {
         sb.append(String.format("Vendas (Produtos):         R$ %,.2f\n", v.entradaConsumo));
         sb.append(String.format("Locacoes (Suites):         R$ %,.2f\n", v.entradaQuarto));
         sb.append(String.format("Ajustes/Justificativas:    R$ %,.2f\n", totalJustificativas));
+        if (totalRetiradas > 0) {
+            sb.append(String.format("Retiradas/Sangrias:       -R$ %,.2f\n", totalRetiradas));
+        }
+        if (totalDespesasDinheiro > 0) {
+            sb.append(String.format("Despesas em Dinheiro:     -R$ %,.2f\n", totalDespesasDinheiro));
+        }
         sb.append("------------------------------------------\n");
         sb.append("VALORES ESPERADOS EM GAVETA:\n");
         sb.append(String.format("Dinheiro Fisico:           R$ %,.2f\n", esperadoDinheiro));
@@ -195,7 +206,29 @@ public class ImpressoraService {
         if (antecipadoOutro > 0) {
             sb.append(String.format("Pago em Outro Caixa (Info):R$ %,.2f\n", antecipadoOutro));
         }
-        sb.append("------------------------------------------\n");
+        // Vendas Avulsas / Adiantamentos detalhados no relatório
+        List<Object[]> avulsas = dao.getListaVendasAvulsas(idCaixa);
+        if (!avulsas.isEmpty()) {
+            sb.append("\nVENDAS AVULSAS / ADIANTAMENTOS:\n");
+            for (Object[] row : avulsas) {
+                sb.append(String.format("%s - %s\n", row[0], row[1]));
+                sb.append(String.format("  Qtd: %d x R$ %.2f = R$ %.2f (%s, %s)\n",
+                        row[2], row[3], row[4], row[5], row[6]));
+            }
+            sb.append("------------------------------------------\n");
+        }
+
+        // Despesas detalhadas no relatório
+        List<Object[]> despesas = dao.getListaDespesasCaixa(idCaixa);
+        if (!despesas.isEmpty()) {
+            sb.append("\nDESPESAS LANÇADAS NO CAIXA:\n");
+            for (Object[] row : despesas) {
+                sb.append(String.format("%s - %s (%s)\n", row[0], row[1], row[2]));
+                sb.append(String.format("  Valor: R$ %.2f (%s, %s)\n", row[3], row[4], row[5]));
+            }
+            sb.append("------------------------------------------\n");
+        }
+
         sb.append(String.format("TOTAL GERAL ESPERADO:      R$ %,.2f\n", saldoFinal));
         sb.append("==========================================\n\n\n\n\n");
 
@@ -616,5 +649,37 @@ public class ImpressoraService {
         } catch (Exception e) {
             logger.error("Erro ao carregar dados da locacao ID " + idLocacao + " para impressao", e);
         }
+    }
+
+    public static void imprimirVendaAvulsa(String produto, int quantidade, float valorUnd, float total,
+            String tipo, String formaPgto, String funcionario) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("========================================\n");
+        sb.append("             VENDA AVULSA               \n");
+        sb.append("========================================\n\n");
+        
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        sb.append("Data: ").append(sdf.format(new Date())).append("\n");
+        sb.append("Usuario: ").append(configGlobal.getInstance().getUsuario()).append("\n");
+        sb.append("Tipo: ").append(tipo.toUpperCase()).append("\n");
+        if (funcionario != null && !funcionario.isEmpty()) {
+            sb.append("Funcionario: ").append(funcionario).append("\n");
+        }
+        sb.append("Forma Pgto: ").append(formaPgto.toUpperCase()).append("\n");
+        sb.append("----------------------------------------\n");
+        sb.append("Produto: ").append(produto).append("\n");
+        sb.append("Qtd: ").append(quantidade).append(" x R$ ").append(String.format(java.util.Locale.US, "%.2f", valorUnd)).append("\n");
+        sb.append("TOTAL: R$ ").append(String.format(java.util.Locale.US, "%.2f", total)).append("\n");
+        sb.append("----------------------------------------\n");
+        
+        if ("adiantamento".equalsIgnoreCase(tipo)) {
+            sb.append("\n\n\n\n");
+            sb.append("----------------------------------------\n");
+            sb.append("       Assinatura do Funcionario        \n");
+            sb.append("----------------------------------------\n");
+        }
+        sb.append("\n\n\n\n\n");
+        
+        imprimirTexto(sb.toString());
     }
 }

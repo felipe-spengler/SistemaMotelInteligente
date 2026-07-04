@@ -138,8 +138,28 @@ public class fcaixa {
                     val.entradaConsumo += resultado.getFloat("valorconsumo");
                     val.entradaQuarto += resultado.getFloat("valorquarto");
                 }
-                return val;
             }
+
+            // Adicionar as vendas avulsas no caixa (exceto adiantamentos)
+            String sqlAvulsas = "SELECT formapagamento, SUM(valortotal) FROM vendas_avulsas WHERE idcaixa = ? AND tipo != 'adiantamento' GROUP BY formapagamento";
+            try (PreparedStatement stmtAvulsa = link.prepareStatement(sqlAvulsas)) {
+                stmtAvulsa.setInt(1, idCaixa);
+                try (ResultSet rsAvulsa = stmtAvulsa.executeQuery()) {
+                    while (rsAvulsa.next()) {
+                        String pgto = rsAvulsa.getString(1);
+                        float valor = rsAvulsa.getFloat(2);
+                        if ("dinheiro".equalsIgnoreCase(pgto)) {
+                            val.entradaD += valor;
+                        } else if ("pix".equalsIgnoreCase(pgto)) {
+                            val.entradaP += valor;
+                        } else {
+                            val.entradaC += valor; // credito, debito, outro
+                        }
+                    }
+                }
+            }
+
+            return val;
         } catch (SQLException e) {
             logger.error("Erro ao buscar valores do caixa: ", e);
             JOptionPane.showMessageDialog(null, "Erro ao obter dados: " + e.getMessage(), "Erro",
@@ -484,6 +504,66 @@ public class fcaixa {
             }
         } catch (SQLException e) {
             logger.error("Erro ao listar vendas avulsas: ", e);
+        }
+        return lista;
+    }
+
+    // ===== DESPESAS =====
+
+    public boolean salvarDespesa(Integer idCaixa, String descricao, String categoria, float valor, String formaPgto, String status) {
+        String sql = "INSERT INTO despesas (idcaixa, descricao, categoria, valor, formapagamento, status, usuario) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        try (Connection link = new fazconexao().conectar();
+             PreparedStatement stmt = link.prepareStatement(sql)) {
+            if (idCaixa != null && idCaixa > 0) {
+                stmt.setInt(1, idCaixa);
+            } else {
+                stmt.setNull(1, java.sql.Types.INTEGER);
+            }
+            stmt.setString(2, descricao);
+            stmt.setString(3, categoria);
+            stmt.setFloat(4, valor);
+            stmt.setString(5, formaPgto);
+            stmt.setString(6, status);
+            stmt.setString(7, configGlobal.getInstance().getUsuario());
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            logger.error("Erro ao salvar despesa: ", e);
+            return false;
+        }
+    }
+
+    public float getTotalDespesasCaixa(int idCaixa, String formaPgto) {
+        String sql = "SELECT COALESCE(SUM(valor), 0) FROM despesas WHERE idcaixa = ? AND formapagamento = ? AND status = 'pago'";
+        try (Connection link = new fazconexao().conectar();
+             PreparedStatement stmt = link.prepareStatement(sql)) {
+            stmt.setInt(1, idCaixa);
+            stmt.setString(2, formaPgto);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return rs.getFloat(1);
+            }
+        } catch (SQLException e) {
+            logger.error("Erro ao somar despesas do caixa: ", e);
+        }
+        return 0f;
+    }
+
+    public List<Object[]> getListaDespesasCaixa(int idCaixa) {
+        List<Object[]> lista = new ArrayList<>();
+        String sql = "SELECT horario, descricao, categoria, valor, formapagamento, status FROM despesas WHERE idcaixa = ? ORDER BY horario";
+        SimpleDateFormat fmt = new SimpleDateFormat("dd/MM HH:mm");
+        try (Connection link = new fazconexao().conectar();
+             PreparedStatement stmt = link.prepareStatement(sql)) {
+            stmt.setInt(1, idCaixa);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    String hora = rs.getTimestamp("horario") != null
+                        ? fmt.format(new Date(rs.getTimestamp("horario").getTime())) : "";
+                    lista.add(new Object[]{ hora, rs.getString("descricao"), rs.getString("categoria"),
+                        rs.getFloat("valor"), rs.getString("formapagamento"), rs.getString("status") });
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Erro ao listar despesas do caixa: ", e);
         }
         return lista;
     }

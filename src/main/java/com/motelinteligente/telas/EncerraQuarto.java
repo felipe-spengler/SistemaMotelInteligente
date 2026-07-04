@@ -107,6 +107,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
     float valorAcrescimo = 0, valorDesconto = 0;
     // true = desconto no total; false = desconto só na locação
     private boolean descontoNoTotal = true;
+    private String lastDescontoVal = "0";
+    private String lastDescontoPorc = "0%";
     float valoreRecebido = 0, valorDivida = 0, valorRecebidoAgora = 0;
     float valorConsumo = 0, valorQuarto = 0, valorAdicionalPeriodo = 0, valorAdicionalPessoa = 0;
     float valD = 0, valP = 0, valC = 0;
@@ -177,6 +179,44 @@ public class EncerraQuarto extends javax.swing.JFrame {
         });
 
         setValorDivida();
+
+        txtDesconto.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                String val = txtDesconto.getText().trim();
+                if (!val.equals(lastDescontoVal)) {
+                    verificaDesconto(2);
+                    lastDescontoVal = val;
+                    lastDescontoPorc = txtDescontoPorcento.getText().trim();
+                }
+            }
+        });
+
+        txtDescontoPorcento.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                String val = txtDescontoPorcento.getText().trim();
+                if (!val.equals(lastDescontoPorc)) {
+                    JRadioButton rbTotal = new JRadioButton("Desconto no Total", descontoNoTotal);
+                    JRadioButton rbLocacao = new JRadioButton("Desconto só na Locação (quarto)", !descontoNoTotal);
+                    ButtonGroup bg = new ButtonGroup();
+                    bg.add(rbTotal); bg.add(rbLocacao);
+                    JPanel pnTipo = new JPanel(new java.awt.GridLayout(2, 1, 0, 4));
+                    pnTipo.add(rbTotal); pnTipo.add(rbLocacao);
+                    Object[] msg = { "Onde aplicar o desconto?", pnTipo };
+                    int resp = JOptionPane.showConfirmDialog(EncerraQuarto.this, msg, "Tipo de Desconto",
+                            JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+                    if (resp == JOptionPane.OK_OPTION) {
+                        descontoNoTotal = rbTotal.isSelected();
+                        verificaDesconto(1);
+                    } else {
+                        txtDescontoPorcento.setText(lastDescontoPorc);
+                    }
+                    lastDescontoPorc = txtDescontoPorcento.getText().trim();
+                    lastDescontoVal = txtDesconto.getText().trim();
+                }
+            }
+        });
 
         try {
             boolean found = new NativeDiscovery().discover();
@@ -539,6 +579,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
             txtJustifica.setText("Desconto aplicado via Autoatendimento");
             // Força cálculo de porcentagem no UI
             verificaDesconto(2);
+            lastDescontoVal = txtDesconto.getText().trim();
+            lastDescontoPorc = txtDescontoPorcento.getText().trim();
         }
 
         return antecipados;
@@ -1313,11 +1355,12 @@ public class EncerraQuarto extends javax.swing.JFrame {
                                                 .addComponent(jLabel14)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                 .addComponent(txtDescontoPorcento,
-                                                        javax.swing.GroupLayout.PREFERRED_SIZE, 53,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE, 75,
                                                         javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(txtDesconto, javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addComponent(txtDesconto,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE, 75,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addGap(30, 30, 30)
                                                 .addComponent(jLabel15)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1606,6 +1649,31 @@ public class EncerraQuarto extends javax.swing.JFrame {
     }
 
     private void btSalvarActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btSalvarActionPerformed
+        // Força sincronização do desconto antes de prosseguir com o salvamento
+        String valDesc = txtDesconto.getText().trim();
+        String valDescPorc = txtDescontoPorcento.getText().trim();
+        if (!valDesc.equals(lastDescontoVal)) {
+            verificaDesconto(2);
+            lastDescontoVal = valDesc;
+            lastDescontoPorc = txtDescontoPorcento.getText().trim();
+        } else if (!valDescPorc.equals(lastDescontoPorc)) {
+            JRadioButton rbTotal = new JRadioButton("Desconto no Total", descontoNoTotal);
+            JRadioButton rbLocacao = new JRadioButton("Desconto só na Locação (quarto)", !descontoNoTotal);
+            ButtonGroup bg = new ButtonGroup();
+            bg.add(rbTotal); bg.add(rbLocacao);
+            JPanel pnTipo = new JPanel(new java.awt.GridLayout(2, 1, 0, 4));
+            pnTipo.add(rbTotal); pnTipo.add(rbLocacao);
+            Object[] msg = { "Onde aplicar o desconto?", pnTipo };
+            int resp = JOptionPane.showConfirmDialog(this, msg, "Tipo de Desconto",
+                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+            if (resp == JOptionPane.OK_OPTION) {
+                descontoNoTotal = rbTotal.isSelected();
+                verificaDesconto(1);
+            }
+            lastDescontoPorc = txtDescontoPorcento.getText().trim();
+            lastDescontoVal = txtDesconto.getText().trim();
+        }
+
         if (motivo != null) {
             // foi dado desistencia
             salvaDesistencia();
@@ -2433,6 +2501,11 @@ public class EncerraQuarto extends javax.swing.JFrame {
     }
 
     private void txtDescontoActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_txtDescontoActionPerformed
+        verificaDesconto(2);
+        txtJustifica.requestFocus();
+    }// GEN-LAST:event_txtDescontoActionPerformed
+
+    private void txtDescontoPorcentoActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_txtDescontoPorcentoActionPerformed
         // Pergunta tipo de desconto antes de calcular
         JRadioButton rbTotal = new JRadioButton("Desconto no Total", descontoNoTotal);
         JRadioButton rbLocacao = new JRadioButton("Desconto só na Locação (quarto)", !descontoNoTotal);
@@ -2445,15 +2518,9 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
         if (resp == JOptionPane.OK_OPTION) {
             descontoNoTotal = rbTotal.isSelected();
-            verificaDesconto(2);
+            verificaDesconto(1);
         }
         txtJustifica.requestFocus();
-    }// GEN-LAST:event_txtDescontoActionPerformed
-
-    private void txtDescontoPorcentoActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_txtDescontoPorcentoActionPerformed
-        verificaDesconto(1);
-        txtJustifica.requestFocus();
-
     }// GEN-LAST:event_txtDescontoPorcentoActionPerformed
 
     public void verificaDesconto(int numero) {
@@ -2462,29 +2529,45 @@ public class EncerraQuarto extends javax.swing.JFrame {
         configGlobal config = configGlobal.getInstance();
         int limiteDesconto = config.getLimiteDesconto();
 
-        // Base de cálculo depende do tipo de desconto
-        float baseCalculo = descontoNoTotal ? valorDivida : (valorQuarto + valorAdicionalPessoa + valorAdicionalPeriodo);
-        if (baseCalculo <= 0) baseCalculo = valorDivida;
+        // Base de cálculo depende do tipo de desconto (usa valores totais estáveis antes do desconto)
+        float valorSomar = valorAcrescimo + valorQuarto + valorConsumo + valorAdicionalPeriodo + valorAdicionalPessoa;
+        float baseCalculo = descontoNoTotal ? valorSomar : (valorQuarto + valorAdicionalPessoa + valorAdicionalPeriodo);
+        if (baseCalculo <= 0) baseCalculo = 1;
 
         if (numero == 1) {
             try {
-                String semPorcentagem = txtDescontoPorcento.getText().replace("%", "");
+                String semPorcentagem = txtDescontoPorcento.getText().replace("%", "").trim().replace(",", ".");
                 valorPorcento = Float.valueOf(semPorcentagem);
+                valorPorcento = Math.round(valorPorcento * 100.0f) / 100.0f; // Limita a 2 casas decimais
+                
                 valorDesconto = (valorPorcento / 100) * baseCalculo;
-                txtDesconto.setText("" + valorDesconto);
+                valorDesconto = Math.round(valorDesconto * 100.0f) / 100.0f; // Limita a 2 casas decimais
+                
+                txtDesconto.setText(String.format(java.util.Locale.US, "%.2f", valorDesconto));
+                txtDescontoPorcento.setText(String.format(java.util.Locale.US, "%.2f%%", valorPorcento));
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(null, "Digite um valor válido");
             }
 
         } else {
-            valorDesconto = Float.valueOf(txtDesconto.getText());
-            valorPorcento = (valorDesconto / baseCalculo) * 100;
-            txtDescontoPorcento.setText(String.format("%.1f%%", valorPorcento));
+            try {
+                String descStr = txtDesconto.getText().trim().replace(",", ".");
+                valorDesconto = Float.valueOf(descStr);
+                valorDesconto = Math.round(valorDesconto * 100.0f) / 100.0f; // Limita a 2 casas decimais
+                
+                valorPorcento = (valorDesconto / baseCalculo) * 100;
+                valorPorcento = Math.round(valorPorcento * 100.0f) / 100.0f; // Limita a 2 casas decimais
+                
+                txtDesconto.setText(String.format(java.util.Locale.US, "%.2f", valorDesconto));
+                txtDescontoPorcento.setText(String.format(java.util.Locale.US, "%.2f%%", valorPorcento));
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "Digite um valor válido");
+            }
         }
 
         if (valorDesconto >= 0) {
             if (config.getCargoUsuario().equals("comum")) {
-                if (valorPorcento < limiteDesconto) {
+                if (valorPorcento <= limiteDesconto) {
                     this.valorDesconto = valorDesconto;
                 } else {
                     JOptionPane.showMessageDialog(null, "Desconto Excede o Permitido");

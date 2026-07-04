@@ -15,6 +15,7 @@ public class ProdutoModerno extends JFrame {
     private JTable tabela;
     private DefaultTableModel tableModel;
     private JButton btNovo, btEditar, btApagar;
+    private JTextField txtBusca;
 
     public ProdutoModerno() {
         initUI();
@@ -32,11 +33,21 @@ public class ProdutoModerno extends JFrame {
         main.setOpaque(false);
 
         // Header Flexível
-        JPanel header = new JPanel(new MigLayout("insets 0, fillx", "[]push[]"));
+        JPanel header = new JPanel(new MigLayout("insets 0, fillx", "[]push[]push[]"));
         header.setOpaque(false);
 
         JLabel lblTitulo = EstiloModerno.criarTitulo("Produtos & Serviços");
         header.add(lblTitulo);
+
+        txtBusca = new JTextField(20);
+        txtBusca.putClientProperty("JTextField.placeholderText", "Pesquisar produto por nome ou categoria...");
+        txtBusca.putClientProperty("JTextField.showClearButton", true);
+        txtBusca.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            public void insertUpdate(javax.swing.event.DocumentEvent e) { carregaTabela(); }
+            public void removeUpdate(javax.swing.event.DocumentEvent e) { carregaTabela(); }
+            public void changedUpdate(javax.swing.event.DocumentEvent e) { carregaTabela(); }
+        });
+        header.add(txtBusca, "width 350!");
 
         btNovo = EstiloModerno.criarBotaoPrincipal("Novo Produto",
                 new ImageIcon(getClass().getResource("/imagens/icon_bot_salvar.png")));
@@ -102,15 +113,18 @@ public class ProdutoModerno extends JFrame {
 
     private void carregaTabela() {
         tableModel.setRowCount(0);
+        String busca = txtBusca != null ? txtBusca.getText().toLowerCase().trim() : "";
         for (vprodutos p : new fprodutos().mostrarProduto()) {
-            tableModel.addRow(new Object[] {
-                    p.getIdProduto(),
-                    p.getCategoria(),
-                    p.getDescricao(),
-                    p.getValor(),
-                    p.getEstoque(),
-                    p.getDataCompra()
-            });
+            if (busca.isEmpty() || p.getDescricao().toLowerCase().contains(busca) || p.getCategoria().toLowerCase().contains(busca)) {
+                tableModel.addRow(new Object[] {
+                        p.getIdProduto(),
+                        p.getCategoria(),
+                        p.getDescricao(),
+                        p.getValor(),
+                        p.getEstoque(),
+                        p.getDataCompra()
+                });
+            }
         }
     }
 

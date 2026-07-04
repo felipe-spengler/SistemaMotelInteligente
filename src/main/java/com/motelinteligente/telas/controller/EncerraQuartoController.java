@@ -120,8 +120,12 @@ public class EncerraQuartoController {
                             
                             // Caso ultrapasse o tempo do período escolhido, cobra adicional
                             if (totalMinutosPassados > p.getTempoMinutos() + 10) {
-                                int sobraMinutos = totalMinutosPassados - p.getTempoMinutos();
-                                int add = (int) Math.ceil(sobraMinutos / 60.0);
+                                int add = 0;
+                                int totalPeriodo = p.getTempoMinutos() + 10;
+                                while (totalMinutosPassados > totalPeriodo) {
+                                    totalPeriodo += 60;
+                                    add++;
+                                }
                                 valorAdicionalPeriodo = (float) add * ocupado.getValorAdicional();
                             }
                             return; // Encontrou o preço exato e os tipos batem, pode parar.
@@ -172,8 +176,12 @@ public class EncerraQuartoController {
 
                 // Horas adicionais (caso ultrapasse o pernoite ou ultimo maior periodo)
                 if (totalMinutosPassados > periodoEncontrado.getTempoMinutos() + 10) {
-                    int sobraMinutos = totalMinutosPassados - periodoEncontrado.getTempoMinutos();
-                    int add = (int) Math.ceil(sobraMinutos / 60.0);
+                    int add = 0;
+                    int totalPeriodo = periodoEncontrado.getTempoMinutos() + 10;
+                    while (totalMinutosPassados > totalPeriodo) {
+                        totalPeriodo += 60;
+                        add++;
+                    }
                     valorAdicionalPeriodo = (float) add * ocupado.getValorAdicional();
                 }
 
