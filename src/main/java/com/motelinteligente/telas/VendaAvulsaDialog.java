@@ -5,6 +5,7 @@ import com.motelinteligente.dados.fprodutos;
 import com.motelinteligente.dados.vfuncionario;
 import com.motelinteligente.telas.controller.TelaPrincipalController;
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -40,17 +41,25 @@ public class VendaAvulsaDialog extends JDialog {
     private String produtoSelecionadoDescricao = "";
     private float produtoSelecionadoValor = 0f;
 
-    private final JComboBox<String> comboTipo;
-    private final JComboBox<String> comboFuncionario;
-    
-    private final JTextField txtProdutoSelecionado;
-    private final JSpinner spinnerQuantidade;
-    private final JLabel lblTotalVenda;
-    private final JComboBox<String> comboPagamento;
-    private final JTextArea txtObservacao;
-    
+    // CardLayout switching
+    private final CardLayout cardLayout;
+    private final JPanel cardsPanel;
+
+    // Step 1 components
     private final JTable tabelaItens;
     private final DefaultTableModel modeloItens;
+    private final JTextField txtProdutoSelecionado;
+    private final JSpinner spinnerQuantidade;
+
+    // Step 2 components
+    private final JComboBox<String> comboTipo;
+    private final JComboBox<String> comboFuncionario;
+    private final JComboBox<String> comboPagamento;
+    private final JTextArea txtObservacao;
+
+    // Bottom panels
+    private final JLabel lblTotalVenda1;
+    private final JLabel lblTotalVenda2;
 
     public VendaAvulsaDialog(JFrame parent, TelaPrincipalController controller) {
         super(parent, "Venda Avulsa", true);
@@ -58,183 +67,194 @@ public class VendaAvulsaDialog extends JDialog {
         this.funcionarios = controller.buscarFuncionarios();
 
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        setSize(780, 520);
+        setSize(650, 480);
         setLocationRelativeTo(parent);
-        setLayout(new BorderLayout(10, 10));
+        setLayout(new BorderLayout());
 
-        JPanel content = new JPanel(new GridBagLayout());
-        content.setBorder(new EmptyBorder(15, 15, 15, 15));
-        content.setBackground(Color.WHITE);
+        cardLayout = new CardLayout();
+        cardsPanel = new JPanel(cardLayout);
+        cardsPanel.setBackground(Color.WHITE);
 
+        // ==========================================
+        // PASSO 1: SELEÇÃO DE PRODUTOS
+        // ==========================================
+        JPanel passo1Panel = new JPanel(new BorderLayout(10, 10));
+        passo1Panel.setBackground(Color.WHITE);
+        passo1Panel.setBorder(new EmptyBorder(15, 15, 15, 15));
+
+        // Topo: Seletor de Produtos
+        JPanel painelSelecao = new JPanel(new GridBagLayout());
+        painelSelecao.setBackground(Color.WHITE);
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(6, 6, 6, 6);
+        gbc.insets = new Insets(5, 5, 5, 5);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.gridx = 0;
-        gbc.gridy = 0;
 
-        content.add(criarTitulo("Dados da Venda"), gbc);
+        gbc.gridx = 0; gbc.gridy = 0;
+        JLabel lblTitulo1 = new JLabel("Passo 1: Adicione os Produtos da Venda");
+        lblTitulo1.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblTitulo1.setForeground(new Color(33, 150, 243));
+        painelSelecao.add(lblTitulo1, gbc);
 
         gbc.gridy++;
-        content.add(new JLabel("Tipo:"), gbc);
-        comboTipo = new JComboBox<>(new String[] {"Cliente", "Funcionário"});
-        comboTipo.addActionListener(e -> atualizarTipoVenda());
-        gbc.gridx = 1;
-        content.add(comboTipo, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy++;
-        content.add(new JLabel("Funcionário:"), gbc);
-        comboFuncionario = new JComboBox<>();
-        comboFuncionario.setEnabled(false);
-        gbc.gridx = 1;
-        content.add(comboFuncionario, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy++;
-        content.add(new JLabel("Produto:"), gbc);
-        JPanel produtoPane = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-        produtoPane.setBackground(Color.WHITE);
-        txtProdutoSelecionado = new JTextField(15);
+        JPanel prodBuscaPane = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        prodBuscaPane.setBackground(Color.WHITE);
+        prodBuscaPane.add(new JLabel("Produto:"));
+        txtProdutoSelecionado = new JTextField(20);
         txtProdutoSelecionado.setEditable(false);
         txtProdutoSelecionado.setBackground(Color.WHITE);
-        produtoPane.add(txtProdutoSelecionado);
-        JButton btnBuscarProduto = new JButton("Buscar");
-        btnBuscarProduto.addActionListener(e -> buscarProduto());
-        produtoPane.add(btnBuscarProduto);
-        gbc.gridx = 1;
-        content.add(produtoPane, gbc);
+        prodBuscaPane.add(txtProdutoSelecionado);
+        JButton btnBuscar = new JButton("Buscar");
+        btnBuscar.addActionListener(e -> buscarProduto());
+        prodBuscaPane.add(btnBuscar);
+        painelSelecao.add(prodBuscaPane, gbc);
 
-        gbc.gridx = 0;
         gbc.gridy++;
-        content.add(new JLabel("Quantidade:"), gbc);
-        JPanel qtdPane = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-        qtdPane.setBackground(Color.WHITE);
+        JPanel qtdAddPane = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        qtdAddPane.setBackground(Color.WHITE);
+        qtdAddPane.add(new JLabel("Quantidade:"));
         spinnerQuantidade = new JSpinner(new SpinnerNumberModel(1, 1, 1000, 1));
-        qtdPane.add(spinnerQuantidade);
+        qtdAddPane.add(spinnerQuantidade);
         JButton btnAdicionar = new JButton("Adicionar Item");
         btnAdicionar.setBackground(new Color(33, 150, 243));
         btnAdicionar.setForeground(Color.WHITE);
         btnAdicionar.addActionListener(e -> adicionarItem());
-        qtdPane.add(btnAdicionar);
-        gbc.gridx = 1;
-        content.add(qtdPane, gbc);
+        qtdAddPane.add(btnAdicionar);
+        painelSelecao.add(qtdAddPane, gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy++;
-        content.add(new JLabel("Forma de Pagamento:"), gbc);
-        comboPagamento = new JComboBox<>(new String[] {"Dinheiro", "Crédito", "Débito", "Pix", "Outro"});
-        gbc.gridx = 1;
-        content.add(comboPagamento, gbc);
+        passo1Panel.add(painelSelecao, BorderLayout.NORTH);
 
-        gbc.gridx = 0;
-        gbc.gridy++;
-        content.add(new JLabel("Observação:"), gbc);
-        txtObservacao = new JTextArea(3, 20);
-        txtObservacao.setLineWrap(true);
-        txtObservacao.setWrapStyleWord(true);
-        txtObservacao.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        txtObservacao.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
-        JScrollPane scrollObs = new JScrollPane(txtObservacao);
-        gbc.gridx = 1;
-        gbc.fill = GridBagConstraints.BOTH;
-        content.add(scrollObs, gbc);
-
-        // Painel Direita (Tabela de Itens Selecionados)
-        JPanel painelTabela = new JPanel(new BorderLayout(5, 5));
-        painelTabela.setBackground(Color.WHITE);
-        painelTabela.setBorder(BorderFactory.createTitledBorder("Itens da Venda"));
-
+        // Centro: Tabela de Itens
         modeloItens = new DefaultTableModel(new Object[] {"ID", "Produto", "Qtd", "Preço Unit.", "Subtotal"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) { return false; }
         };
         tabelaItens = new JTable(modeloItens);
         tabelaItens.setRowHeight(22);
-        
-        // Hide ID column
         tabelaItens.getColumnModel().getColumn(0).setMinWidth(0);
         tabelaItens.getColumnModel().getColumn(0).setMaxWidth(0);
         tabelaItens.getColumnModel().getColumn(0).setWidth(0);
 
-        JScrollPane scrollTabela = new JScrollPane(tabelaItens);
-        painelTabela.add(scrollTabela, BorderLayout.CENTER);
+        JScrollPane scrollItens = new JScrollPane(tabelaItens);
+        scrollItens.setBorder(BorderFactory.createLineBorder(new Color(226, 232, 240)));
+        passo1Panel.add(scrollItens, BorderLayout.CENTER);
 
-        JPanel painelTabelaBotoes = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        painelTabelaBotoes.setBackground(Color.WHITE);
+        // Rodapé Passo 1: Remover Item, Total e Próximo
+        JPanel rodape1 = new JPanel(new BorderLayout());
+        rodape1.setBackground(Color.WHITE);
+
+        JPanel botoesTabela = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 5));
+        botoesTabela.setBackground(Color.WHITE);
         JButton btnRemover = new JButton("Remover Item");
         btnRemover.setBackground(new Color(244, 67, 54));
         btnRemover.setForeground(Color.WHITE);
         btnRemover.addActionListener(e -> removerItemSelecionado());
-        painelTabelaBotoes.add(btnRemover);
-        painelTabela.add(painelTabelaBotoes, BorderLayout.SOUTH);
+        botoesTabela.add(btnRemover);
+        rodape1.add(botoesTabela, BorderLayout.WEST);
 
-        // Layout Geral: Divide a tela entre o formulário de entrada (Oeste) e a tabela (Centro)
-        add(content, BorderLayout.WEST);
-        add(painelTabela, BorderLayout.CENTER);
+        JPanel navegacao1 = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 5));
+        navegacao1.setBackground(Color.WHITE);
+        lblTotalVenda1 = new JLabel("Total: R$ 0,00");
+        lblTotalVenda1.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        lblTotalVenda1.setForeground(new Color(34, 197, 94));
+        navegacao1.add(lblTotalVenda1);
+        JButton btnProximo = new JButton("Avançar >");
+        btnProximo.setBackground(new Color(76, 175, 80));
+        btnProximo.setForeground(Color.WHITE);
+        btnProximo.addActionListener(e -> avancarParaPasso2());
+        navegacao1.add(btnProximo);
+        rodape1.add(navegacao1, BorderLayout.EAST);
 
-        // Painel Sul (Salvar / Total)
-        JPanel painelSul = new JPanel(new BorderLayout());
-        painelSul.setBackground(Color.WHITE);
-        painelSul.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(226, 232, 240)));
+        passo1Panel.add(rodape1, BorderLayout.SOUTH);
+        cardsPanel.add(passo1Panel, "passo1");
 
-        JPanel painelTotal = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 10));
-        painelTotal.setBackground(Color.WHITE);
-        painelTotal.add(new JLabel("TOTAL DA VENDA:"));
-        lblTotalVenda = new JLabel("R$ 0,00");
-        lblTotalVenda.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        lblTotalVenda.setForeground(new Color(34, 197, 94));
-        painelTotal.add(lblTotalVenda);
-        painelSul.add(painelTotal, BorderLayout.WEST);
+        // ==========================================
+        // PASSO 2: DADOS DE PAGAMENTO E FINALIZAÇÃO
+        // ==========================================
+        JPanel passo2Panel = new JPanel(new BorderLayout(15, 15));
+        passo2Panel.setBackground(Color.WHITE);
+        passo2Panel.setBorder(new EmptyBorder(25, 25, 25, 25));
 
-        JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 10));
-        buttons.setBackground(Color.WHITE);
-        JButton btnSalvar = new JButton("Salvar Venda");
-        btnSalvar.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        btnSalvar.setBackground(new Color(76, 175, 80));
-        btnSalvar.setForeground(Color.WHITE);
-        btnSalvar.addActionListener(e -> salvarVendaAvulsa());
-        JButton btnCancelar = new JButton("Cancelar");
-        btnCancelar.addActionListener(e -> dispose());
-        buttons.add(btnCancelar);
-        buttons.add(btnSalvar);
-        painelSul.add(buttons, BorderLayout.EAST);
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBackground(Color.WHITE);
+        GridBagConstraints gbc2 = new GridBagConstraints();
+        gbc2.insets = new Insets(8, 8, 8, 8);
+        gbc2.anchor = GridBagConstraints.WEST;
+        gbc2.fill = GridBagConstraints.HORIZONTAL;
 
-        add(painelSul, BorderLayout.SOUTH);
+        gbc2.gridx = 0; gbc2.gridy = 0;
+        JLabel lblTitulo2 = new JLabel("Passo 2: Informe os Dados de Pagamento");
+        lblTitulo2.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblTitulo2.setForeground(new Color(33, 150, 243));
+        formPanel.add(lblTitulo2, gbc2);
 
-        atualizarTipoVenda();
-    }
+        gbc2.gridy++;
+        formPanel.add(new JLabel("Tipo de Venda:"), gbc2);
+        comboTipo = new JComboBox<>(new String[] {"Cliente", "Funcionário"});
+        comboTipo.addActionListener(e -> atualizarTipoVenda());
+        gbc2.gridx = 1;
+        formPanel.add(comboTipo, gbc2);
 
-    private JLabel criarTitulo(String texto) {
-        label = new JLabel(texto);
-        label.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        label.setForeground(Color.DARK_GRAY);
-        return label;
-    }
-    private JLabel label;
+        gbc2.gridx = 0; gbc2.gridy++;
+        formPanel.add(new JLabel("Funcionário:"), gbc2);
+        comboFuncionario = new JComboBox<>();
+        comboFuncionario.setEnabled(false);
+        gbc2.gridx = 1;
+        formPanel.add(comboFuncionario, gbc2);
 
-    private void atualizarTipoVenda() {
-        boolean isFuncionario = "Funcionário".equals(comboTipo.getSelectedItem());
-        comboFuncionario.setEnabled(isFuncionario);
-        comboFuncionario.removeAllItems();
+        gbc2.gridx = 0; gbc2.gridy++;
+        formPanel.add(new JLabel("Forma de Pagamento:"), gbc2);
+        comboPagamento = new JComboBox<>(new String[] {"Dinheiro", "Crédito", "Débito", "Pix", "Outro"});
+        gbc2.gridx = 1;
+        formPanel.add(comboPagamento, gbc2);
+
+        gbc2.gridx = 0; gbc2.gridy++;
+        formPanel.add(new JLabel("Observação:"), gbc2);
+        txtObservacao = new JTextArea(4, 25);
+        txtObservacao.setLineWrap(true);
+        txtObservacao.setWrapStyleWord(true);
+        txtObservacao.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+        txtObservacao.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        JScrollPane scrollObs = new JScrollPane(txtObservacao);
+        gbc2.gridx = 1;
+        gbc2.fill = GridBagConstraints.BOTH;
+        formPanel.add(scrollObs, gbc2);
+
+        passo2Panel.add(formPanel, BorderLayout.CENTER);
+
+        // Rodapé Passo 2: Voltar, Total e Finalizar
+        JPanel rodape2 = new JPanel(new BorderLayout());
+        rodape2.setBackground(Color.WHITE);
+
+        JPanel navegacao2Back = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 5));
+        navegacao2Back.setBackground(Color.WHITE);
+        JButton btnVoltar = new JButton("< Voltar");
+        btnVoltar.addActionListener(e -> voltarParaPasso1());
+        navegacao2Back.add(btnVoltar);
+        rodape2.add(navegacao2Back, BorderLayout.WEST);
+
+        JPanel navegacao2Next = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 5));
+        navegacao2Next.setBackground(Color.WHITE);
+        lblTotalVenda2 = new JLabel("Total: R$ 0,00");
+        lblTotalVenda2.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        lblTotalVenda2.setForeground(new Color(34, 197, 94));
+        navegacao2Next.add(lblTotalVenda2);
         
-        comboPagamento.removeAllItems();
-        comboPagamento.addItem("Dinheiro");
-        comboPagamento.addItem("Crédito");
-        comboPagamento.addItem("Débito");
-        comboPagamento.addItem("Pix");
-        if (isFuncionario) {
-            comboPagamento.addItem("Adiantamento");
-            if (funcionarios.isEmpty()) {
-                comboFuncionario.addItem("Nenhum funcionário cadastrado");
-                comboFuncionario.setEnabled(false);
-            } else {
-                for (vfuncionario func : funcionarios) {
-                    comboFuncionario.addItem(func.getNomefuncionario());
-                }
-            }
-        }
-        comboPagamento.addItem("Outro");
+        JButton btnFinalizar = new JButton("Finalizar Venda");
+        btnFinalizar.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnFinalizar.setBackground(new Color(76, 175, 80));
+        btnFinalizar.setForeground(Color.WHITE);
+        btnFinalizar.addActionListener(e -> salvarVendaAvulsa());
+        navegacao2Next.add(btnFinalizar);
+        rodape2.add(navegacao2Next, BorderLayout.EAST);
+
+        passo2Panel.add(rodape2, BorderLayout.SOUTH);
+        cardsPanel.add(passo2Panel, "passo2");
+
+        add(cardsPanel, BorderLayout.CENTER);
+        
+        // Inicializar opções
+        atualizarTipoVenda();
     }
 
     private void buscarProduto() {
@@ -295,7 +315,45 @@ public class VendaAvulsaDialog extends JDialog {
         for (int i = 0; i < modeloItens.getRowCount(); i++) {
             total += (Float) modeloItens.getValueAt(i, 4);
         }
-        lblTotalVenda.setText("R$ " + String.format(java.util.Locale.US, "%.2f", total));
+        String formatado = "Total: R$ " + String.format(java.util.Locale.US, "%.2f", total);
+        lblTotalVenda1.setText(formatado);
+        lblTotalVenda2.setText(formatado);
+    }
+
+    private void avancarParaPasso2() {
+        if (modeloItens.getRowCount() == 0) {
+            JOptionPane.showMessageDialog(this, "Adicione pelo menos um produto para continuar.", "Atenção", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        cardLayout.show(cardsPanel, "passo2");
+    }
+
+    private void voltarParaPasso1() {
+        cardLayout.show(cardsPanel, "passo1");
+    }
+
+    private void atualizarTipoVenda() {
+        boolean isFuncionario = "Funcionário".equals(comboTipo.getSelectedItem());
+        comboFuncionario.setEnabled(isFuncionario);
+        comboFuncionario.removeAllItems();
+        
+        comboPagamento.removeAllItems();
+        comboPagamento.addItem("Dinheiro");
+        comboPagamento.addItem("Crédito");
+        comboPagamento.addItem("Débito");
+        comboPagamento.addItem("Pix");
+        if (isFuncionario) {
+            comboPagamento.addItem("Adiantamento");
+            if (funcionarios.isEmpty()) {
+                comboFuncionario.addItem("Nenhum funcionário cadastrado");
+                comboFuncionario.setEnabled(false);
+            } else {
+                for (vfuncionario func : funcionarios) {
+                    comboFuncionario.addItem(func.getNomefuncionario());
+                }
+            }
+        }
+        comboPagamento.addItem("Outro");
     }
 
     private void salvarVendaAvulsa() {

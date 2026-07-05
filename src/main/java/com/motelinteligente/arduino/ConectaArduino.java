@@ -19,6 +19,14 @@ public class ConectaArduino {
     private static final int TIMEOUT_RESPOSTA_MS = 1000;
 
     public ConectaArduino(int valorPortao) {
+        String chamador = "Desconhecido";
+        StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+        if (stack.length > 2) {
+            chamador = stack[2].getClassName() + "." + stack[2].getMethodName() + "(Linha " + stack[2].getLineNumber() + ")";
+        }
+        logger.info("[ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: {}. Chamador: {} (Thread: {})", 
+            valorPortao, chamador, Thread.currentThread().getName());
+
         configGlobal config = configGlobal.getInstance();
         boolean portoesRF = config.getPortoesRF();
 
@@ -184,6 +192,14 @@ public class ConectaArduino {
     }
 
     public static void enviarComandoLuz(int numeroQuarto, boolean ligar) {
+        String chamador = "Desconhecido";
+        StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+        if (stack.length > 2) {
+            chamador = stack[2].getClassName() + "." + stack[2].getMethodName() + "(Linha " + stack[2].getLineNumber() + ")";
+        }
+        logger.info("[ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: {}, Ligar: {}. Chamador: {} (Thread: {})", 
+            numeroQuarto, ligar, chamador, Thread.currentThread().getName());
+
         configGlobal config = configGlobal.getInstance();
         if (config.isFlagArduino() && CacheDados.getArduinoPort() != null) {
             synchronized (ConectaArduino.class) {
