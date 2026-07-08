@@ -155,6 +155,7 @@ public class fcaixa {
                         } else {
                             val.entradaC += valor; // credito, debito, outro
                         }
+                        val.entradaConsumo += valor;
                     }
                 }
             }

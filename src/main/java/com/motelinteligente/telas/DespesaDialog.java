@@ -66,7 +66,7 @@ public class DespesaDialog extends JDialog {
         gbc.gridy++;
         content.add(new JLabel("Categoria:"), gbc);
         comboCategoria = new JComboBox<>(new String[] {
-            "Limpeza", "Manutenção", "Água/Luz/Internet", "Lavanderia", "Aluguel", "Salários", "Outros"
+            "Limpeza", "Manutenção", "Água/Luz/Internet", "Lavanderia", "Aluguel", "Salários", "Reposição Mercadoria", "Cozinha", "Outros"
         });
         gbc.gridx = 1;
         content.add(comboCategoria, gbc);

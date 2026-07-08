@@ -112,7 +112,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private Timer pedidosTimer; // Timer para pedidos online
     private long lastUpdate = 0;
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(TelaPrincipal.class);
-    private EncerraQuarto encerraQuarto;
+    private com.motelinteligente.telas.EncerraQuarto encerraQuarto;
     private CaixaFrameModerno caixaFrame;
     private java.util.Map<Integer, Quadrado> mapaQuadrados = new java.util.HashMap<>();
     private com.motelinteligente.telas.controller.TelaPrincipalController controller;
@@ -219,9 +219,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         this.setVisible(true);
         int idCaixaAtual = new fazconexao().verificaCaixa();
 
-        if (idCaixaAtual == 0) {
-            JOptionPane.showMessageDialog(null, "Precisa Abrir o Caixa!");
-        } else {
+        if (idCaixaAtual > 0) {
             configGlobal configuracao = configGlobal.getInstance();
             configuracao.setCaixa(idCaixaAtual);
         }
@@ -250,7 +248,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         user = ini_user;
 
         lblUsuario.setText(user);
-        lblCargo.setText(cargo);
+        String cargoExibir = "comum".equalsIgnoreCase(cargo) ? "Padrão" : cargo;
+        lblCargo.setText(cargoExibir);
     }
 
     public void focoQuarto() {
@@ -1855,7 +1854,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         // Mostra os quartos inicialmente
         mostraQuartos();
         if (config.getCaixa() == 0) {
-            JOptionPane.showMessageDialog(null, "Precisa abrir o caixa");
             new CaixaFrameModerno().setVisible(true);
         }
 
@@ -2344,8 +2342,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         configGlobal config = configGlobal.getInstance();
         int idCaixa = config.getCaixa();
         if (idCaixa == 0) {
-            new com.motelinteligente.telas.modernas.CaixaFrameModerno().setVisible(true);
             JOptionPane.showMessageDialog(null, "Precisa abrir o caixa!");
+            new com.motelinteligente.telas.modernas.CaixaFrameModerno().setVisible(true);
 
         } else {
             // Abre uma caixa de diálogo de confirmação
@@ -2364,8 +2362,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
     public void abrirEncerraQuarto(int quartoEmFoco, boolean remoto) {
         if (encerraQuarto == null || !encerraQuarto.isVisible()) {
-            // Criar nova instância se não houver tela aberta
-            encerraQuarto = new EncerraQuarto(this, quartoEmFoco);
+            encerraQuarto = new com.motelinteligente.telas.EncerraQuarto(this, quartoEmFoco);
             encerraQuarto.setAbertoRemotamente(remoto);
             encerraQuarto.setVisible(true);
         } else {

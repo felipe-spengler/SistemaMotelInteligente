@@ -351,8 +351,8 @@ public class TelaPrincipalController {
         configGlobal config = configGlobal.getInstance();
         int idCaixa = config.getCaixa();
         if (idCaixa == 0) {
-            new com.motelinteligente.telas.modernas.CaixaFrameModerno().setVisible(true);
             JOptionPane.showMessageDialog(null, "Precisa abrir o caixa!");
+            new com.motelinteligente.telas.modernas.CaixaFrameModerno().setVisible(true);
         } else {
             int confirmacao = JOptionPane.showConfirmDialog(null, "Deseja encerrar o quarto " + quartoEmFoco + "?",
                     "Confirmação", JOptionPane.YES_NO_OPTION);

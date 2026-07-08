@@ -250,17 +250,24 @@ public class ImpressoraService {
         sb.append(String.format("Qtd  Produto              V.Unit  V.Total\n"));
         sb.append("------------------------------------------\n");
 
-        String sql = "SELECT p.descricao, SUM(rv.quantidade) as qtd, rv.valorunidade, SUM(rv.valortotal) as total " +
-                     "FROM registravendido rv " +
-                     "INNER JOIN produtos p ON rv.idproduto = p.idproduto " +
-                     "WHERE rv.idcaixaatual = ? " +
-                     "GROUP BY p.descricao, rv.valorunidade";
+        String sql = "SELECT descricao, SUM(qtd) as qtd, valorunidade, SUM(total) as total FROM (" +
+                     "  SELECT p.descricao, rv.quantidade as qtd, rv.valorunidade, rv.valortotal as total " +
+                     "  FROM registravendido rv " +
+                     "  INNER JOIN produtos p ON rv.idproduto = p.idproduto " +
+                     "  WHERE rv.idcaixaatual = ? " +
+                     "  UNION ALL " +
+                     "  SELECT p.descricao, va.quantidade as qtd, va.valorunidade, va.valortotal as total " +
+                     "  FROM vendas_avulsas va " +
+                     "  INNER JOIN produtos p ON va.idproduto = p.idproduto " +
+                     "  WHERE va.idcaixa = ? " +
+                     ") as combined GROUP BY descricao, valorunidade";
 
         float totalGeral = 0;
 
         try (Connection link = new fazconexao().conectar();
              PreparedStatement stmt = link.prepareStatement(sql)) {
             stmt.setInt(1, idCaixa);
+            stmt.setInt(2, idCaixa);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     String desc = rs.getString("descricao");
@@ -366,6 +373,7 @@ public class ImpressoraService {
             int numeroQuarto, int idLocacao, String dataInicio, String dataFim, String tempoTotalLocado,
             float valorQuarto, float valorAdicionalPessoa, float valorAdicionalPeriodo, float valorConsumo,
             float valorAcrescimo, float valorDesconto, float valoreRecebido, float valorRecebidoAgora,
+            float valD, float valP, float valC,
             DefaultTableModel modelTabela) {
 
         if (!configGlobal.getInstance().isImpressoraAtiva()) return;
@@ -452,6 +460,15 @@ public class ImpressoraService {
         }
         if (valorRecebidoAgora > 0) {
             sb.append(String.format("Pago no Fechamento:        R$ %,.2f\n", valorRecebidoAgora));
+            if (valD > 0) {
+                sb.append(String.format(" -> Em Dinheiro:           R$ %,.2f\n", valD));
+            }
+            if (valP > 0) {
+                sb.append(String.format(" -> Em Pix:                R$ %,.2f\n", valP));
+            }
+            if (valC > 0) {
+                sb.append(String.format(" -> Em Cartao:             R$ %,.2f\n", valC));
+            }
         }
         float aReceber = totalGeral - valoreRecebido - valorRecebidoAgora;
         sb.append(String.format("SALDO RESTANTE:            R$ %,.2f\n", aReceber > 0 ? aReceber : 0));

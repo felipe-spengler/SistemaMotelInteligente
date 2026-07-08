@@ -111,7 +111,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
     private String lastDescontoPorc = "0%";
     float valoreRecebido = 0, valorDivida = 0, valorRecebidoAgora = 0;
     float valorConsumo = 0, valorQuarto = 0, valorAdicionalPeriodo = 0, valorAdicionalPessoa = 0;
-    float valD = 0, valP = 0, valC = 0;
+    float valD = 0, valP = 0, valC = 0, valCredito = 0, valDebito = 0;
     com.motelinteligente.telas.modernas.ClienteEncerraModerno outraTela = new com.motelinteligente.telas.modernas.ClienteEncerraModerno();
     int numeroDoQuarto;
     String motivo = null;
@@ -195,26 +195,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         txtDescontoPorcento.addFocusListener(new java.awt.event.FocusAdapter() {
             @Override
             public void focusLost(java.awt.event.FocusEvent evt) {
-                String val = txtDescontoPorcento.getText().trim();
-                if (!val.equals(lastDescontoPorc)) {
-                    JRadioButton rbTotal = new JRadioButton("Desconto no Total", descontoNoTotal);
-                    JRadioButton rbLocacao = new JRadioButton("Desconto só na Locação (quarto)", !descontoNoTotal);
-                    ButtonGroup bg = new ButtonGroup();
-                    bg.add(rbTotal); bg.add(rbLocacao);
-                    JPanel pnTipo = new JPanel(new java.awt.GridLayout(2, 1, 0, 4));
-                    pnTipo.add(rbTotal); pnTipo.add(rbLocacao);
-                    Object[] msg = { "Onde aplicar o desconto?", pnTipo };
-                    int resp = JOptionPane.showConfirmDialog(EncerraQuarto.this, msg, "Tipo de Desconto",
-                            JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-                    if (resp == JOptionPane.OK_OPTION) {
-                        descontoNoTotal = rbTotal.isSelected();
-                        verificaDesconto(1);
-                    } else {
-                        txtDescontoPorcento.setText(lastDescontoPorc);
-                    }
-                    lastDescontoPorc = txtDescontoPorcento.getText().trim();
-                    lastDescontoVal = txtDesconto.getText().trim();
-                }
+                processaDescontoPorcento();
             }
         });
 
@@ -632,39 +613,17 @@ public class EncerraQuarto extends javax.swing.JFrame {
         );
             
         if (salvar) {
-            // Grava no banco na tabela prevendidos
-            try (java.sql.Connection conn = new com.motelinteligente.dados.fazconexao().conectar()) {
-                conn.setAutoCommit(false);
+            List<vendaProdutos> lista = new ArrayList<>();
+            for (int i = 0; i < qtdLinhas; i++) {
                 try {
-                    // 1. Limpa os pré-vendidos anteriores
-                    try (java.sql.PreparedStatement del = conn.prepareStatement("DELETE FROM prevendidos WHERE idlocacao = ?")) {
-                        del.setInt(1, idLocacao);
-                        del.executeUpdate();
-                    }
-                    
-                    // 2. Insere a lista atual da tabela
-                    if (qtdLinhas > 0) {
-                        try (java.sql.PreparedStatement ins = conn.prepareStatement("INSERT INTO prevendidos (idlocacao, idproduto, quantidade) VALUES (?, ?, ?)")) {
-                            for (int i = 0; i < qtdLinhas; i++) {
-                                int idProd = Integer.parseInt(modelo.getValueAt(i, 0).toString());
-                                int quantidade = Integer.parseInt(modelo.getValueAt(i, 1).toString());
-                                
-                                ins.setInt(1, idLocacao);
-                                ins.setInt(2, idProd);
-                                ins.setInt(3, quantidade);
-                                ins.addBatch();
-                            }
-                            ins.executeBatch();
-                        }
-                    }
-                    conn.commit();
-                } catch (Exception ex) {
-                    conn.rollback();
-                    logger.error("Erro ao salvar prevendidos no fechamento: ", ex);
+                    int idProd = Integer.parseInt(modelo.getValueAt(i, 0).toString());
+                    int quantidade = Integer.parseInt(modelo.getValueAt(i, 1).toString());
+                    lista.add(new vendaProdutos(idProd, quantidade, 0, 0));
+                } catch (Exception e) {
+                    // ignora erros de conversão
                 }
-            } catch (Exception e) {
-                logger.error("Erro de conexao ao salvar prevendidos: ", e);
             }
+            controller.salvarPreVendidos(lista);
         }
     }
 
@@ -1634,17 +1593,23 @@ public class EncerraQuarto extends javax.swing.JFrame {
     }// GEN-LAST:event_txtPessoasActionPerformed
 
     private void setValorDivida() {
-        float valorSomar = valorAcrescimo + valorQuarto + valorConsumo + valorAdicionalPeriodo + valorAdicionalPessoa;
-        valorDivida = valorSomar - valorDesconto;
+        controller.setValorConsumo(valorConsumo);
+        controller.setValorDesconto(valorDesconto);
+        controller.setValorAcrescimo(valorAcrescimo);
+        controller.setValorRecebidoAgora(valorRecebidoAgora);
+
+        valorDivida = controller.calcularDividaTotal();
+        float aReceber = controller.calcularValorAReceber();
+
         txtValorDivida.setText(String.valueOf(valorDivida));
         txtRecebidoAntecipado.setText(String.valueOf(valorRecebidoAgora));
         lblValorQuarto.setText(String.valueOf(valorAdicionalPessoa + valorQuarto));
         lblValorConsumo.setText(String.valueOf(valorConsumo));
-        lblAReceber.setText(String.valueOf(valorDivida - valoreRecebido - valorRecebidoAgora));
+        lblAReceber.setText(String.valueOf(aReceber));
         outraTela.setarValores(valorAdicionalPessoa + valorQuarto, valorAdicionalPeriodo);
         outraTela.setDesconto(valorDesconto);
         outraTela.setAcrescimo(valorAcrescimo);
-        outraTela.setValorTotal(valorDivida - valoreRecebido - valorRecebidoAgora);
+        outraTela.setValorTotal(aReceber);
         outraTela.setConsumo(valorConsumo);
     }
 
@@ -1716,147 +1681,23 @@ public class EncerraQuarto extends javax.swing.JFrame {
     }// GEN-LAST:event_btSalvarActionPerformed
 
     public void salvaJustifica(String tipoValor, float valorSalvar) {
-        Connection link = null;
-        CacheDados cache = CacheDados.getInstancia();
-        if (idLocacao == 0) {
-            idLocacao = cache.getCacheOcupado().get(numeroDoQuarto).getIdLoca();
-            if (idLocacao == 0) {
-                DadosOcupados quartoOcupado = cache.getCacheOcupado().get(numeroDoQuarto);
-                int novoID = new fquartos().getIdLocacao(numeroDoQuarto);
-                idLocacao = novoID;
-
-            }
-        }
-        try {
-            link = new fazconexao().conectar();
-            String consultaSQL = "INSERT INTO justificativa (idlocacao, valor, tipo, justificativa) VALUES (?, ?, ?, ?)";
-            PreparedStatement statement = link.prepareStatement(consultaSQL);
-            System.out.println("");
-            statement.setInt(1, idLocacao);
-            statement.setFloat(2, valorSalvar);
-            statement.setString(3, tipoValor);
-            statement.setString(4, txtJustifica.getText());
-
-            int n = statement.executeUpdate();
-
-            if (n != 0) {
-                link.close();
-                statement.close();
-
-            } else {
-                link.close();
-                statement.close();
-                JOptionPane.showMessageDialog(null, "Erro ao salvar Justificativa! Infome ao Suporte do Sistema!");
-            }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "SEVERAL ERROR: Justificativa! Infome ao Suporte do Sistema!");
-
-        } finally {
-            try {
-                // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
-                if (link != null && !link.isClosed()) {
-                    link.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+        boolean sucesso = controller.salvarJustificativa(tipoValor, valorSalvar, txtJustifica.getText());
+        if (!sucesso) {
+            JOptionPane.showMessageDialog(null, "Erro ao salvar Justificativa! Infome ao Suporte do Sistema!");
         }
     }
 
     public void salvaDesistencia() {
-        configGlobal config = configGlobal.getInstance();
-        int idCaixa = config.getCaixa();
-        fquartos quartodao = new fquartos();
-        CacheDados cache = CacheDados.getInstancia();
-        if (idLocacao == 0) {
-            idLocacao = cache.getCacheOcupado().get(numeroDoQuarto).getIdLoca();
-            if (idLocacao == 0) {
-                DadosOcupados quartoOcupado = cache.getCacheOcupado().get(numeroDoQuarto);
-                int novoID = new fquartos().getIdLocacao(numeroDoQuarto);
-                idLocacao = novoID;
-
+        boolean sucesso = controller.registrarDesistencia(motivo);
+        if (sucesso) {
+            JOptionPane.showMessageDialog(null, "Desistencia Salva! ");
+            outraTela.dispose();
+            if (principal != null) {
+                SwingUtilities.invokeLater(() -> principal.mostraQuartos());
             }
-        }
-        String horaFim = dataFim;
-        String horaInicio = dataInicio;
-        Connection link = null;
-        try {
-            link = new fazconexao().conectar();
-            String consultaSQL = "INSERT INTO desistencia (numquarto, horainicio, horafim, motivo, idcaixaatual) VALUES (?, ?, ? , ? , ?)";
-            PreparedStatement statement = link.prepareStatement(consultaSQL);
-            statement.setInt(1, numeroDoQuarto);
-            statement.setTimestamp(2, Timestamp.valueOf(horaInicio));
-            statement.setTimestamp(3, Timestamp.valueOf(horaFim));
-            statement.setString(4, motivo);
-            statement.setInt(5, idCaixa);
-
-            int n = statement.executeUpdate();
-
-            if (n != 0) {
-                link.close();
-                statement.close();
-                JOptionPane.showMessageDialog(null, "Desistencia Salva! ");
-                excluiDaRegistraLocado(idLocacao);
-                // altera o status do quarto para limpeza
-                mudaStatusNaCache(numeroDoQuarto, "limpeza");
-                // retira da cache ocupados
-                cache.getCacheOcupado().remove(numeroDoQuarto);
-                quartodao.setStatus(numeroDoQuarto, "limpeza");
-                quartodao.adicionaRegistro(numeroDoQuarto, "limpeza");
-                config.setMudanca(true);
-                outraTela.dispose();
-                if (principal != null) {
-                    SwingUtilities.invokeLater(() -> principal.mostraQuartos());
-                }
-                this.dispose();
-            } else {
-                link.close();
-                statement.close();
-                JOptionPane.showMessageDialog(null, "Erro ao salvar Desistencia! Infome ao Suporte do Sistema!");
-            }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "SEVERAL ERROR: Desistencia! Infome ao Suporte do Sistema!");
-
-        } finally {
-            try {
-                // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
-                if (link != null && !link.isClosed()) {
-                    link.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public void excluiDaRegistraLocado(int idLocacao) {
-        Connection link = null;
-        try {
-            link = new fazconexao().conectar();
-            String consultaSQL = "DELETE FROM registralocado WHERE idlocacao = ?";
-            PreparedStatement statement = link.prepareStatement(consultaSQL);
-            statement.setInt(1, idLocacao);
-            int n = statement.executeUpdate();
-
-            if (n != 0) {
-
-            } else {
-                JOptionPane.showMessageDialog(null,
-                        "Nenhum registro encontrado para exclusão na tabela registralocado!");
-            }
-            statement.close();
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null,
-                    "Erro ao excluir registro de locação na tabela registralocado! Informe ao Suporte do Sistema!");
-        } finally {
-            try {
-                // Certifique-se de que a conexão seja encerrada mesmo se ocorrerem exceções
-                if (link != null && !link.isClosed()) {
-                    link.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            this.dispose();
+        } else {
+            JOptionPane.showMessageDialog(null, "Erro ao salvar Desistencia! Infome ao Suporte do Sistema!");
         }
     }
 
@@ -2199,9 +2040,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 valD = recebidoDin[0];
                 valC = recebidoCredito[0] + recebidoDebito[0];
                 valP = recebidoPix[0];
-                if (valC > 0) {
-                    salvaCartao(idLocacao, recebidoCredito[0], recebidoDebito[0]);
-                }
+                valCredito = recebidoCredito[0];
+                valDebito = recebidoDebito[0];
                 sucesso[0] = true; // Indica que o pagamento foi bem-sucedido
                 dialog.dispose(); // Fecha o JDialog
             } else {
@@ -2218,26 +2058,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         return sucesso[0]; // Retorna o status de sucesso do pagamento
     }
 
-    public void salvaCartao(int idLocacao, float recebidoCredito, float recebidoDebito) {
-        String consultaSQL = "INSERT INTO valorcartao (idlocacao, valorcredito, valordebito) VALUES (?, ?, ?)";
 
-        try (Connection link = new fazconexao().conectar();
-                PreparedStatement statement = link.prepareStatement(consultaSQL)) {
-
-            statement.setInt(1, idLocacao);
-            statement.setFloat(2, recebidoCredito);
-            statement.setFloat(3, recebidoDebito);
-
-            int n = statement.executeUpdate();
-            if (n == 0) {
-                JOptionPane.showMessageDialog(null, "Nenhum registro foi inserido.", "Erro", JOptionPane.ERROR_MESSAGE);
-            }
-
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Erro ao salvar o cartão: " + e.getMessage(), "Erro",
-                    JOptionPane.ERROR_MESSAGE);
-        }
-    }
 
     private void resetarBotoes(JButton... botoes) {
         Dimension buttonSize = new Dimension(120, 40);
@@ -2321,7 +2142,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         final float snapshotAntecipado = totalAntecipadoSoma;
 
         controller.setValorConsumo(valorConsumo);
-        controller.salvarLocacao(produtosParaSalvar, valD, valP, valC, 0);
+        controller.salvarLocacao(produtosParaSalvar, valD, valP, valCredito, valDebito);
 
         outraTela.dispose();
         if (principal != null) {
@@ -2360,6 +2181,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 snapshotQuarto, snapshotLocacao, snapshotInicio, snapshotFim, snapshotTempo,
                 snapshotQuartoVal, snapshotPessoa, snapshotPeriodo, snapshotConsumo,
                 snapshotAcrescimo, snapshotDesconto, snapshotAntecipado, snapshotRecebidoAgora,
+                snapshotValD, snapshotValP, snapshotValC,
                 modelCopia
             );
             JOptionPane.showMessageDialog(dialog, "Extrato enviado para a impressora!");
@@ -2465,27 +2287,18 @@ public class EncerraQuarto extends javax.swing.JFrame {
     }// GEN-LAST:event_btConferenciaActionPerformed
 
     private void btDesistenciaActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btDesistenciaActionPerformed
-        // verifica o tempo que está locado
-
-        String[] partes = tempoTotalLocado.split(":");
-        int horas = Integer.parseInt(partes[0]);
-        int minutos = Integer.parseInt(partes[1]);
-        configGlobal config = configGlobal.getInstance();
-        String cargo = config.getCargoUsuario();
-
-        if (horas == 0 && minutos <= 10) {
-            // da tempo de fazer desistencia
+        if (controller.podeFazerDesistencia()) {
             fazDesistencia();
-        } else {
-            if (cargo.equals("gerente") || cargo.equals("admin")) {
-                fazDesistencia();
+            String[] partes = tempoTotalLocado.split(":");
+            int horas = Integer.parseInt(partes[0]);
+            int minutos = Integer.parseInt(partes[1]);
+            if (!(horas == 0 && minutos <= 10)) {
                 lblAReceber.setText("0.00");
-            } else {
-                JOptionPane.showMessageDialog(null,
-                        "Seu cargo não possui permissão para essa desistência! Contacte um gerente.");
             }
+        } else {
+            JOptionPane.showMessageDialog(null,
+                    "Seu cargo não possui permissão para essa desistência! Contacte um gerente.");
         }
-
     }// GEN-LAST:event_btDesistenciaActionPerformed
 
     public void fazDesistencia() {
@@ -2505,21 +2318,53 @@ public class EncerraQuarto extends javax.swing.JFrame {
         txtJustifica.requestFocus();
     }// GEN-LAST:event_txtDescontoActionPerformed
 
-    private void txtDescontoPorcentoActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_txtDescontoPorcentoActionPerformed
-        // Pergunta tipo de desconto antes de calcular
+    private void processaDescontoPorcento() {
+        String val = txtDescontoPorcento.getText().trim();
+        if (val.equals(lastDescontoPorc)) {
+            return;
+        }
+
+        // Armazena os valores anteriores
+        String oldPorc = lastDescontoPorc;
+        String oldVal = lastDescontoVal;
+
+        // Atualiza para evitar re-entrada recursiva/duplicação no focusLost
+        lastDescontoPorc = val;
+
         JRadioButton rbTotal = new JRadioButton("Desconto no Total", descontoNoTotal);
         JRadioButton rbLocacao = new JRadioButton("Desconto só na Locação (quarto)", !descontoNoTotal);
+        rbTotal.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 14));
+        rbLocacao.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 14));
+        rbTotal.setFocusPainted(false);
+        rbLocacao.setFocusPainted(false);
+
         ButtonGroup bg = new ButtonGroup();
-        bg.add(rbTotal); bg.add(rbLocacao);
-        JPanel pnTipo = new JPanel(new java.awt.GridLayout(2, 1, 0, 4));
-        pnTipo.add(rbTotal); pnTipo.add(rbLocacao);
+        bg.add(rbTotal);
+        bg.add(rbLocacao);
+
+        JPanel pnTipo = new JPanel(new java.awt.GridLayout(2, 1, 0, 8));
+        pnTipo.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        pnTipo.add(rbTotal);
+        pnTipo.add(rbLocacao);
+
         Object[] msg = { "Onde aplicar o desconto?", pnTipo };
-        int resp = JOptionPane.showConfirmDialog(this, msg, "Tipo de Desconto",
+        int resp = JOptionPane.showConfirmDialog(EncerraQuarto.this, msg, "Tipo de Desconto",
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+
         if (resp == JOptionPane.OK_OPTION) {
             descontoNoTotal = rbTotal.isSelected();
             verificaDesconto(1);
+            lastDescontoPorc = txtDescontoPorcento.getText().trim();
+            lastDescontoVal = txtDesconto.getText().trim();
+        } else {
+            txtDescontoPorcento.setText(oldPorc);
+            lastDescontoPorc = oldPorc;
+            lastDescontoVal = oldVal;
         }
+    }
+
+    private void txtDescontoPorcentoActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_txtDescontoPorcentoActionPerformed
+        processaDescontoPorcento();
         txtJustifica.requestFocus();
     }// GEN-LAST:event_txtDescontoPorcentoActionPerformed
 
@@ -3031,6 +2876,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
             numeroDoQuarto, idLocacao, dataInicio, dataFim, tempoTotalLocado,
             valorQuarto, valorAdicionalPessoa, valorAdicionalPeriodo, valorConsumo,
             valorAcrescimo, valorDesconto, valorAntecipadoSoma, valorRecebidoAgora,
+            valD, valP, valC,
             (DefaultTableModel) tabela.getModel()
         );
         JOptionPane.showMessageDialog(this, "Extrato de locação enviado para a impressora!");
@@ -3051,6 +2897,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
             numeroDoQuarto, idLocacao, dataInicio, dataFim, tempoTotalLocado,
             valorQuarto, valorAdicionalPessoa, valorAdicionalPeriodo, valorConsumo,
             valorAcrescimo, valorDesconto, valorAntecipadoSoma, valorRecebidoAgora,
+            valD, valP, valC,
             (DefaultTableModel) tabela.getModel()
         );
     }

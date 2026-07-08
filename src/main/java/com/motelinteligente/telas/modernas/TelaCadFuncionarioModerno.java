@@ -63,7 +63,7 @@ public class TelaCadFuncionarioModerno extends JFrame {
         cardForm.add(txtLogin);
 
         cardForm.add(EstiloModerno.criarLabel("Cargo"));
-        comboCargo = new JComboBox<>(new String[] { "comum", "gerente", "admin" });
+        comboCargo = new JComboBox<>(new String[] { "Padrão", "gerente", "admin" });
         comboCargo.setBackground(Color.WHITE);
         cardForm.add(comboCargo);
 
@@ -154,8 +154,9 @@ public class TelaCadFuncionarioModerno extends JFrame {
         ffuncionario func = new ffuncionario();
         tableModel.setRowCount(0);
         for (vfuncionario q : func.mostrar()) {
+            String cargoExibir = "comum".equalsIgnoreCase(q.getCargofuncionario()) ? "Padrão" : q.getCargofuncionario();
             tableModel
-                    .addRow(new Object[] { q.getNomefuncionario(), q.getCargofuncionario(), q.getLoginfuncionario() });
+                    .addRow(new Object[] { q.getNomefuncionario(), cargoExibir, q.getLoginfuncionario() });
         }
     }
 
@@ -164,7 +165,8 @@ public class TelaCadFuncionarioModerno extends JFrame {
         String login = txtLogin.getText().trim();
         String senha1 = new String(txtSenha1.getPassword());
         String senha2 = new String(txtSenha2.getPassword());
-        String cargo = (String) comboCargo.getSelectedItem();
+        String cargoExibir = (String) comboCargo.getSelectedItem();
+        String cargo = "Padrão".equals(cargoExibir) ? "comum" : cargoExibir;
 
         if (nome.isEmpty() || login.isEmpty()) {
             EstiloModerno.mensagemAviso(this, "Atenção", "Preencha Nome e Login!");
@@ -230,9 +232,10 @@ public class TelaCadFuncionarioModerno extends JFrame {
             return;
 
         String nome = (String) tabelaFunc.getValueAt(row, 0);
-        String cargo = (String) tabelaFunc.getValueAt(row, 1);
+        String cargoExibir = (String) tabelaFunc.getValueAt(row, 1);
         String login = (String) tabelaFunc.getValueAt(row, 2);
 
+        String cargo = "Padrão".equals(cargoExibir) ? "comum" : cargoExibir;
         ffuncionario funcDao = new ffuncionario();
         int id = funcDao.getIdFuncionario(nome, cargo, login);
 

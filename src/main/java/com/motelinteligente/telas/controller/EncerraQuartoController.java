@@ -340,6 +340,10 @@ public class EncerraQuartoController {
         this.valorConsumo = valorConsumo;
     }
 
+    public float getValorConsumo() {
+        return valorConsumo;
+    }
+
     public void setValorRecebidoAgora(float valor) {
         this.valorRecebidoAgora = valor;
     }
@@ -409,7 +413,10 @@ public class EncerraQuartoController {
             prodDao.diminuiEstoque(vp.idProduto, vp.quantidade);
         }
 
-        // 2. Salvar Cartão JA FOI FEITO NA VIEW (EncerraQuarto.java)
+        // 2. Salvar Cartão
+        if (pagoCredito > 0 || pagoDebito > 0) {
+            salvaCartao(idLocacao, pagoCredito, pagoDebito);
+        }
 
         // 3. Salvar Justificativa Se Houver
         // (A view deve chamar salvaJustifica separadamente ou passamos o texto aqui?
@@ -437,7 +444,7 @@ public class EncerraQuartoController {
         configGlobal.getInstance().setMudanca(true);
     }
 
-    public void registrarDesistencia(String motivo) {
+    public boolean registrarDesistencia(String motivo) {
         configGlobal config = configGlobal.getInstance();
         int idCaixa = config.getCaixa();
         fquartos quartodao = new fquartos();
@@ -465,9 +472,12 @@ public class EncerraQuartoController {
                 quartodao.setStatus(numeroDoQuarto, "limpeza");
                 quartodao.adicionaRegistro(numeroDoQuarto, "limpeza");
                 config.setMudanca(true);
+                return true;
             }
+            return false;
         } catch (Exception e) {
             logger.error("Erro ao registrar desistência", e);
+            return false;
         }
     }
 
@@ -507,6 +517,23 @@ public class EncerraQuartoController {
         }
     }
 
+    public void salvaCartao(int idLocacao, float recebidoCredito, float recebidoDebito) {
+        String consultaSQL = "INSERT INTO valorcartao (idlocacao, valorcredito, valordebito) VALUES (?, ?, ?)";
+
+        try (Connection link = new fazconexao().conectar();
+                PreparedStatement statement = link.prepareStatement(consultaSQL)) {
+
+            statement.setInt(1, idLocacao);
+            statement.setFloat(2, recebidoCredito);
+            statement.setFloat(3, recebidoDebito);
+
+            statement.executeUpdate();
+        } catch (Exception e) {
+            logger.error("Erro ao salvar o cartão: ", e);
+        }
+    }
+
+
     // Verifica permissão para desistência
     public boolean podeFazerDesistencia() {
         if (tempoTotalLocado == null)
@@ -524,5 +551,40 @@ public class EncerraQuartoController {
 
         String cargo = configGlobal.getInstance().getCargoUsuario();
         return cargo.equals("gerente") || cargo.equals("admin");
+    }
+
+    public boolean salvarPreVendidos(List<vendaProdutos> produtos) {
+        try (Connection conn = new fazconexao().conectar()) {
+            conn.setAutoCommit(false);
+            try {
+                // 1. Limpa os pré-vendidos anteriores
+                try (PreparedStatement del = conn.prepareStatement("DELETE FROM prevendidos WHERE idlocacao = ?")) {
+                    del.setInt(1, idLocacao);
+                    del.executeUpdate();
+                }
+                
+                // 2. Insere a lista atual
+                if (produtos != null && !produtos.isEmpty()) {
+                    try (PreparedStatement ins = conn.prepareStatement("INSERT INTO prevendidos (idlocacao, idproduto, quantidade) VALUES (?, ?, ?)")) {
+                        for (vendaProdutos vp : produtos) {
+                            ins.setInt(1, idLocacao);
+                            ins.setInt(2, vp.idProduto);
+                            ins.setInt(3, vp.quantidade);
+                            ins.addBatch();
+                        }
+                        ins.executeBatch();
+                    }
+                }
+                conn.commit();
+                return true;
+            } catch (Exception ex) {
+                conn.rollback();
+                logger.error("Erro ao salvar prevendidos no fechamento: ", ex);
+                return false;
+            }
+        } catch (Exception e) {
+            logger.error("Erro de conexao ao salvar prevendidos: ", e);
+            return false;
+        }
     }
 }

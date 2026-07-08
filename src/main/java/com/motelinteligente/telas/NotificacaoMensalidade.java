@@ -83,13 +83,13 @@ public class NotificacaoMensalidade extends JDialog {
         btnFechar.addActionListener(e -> dispose());
         content.add(btnFechar);
 
-        // Auto-fechar após 20 segundos
+        // Auto-fechar após 20 minutos
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
                 dispose();
             }
-        }, 20000);
+        }, 600000);
 
         // Permitir fechar clicando no canto
         JLabel closeBtn = new JLabel("X");

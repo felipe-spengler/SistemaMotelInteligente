@@ -34,6 +34,7 @@ public class CadastraProdutoModerno extends JDialog {
     private JTextField txtCEST;
     private JTextField txtCSOSN;
     private boolean atualizar = false;
+    private JButton btnSalvar;
 
     public CadastraProdutoModerno(Window parent, int idPassado) { // Aceita Window (JFrame ou JDialog)
         super(parent, ModalityType.APPLICATION_MODAL);
@@ -141,7 +142,7 @@ public class CadastraProdutoModerno extends JDialog {
         JButton btnVoltar = EstiloModerno.criarBotaoSecundario("Cancelar", null);
         btnVoltar.addActionListener(e -> dispose());
 
-        JButton btnSalvar = EstiloModerno.criarBotaoPrincipal(atualizar ? "Salvar Alterações" : "Cadastrar Produto",
+        btnSalvar = EstiloModerno.criarBotaoPrincipal(atualizar ? "Salvar Alterações" : "Cadastrar Produto",
                 null);
         btnSalvar.addActionListener(e -> salvarProduto());
 
@@ -157,17 +158,17 @@ public class CadastraProdutoModerno extends JDialog {
         vprodutos produto = new fprodutos().getProduto(id);
         if (produto != null) {
             txtId.setText(String.valueOf(id));
-            txtDescricao.setText(produto.getDescricao());
+            txtDescricao.setText(produto.getDescricao() != null ? produto.getDescricao() : "");
             txtValor.setText(String.valueOf(produto.getValor()));
-            txtEstoque.setText(String.valueOf(produto.getEstoque()));
+            txtEstoque.setText(produto.getEstoque() != null ? produto.getEstoque() : "-");
             txtCategoria.setText(produto.getCategoria() != null ? produto.getCategoria() : "Diversos");
-            txtImagem.setText(produto.getImagem());
-            txtDetalhes.setText(produto.getDetalhes());
+            txtImagem.setText(produto.getImagem() != null ? produto.getImagem() : "");
+            txtDetalhes.setText(produto.getDetalhes() != null ? produto.getDetalhes() : "");
             txtNCM.setText(produto.getNcm() != null ? produto.getNcm() : "");
             txtCEST.setText(produto.getCest() != null ? produto.getCest() : "");
             txtCSOSN.setText(produto.getCsosn() != null ? produto.getCsosn() : "");
 
-            if (!produto.getEstoque().equals("-")) {
+            if (produto.getEstoque() != null && !produto.getEstoque().equals("-")) {
                 chkControlarEstoque.setSelected(true);
                 txtEstoque.setEnabled(true);
             } else {
@@ -180,6 +181,9 @@ public class CadastraProdutoModerno extends JDialog {
 
             atualizar = true;
             setTitle("Editar Produto");
+            if (btnSalvar != null) {
+                btnSalvar.setText("Salvar Alterações");
+            }
         }
     }
 

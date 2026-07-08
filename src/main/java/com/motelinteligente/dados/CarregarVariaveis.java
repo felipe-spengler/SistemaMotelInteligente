@@ -67,6 +67,12 @@ public class CarregarVariaveis {
         } catch (IOException e) {
             System.err.println("Erro ao carregar o arquivo de propriedades: " + filePath);
             e.printStackTrace();
+            JOptionPane.showMessageDialog(null, 
+                "Arquivo de configuração não encontrado ou ilegível!\n" +
+                "Caminho esperado: " + filePath + "\n\n" +
+                "Por favor, insira o arquivo 'application.properties' com as credenciais de banco e login no diretório acima.", 
+                "Erro de Configuração", 
+                JOptionPane.ERROR_MESSAGE);
             throw new RuntimeException("Erro ao carregar o arquivo de propriedades.", e);
         }
     }

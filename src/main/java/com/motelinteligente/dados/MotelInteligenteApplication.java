@@ -80,26 +80,60 @@ class Agendamentos {
 
     private static final Logger logger = LoggerFactory.getLogger(Agendamentos.class);
 
-    // 1. Injete a dependência da classe DatabaseSynchronizer
     @Autowired
     private DatabaseSynchronizer databaseSynchronizer;
     @Autowired
     private TelaSistemaModerno telaSistema;
 
-    @Scheduled(cron = "0 0 3 * * ?")
-    public void agendarTresDaManha() {
-        logger.info("Executando tarefas agendadas das 03:00.");
+    @Scheduled(cron = "0 0 14 * * ?")
+    public void agendarDuranteDia() {
+        logger.info("Executando tarefas agendadas das 14:00.");
         try {
             databaseSynchronizer.sincronizarBanco(null);
             if (telaSistema.temNovaVersaoDisponivel()) {
                 SwingUtilities.invokeLater(() -> {
-                    telaSistema.setVisible(true);
-                    telaSistema.iniciarVerificacao();
+                    exibirPromptAtualizacao();
                 });
             }
         } catch (Exception e) {
             logger.error("Erro nas tarefas agendadas: " + e.getMessage());
         }
+    }
+
+    private void exibirPromptAtualizacao() {
+        Object[] options = {"Atualizar Agora", "Atualizar em 5 Minutos"};
+        
+        int escolha = JOptionPane.showOptionDialog(
+            null,
+            "Uma nova atualização do sistema está disponível.\nDeseja atualizar agora ou aguardar 5 minutos?",
+            "Atualização do Sistema",
+            JOptionPane.YES_NO_CANCEL_OPTION,
+            JOptionPane.QUESTION_MESSAGE,
+            null,
+            options,
+            options[0]
+        );
+
+        if (escolha == JOptionPane.YES_OPTION) {
+            iniciarAtualizacao();
+        } else {
+            // Qualquer outra escolha (5 Minutos, Cancelar ou Fechar o diálogo no "X")
+            // agenda o timer de 5 minutos
+            javax.swing.Timer timer = new javax.swing.Timer(300000, e -> iniciarAtualizacao());
+            timer.setRepeats(false);
+            timer.start();
+            JOptionPane.showMessageDialog(
+                null,
+                "A atualização foi adiada em 5 minutos. O sistema atualizará automaticamente após esse período.",
+                "Atualização Agendada",
+                JOptionPane.INFORMATION_MESSAGE
+            );
+        }
+    }
+
+    private void iniciarAtualizacao() {
+        telaSistema.setVisible(true);
+        telaSistema.iniciarVerificacao();
     }
 
 }
