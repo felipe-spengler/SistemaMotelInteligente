@@ -201,7 +201,7 @@ public class ConectaArduino {
             numeroQuarto, ligar, chamador, Thread.currentThread().getName());
 
         configGlobal config = configGlobal.getInstance();
-        if (config.isFlagArduino() && CacheDados.getArduinoPort() != null) {
+        if (config.isFlagArduino() && config.isLuzAtiva() && CacheDados.getArduinoPort() != null) {
             synchronized (ConectaArduino.class) {
                 String cmd = "LUZ-" + (ligar ? "ON" : "OFF") + "-" + numeroQuarto + "\n";
                 try {

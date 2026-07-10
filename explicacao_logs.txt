@@ -1,0 +1,609 @@
+=====================================================================
+        RELATÓRIO EXPLICAÇÃO DOS ACIONAMENTOS DE PORTÕES E LUZES     
+=====================================================================
+
+Olá! Analisei os logs do sistema e montei a seguinte explicação dos
+acionamentos de portões e luzes para cada situação:
+
+--- FLUXOS DETECTADOS NOS LOGS ---
+
+[HORÁRIO: 2026-07-08 11:46:01.353]
+  * Chamador / Motivo: lambda$executaIniciar$0 (Instanciou acionamento do portão 2)
+  * Portões Acionados: Portão do Quarto 2
+  * Luzes Controladas: Luz do Quarto 2 -> Comando: LIGAR
+    -> Transmissão RF enviada: Código 190245525
+
+[HORÁRIO: 2026-07-08 11:46:02.566]
+  * Chamador / Motivo: lambda$executaIniciar$0 (Instanciou acionamento do portão 888)
+  * Portões Acionados: Portão de ENTRADA (888)
+
+[HORÁRIO: 2026-07-08 11:46:03.278]
+    -> Transmissão RF enviada: Código 168753845
+
+[HORÁRIO: 2026-07-08 11:46:11.146]
+  * Chamador / Motivo: lambda$executaIniciar$0 (Instanciou acionamento do portão 3)
+  * Portões Acionados: Portão do Quarto 3
+  * Luzes Controladas: Luz do Quarto 3 -> Comando: LIGAR
+    -> Transmissão RF enviada: Código 190245557
+
+[HORÁRIO: 2026-07-08 11:46:12.359]
+  * Chamador / Motivo: lambda$executaIniciar$0 (Instanciou acionamento do portão 888)
+  * Portões Acionados: Portão de ENTRADA (888)
+
+[HORÁRIO: 2026-07-08 11:46:13.071]
+    -> Transmissão RF enviada: Código 168753845
+
+[HORÁRIO: 2026-07-08 11:46:15.586]
+  * Chamador / Motivo: lambda$executaIniciar$0 (Instanciou acionamento do portão 4)
+  * Portões Acionados: Portão do Quarto 4
+  * Luzes Controladas: Luz do Quarto 4 -> Comando: LIGAR
+    -> Transmissão RF enviada: Código 170651413
+
+[HORÁRIO: 2026-07-08 11:46:16.795]
+  * Chamador / Motivo: lambda$executaIniciar$0 (Instanciou acionamento do portão 888)
+  * Portões Acionados: Portão de ENTRADA (888)
+
+[HORÁRIO: 2026-07-08 11:46:17.507]
+    -> Transmissão RF enviada: Código 168753845
+
+[HORÁRIO: 2026-07-08 11:46:42.077]
+  * Luzes Controladas: Luz do Quarto 4 -> Comando: DESLIGAR
+
+[HORÁRIO: 2026-07-08 11:47:05.861]
+  * Luzes Controladas: Luz do Quarto 2 -> Comando: DESLIGAR
+
+[HORÁRIO: 2026-07-08 11:47:23.183]
+  * Luzes Controladas: Luz do Quarto 3 -> Comando: DESLIGAR
+
+[HORÁRIO: 2026-07-08 11:55:36.458]
+  * Chamador / Motivo: lambda$jButton4ActionPerformed$13 (Instanciou acionamento do portão 11)
+  * Portões Acionados: Portão do Quarto 11
+    -> Transmissão RF enviada: Código 170090517
+
+[HORÁRIO: 2026-07-08 11:55:44.505]
+  * Chamador / Motivo: lambda$jButton4ActionPerformed$13 (Instanciou acionamento do portão 11)
+  * Portões Acionados: Portão do Quarto 11
+    -> Transmissão RF enviada: Código 170090517
+
+[HORÁRIO: 2026-07-08 11:56:51.830]
+  * Chamador / Motivo: salvarLocacao (Instanciou acionamento do portão 999)
+  * Portões Acionados: Portão de SAÍDA (999)
+    -> Transmissão RF enviada: Código 168095317
+
+[HORÁRIO: 2026-07-08 11:56:52.224]
+  * Luzes Controladas: Luz do Quarto 11 -> Comando: DESLIGAR
+
+[HORÁRIO: 2026-07-08 12:00:56.765]
+  * Chamador / Motivo: lambda$jButton4ActionPerformed$13 (Instanciou acionamento do portão 11)
+  * Portões Acionados: Portão do Quarto 11
+    -> Transmissão RF enviada: Código 170090517
+
+[HORÁRIO: 2026-07-08 12:01:00.661]
+  * Chamador / Motivo: lambda$jButton4ActionPerformed$13 (Instanciou acionamento do portão 10)
+  * Portões Acionados: Portão do Quarto 10
+    -> Transmissão RF enviada: Código 135674005
+
+[HORÁRIO: 2026-07-08 12:01:17.342]
+  * Chamador / Motivo: lambda$jButton3ActionPerformed$20 (Instanciou acionamento do portão 999)
+  * Portões Acionados: Portão de SAÍDA (999)
+    -> Transmissão RF enviada: Código 168095317
+
+[HORÁRIO: 2026-07-08 12:02:23.414]
+  * Chamador / Motivo: lambda$executaIniciar$0 (Instanciou acionamento do portão 8)
+  * Portões Acionados: Portão do Quarto 8
+  * Luzes Controladas: Luz do Quarto 8 -> Comando: LIGAR
+    -> Transmissão RF enviada: Código 176870437
+
+[HORÁRIO: 2026-07-08 12:02:24.630]
+  * Chamador / Motivo: lambda$executaIniciar$0 (Instanciou acionamento do portão 888)
+  * Portões Acionados: Portão de ENTRADA (888)
+
+[HORÁRIO: 2026-07-08 12:02:25.341]
+    -> Transmissão RF enviada: Código 168753845
+
+[HORÁRIO: 2026-07-08 12:02:44.333]
+  * Chamador / Motivo: lambda$jButton1ActionPerformed$19 (Instanciou acionamento do portão 888)
+  * Portões Acionados: Portão de ENTRADA (888)
+    -> Transmissão RF enviada: Código 168753845
+
+[HORÁRIO: 2026-07-08 12:02:57.332]
+  * Chamador / Motivo: lambda$jButton4ActionPerformed$13 (Instanciou acionamento do portão 8)
+  * Portões Acionados: Portão do Quarto 8
+    -> Transmissão RF enviada: Código 176870437
+
+[HORÁRIO: 2026-07-08 12:39:31.782]
+  * Chamador / Motivo: processarComando (Instanciou acionamento do portão 888)
+  * Portões Acionados: Portão de ENTRADA (888)
+    -> Transmissão RF enviada: Código 168753845
+
+[HORÁRIO: 2026-07-08 12:39:55.933]
+  * Chamador / Motivo: processarComando (Instanciou acionamento do portão 888)
+  * Portões Acionados: Portão de ENTRADA (888)
+
+[HORÁRIO: 2026-07-08 12:39:56.039]
+    -> Transmissão RF enviada: Código 168753845
+
+[HORÁRIO: 2026-07-08 12:43:58.037]
+  * Chamador / Motivo: lambda$jButton4ActionPerformed$13 (Instanciou acionamento do portão 2)
+  * Portões Acionados: Portão do Quarto 2
+    -> Transmissão RF enviada: Código 190245525
+
+[HORÁRIO: 2026-07-08 12:44:00.157]
+  * Chamador / Motivo: lambda$jButton4ActionPerformed$13 (Instanciou acionamento do portão 4)
+  * Portões Acionados: Portão do Quarto 4
+    -> Transmissão RF enviada: Código 170651413
+
+[HORÁRIO: 2026-07-08 12:44:04.509]
+  * Chamador / Motivo: lambda$jButton4ActionPerformed$13 (Instanciou acionamento do portão 9)
+  * Portões Acionados: Portão do Quarto 9
+    -> Transmissão RF enviada: Código 176870421
+
+[HORÁRIO: 2026-07-08 12:44:07.013]
+  * Chamador / Motivo: lambda$jButton4ActionPerformed$13 (Instanciou acionamento do portão 10)
+  * Portões Acionados: Portão do Quarto 10
+    -> Transmissão RF enviada: Código 135674005
+
+[HORÁRIO: 2026-07-08 12:44:09.781]
+  * Chamador / Motivo: lambda$jButton4ActionPerformed$13 (Instanciou acionamento do portão 11)
+  * Portões Acionados: Portão do Quarto 11
+    -> Transmissão RF enviada: Código 170090517
+
+[HORÁRIO: 2026-07-08 12:56:41.259]
+  * Chamador / Motivo: lambda$jButton4ActionPerformed$13 (Instanciou acionamento do portão 8)
+  * Portões Acionados: Portão do Quarto 8
+    -> Transmissão RF enviada: Código 176870437
+
+[HORÁRIO: 2026-07-08 12:58:06.709]
+  * Luzes Controladas: Luz do Quarto 3 -> Comando: DESLIGAR
+
+[HORÁRIO: 2026-07-08 12:58:11.560]
+  * Luzes Controladas: Luz do Quarto 2 -> Comando: DESLIGAR
+
+[HORÁRIO: 2026-07-08 12:58:16.674]
+  * Chamador / Motivo: processarComando (Instanciou acionamento do portão 2)
+  * Portões Acionados: Portão do Quarto 2
+    -> Transmissão RF enviada: Código 190245525
+
+[HORÁRIO: 2026-07-08 12:58:24.244]
+  * Chamador / Motivo: salvarLocacao (Instanciou acionamento do portão 999)
+  * Portões Acionados: Portão de SAÍDA (999)
+  * Luzes Controladas: Luz do Quarto 8 -> Comando: DESLIGAR
+    -> Transmissão RF enviada: Código 168095317
+
+[HORÁRIO: 2026-07-08 12:58:42.628]
+  * Chamador / Motivo: lambda$executaIniciar$0 (Instanciou acionamento do portão 2)
+  * Portões Acionados: Portão do Quarto 2
+  * Luzes Controladas: Luz do Quarto 2 -> Comando: LIGAR
+
+[HORÁRIO: 2026-07-08 12:58:43.033]
+  * Chamador / Motivo: lambda$executaIniciar$0 (Instanciou acionamento do portão 888)
+  * Portões Acionados: Portão de ENTRADA (888)
+    -> Transmissão RF enviada: Código 190245525
+
+[HORÁRIO: 2026-07-08 12:58:44.539]
+    -> Transmissão RF enviada: Código 168753845
+
+[HORÁRIO: 2026-07-08 12:58:56.538]
+  * Chamador / Motivo: lambda$jButton3ActionPerformed$20 (Instanciou acionamento do portão 999)
+  * Portões Acionados: Portão de SAÍDA (999)
+    -> Transmissão RF enviada: Código 168095317
+
+[HORÁRIO: 2026-07-08 12:59:11.794]
+  * Chamador / Motivo: lambda$jButton1ActionPerformed$19 (Instanciou acionamento do portão 888)
+  * Portões Acionados: Portão de ENTRADA (888)
+    -> Transmissão RF enviada: Código 168753845
+
+[HORÁRIO: 2026-07-08 12:59:15.538]
+  * Chamador / Motivo: lambda$jButton4ActionPerformed$13 (Instanciou acionamento do portão 2)
+  * Portões Acionados: Portão do Quarto 2
+    -> Transmissão RF enviada: Código 190245525
+
+[HORÁRIO: 2026-07-08 13:04:26.953]
+  * Luzes Controladas: Luz do Quarto 4 -> Comando: DESLIGAR
+
+[HORÁRIO: 2026-07-08 13:04:33.151]
+  * Chamador / Motivo: processarComando (Instanciou acionamento do portão 4)
+  * Portões Acionados: Portão do Quarto 4
+    -> Transmissão RF enviada: Código 170651413
+
+[HORÁRIO: 2026-07-08 13:11:24.838]
+  * Luzes Controladas: Luz do Quarto 9 -> Comando: DESLIGAR
+
+[HORÁRIO: 2026-07-08 13:11:30.537]
+  * Chamador / Motivo: processarComando (Instanciou acionamento do portão 9)
+  * Portões Acionados: Portão do Quarto 9
+    -> Transmissão RF enviada: Código 176870421
+
+[HORÁRIO: 2026-07-08 13:26:45.829]
+  * Chamador / Motivo: lambda$jButton3ActionPerformed$20 (Instanciou acionamento do portão 999)
+  * Portões Acionados: Portão de SAÍDA (999)
+    -> Transmissão RF enviada: Código 168095317
+
+[HORÁRIO: 2026-07-08 13:31:49.297]
+  * Chamador / Motivo: lambda$jButton4ActionPerformed$13 (Instanciou acionamento do portão 2)
+  * Portões Acionados: Portão do Quarto 2
+    -> Transmissão RF enviada: Código 190245525
+
+[HORÁRIO: 2026-07-08 13:31:52.073]
+  * Chamador / Motivo: lambda$jButton3ActionPerformed$20 (Instanciou acionamento do portão 999)
+  * Portões Acionados: Portão de SAÍDA (999)
+    -> Transmissão RF enviada: Código 168095317
+
+[HORÁRIO: 2026-07-08 13:34:04.329]
+  * Chamador / Motivo: salvarLocacao (Instanciou acionamento do portão 999)
+  * Portões Acionados: Portão de SAÍDA (999)
+  * Luzes Controladas: Luz do Quarto 2 -> Comando: DESLIGAR
+    -> Transmissão RF enviada: Código 168095317
+
+[HORÁRIO: 2026-07-08 13:35:13.583]
+  * Chamador / Motivo: lambda$jButton3ActionPerformed$20 (Instanciou acionamento do portão 999)
+  * Portões Acionados: Portão de SAÍDA (999)
+    -> Transmissão RF enviada: Código 168095317
+
+[HORÁRIO: 2026-07-08 14:03:47.164]
+  * Chamador / Motivo: lambda$receberNumeroQuarto$0 (Instanciou acionamento do portão 3)
+  * Portões Acionados: Portão do Quarto 3
+  * Luzes Controladas: Luz do Quarto 3 -> Comando: LIGAR
+    -> Transmissão RF enviada: Código 190245557
+
+[HORÁRIO: 2026-07-08 14:03:48.578]
+  * Chamador / Motivo: lambda$receberNumeroQuarto$0 (Instanciou acionamento do portão 888)
+  * Portões Acionados: Portão de ENTRADA (888)
+
+[HORÁRIO: 2026-07-08 14:03:49.288]
+    -> Transmissão RF enviada: Código 168753845
+
+[HORÁRIO: 2026-07-08 14:37:36.084]
+  * Chamador / Motivo: salvarLocacao (Instanciou acionamento do portão 999)
+  * Portões Acionados: Portão de SAÍDA (999)
+  * Luzes Controladas: Luz do Quarto 3 -> Comando: DESLIGAR
+    -> Transmissão RF enviada: Código 168095317
+
+[HORÁRIO: 2026-07-08 14:38:06.064]
+  * Chamador / Motivo: lambda$jButton3ActionPerformed$20 (Instanciou acionamento do portão 999)
+  * Portões Acionados: Portão de SAÍDA (999)
+    -> Transmissão RF enviada: Código 168095317
+
+[HORÁRIO: 2026-07-08 14:44:20.211]
+  * Chamador / Motivo: lambda$jButton1ActionPerformed$19 (Instanciou acionamento do portão 888)
+  * Portões Acionados: Portão de ENTRADA (888)
+    -> Transmissão RF enviada: Código 168753845
+
+[HORÁRIO: 2026-07-08 14:44:39.467]
+  * Chamador / Motivo: lambda$jButton1ActionPerformed$19 (Instanciou acionamento do portão 888)
+  * Portões Acionados: Portão de ENTRADA (888)
+    -> Transmissão RF enviada: Código 168753845
+
+[HORÁRIO: 2026-07-08 14:44:40.971]
+  * Chamador / Motivo: lambda$jButton3ActionPerformed$20 (Instanciou acionamento do portão 999)
+  * Portões Acionados: Portão de SAÍDA (999)
+
+[HORÁRIO: 2026-07-08 14:44:41.075]
+    -> Transmissão RF enviada: Código 168095317
+
+[HORÁRIO: 2026-07-08 14:48:50.072]
+  * Chamador / Motivo: lambda$jButton3ActionPerformed$20 (Instanciou acionamento do portão 999)
+  * Portões Acionados: Portão de SAÍDA (999)
+    -> Transmissão RF enviada: Código 168095317
+
+[HORÁRIO: 2026-07-08 14:57:08.663]
+  * Luzes Controladas: Luz do Quarto 4 -> Comando: LIGAR
+
+[HORÁRIO: 2026-07-08 14:57:09.165]
+  * Chamador / Motivo: lambda$receberNumeroQuarto$0 (Instanciou acionamento do portão 4)
+  * Portões Acionados: Portão do Quarto 4
+    -> Transmissão RF enviada: Código 170651413
+
+[HORÁRIO: 2026-07-08 14:57:10.071]
+  * Chamador / Motivo: lambda$receberNumeroQuarto$0 (Instanciou acionamento do portão 888)
+  * Portões Acionados: Portão de ENTRADA (888)
+    -> Transmissão RF enviada: Código 168753845
+
+[HORÁRIO: 2026-07-08 14:58:21.825]
+  * Luzes Controladas: Luz do Quarto 9 -> Comando: LIGAR
+
+[HORÁRIO: 2026-07-08 14:58:22.328]
+  * Chamador / Motivo: lambda$receberNumeroQuarto$0 (Instanciou acionamento do portão 9)
+  * Portões Acionados: Portão do Quarto 9
+    -> Transmissão RF enviada: Código 176870421
+
+[HORÁRIO: 2026-07-08 14:58:23.233]
+  * Chamador / Motivo: lambda$receberNumeroQuarto$0 (Instanciou acionamento do portão 888)
+  * Portões Acionados: Portão de ENTRADA (888)
+    -> Transmissão RF enviada: Código 168753845
+
+[HORÁRIO: 2026-07-08 14:58:49.316]
+  * Chamador / Motivo: processarComando (Instanciou acionamento do portão 888), processarComando (Instanciou acionamento do portão 4)
+  * Portões Acionados: Portão do Quarto 4, Portão de ENTRADA (888)
+    -> Transmissão RF enviada: Código 170651413
+
+[HORÁRIO: 2026-07-08 14:58:51.621]
+    -> Transmissão RF enviada: Código 168753845
+
+[HORÁRIO: 2026-07-08 14:59:00.392]
+  * Chamador / Motivo: lambda$jButton4ActionPerformed$13 (Instanciou acionamento do portão 4)
+  * Portões Acionados: Portão do Quarto 4
+    -> Transmissão RF enviada: Código 170651413
+
+[HORÁRIO: 2026-07-08 14:59:02.464]
+  * Chamador / Motivo: lambda$jButton4ActionPerformed$13 (Instanciou acionamento do portão 4)
+  * Portões Acionados: Portão do Quarto 4
+    -> Transmissão RF enviada: Código 170651413
+
+[HORÁRIO: 2026-07-08 14:59:04.840]
+  * Chamador / Motivo: lambda$jButton1ActionPerformed$19 (Instanciou acionamento do portão 888)
+  * Portões Acionados: Portão de ENTRADA (888)
+    -> Transmissão RF enviada: Código 168753845
+
+[HORÁRIO: 2026-07-08 14:59:07.440]
+  * Chamador / Motivo: lambda$jButton4ActionPerformed$13 (Instanciou acionamento do portão 9)
+  * Portões Acionados: Portão do Quarto 9
+    -> Transmissão RF enviada: Código 176870421
+
+[HORÁRIO: 2026-07-08 15:04:42.676]
+  * Luzes Controladas: Luz do Quarto 11 -> Comando: DESLIGAR
+
+[HORÁRIO: 2026-07-08 15:04:54.668]
+  * Chamador / Motivo: lambda$jButton1ActionPerformed$19 (Instanciou acionamento do portão 888)
+  * Portões Acionados: Portão de ENTRADA (888)
+    -> Transmissão RF enviada: Código 168753845
+
+[HORÁRIO: 2026-07-08 15:05:23.535]
+  * Chamador / Motivo: lambda$executaIniciar$0 (Instanciou acionamento do portão 11)
+  * Portões Acionados: Portão do Quarto 11
+  * Luzes Controladas: Luz do Quarto 11 -> Comando: LIGAR
+    -> Transmissão RF enviada: Código 170090517
+
+[HORÁRIO: 2026-07-08 15:05:24.743]
+  * Chamador / Motivo: lambda$executaIniciar$0 (Instanciou acionamento do portão 888)
+  * Portões Acionados: Portão de ENTRADA (888)
+
+[HORÁRIO: 2026-07-08 15:05:25.450]
+    -> Transmissão RF enviada: Código 168753845
+
+[HORÁRIO: 2026-07-08 15:12:46.711]
+  * Luzes Controladas: Luz do Quarto 10 -> Comando: DESLIGAR
+
+[HORÁRIO: 2026-07-08 15:12:47.430]
+  * Chamador / Motivo: lambda$jButton4ActionPerformed$13 (Instanciou acionamento do portão 10)
+  * Portões Acionados: Portão do Quarto 10
+    -> Transmissão RF enviada: Código 135674005
+
+[HORÁRIO: 2026-07-08 15:20:14.769]
+  * Chamador / Motivo: processarComando (Instanciou acionamento do portão 888)
+  * Portões Acionados: Portão de ENTRADA (888)
+    -> Transmissão RF enviada: Código 168753845
+
+[HORÁRIO: 2026-07-08 15:20:19.220]
+  * Chamador / Motivo: processarComando (Instanciou acionamento do portão 999)
+  * Portões Acionados: Portão de SAÍDA (999)
+    -> Transmissão RF enviada: Código 168095317
+
+[HORÁRIO: 2026-07-08 15:20:36.388]
+  * Chamador / Motivo: processarComando (Instanciou acionamento do portão 888)
+  * Portões Acionados: Portão de ENTRADA (888)
+    -> Transmissão RF enviada: Código 168753845
+
+[HORÁRIO: 2026-07-08 15:24:45.141]
+  * Chamador / Motivo: lambda$jButton3ActionPerformed$20 (Instanciou acionamento do portão 999)
+  * Portões Acionados: Portão de SAÍDA (999)
+    -> Transmissão RF enviada: Código 168095317
+
+[HORÁRIO: 2026-07-08 15:25:06.381]
+  * Chamador / Motivo: lambda$jButton4ActionPerformed$13 (Instanciou acionamento do portão 11)
+  * Portões Acionados: Portão do Quarto 11
+    -> Transmissão RF enviada: Código 170090517
+
+[HORÁRIO: 2026-07-08 15:26:17.077]
+  * Chamador / Motivo: lambda$receberNumeroQuarto$0 (Instanciou acionamento do portão 10)
+  * Portões Acionados: Portão do Quarto 10
+  * Luzes Controladas: Luz do Quarto 10 -> Comando: LIGAR
+    -> Transmissão RF enviada: Código 135674005
+
+[HORÁRIO: 2026-07-08 15:26:18.484]
+  * Chamador / Motivo: lambda$receberNumeroQuarto$0 (Instanciou acionamento do portão 888)
+  * Portões Acionados: Portão de ENTRADA (888)
+
+[HORÁRIO: 2026-07-08 15:26:19.193]
+    -> Transmissão RF enviada: Código 168753845
+
+[HORÁRIO: 2026-07-08 15:26:40.756]
+  * Chamador / Motivo: lambda$jButton1ActionPerformed$19 (Instanciou acionamento do portão 888)
+  * Portões Acionados: Portão de ENTRADA (888)
+    -> Transmissão RF enviada: Código 168753845
+
+[HORÁRIO: 2026-07-08 15:26:49.059]
+  * Chamador / Motivo: lambda$jButton4ActionPerformed$13 (Instanciou acionamento do portão 10)
+  * Portões Acionados: Portão do Quarto 10
+    -> Transmissão RF enviada: Código 135674005
+
+[HORÁRIO: 2026-07-08 15:29:15.859]
+  * Chamador / Motivo: salvarLocacao (Instanciou acionamento do portão 999)
+  * Portões Acionados: Portão de SAÍDA (999)
+  * Luzes Controladas: Luz do Quarto 11 -> Comando: DESLIGAR
+    -> Transmissão RF enviada: Código 168095317
+
+[HORÁRIO: 2026-07-08 15:29:34.401]
+  * Chamador / Motivo: lambda$jButton4ActionPerformed$13 (Instanciou acionamento do portão 4)
+  * Portões Acionados: Portão do Quarto 4
+    -> Transmissão RF enviada: Código 170651413
+
+[HORÁRIO: 2026-07-08 15:29:40.449]
+  * Chamador / Motivo: lambda$jButton3ActionPerformed$20 (Instanciou acionamento do portão 999)
+  * Portões Acionados: Portão de SAÍDA (999)
+    -> Transmissão RF enviada: Código 168095317
+
+[HORÁRIO: 2026-07-08 15:31:34.235]
+  * Chamador / Motivo: salvarLocacao (Instanciou acionamento do portão 999)
+  * Portões Acionados: Portão de SAÍDA (999)
+  * Luzes Controladas: Luz do Quarto 4 -> Comando: DESLIGAR
+    -> Transmissão RF enviada: Código 168095317
+
+[HORÁRIO: 2026-07-08 15:32:03.375]
+  * Chamador / Motivo: lambda$jButton3ActionPerformed$20 (Instanciou acionamento do portão 999)
+  * Portões Acionados: Portão de SAÍDA (999)
+    -> Transmissão RF enviada: Código 168095317
+
+[HORÁRIO: 2026-07-08 15:32:07.477]
+  * Luzes Controladas: Luz do Quarto 6 -> Comando: DESLIGAR
+
+[HORÁRIO: 2026-07-08 15:32:08.000]
+  * Chamador / Motivo: lambda$jButton4ActionPerformed$13 (Instanciou acionamento do portão 6)
+  * Portões Acionados: Portão do Quarto 6
+    -> Transmissão RF enviada: Código 200267925
+
+[HORÁRIO: 2026-07-08 15:34:43.535]
+  * Chamador / Motivo: lambda$executaIniciar$0 (Instanciou acionamento do portão 6)
+  * Portões Acionados: Portão do Quarto 6
+  * Luzes Controladas: Luz do Quarto 6 -> Comando: LIGAR
+    -> Transmissão RF enviada: Código 200267925
+
+[HORÁRIO: 2026-07-08 15:34:44.742]
+  * Chamador / Motivo: lambda$executaIniciar$0 (Instanciou acionamento do portão 888)
+  * Portões Acionados: Portão de ENTRADA (888)
+
+[HORÁRIO: 2026-07-08 15:34:45.449]
+    -> Transmissão RF enviada: Código 168753845
+
+[HORÁRIO: 2026-07-08 15:35:12.885]
+  * Chamador / Motivo: lambda$jButton1ActionPerformed$19 (Instanciou acionamento do portão 888)
+  * Portões Acionados: Portão de ENTRADA (888)
+    -> Transmissão RF enviada: Código 168753845
+
+[HORÁRIO: 2026-07-08 15:35:16.573]
+  * Chamador / Motivo: lambda$jButton4ActionPerformed$13 (Instanciou acionamento do portão 6)
+  * Portões Acionados: Portão do Quarto 6
+    -> Transmissão RF enviada: Código 200267925
+
+[HORÁRIO: 2026-07-08 15:52:09.530]
+  * Luzes Controladas: Luz do Quarto 4 -> Comando: DESLIGAR
+
+[HORÁRIO: 2026-07-08 15:52:14.639]
+  * Chamador / Motivo: processarComando (Instanciou acionamento do portão 4)
+  * Portões Acionados: Portão do Quarto 4
+    -> Transmissão RF enviada: Código 170651413
+
+[HORÁRIO: 2026-07-08 15:54:04.742]
+  * Luzes Controladas: Luz do Quarto 4 -> Comando: LIGAR
+
+[HORÁRIO: 2026-07-08 15:54:05.245]
+  * Chamador / Motivo: lambda$receberNumeroQuarto$0 (Instanciou acionamento do portão 4)
+  * Portões Acionados: Portão do Quarto 4
+    -> Transmissão RF enviada: Código 170651413
+
+[HORÁRIO: 2026-07-08 15:54:06.150]
+  * Chamador / Motivo: lambda$receberNumeroQuarto$0 (Instanciou acionamento do portão 888)
+  * Portões Acionados: Portão de ENTRADA (888)
+    -> Transmissão RF enviada: Código 168753845
+
+[HORÁRIO: 2026-07-08 15:59:11.240]
+  * Chamador / Motivo: processarComando (Instanciou acionamento do portão 4)
+  * Portões Acionados: Portão do Quarto 4, Portão do Quarto 4
+    -> Transmissão RF enviada: Código 170651413
+
+[HORÁRIO: 2026-07-08 15:59:13.393]
+  * Chamador / Motivo: processarComando (Instanciou acionamento do portão 888)
+  * Portões Acionados: Portão de ENTRADA (888)
+    -> Transmissão RF enviada: Código 170651413
+
+[HORÁRIO: 2026-07-08 15:59:15.263]
+  * Chamador / Motivo: lambda$jButton4ActionPerformed$13 (Instanciou acionamento do portão 6)
+  * Portões Acionados: Portão do Quarto 6
+    -> Transmissão RF enviada: Código 168753845
+
+[HORÁRIO: 2026-07-08 15:59:16.786]
+    -> Transmissão RF enviada: Código 200267925
+
+[HORÁRIO: 2026-07-08 15:59:45.507]
+  * Chamador / Motivo: lambda$jButton4ActionPerformed$13 (Instanciou acionamento do portão 8)
+  * Portões Acionados: Portão do Quarto 8
+    -> Transmissão RF enviada: Código 176870437
+
+[HORÁRIO: 2026-07-08 15:59:50.931]
+  * Chamador / Motivo: lambda$jButton4ActionPerformed$13 (Instanciou acionamento do portão 7)
+  * Portões Acionados: Portão do Quarto 7
+
+[HORÁRIO: 2026-07-08 15:59:51.034]
+    -> Transmissão RF enviada: Código 148154517
+
+[HORÁRIO: 2026-07-08 16:00:17.076]
+  * Chamador / Motivo: lambda$executaIniciar$0 (Instanciou acionamento do portão 7)
+  * Portões Acionados: Portão do Quarto 7
+  * Luzes Controladas: Luz do Quarto 7 -> Comando: LIGAR
+    -> Transmissão RF enviada: Código 148154517
+
+[HORÁRIO: 2026-07-08 16:00:18.283]
+  * Chamador / Motivo: lambda$executaIniciar$0 (Instanciou acionamento do portão 888)
+  * Portões Acionados: Portão de ENTRADA (888)
+    -> Transmissão RF enviada: Código 168753845
+
+[HORÁRIO: 2026-07-08 16:00:24.666]
+  * Chamador / Motivo: lambda$jButton4ActionPerformed$13 (Instanciou acionamento do portão 4)
+  * Portões Acionados: Portão do Quarto 4
+    -> Transmissão RF enviada: Código 170651413
+
+[HORÁRIO: 2026-07-08 16:00:28.978]
+  * Chamador / Motivo: lambda$jButton4ActionPerformed$13 (Instanciou acionamento do portão 6)
+  * Portões Acionados: Portão do Quarto 6
+
+[HORÁRIO: 2026-07-08 16:00:29.081]
+    -> Transmissão RF enviada: Código 200267925
+
+[HORÁRIO: 2026-07-08 16:08:38.572]
+  * Chamador / Motivo: lambda$jButton4ActionPerformed$13 (Instanciou acionamento do portão 6)
+  * Portões Acionados: Portão do Quarto 6
+    -> Transmissão RF enviada: Código 200267925
+
+[HORÁRIO: 2026-07-08 16:11:28.454]
+  * Chamador / Motivo: salvarLocacao (Instanciou acionamento do portão 999)
+  * Portões Acionados: Portão de SAÍDA (999)
+  * Luzes Controladas: Luz do Quarto 6 -> Comando: DESLIGAR
+    -> Transmissão RF enviada: Código 168095317
+
+[HORÁRIO: 2026-07-08 16:12:02.202]
+  * Chamador / Motivo: lambda$jButton3ActionPerformed$20 (Instanciou acionamento do portão 999)
+  * Portões Acionados: Portão de SAÍDA (999)
+    -> Transmissão RF enviada: Código 168095317
+
+[HORÁRIO: 2026-07-08 16:12:45.537]
+  * Chamador / Motivo: lambda$jButton4ActionPerformed$13 (Instanciou acionamento do portão 4)
+  * Portões Acionados: Portão do Quarto 4
+    -> Transmissão RF enviada: Código 170651413
+
+[HORÁRIO: 2026-07-08 16:14:49.292]
+  * Chamador / Motivo: salvarLocacao (Instanciou acionamento do portão 999)
+  * Portões Acionados: Portão de SAÍDA (999)
+  * Luzes Controladas: Luz do Quarto 4 -> Comando: DESLIGAR
+    -> Transmissão RF enviada: Código 168095317
+
+[HORÁRIO: 2026-07-08 16:15:13.079]
+  * Chamador / Motivo: lambda$jButton3ActionPerformed$20 (Instanciou acionamento do portão 999)
+  * Portões Acionados: Portão de SAÍDA (999)
+    -> Transmissão RF enviada: Código 168095317
+
+[HORÁRIO: 2026-07-08 16:15:53.263]
+  * Chamador / Motivo: lambda$jButton4ActionPerformed$13 (Instanciou acionamento do portão 9)
+  * Portões Acionados: Portão do Quarto 9
+    -> Transmissão RF enviada: Código 176870421
+
+[HORÁRIO: 2026-07-08 16:18:16.250]
+  * Chamador / Motivo: salvarLocacao (Instanciou acionamento do portão 999)
+  * Portões Acionados: Portão de SAÍDA (999)
+  * Luzes Controladas: Luz do Quarto 9 -> Comando: DESLIGAR
+    -> Transmissão RF enviada: Código 168095317
+
+[HORÁRIO: 2026-07-08 16:18:34.604]
+  * Chamador / Motivo: lambda$jButton3ActionPerformed$20 (Instanciou acionamento do portão 999)
+  * Portões Acionados: Portão de SAÍDA (999)
+    -> Transmissão RF enviada: Código 168095317
+
+[HORÁRIO: 2026-07-08 16:18:53.073]
+  * Luzes Controladas: Luz do Quarto 3 -> Comando: DESLIGAR
+
+[HORÁRIO: 2026-07-08 16:32:12.272]
+  * Chamador / Motivo: processarComando (Instanciou acionamento do portão 2)
+  * Portões Acionados: Portão do Quarto 2
+    -> Transmissão RF enviada: Código 190245525
+
+[HORÁRIO: 2026-07-08 16:32:22.542]
+  * Luzes Controladas: Luz do Quarto 2 -> Comando: DESLIGAR

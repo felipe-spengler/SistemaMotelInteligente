@@ -1,0 +1,802 @@
+=== ANALISE DE INSTANCIAS DE CONECTAARDUINO ===
+
+EVENTO INICIADO EM: 2026-07-08 11:46:01.658 (Thread: Thread-19)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 2. Chamador: com.motelinteligente.telas.controller.TelaPrincipalController.lambda$executaIniciar$0(Linha 335) (Thread: Thread-19)
+  Ações subsequentes:
+    - 2026-07-08 11:46:01.762: Resposta parcial do Arduino: OK
+    - 2026-07-08 11:46:01.763: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 11:46:01.764: Código do portão enviado com sucesso: 190245525
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 11:46:02.566 (Thread: Thread-19)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.telas.controller.TelaPrincipalController.lambda$executaIniciar$0(Linha 341) (Thread: Thread-19)
+  Ações subsequentes:
+    - 2026-07-08 11:46:03.276: Resposta parcial do Arduino: OK
+OK
+    - 2026-07-08 11:46:03.278: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 11:46:03.278: Código do portão enviado com sucesso: 168753845
+    - 2026-07-08 11:46:11.146: [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 3, Ligar: true. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 62) (Thread: AWT-EventQueue-0)
+    - 2026-07-08 11:46:11.147: Comando de luz enviado: LUZ-ON-3
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 11:46:11.450 (Thread: Thread-25)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 3. Chamador: com.motelinteligente.telas.controller.TelaPrincipalController.lambda$executaIniciar$0(Linha 335) (Thread: Thread-25)
+  Ações subsequentes:
+    - 2026-07-08 11:46:11.556: Resposta parcial do Arduino: OK
+    - 2026-07-08 11:46:11.557: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 11:46:11.557: Código do portão enviado com sucesso: 190245557
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 11:46:12.359 (Thread: Thread-25)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.telas.controller.TelaPrincipalController.lambda$executaIniciar$0(Linha 341) (Thread: Thread-25)
+  Ações subsequentes:
+    - 2026-07-08 11:46:13.070: Resposta parcial do Arduino: OK
+OK
+    - 2026-07-08 11:46:13.071: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 11:46:13.071: Código do portão enviado com sucesso: 168753845
+    - 2026-07-08 11:46:15.586: [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 4, Ligar: true. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 62) (Thread: AWT-EventQueue-0)
+    - 2026-07-08 11:46:15.586: Comando de luz enviado: LUZ-ON-4
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 11:46:15.888 (Thread: Thread-31)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 4. Chamador: com.motelinteligente.telas.controller.TelaPrincipalController.lambda$executaIniciar$0(Linha 335) (Thread: Thread-31)
+  Ações subsequentes:
+    - 2026-07-08 11:46:15.993: Resposta parcial do Arduino: OK
+    - 2026-07-08 11:46:15.994: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 11:46:15.994: Código do portão enviado com sucesso: 170651413
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 11:46:16.795 (Thread: Thread-31)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.telas.controller.TelaPrincipalController.lambda$executaIniciar$0(Linha 341) (Thread: Thread-31)
+  Ações subsequentes:
+    - 2026-07-08 11:46:17.506: Resposta parcial do Arduino: OK
+OK
+    - 2026-07-08 11:46:17.507: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 11:46:17.507: Código do portão enviado com sucesso: 168753845
+    - 2026-07-08 11:46:42.077: [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 4, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: AWT-EventQueue-0)
+    - 2026-07-08 11:46:42.077: Comando de luz enviado: LUZ-OFF-4
+    - 2026-07-08 11:47:05.861: [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 2, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: AWT-EventQueue-0)
+    - 2026-07-08 11:47:05.862: Comando de luz enviado: LUZ-OFF-2
+    - 2026-07-08 11:47:23.183: [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 3, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: AWT-EventQueue-0)
+    - 2026-07-08 11:47:23.184: Comando de luz enviado: LUZ-OFF-3
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 11:55:36.458 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 11. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 11:55:36.583: Resposta parcial do Arduino: OK
+    - 2026-07-08 11:55:36.584: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 11:55:36.584: Código do portão enviado com sucesso: 170090517
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 11:55:44.505 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 11. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 11:55:44.608: Resposta parcial do Arduino: OK
+    - 2026-07-08 11:55:44.609: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 11:55:44.609: Código do portão enviado com sucesso: 170090517
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 11:56:51.830 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.controller.EncerraQuartoController.salvarLocacao(Linha 429) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 11:56:51.934: Resposta parcial do Arduino: OK
+    - 2026-07-08 11:56:51.934: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 11:56:51.935: Código do portão enviado com sucesso: 168095317
+    - 2026-07-08 11:56:52.224: [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 11, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: AWT-EventQueue-0)
+    - 2026-07-08 11:56:52.225: Comando de luz enviado: LUZ-OFF-11
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 12:00:56.765 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 11. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 12:00:56.868: Resposta parcial do Arduino: OK
+    - 2026-07-08 12:00:56.869: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 12:00:56.869: Código do portão enviado com sucesso: 170090517
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 12:01:00.661 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 10. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 12:01:00.764: Resposta parcial do Arduino: OK
+    - 2026-07-08 12:01:00.765: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 12:01:00.765: Código do portão enviado com sucesso: 135674005
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 12:01:17.342 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton3ActionPerformed$20(Linha 3146) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 12:01:17.444: Resposta parcial do Arduino: OK
+    - 2026-07-08 12:01:17.444: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 12:01:17.444: Código do portão enviado com sucesso: 168095317
+    - 2026-07-08 12:02:23.414: [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 8, Ligar: true. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 62) (Thread: AWT-EventQueue-0)
+    - 2026-07-08 12:02:23.415: Comando de luz enviado: LUZ-ON-8
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 12:02:23.726 (Thread: Thread-73)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 8. Chamador: com.motelinteligente.telas.controller.TelaPrincipalController.lambda$executaIniciar$0(Linha 335) (Thread: Thread-73)
+  Ações subsequentes:
+    - 2026-07-08 12:02:23.828: Resposta parcial do Arduino: OK
+    - 2026-07-08 12:02:23.829: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 12:02:23.829: Código do portão enviado com sucesso: 176870437
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 12:02:24.630 (Thread: Thread-73)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.telas.controller.TelaPrincipalController.lambda$executaIniciar$0(Linha 341) (Thread: Thread-73)
+  Ações subsequentes:
+    - 2026-07-08 12:02:25.340: Resposta parcial do Arduino: OK
+OK
+    - 2026-07-08 12:02:25.341: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 12:02:25.341: Código do portão enviado com sucesso: 168753845
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 12:02:44.333 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton1ActionPerformed$19(Linha 3140) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 12:02:44.436: Resposta parcial do Arduino: OK
+    - 2026-07-08 12:02:44.437: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 12:02:44.437: Código do portão enviado com sucesso: 168753845
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 12:02:57.332 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 8. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 12:02:57.434: Resposta parcial do Arduino: OK
+    - 2026-07-08 12:02:57.434: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 12:02:57.435: Código do portão enviado com sucesso: 176870437
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 12:39:31.782 (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.dados.VerificaComandosRemotos.processarComando(Linha 209) (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+  Ações subsequentes:
+    - 2026-07-08 12:39:31.886: Resposta parcial do Arduino: OK
+    - 2026-07-08 12:39:31.886: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 12:39:31.887: Código do portão enviado com sucesso: 168753845
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 12:39:55.933 (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.dados.VerificaComandosRemotos.processarComando(Linha 209) (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+  Ações subsequentes:
+    - 2026-07-08 12:39:56.037: Resposta parcial do Arduino: OK
+    - 2026-07-08 12:39:56.037: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 12:39:56.039: Código do portão enviado com sucesso: 168753845
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 12:43:58.037 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 2. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 12:43:58.140: Resposta parcial do Arduino: OK
+    - 2026-07-08 12:43:58.141: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 12:43:58.141: Código do portão enviado com sucesso: 190245525
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 12:44:00.157 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 4. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 12:44:00.259: Resposta parcial do Arduino: OK
+    - 2026-07-08 12:44:00.260: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 12:44:00.260: Código do portão enviado com sucesso: 170651413
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 12:44:04.509 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 9. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 12:44:04.612: Resposta parcial do Arduino: OK
+    - 2026-07-08 12:44:04.613: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 12:44:04.613: Código do portão enviado com sucesso: 176870421
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 12:44:07.013 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 10. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 12:44:07.115: Resposta parcial do Arduino: OK
+    - 2026-07-08 12:44:07.115: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 12:44:07.116: Código do portão enviado com sucesso: 135674005
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 12:44:09.781 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 11. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 12:44:09.884: Resposta parcial do Arduino: OK
+    - 2026-07-08 12:44:09.885: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 12:44:09.885: Código do portão enviado com sucesso: 170090517
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 12:56:41.259 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 8. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 12:56:41.366: Resposta parcial do Arduino: OK
+    - 2026-07-08 12:56:41.367: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 12:56:41.367: Código do portão enviado com sucesso: 176870437
+    - 2026-07-08 12:58:06.709: [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 3, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: SwingWorker-pool-4-thread-1)
+    - 2026-07-08 12:58:06.710: Comando de luz enviado: LUZ-OFF-3
+    - 2026-07-08 12:58:11.560: [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 2, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: SwingWorker-pool-4-thread-2)
+    - 2026-07-08 12:58:11.561: Comando de luz enviado: LUZ-OFF-2
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 12:58:16.674 (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 2. Chamador: com.motelinteligente.dados.VerificaComandosRemotos.processarComando(Linha 213) (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+  Ações subsequentes:
+    - 2026-07-08 12:58:16.777: Resposta parcial do Arduino: OK
+    - 2026-07-08 12:58:16.777: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 12:58:16.778: Código do portão enviado com sucesso: 190245525
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 12:58:24.244 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.controller.EncerraQuartoController.salvarLocacao(Linha 429) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 12:58:24.347: Resposta parcial do Arduino: OK
+    - 2026-07-08 12:58:24.347: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 12:58:24.347: Código do portão enviado com sucesso: 168095317
+    - 2026-07-08 12:58:24.362: [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 8, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: AWT-EventQueue-0)
+    - 2026-07-08 12:58:24.363: Comando de luz enviado: LUZ-OFF-8
+    - 2026-07-08 12:58:42.628: [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 2, Ligar: true. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 62) (Thread: AWT-EventQueue-0)
+    - 2026-07-08 12:58:42.628: Comando de luz enviado: LUZ-ON-2
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 12:58:42.930 (Thread: Thread-98)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 2. Chamador: com.motelinteligente.telas.controller.TelaPrincipalController.lambda$executaIniciar$0(Linha 335) (Thread: Thread-98)
+  Ações subsequentes:
+    - 2026-07-08 12:58:43.032: Resposta parcial do Arduino: OK
+    - 2026-07-08 12:58:43.033: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 12:58:43.033: Código do portão enviado com sucesso: 190245525
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 12:58:43.834 (Thread: Thread-98)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.telas.controller.TelaPrincipalController.lambda$executaIniciar$0(Linha 341) (Thread: Thread-98)
+  Ações subsequentes:
+    - 2026-07-08 12:58:44.538: Resposta parcial do Arduino: OK
+OK
+    - 2026-07-08 12:58:44.538: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 12:58:44.539: Código do portão enviado com sucesso: 168753845
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 12:58:56.538 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton3ActionPerformed$20(Linha 3146) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 12:58:56.640: Resposta parcial do Arduino: OK
+    - 2026-07-08 12:58:56.641: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 12:58:56.641: Código do portão enviado com sucesso: 168095317
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 12:59:11.794 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton1ActionPerformed$19(Linha 3140) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 12:59:11.897: Resposta parcial do Arduino: OK
+    - 2026-07-08 12:59:11.897: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 12:59:11.898: Código do portão enviado com sucesso: 168753845
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 12:59:15.538 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 2. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 12:59:15.640: Resposta parcial do Arduino: OK
+    - 2026-07-08 12:59:15.641: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 12:59:15.641: Código do portão enviado com sucesso: 190245525
+    - 2026-07-08 13:04:26.953: [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 4, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: SwingWorker-pool-4-thread-3)
+    - 2026-07-08 13:04:26.953: Comando de luz enviado: LUZ-OFF-4
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 13:04:33.151 (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 4. Chamador: com.motelinteligente.dados.VerificaComandosRemotos.processarComando(Linha 213) (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+  Ações subsequentes:
+    - 2026-07-08 13:04:33.254: Resposta parcial do Arduino: OK
+    - 2026-07-08 13:04:33.255: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 13:04:33.255: Código do portão enviado com sucesso: 170651413
+    - 2026-07-08 13:11:24.838: [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 9, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: SwingWorker-pool-4-thread-4)
+    - 2026-07-08 13:11:24.838: Comando de luz enviado: LUZ-OFF-9
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 13:11:30.537 (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 9. Chamador: com.motelinteligente.dados.VerificaComandosRemotos.processarComando(Linha 213) (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+  Ações subsequentes:
+    - 2026-07-08 13:11:30.639: Resposta parcial do Arduino: OK
+    - 2026-07-08 13:11:30.639: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 13:11:30.640: Código do portão enviado com sucesso: 176870421
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 13:26:45.829 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton3ActionPerformed$20(Linha 3146) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 13:26:45.931: Resposta parcial do Arduino: OK
+    - 2026-07-08 13:26:45.931: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 13:26:45.931: Código do portão enviado com sucesso: 168095317
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 13:31:49.297 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 2. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 13:31:49.400: Resposta parcial do Arduino: OK
+    - 2026-07-08 13:31:49.401: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 13:31:49.401: Código do portão enviado com sucesso: 190245525
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 13:31:52.073 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton3ActionPerformed$20(Linha 3146) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 13:31:52.176: Resposta parcial do Arduino: OK
+    - 2026-07-08 13:31:52.177: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 13:31:52.177: Código do portão enviado com sucesso: 168095317
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 13:34:04.329 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.controller.EncerraQuartoController.salvarLocacao(Linha 429) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 13:34:04.432: Resposta parcial do Arduino: OK
+    - 2026-07-08 13:34:04.432: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 13:34:04.433: Código do portão enviado com sucesso: 168095317
+    - 2026-07-08 13:34:04.553: [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 2, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: AWT-EventQueue-0)
+    - 2026-07-08 13:34:04.553: Comando de luz enviado: LUZ-OFF-2
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 13:35:13.583 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton3ActionPerformed$20(Linha 3146) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 13:35:13.685: Resposta parcial do Arduino: OK
+    - 2026-07-08 13:35:13.686: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 13:35:13.686: Código do portão enviado com sucesso: 168095317
+    - 2026-07-08 14:03:47.164: [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 3, Ligar: true. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 62) (Thread: http-nio-0.0.0.0-1521-exec-10)
+    - 2026-07-08 14:03:47.165: Comando de luz enviado: LUZ-ON-3
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 14:03:47.673 (Thread: Thread-125)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 3. Chamador: com.motelinteligente.dados.ReceberNumeroQuartoController.lambda$receberNumeroQuarto$0(Linha 177) (Thread: Thread-125)
+  Ações subsequentes:
+    - 2026-07-08 14:03:47.776: Resposta parcial do Arduino: OK
+    - 2026-07-08 14:03:47.777: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 14:03:47.777: Código do portão enviado com sucesso: 190245557
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 14:03:48.578 (Thread: Thread-125)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.dados.ReceberNumeroQuartoController.lambda$receberNumeroQuarto$0(Linha 182) (Thread: Thread-125)
+  Ações subsequentes:
+    - 2026-07-08 14:03:49.287: Resposta parcial do Arduino: OK
+OK
+    - 2026-07-08 14:03:49.288: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 14:03:49.288: Código do portão enviado com sucesso: 168753845
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 14:37:36.084 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.controller.EncerraQuartoController.salvarLocacao(Linha 429) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 14:37:36.188: Resposta parcial do Arduino: OK
+    - 2026-07-08 14:37:36.189: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 14:37:36.189: Código do portão enviado com sucesso: 168095317
+    - 2026-07-08 14:37:36.203: [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 3, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: AWT-EventQueue-0)
+    - 2026-07-08 14:37:36.203: Comando de luz enviado: LUZ-OFF-3
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 14:38:06.064 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton3ActionPerformed$20(Linha 3146) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 14:38:06.166: Resposta parcial do Arduino: OK
+    - 2026-07-08 14:38:06.166: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 14:38:06.167: Código do portão enviado com sucesso: 168095317
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 14:44:20.211 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton1ActionPerformed$19(Linha 3140) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 14:44:20.314: Resposta parcial do Arduino: OK
+    - 2026-07-08 14:44:20.314: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 14:44:20.314: Código do portão enviado com sucesso: 168753845
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 14:44:39.467 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton1ActionPerformed$19(Linha 3140) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 14:44:39.570: Resposta parcial do Arduino: OK
+    - 2026-07-08 14:44:39.571: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 14:44:39.571: Código do portão enviado com sucesso: 168753845
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 14:44:40.971 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton3ActionPerformed$20(Linha 3146) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 14:44:41.074: Resposta parcial do Arduino: OK
+OK
+    - 2026-07-08 14:44:41.074: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 14:44:41.075: Código do portão enviado com sucesso: 168095317
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 14:48:50.072 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton3ActionPerformed$20(Linha 3146) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 14:48:50.175: Resposta parcial do Arduino: OK
+    - 2026-07-08 14:48:50.175: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 14:48:50.176: Código do portão enviado com sucesso: 168095317
+    - 2026-07-08 14:57:08.663: [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 4, Ligar: true. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 62) (Thread: http-nio-0.0.0.0-1521-exec-3)
+    - 2026-07-08 14:57:08.664: Comando de luz enviado: LUZ-ON-4
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 14:57:09.165 (Thread: Thread-140)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 4. Chamador: com.motelinteligente.dados.ReceberNumeroQuartoController.lambda$receberNumeroQuarto$0(Linha 177) (Thread: Thread-140)
+  Ações subsequentes:
+    - 2026-07-08 14:57:09.269: Resposta parcial do Arduino: OK
+    - 2026-07-08 14:57:09.270: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 14:57:09.270: Código do portão enviado com sucesso: 170651413
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 14:57:10.071 (Thread: Thread-140)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.dados.ReceberNumeroQuartoController.lambda$receberNumeroQuarto$0(Linha 182) (Thread: Thread-140)
+  Ações subsequentes:
+    - 2026-07-08 14:57:10.776: Resposta parcial do Arduino: OK
+OK
+    - 2026-07-08 14:57:10.776: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 14:57:10.777: Código do portão enviado com sucesso: 168753845
+    - 2026-07-08 14:58:21.825: [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 9, Ligar: true. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 62) (Thread: http-nio-0.0.0.0-1521-exec-5)
+    - 2026-07-08 14:58:21.826: Comando de luz enviado: LUZ-ON-9
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 14:58:22.328 (Thread: Thread-145)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 9. Chamador: com.motelinteligente.dados.ReceberNumeroQuartoController.lambda$receberNumeroQuarto$0(Linha 177) (Thread: Thread-145)
+  Ações subsequentes:
+    - 2026-07-08 14:58:22.431: Resposta parcial do Arduino: OK
+    - 2026-07-08 14:58:22.432: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 14:58:22.432: Código do portão enviado com sucesso: 176870421
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 14:58:23.233 (Thread: Thread-145)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.dados.ReceberNumeroQuartoController.lambda$receberNumeroQuarto$0(Linha 182) (Thread: Thread-145)
+  Ações subsequentes:
+    - 2026-07-08 14:58:23.941: Resposta parcial do Arduino: OK
+OK
+    - 2026-07-08 14:58:23.941: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 14:58:23.942: Código do portão enviado com sucesso: 168753845
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 14:58:49.316 (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 4. Chamador: com.motelinteligente.dados.VerificaComandosRemotos.processarComando(Linha 213) (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+  Ações subsequentes:
+    - 2026-07-08 14:58:49.420: Resposta parcial do Arduino: OK
+    - 2026-07-08 14:58:49.420: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 14:58:49.420: Código do portão enviado com sucesso: 170651413
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 14:58:49.810 (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.dados.VerificaComandosRemotos.processarComando(Linha 209) (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+  Ações subsequentes:
+    - 2026-07-08 14:58:50.818: Timeout aguardando resposta do Arduino. Última resposta:
+    - 2026-07-08 14:58:51.620: Resposta parcial do Arduino: OK
+    - 2026-07-08 14:58:51.621: Tentativa 1 recebeu ok (RF)
+    - 2026-07-08 14:58:51.621: Código do portão enviado com sucesso: 168753845
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 14:59:00.392 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 4. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 14:59:00.496: Resposta parcial do Arduino: OK
+    - 2026-07-08 14:59:00.496: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 14:59:00.497: Código do portão enviado com sucesso: 170651413
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 14:59:02.464 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 4. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 14:59:02.567: Resposta parcial do Arduino: OK
+    - 2026-07-08 14:59:02.567: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 14:59:02.568: Código do portão enviado com sucesso: 170651413
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 14:59:04.840 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton1ActionPerformed$19(Linha 3140) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 14:59:04.943: Resposta parcial do Arduino: OK
+    - 2026-07-08 14:59:04.943: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 14:59:04.944: Código do portão enviado com sucesso: 168753845
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 14:59:07.440 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 9. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 14:59:07.542: Resposta parcial do Arduino: OK
+    - 2026-07-08 14:59:07.542: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 14:59:07.543: Código do portão enviado com sucesso: 176870421
+    - 2026-07-08 15:04:42.676: [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 11, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: SwingWorker-pool-4-thread-5)
+    - 2026-07-08 15:04:42.677: Comando de luz enviado: LUZ-OFF-11
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 15:04:54.668 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton1ActionPerformed$19(Linha 3140) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 15:04:54.771: Resposta parcial do Arduino: OK
+    - 2026-07-08 15:04:54.772: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 15:04:54.772: Código do portão enviado com sucesso: 168753845
+    - 2026-07-08 15:05:23.535: [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 11, Ligar: true. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 62) (Thread: AWT-EventQueue-0)
+    - 2026-07-08 15:05:23.536: Comando de luz enviado: LUZ-ON-11
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 15:05:23.839 (Thread: Thread-154)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 11. Chamador: com.motelinteligente.telas.controller.TelaPrincipalController.lambda$executaIniciar$0(Linha 335) (Thread: Thread-154)
+  Ações subsequentes:
+    - 2026-07-08 15:05:23.942: Resposta parcial do Arduino: OK
+    - 2026-07-08 15:05:23.942: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 15:05:23.943: Código do portão enviado com sucesso: 170090517
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 15:05:24.743 (Thread: Thread-154)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.telas.controller.TelaPrincipalController.lambda$executaIniciar$0(Linha 341) (Thread: Thread-154)
+  Ações subsequentes:
+    - 2026-07-08 15:05:25.449: Resposta parcial do Arduino: OK
+OK
+    - 2026-07-08 15:05:25.450: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 15:05:25.450: Código do portão enviado com sucesso: 168753845
+    - 2026-07-08 15:12:46.711: [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 10, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: SwingWorker-pool-4-thread-6)
+    - 2026-07-08 15:12:46.711: Comando de luz enviado: LUZ-OFF-10
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 15:12:47.430 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 10. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 15:12:47.532: Resposta parcial do Arduino: OK
+    - 2026-07-08 15:12:47.532: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 15:12:47.533: Código do portão enviado com sucesso: 135674005
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 15:20:14.769 (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.dados.VerificaComandosRemotos.processarComando(Linha 209) (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+  Ações subsequentes:
+    - 2026-07-08 15:20:14.872: Resposta parcial do Arduino: OK
+    - 2026-07-08 15:20:14.873: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 15:20:14.873: Código do portão enviado com sucesso: 168753845
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 15:20:19.220 (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.dados.VerificaComandosRemotos.processarComando(Linha 211) (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+  Ações subsequentes:
+    - 2026-07-08 15:20:19.323: Resposta parcial do Arduino: OK
+    - 2026-07-08 15:20:19.324: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 15:20:19.324: Código do portão enviado com sucesso: 168095317
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 15:20:36.388 (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.dados.VerificaComandosRemotos.processarComando(Linha 209) (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+  Ações subsequentes:
+    - 2026-07-08 15:20:36.491: Resposta parcial do Arduino: OK
+    - 2026-07-08 15:20:36.491: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 15:20:36.492: Código do portão enviado com sucesso: 168753845
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 15:24:45.141 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton3ActionPerformed$20(Linha 3146) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 15:24:45.243: Resposta parcial do Arduino: OK
+    - 2026-07-08 15:24:45.243: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 15:24:45.244: Código do portão enviado com sucesso: 168095317
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 15:25:06.381 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 11. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 15:25:06.484: Resposta parcial do Arduino: OK
+    - 2026-07-08 15:25:06.485: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 15:25:06.485: Código do portão enviado com sucesso: 170090517
+    - 2026-07-08 15:26:17.077: [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 10, Ligar: true. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 62) (Thread: http-nio-0.0.0.0-1521-exec-9)
+    - 2026-07-08 15:26:17.078: Comando de luz enviado: LUZ-ON-10
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 15:26:17.579 (Thread: Thread-164)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 10. Chamador: com.motelinteligente.dados.ReceberNumeroQuartoController.lambda$receberNumeroQuarto$0(Linha 177) (Thread: Thread-164)
+  Ações subsequentes:
+    - 2026-07-08 15:26:17.682: Resposta parcial do Arduino: OK
+    - 2026-07-08 15:26:17.682: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 15:26:17.683: Código do portão enviado com sucesso: 135674005
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 15:26:18.484 (Thread: Thread-164)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.dados.ReceberNumeroQuartoController.lambda$receberNumeroQuarto$0(Linha 182) (Thread: Thread-164)
+  Ações subsequentes:
+    - 2026-07-08 15:26:19.192: Resposta parcial do Arduino: OK
+OK
+    - 2026-07-08 15:26:19.193: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 15:26:19.193: Código do portão enviado com sucesso: 168753845
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 15:26:40.756 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton1ActionPerformed$19(Linha 3140) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 15:26:40.857: Resposta parcial do Arduino: OK
+    - 2026-07-08 15:26:40.857: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 15:26:40.858: Código do portão enviado com sucesso: 168753845
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 15:26:49.059 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 10. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 15:26:49.161: Resposta parcial do Arduino: OK
+    - 2026-07-08 15:26:49.162: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 15:26:49.162: Código do portão enviado com sucesso: 135674005
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 15:29:15.859 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.controller.EncerraQuartoController.salvarLocacao(Linha 429) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 15:29:15.965: Resposta parcial do Arduino: OK
+    - 2026-07-08 15:29:15.965: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 15:29:15.966: Código do portão enviado com sucesso: 168095317
+    - 2026-07-08 15:29:15.976: [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 11, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: AWT-EventQueue-0)
+    - 2026-07-08 15:29:15.977: Comando de luz enviado: LUZ-OFF-11
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 15:29:34.401 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 4. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 15:29:34.505: Resposta parcial do Arduino: OK
+    - 2026-07-08 15:29:34.505: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 15:29:34.506: Código do portão enviado com sucesso: 170651413
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 15:29:40.449 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton3ActionPerformed$20(Linha 3146) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 15:29:40.552: Resposta parcial do Arduino: OK
+    - 2026-07-08 15:29:40.552: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 15:29:40.553: Código do portão enviado com sucesso: 168095317
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 15:31:34.235 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.controller.EncerraQuartoController.salvarLocacao(Linha 429) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 15:31:34.339: Resposta parcial do Arduino: OK
+    - 2026-07-08 15:31:34.339: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 15:31:34.339: Código do portão enviado com sucesso: 168095317
+    - 2026-07-08 15:31:34.349: [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 4, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: AWT-EventQueue-0)
+    - 2026-07-08 15:31:34.350: Comando de luz enviado: LUZ-OFF-4
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 15:32:03.375 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton3ActionPerformed$20(Linha 3146) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 15:32:03.478: Resposta parcial do Arduino: OK
+    - 2026-07-08 15:32:03.478: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 15:32:03.479: Código do portão enviado com sucesso: 168095317
+    - 2026-07-08 15:32:07.477: [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 6, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: SwingWorker-pool-4-thread-7)
+    - 2026-07-08 15:32:07.477: Comando de luz enviado: LUZ-OFF-6
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 15:32:08.000 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 6. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 15:32:08.102: Resposta parcial do Arduino: OK
+    - 2026-07-08 15:32:08.102: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 15:32:08.103: Código do portão enviado com sucesso: 200267925
+    - 2026-07-08 15:34:43.535: [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 6, Ligar: true. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 62) (Thread: AWT-EventQueue-0)
+    - 2026-07-08 15:34:43.535: Comando de luz enviado: LUZ-ON-6
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 15:34:43.836 (Thread: Thread-197)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 6. Chamador: com.motelinteligente.telas.controller.TelaPrincipalController.lambda$executaIniciar$0(Linha 335) (Thread: Thread-197)
+  Ações subsequentes:
+    - 2026-07-08 15:34:43.940: Resposta parcial do Arduino: OK
+    - 2026-07-08 15:34:43.941: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 15:34:43.941: Código do portão enviado com sucesso: 200267925
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 15:34:44.742 (Thread: Thread-197)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.telas.controller.TelaPrincipalController.lambda$executaIniciar$0(Linha 341) (Thread: Thread-197)
+  Ações subsequentes:
+    - 2026-07-08 15:34:45.448: Resposta parcial do Arduino: OK
+OK
+    - 2026-07-08 15:34:45.448: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 15:34:45.449: Código do portão enviado com sucesso: 168753845
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 15:35:12.885 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton1ActionPerformed$19(Linha 3140) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 15:35:12.987: Resposta parcial do Arduino: OK
+    - 2026-07-08 15:35:12.988: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 15:35:12.988: Código do portão enviado com sucesso: 168753845
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 15:35:16.573 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 6. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 15:35:16.676: Resposta parcial do Arduino: OK
+    - 2026-07-08 15:35:16.676: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 15:35:16.677: Código do portão enviado com sucesso: 200267925
+    - 2026-07-08 15:52:09.530: [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 4, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: SwingWorker-pool-4-thread-8)
+    - 2026-07-08 15:52:09.531: Comando de luz enviado: LUZ-OFF-4
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 15:52:14.639 (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 4. Chamador: com.motelinteligente.dados.VerificaComandosRemotos.processarComando(Linha 213) (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+  Ações subsequentes:
+    - 2026-07-08 15:52:14.742: Resposta parcial do Arduino: OK
+    - 2026-07-08 15:52:14.743: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 15:52:14.743: Código do portão enviado com sucesso: 170651413
+    - 2026-07-08 15:54:04.742: [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 4, Ligar: true. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 62) (Thread: http-nio-0.0.0.0-1521-exec-10)
+    - 2026-07-08 15:54:04.743: Comando de luz enviado: LUZ-ON-4
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 15:54:05.245 (Thread: Thread-207)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 4. Chamador: com.motelinteligente.dados.ReceberNumeroQuartoController.lambda$receberNumeroQuarto$0(Linha 177) (Thread: Thread-207)
+  Ações subsequentes:
+    - 2026-07-08 15:54:05.348: Resposta parcial do Arduino: OK
+    - 2026-07-08 15:54:05.348: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 15:54:05.349: Código do portão enviado com sucesso: 170651413
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 15:54:06.150 (Thread: Thread-207)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.dados.ReceberNumeroQuartoController.lambda$receberNumeroQuarto$0(Linha 182) (Thread: Thread-207)
+  Ações subsequentes:
+    - 2026-07-08 15:54:06.858: Resposta parcial do Arduino: OK
+OK
+    - 2026-07-08 15:54:06.858: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 15:54:06.858: Código do portão enviado com sucesso: 168753845
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 15:59:11.240 (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 4. Chamador: com.motelinteligente.dados.VerificaComandosRemotos.processarComando(Linha 213) (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+  Ações subsequentes:
+    - 2026-07-08 15:59:11.344: Resposta parcial do Arduino: OK
+    - 2026-07-08 15:59:11.344: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 15:59:11.344: Código do portão enviado com sucesso: 170651413
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 15:59:11.584 (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 4. Chamador: com.motelinteligente.dados.VerificaComandosRemotos.processarComando(Linha 213) (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+  Ações subsequentes:
+    - 2026-07-08 15:59:12.590: Timeout aguardando resposta do Arduino. Última resposta:
+    - 2026-07-08 15:59:13.392: Resposta parcial do Arduino: OK
+    - 2026-07-08 15:59:13.393: Tentativa 1 recebeu ok (RF)
+    - 2026-07-08 15:59:13.393: Código do portão enviado com sucesso: 170651413
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 15:59:13.449 (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.dados.VerificaComandosRemotos.processarComando(Linha 209) (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+  Ações subsequentes:
+    - 2026-07-08 15:59:14.459: Timeout aguardando resposta do Arduino. Última resposta:
+    - 2026-07-08 15:59:15.262: Resposta parcial do Arduino: OK
+    - 2026-07-08 15:59:15.263: Tentativa 1 recebeu ok (RF)
+    - 2026-07-08 15:59:15.263: Código do portão enviado com sucesso: 168753845
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 15:59:15.979 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 6. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 15:59:16.785: Resposta parcial do Arduino: OK
+OK
+    - 2026-07-08 15:59:16.785: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 15:59:16.786: Código do portão enviado com sucesso: 200267925
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 15:59:45.507 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 8. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 15:59:45.609: Resposta parcial do Arduino: OK
+    - 2026-07-08 15:59:45.610: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 15:59:45.610: Código do portão enviado com sucesso: 176870437
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 15:59:50.931 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 7. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 15:59:51.033: Resposta parcial do Arduino: OK
+    - 2026-07-08 15:59:51.033: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 15:59:51.034: Código do portão enviado com sucesso: 148154517
+    - 2026-07-08 16:00:17.076: [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 7, Ligar: true. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 62) (Thread: AWT-EventQueue-0)
+    - 2026-07-08 16:00:17.077: Comando de luz enviado: LUZ-ON-7
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 16:00:17.378 (Thread: Thread-212)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 7. Chamador: com.motelinteligente.telas.controller.TelaPrincipalController.lambda$executaIniciar$0(Linha 335) (Thread: Thread-212)
+  Ações subsequentes:
+    - 2026-07-08 16:00:17.481: Resposta parcial do Arduino: OK
+    - 2026-07-08 16:00:17.481: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 16:00:17.481: Código do portão enviado com sucesso: 148154517
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 16:00:18.283 (Thread: Thread-212)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.telas.controller.TelaPrincipalController.lambda$executaIniciar$0(Linha 341) (Thread: Thread-212)
+  Ações subsequentes:
+    - 2026-07-08 16:00:18.989: Resposta parcial do Arduino: OK
+OK
+    - 2026-07-08 16:00:18.990: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 16:00:18.990: Código do portão enviado com sucesso: 168753845
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 16:00:24.666 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 4. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 16:00:24.768: Resposta parcial do Arduino: OK
+    - 2026-07-08 16:00:24.768: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 16:00:24.769: Código do portão enviado com sucesso: 170651413
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 16:00:28.978 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 6. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 16:00:29.080: Resposta parcial do Arduino: OK
+    - 2026-07-08 16:00:29.081: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 16:00:29.081: Código do portão enviado com sucesso: 200267925
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 16:08:38.572 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 6. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 16:08:38.674: Resposta parcial do Arduino: OK
+    - 2026-07-08 16:08:38.674: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 16:08:38.675: Código do portão enviado com sucesso: 200267925
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 16:11:28.454 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.controller.EncerraQuartoController.salvarLocacao(Linha 429) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 16:11:28.558: Resposta parcial do Arduino: OK
+    - 2026-07-08 16:11:28.558: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 16:11:28.559: Código do portão enviado com sucesso: 168095317
+    - 2026-07-08 16:11:28.573: [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 6, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: AWT-EventQueue-0)
+    - 2026-07-08 16:11:28.573: Comando de luz enviado: LUZ-OFF-6
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 16:12:02.202 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton3ActionPerformed$20(Linha 3146) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 16:12:02.304: Resposta parcial do Arduino: OK
+    - 2026-07-08 16:12:02.304: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 16:12:02.304: Código do portão enviado com sucesso: 168095317
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 16:12:45.537 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 4. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 16:12:45.639: Resposta parcial do Arduino: OK
+    - 2026-07-08 16:12:45.640: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 16:12:45.640: Código do portão enviado com sucesso: 170651413
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 16:14:49.292 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.controller.EncerraQuartoController.salvarLocacao(Linha 429) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 16:14:49.395: Resposta parcial do Arduino: OK
+    - 2026-07-08 16:14:49.395: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 16:14:49.395: Código do portão enviado com sucesso: 168095317
+    - 2026-07-08 16:14:49.406: [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 4, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: AWT-EventQueue-0)
+    - 2026-07-08 16:14:49.407: Comando de luz enviado: LUZ-OFF-4
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 16:15:13.079 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton3ActionPerformed$20(Linha 3146) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 16:15:13.182: Resposta parcial do Arduino: OK
+    - 2026-07-08 16:15:13.182: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 16:15:13.183: Código do portão enviado com sucesso: 168095317
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 16:15:53.263 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 9. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 16:15:53.366: Resposta parcial do Arduino: OK
+    - 2026-07-08 16:15:53.367: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 16:15:53.367: Código do portão enviado com sucesso: 176870421
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 16:18:16.250 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.controller.EncerraQuartoController.salvarLocacao(Linha 429) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 16:18:16.356: Resposta parcial do Arduino: OK
+    - 2026-07-08 16:18:16.356: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 16:18:16.356: Código do portão enviado com sucesso: 168095317
+    - 2026-07-08 16:18:16.367: [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 9, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: AWT-EventQueue-0)
+    - 2026-07-08 16:18:16.367: Comando de luz enviado: LUZ-OFF-9
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 16:18:34.604 (Thread: AWT-EventQueue-0)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton3ActionPerformed$20(Linha 3146) (Thread: AWT-EventQueue-0)
+  Ações subsequentes:
+    - 2026-07-08 16:18:34.708: Resposta parcial do Arduino: OK
+    - 2026-07-08 16:18:34.709: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 16:18:34.709: Código do portão enviado com sucesso: 168095317
+    - 2026-07-08 16:18:53.073: [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 3, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: SwingWorker-pool-4-thread-9)
+    - 2026-07-08 16:18:53.073: Comando de luz enviado: LUZ-OFF-3
+--------------------------------------------------------------------------------
+EVENTO INICIADO EM: 2026-07-08 16:32:12.272 (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+  Comando: [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 2. Chamador: com.motelinteligente.dados.VerificaComandosRemotos.processarComando(Linha 213) (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+  Ações subsequentes:
+    - 2026-07-08 16:32:12.376: Resposta parcial do Arduino: OK
+    - 2026-07-08 16:32:12.377: Tentativa 0 recebeu ok (RF)
+    - 2026-07-08 16:32:12.377: Código do portão enviado com sucesso: 190245525
+    - 2026-07-08 16:32:22.542: [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 2, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: SwingWorker-pool-4-thread-10)
+    - 2026-07-08 16:32:22.543: Comando de luz enviado: LUZ-OFF-2
+--------------------------------------------------------------------------------

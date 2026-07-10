@@ -604,9 +604,8 @@ public class UltimaLocacao extends javax.swing.JFrame {
             if (!(txtValorQuarto.getText().isEmpty()) && isNumeroFloat(txtValorQuarto.getText())) {
                 valorQuarto = Float.parseFloat(txtValorQuarto.getText().replace(',', '.'));
             }
-            if (!(txtValorTotal.getText().isEmpty()) && isNumeroFloat(txtValorTotal.getText())) {
-                valorTotal = Float.parseFloat(txtValorTotal.getText().replace(',', '.'));
-            }
+            valorTotal = valorQuarto + valorConsumo + valorAcrescimo - valorDesconto;
+            txtValorTotal.setText(String.format(java.util.Locale.US, "%.2f", valorTotal));
 
             // Verificar se todos os valores são positivos
             if (recC >= 0 && recD >= 0 && recP >= 0 && valorDesconto >= 0 && valorAcrescimo >= 0
@@ -822,6 +821,23 @@ public class UltimaLocacao extends javax.swing.JFrame {
                 }
             }
 
+            float oldDesconto = 0, oldAcrescimo = 0;
+            String sqlJustSelect = "SELECT tipo, valor FROM justificativa WHERE idlocacao = ?";
+            try (PreparedStatement stmtJustSelect = link.prepareStatement(sqlJustSelect)) {
+                stmtJustSelect.setInt(1, idLocacao);
+                try (ResultSet rs = stmtJustSelect.executeQuery()) {
+                    if (rs.next()) {
+                        String oldTipo = rs.getString("tipo");
+                        float oldVal = rs.getFloat("valor");
+                        if ("desconto".equals(oldTipo)) {
+                            oldDesconto = oldVal;
+                        } else if ("acrescimo".equals(oldTipo)) {
+                            oldAcrescimo = oldVal;
+                        }
+                    }
+                }
+            }
+
             float newDinheiro = Float.parseFloat(txtDinheiro.getText().replace(',', '.'));
             float newPix = Float.parseFloat(txtPix.getText().replace(',', '.'));
             float newCartao = Float.parseFloat(txtCartao.getText().replace(',', '.'));
@@ -893,6 +909,20 @@ public class UltimaLocacao extends javax.swing.JFrame {
                     statementInsertJustificativa.setString(4, txtJustificativa.getText());
                     statementInsertJustificativa.executeUpdate();
                 }
+            }
+
+            float newDesconto = 0, newAcrescimo = 0;
+            if ("desconto".equals(tipo)) {
+                newDesconto = valorSetar;
+            } else if ("acrescimo".equals(tipo)) {
+                newAcrescimo = valorSetar;
+            }
+
+            if (oldDesconto != newDesconto) {
+                com.motelinteligente.dados.fazconexao.registrarAuditoria(idLocacao, "desconto", String.valueOf(oldDesconto), String.valueOf(newDesconto));
+            }
+            if (oldAcrescimo != newAcrescimo) {
+                com.motelinteligente.dados.fazconexao.registrarAuditoria(idLocacao, "acrescimo", String.valueOf(oldAcrescimo), String.valueOf(newAcrescimo));
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, "Erro SalvaDados: " + e);

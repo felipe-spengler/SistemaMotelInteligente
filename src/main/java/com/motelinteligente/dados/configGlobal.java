@@ -36,6 +36,7 @@ public class configGlobal {
     private boolean pedidosOnlineAtivo;
     private boolean impressoraAtiva;
     private String impressoraNome;
+    private boolean luzAtiva;
 
     // Construtor privado para evitar a criação de múltiplas instâncias
     public configGlobal() {
@@ -50,6 +51,7 @@ public class configGlobal {
         telaMostrar = null;
         impressoraAtiva = false;
         impressoraNome = null;
+        luzAtiva = false;
 
     }
 
@@ -140,7 +142,8 @@ public class configGlobal {
     private void verificarColunasImpressora(Connection link) {
         String[] colunas = {
             "impressora_ativa TINYINT(1) DEFAULT 0",
-            "impressora_nome VARCHAR(255) DEFAULT NULL"
+            "impressora_nome VARCHAR(255) DEFAULT NULL",
+            "luz_ativa TINYINT(1) DEFAULT 0"
         };
         for (String col : colunas) {
             String nomeColuna = col.split(" ")[0];
@@ -188,6 +191,11 @@ public class configGlobal {
                         this.impressoraNome = resultado.getString("impressora_nome");
                     } catch (Exception ex) {
                         // Colunas podem não existir ainda
+                    }
+                    try {
+                        this.luzAtiva = resultado.getBoolean("luz_ativa");
+                    } catch (Exception ex) {
+                        // Coluna pode não existir ainda
                     }
                 } else {
                     JOptionPane.showMessageDialog(null,
@@ -328,5 +336,13 @@ public class configGlobal {
 
     public void setImpressoraNome(String impressoraNome) {
         this.impressoraNome = impressoraNome;
+    }
+
+    public boolean isLuzAtiva() {
+        return luzAtiva;
+    }
+
+    public void setLuzAtiva(boolean luzAtiva) {
+        this.luzAtiva = luzAtiva;
     }
 }

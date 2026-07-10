@@ -20,6 +20,7 @@ public class ConfiguracoesModerno extends JFrame {
     private JCheckBox checkLogoff;
     private JCheckBox checkEstoque;
     private JCheckBox checkPedidos;
+    private JCheckBox checkLuz;
     private JTextField txtLimiteDesconto;
     private JComboBox<String> jComboBoxTelas;
     private JRadioButton botaoRF;
@@ -62,6 +63,10 @@ public class ConfiguracoesModerno extends JFrame {
         checkPedidos = new JCheckBox("Ativar Pedidos Online");
         checkPedidos.addActionListener(e -> salvarCheckPedidos());
         pnlGeral.add(checkPedidos, "wrap");
+
+        checkLuz = new JCheckBox("Ativar Módulo de Luzes (Automação)");
+        checkLuz.addActionListener(e -> salvarCheckLuz());
+        pnlGeral.add(checkLuz, "wrap");
 
         // Discount
         JPanel pnlDesconto = new JPanel(new MigLayout("insets 0", "[]10[]5[]"));
@@ -190,6 +195,7 @@ public class ConfiguracoesModerno extends JFrame {
         checkLogoff.setSelected(config.getLogoffecharcaixa());
         checkEstoque.setSelected(config.getControlaEstoque());
         checkPedidos.setSelected(config.isPedidosOnlineAtivo());
+        checkLuz.setSelected(config.isLuzAtiva());
 
         // Discount
         txtLimiteDesconto.setText(String.valueOf(config.getLimiteDesconto()));
@@ -335,6 +341,13 @@ public class ConfiguracoesModerno extends JFrame {
                 JOptionPane.showMessageDialog(this, "Erro ao salvar impressora: " + e.getMessage());
             }
         }
+    }
+
+    private void salvarCheckLuz() {
+        if (isInitializing) return;
+        boolean selected = checkLuz.isSelected();
+        configGlobal.getInstance().setLuzAtiva(selected);
+        funcaoSet("luz_ativa", selected);
     }
 
     // Number Only Filter

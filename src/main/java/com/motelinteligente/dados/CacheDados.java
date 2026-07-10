@@ -75,15 +75,15 @@ public class CacheDados {
 
     public static void carregaArduino() {
         System.setProperty("jSerialComm.library.path", "C:\\Windows\\System32");
-        logger.info("[ARDUINO] Iniciando carregaArduino");
+        logger.debug("[ARDUINO] Iniciando carregaArduino");
         // Fecha qualquer conexão anterior mantida pela JVM para forçar reconexão limpa
         if (arduinoPort != null) {
             try {
                 if (arduinoPort.isOpen()) {
-                    logger.info("[ARDUINO] Fechando conexão Arduino existente: {}", arduinoPort.getSystemPortName());
+                    logger.debug("[ARDUINO] Fechando conexão Arduino existente: {}", arduinoPort.getSystemPortName());
                     arduinoPort.closePort();
                 } else {
-                    logger.info("[ARDUINO] Referência a arduinoPort encontrada, porém não está aberta. Limpando referência.");
+                    logger.debug("[ARDUINO] Referência a arduinoPort encontrada, porém não está aberta. Limpando referência.");
                 }
             } catch (Exception e) {
                 logger.warn("[ARDUINO] Erro ao fechar conexão anterior: {}", e.toString());
@@ -93,9 +93,9 @@ public class CacheDados {
         }
 
         try {
-            logger.info("[ARDUINO] Antes de SerialPort.getCommPorts()");
+            logger.debug("[ARDUINO] Antes de SerialPort.getCommPorts()");
             SerialPort[] portas = getCommPortsWithTimeout(2000); // 2s timeout
-            logger.info("[ARDUINO] Depois de SerialPort.getCommPorts() - total: {}", portas.length);
+            logger.debug("[ARDUINO] Depois de SerialPort.getCommPorts() - total: {}", portas.length);
 
             if (portas.length == 0) {
                 logger.warn("[ARDUINO] Nenhuma porta serial encontrada.");
@@ -103,7 +103,7 @@ public class CacheDados {
 
             for (SerialPort porta : portas) {
                 String descricao = porta.getDescriptivePortName().toLowerCase();
-                logger.info("[ARDUINO] Nome: {}, Descrição: {}", porta.getSystemPortName(), porta.getDescriptivePortName());
+                logger.debug("[ARDUINO] Nome: {}, Descrição: {}", porta.getSystemPortName(), porta.getDescriptivePortName());
 
                 boolean isCh340 = descricao.contains("usb-serial ch340");
                 boolean isFt232 = descricao.contains("ft232r usb uart") || descricao.contains("usb serial port");
@@ -126,7 +126,7 @@ public class CacheDados {
         }
 
         try {
-            logger.info("[ARDUINO] Tentando abrir porta {}", arduinoPort.getSystemPortName());
+            logger.debug("[ARDUINO] Tentando abrir porta {}", arduinoPort.getSystemPortName());
             if (!arduinoPort.openPort()) {
                 logger.error("[ARDUINO] Falha ao abrir a porta {}", arduinoPort.getSystemPortName());
                 return;
@@ -142,8 +142,8 @@ public class CacheDados {
             arduinoPort.setNumDataBits(8); // Bits de dados
             arduinoPort.setNumStopBits(1); // Bits de parada
             arduinoPort.setParity(SerialPort.NO_PARITY); // Paridade
-            logger.info("[ARDUINO] Porta serial configurada: {}", arduinoPort.getSystemPortName());
-            logger.info("[ARDUINO] carregaArduino finalizado com sucesso");
+            logger.debug("[ARDUINO] Porta serial configurada: {}", arduinoPort.getSystemPortName());
+            logger.debug("[ARDUINO] carregaArduino finalizado com sucesso");
         } catch (Exception ex) {
             logger.error("[ARDUINO] Exceção ao configurar a porta serial", ex);
         }
@@ -192,13 +192,13 @@ public class CacheDados {
 
     public CarregaQuarto carregarDadosQuarto() {
 
-        logger.info("[CACHE] Iniciando carregarDadosQuarto");
+        logger.debug("[CACHE] Iniciando carregarDadosQuarto");
     synchronized (cacheQuarto) { 
         try (Connection link = new fazconexao().conectar(); 
              PreparedStatement statement = link.prepareStatement("select * from status order by numeroquarto"); 
              ResultSet resultado = statement.executeQuery()) {
 
-            logger.info("[CACHE] Query de status executada");
+            logger.debug("[CACHE] Query de status executada");
             // Opcional, dependendo da sua lógica: Se o objetivo é recarregar a cache
             // cacheQuarto.clear(); 
             // cacheOcupado.clear(); 
@@ -223,7 +223,7 @@ public class CacheDados {
                     carregarOcupado(numeroQuarto);
                 }
             }
-            logger.info("[CACHE] carregarDadosQuarto concluído com {} quartos", cacheQuarto.size());
+            logger.debug("[CACHE] carregarDadosQuarto concluído com {} quartos", cacheQuarto.size());
         } catch (SQLException e) {
             logger.error("Erro ao carregar dados dos quartos", e);
         }

@@ -173,7 +173,7 @@ public class ImpressoraService {
         float totalDespesasCartao = dao.getTotalDespesasCaixa(idCaixa, "credito") + dao.getTotalDespesasCaixa(idCaixa, "debito") + dao.getTotalDespesasCaixa(idCaixa, "outro");
         float totalDespesasPix = dao.getTotalDespesasCaixa(idCaixa, "pix");
 
-        float esperadoDinheiro = saldoIni + v.entradaD - totalRetiradas - totalDespesasDinheiro - (antecipadoOutro > 0 ? antecipadoOutro : 0);
+        float esperadoDinheiro = saldoIni + v.entradaD + totalJustificativas - totalRetiradas - totalDespesasDinheiro - (antecipadoOutro > 0 ? antecipadoOutro : 0);
         float esperadoCartao = v.entradaC - totalDespesasCartao;
         float esperadoPix = v.entradaP - totalDespesasPix;
         float saldoFinal = esperadoDinheiro + esperadoCartao + esperadoPix;

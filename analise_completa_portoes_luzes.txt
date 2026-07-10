@@ -1,0 +1,307 @@
+========================================================================
+   RELATÓRIO DE ANÁLISE DE EVENTOS (LOCAÇÕES, PORTÕES E ILUMINAÇÃO)    
+========================================================================
+
+Este relatório foi gerado automaticamente a partir da análise detalhada
+do arquivo 'app-logs.html'. Ele lista cronologicamente as locações,
+aberturas de portões e comandos de iluminação enviados aos quartos.
+
+--- CRONOLOGIA DE EVENTOS ENCONTRADOS ---
+
+[2026-07-08 11:42:54.444] [LOGIN] [LOGIN] Tentativa de login com usuário='fe'
+[2026-07-08 11:43:25.773] [LOGIN] [LOGIN] Tentativa de login com usuário='fe'
+[2026-07-08 11:43:33.128] [LOGIN] [LOGIN] Tentativa de login com usuário='fe'
+[2026-07-08 11:43:33.277] [LOGIN] [LOGIN] Tentativa de login com usuário='fe'
+[2026-07-08 11:43:41.109] [LOGIN] [LOGIN] Tentativa de login com usuário='fe'
+[2026-07-08 11:44:04.868] [LOGIN] [LOGIN] Tentativa de login com usuário='fe'
+[2026-07-08 11:44:07.912] [LOGIN] [LOGIN] Tentativa de login com usuário='fe'
+[2026-07-08 11:44:09.052] [LOGIN] [LOGIN] Tentativa de login com usuário='fe'
+[2026-07-08 11:44:09.307] [LOGIN] [LOGIN] Tentativa de login com usuário='fe'
+[2026-07-08 11:44:09.485] [LOGIN] [LOGIN] Tentativa de login com usuário='fe'
+[2026-07-08 11:44:09.642] [LOGIN] [LOGIN] Tentativa de login com usuário='fe'
+[2026-07-08 11:44:09.840] [LOGIN] [LOGIN] Tentativa de login com usuário='fe'
+[2026-07-08 11:44:10.009] [LOGIN] [LOGIN] Tentativa de login com usuário='fe'
+[2026-07-08 11:44:10.172] [LOGIN] [LOGIN] Tentativa de login com usuário='fe'
+[2026-07-08 11:44:10.410] [LOGIN] [LOGIN] Tentativa de login com usuário='fe'
+[2026-07-08 11:44:10.599] [LOGIN] [LOGIN] Tentativa de login com usuário='fe'
+[2026-07-08 11:44:10.831] [LOGIN] [LOGIN] Tentativa de login com usuário='fe'
+[2026-07-08 11:44:11.060] [LOGIN] [LOGIN] Tentativa de login com usuário='fe'
+[2026-07-08 11:44:11.236] [LOGIN] [LOGIN] Tentativa de login com usuário='fe'
+[2026-07-08 11:44:59.935] [LOGIN] [LOGIN] Tentativa de login com usuário='fe'
+[2026-07-08 11:45:15.790] [LOGIN] [LOGIN] Tentativa de login com usuário='fe'
+[2026-07-08 11:45:19.938] [LOGIN] Login efetuado: Usuário 'fe' - Cargo: admin
+[2026-07-08 11:45:19.941] [LOGIN] [LOGIN] Login bem-sucedido para usuário='fe', cargo='admin'
+[2026-07-08 11:46:01.353] [LIGHT] [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 2, Ligar: true. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 62) (Thread: AWT-EventQueue-0)
+[2026-07-08 11:46:01.354] [LIGHT] Comando de luz enviado: LUZ-ON-2
+[2026-07-08 11:46:01.658] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 2. Chamador: com.motelinteligente.telas.controller.TelaPrincipalController.lambda$executaIniciar$0(Linha 335) (Thread: Thread-19)
+[2026-07-08 11:46:01.764] [GATE_SUCCESS] Código do portão enviado com sucesso: 190245525
+[2026-07-08 11:46:02.566] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.telas.controller.TelaPrincipalController.lambda$executaIniciar$0(Linha 341) (Thread: Thread-19)
+[2026-07-08 11:46:03.278] [GATE_SUCCESS] Código do portão enviado com sucesso: 168753845
+[2026-07-08 11:46:11.146] [LIGHT] [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 3, Ligar: true. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 62) (Thread: AWT-EventQueue-0)
+[2026-07-08 11:46:11.147] [LIGHT] Comando de luz enviado: LUZ-ON-3
+[2026-07-08 11:46:11.450] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 3. Chamador: com.motelinteligente.telas.controller.TelaPrincipalController.lambda$executaIniciar$0(Linha 335) (Thread: Thread-25)
+[2026-07-08 11:46:11.557] [GATE_SUCCESS] Código do portão enviado com sucesso: 190245557
+[2026-07-08 11:46:12.359] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.telas.controller.TelaPrincipalController.lambda$executaIniciar$0(Linha 341) (Thread: Thread-25)
+[2026-07-08 11:46:13.071] [GATE_SUCCESS] Código do portão enviado com sucesso: 168753845
+[2026-07-08 11:46:15.586] [LIGHT] [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 4, Ligar: true. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 62) (Thread: AWT-EventQueue-0)
+[2026-07-08 11:46:15.586] [LIGHT] Comando de luz enviado: LUZ-ON-4
+[2026-07-08 11:46:15.888] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 4. Chamador: com.motelinteligente.telas.controller.TelaPrincipalController.lambda$executaIniciar$0(Linha 335) (Thread: Thread-31)
+[2026-07-08 11:46:15.994] [GATE_SUCCESS] Código do portão enviado com sucesso: 170651413
+[2026-07-08 11:46:16.795] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.telas.controller.TelaPrincipalController.lambda$executaIniciar$0(Linha 341) (Thread: Thread-31)
+[2026-07-08 11:46:17.507] [GATE_SUCCESS] Código do portão enviado com sucesso: 168753845
+[2026-07-08 11:46:42.077] [LIGHT] [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 4, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: AWT-EventQueue-0)
+[2026-07-08 11:46:42.077] [LIGHT] Comando de luz enviado: LUZ-OFF-4
+[2026-07-08 11:47:05.861] [LIGHT] [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 2, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: AWT-EventQueue-0)
+[2026-07-08 11:47:05.862] [LIGHT] Comando de luz enviado: LUZ-OFF-2
+[2026-07-08 11:47:23.183] [LIGHT] [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 3, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: AWT-EventQueue-0)
+[2026-07-08 11:47:23.184] [LIGHT] Comando de luz enviado: LUZ-OFF-3
+[2026-07-08 11:55:36.458] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 11. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+[2026-07-08 11:55:36.584] [GATE_SUCCESS] Código do portão enviado com sucesso: 170090517
+[2026-07-08 11:55:44.505] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 11. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+[2026-07-08 11:55:44.609] [GATE_SUCCESS] Código do portão enviado com sucesso: 170090517
+[2026-07-08 11:56:51.830] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.controller.EncerraQuartoController.salvarLocacao(Linha 429) (Thread: AWT-EventQueue-0)
+[2026-07-08 11:56:51.935] [GATE_SUCCESS] Código do portão enviado com sucesso: 168095317
+[2026-07-08 11:56:52.224] [LIGHT] [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 11, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: AWT-EventQueue-0)
+[2026-07-08 11:56:52.225] [LIGHT] Comando de luz enviado: LUZ-OFF-11
+[2026-07-08 12:00:56.765] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 11. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+[2026-07-08 12:00:56.869] [GATE_SUCCESS] Código do portão enviado com sucesso: 170090517
+[2026-07-08 12:01:00.661] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 10. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+[2026-07-08 12:01:00.765] [GATE_SUCCESS] Código do portão enviado com sucesso: 135674005
+[2026-07-08 12:01:17.342] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton3ActionPerformed$20(Linha 3146) (Thread: AWT-EventQueue-0)
+[2026-07-08 12:01:17.444] [GATE_SUCCESS] Código do portão enviado com sucesso: 168095317
+[2026-07-08 12:02:23.414] [LIGHT] [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 8, Ligar: true. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 62) (Thread: AWT-EventQueue-0)
+[2026-07-08 12:02:23.415] [LIGHT] Comando de luz enviado: LUZ-ON-8
+[2026-07-08 12:02:23.726] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 8. Chamador: com.motelinteligente.telas.controller.TelaPrincipalController.lambda$executaIniciar$0(Linha 335) (Thread: Thread-73)
+[2026-07-08 12:02:23.829] [GATE_SUCCESS] Código do portão enviado com sucesso: 176870437
+[2026-07-08 12:02:24.630] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.telas.controller.TelaPrincipalController.lambda$executaIniciar$0(Linha 341) (Thread: Thread-73)
+[2026-07-08 12:02:25.341] [GATE_SUCCESS] Código do portão enviado com sucesso: 168753845
+[2026-07-08 12:02:44.333] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton1ActionPerformed$19(Linha 3140) (Thread: AWT-EventQueue-0)
+[2026-07-08 12:02:44.437] [GATE_SUCCESS] Código do portão enviado com sucesso: 168753845
+[2026-07-08 12:02:57.332] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 8. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+[2026-07-08 12:02:57.435] [GATE_SUCCESS] Código do portão enviado com sucesso: 176870437
+[2026-07-08 12:39:31.782] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.dados.VerificaComandosRemotos.processarComando(Linha 209) (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+[2026-07-08 12:39:31.887] [GATE_SUCCESS] Código do portão enviado com sucesso: 168753845
+[2026-07-08 12:39:55.933] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.dados.VerificaComandosRemotos.processarComando(Linha 209) (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+[2026-07-08 12:39:56.039] [GATE_SUCCESS] Código do portão enviado com sucesso: 168753845
+[2026-07-08 12:43:58.037] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 2. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+[2026-07-08 12:43:58.141] [GATE_SUCCESS] Código do portão enviado com sucesso: 190245525
+[2026-07-08 12:44:00.157] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 4. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+[2026-07-08 12:44:00.260] [GATE_SUCCESS] Código do portão enviado com sucesso: 170651413
+[2026-07-08 12:44:04.509] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 9. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+[2026-07-08 12:44:04.613] [GATE_SUCCESS] Código do portão enviado com sucesso: 176870421
+[2026-07-08 12:44:07.013] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 10. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+[2026-07-08 12:44:07.116] [GATE_SUCCESS] Código do portão enviado com sucesso: 135674005
+[2026-07-08 12:44:09.781] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 11. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+[2026-07-08 12:44:09.885] [GATE_SUCCESS] Código do portão enviado com sucesso: 170090517
+[2026-07-08 12:56:41.259] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 8. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+[2026-07-08 12:56:41.367] [GATE_SUCCESS] Código do portão enviado com sucesso: 176870437
+[2026-07-08 12:58:06.709] [LIGHT] [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 3, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: SwingWorker-pool-4-thread-1)
+[2026-07-08 12:58:06.710] [LIGHT] Comando de luz enviado: LUZ-OFF-3
+[2026-07-08 12:58:11.560] [LIGHT] [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 2, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: SwingWorker-pool-4-thread-2)
+[2026-07-08 12:58:11.561] [LIGHT] Comando de luz enviado: LUZ-OFF-2
+[2026-07-08 12:58:16.674] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 2. Chamador: com.motelinteligente.dados.VerificaComandosRemotos.processarComando(Linha 213) (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+[2026-07-08 12:58:16.778] [GATE_SUCCESS] Código do portão enviado com sucesso: 190245525
+[2026-07-08 12:58:24.244] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.controller.EncerraQuartoController.salvarLocacao(Linha 429) (Thread: AWT-EventQueue-0)
+[2026-07-08 12:58:24.347] [GATE_SUCCESS] Código do portão enviado com sucesso: 168095317
+[2026-07-08 12:58:24.362] [LIGHT] [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 8, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: AWT-EventQueue-0)
+[2026-07-08 12:58:24.363] [LIGHT] Comando de luz enviado: LUZ-OFF-8
+[2026-07-08 12:58:42.628] [LIGHT] [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 2, Ligar: true. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 62) (Thread: AWT-EventQueue-0)
+[2026-07-08 12:58:42.628] [LIGHT] Comando de luz enviado: LUZ-ON-2
+[2026-07-08 12:58:42.930] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 2. Chamador: com.motelinteligente.telas.controller.TelaPrincipalController.lambda$executaIniciar$0(Linha 335) (Thread: Thread-98)
+[2026-07-08 12:58:43.033] [GATE_SUCCESS] Código do portão enviado com sucesso: 190245525
+[2026-07-08 12:58:43.834] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.telas.controller.TelaPrincipalController.lambda$executaIniciar$0(Linha 341) (Thread: Thread-98)
+[2026-07-08 12:58:44.539] [GATE_SUCCESS] Código do portão enviado com sucesso: 168753845
+[2026-07-08 12:58:56.538] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton3ActionPerformed$20(Linha 3146) (Thread: AWT-EventQueue-0)
+[2026-07-08 12:58:56.641] [GATE_SUCCESS] Código do portão enviado com sucesso: 168095317
+[2026-07-08 12:59:11.794] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton1ActionPerformed$19(Linha 3140) (Thread: AWT-EventQueue-0)
+[2026-07-08 12:59:11.898] [GATE_SUCCESS] Código do portão enviado com sucesso: 168753845
+[2026-07-08 12:59:15.538] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 2. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+[2026-07-08 12:59:15.641] [GATE_SUCCESS] Código do portão enviado com sucesso: 190245525
+[2026-07-08 13:04:26.953] [LIGHT] [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 4, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: SwingWorker-pool-4-thread-3)
+[2026-07-08 13:04:26.953] [LIGHT] Comando de luz enviado: LUZ-OFF-4
+[2026-07-08 13:04:33.151] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 4. Chamador: com.motelinteligente.dados.VerificaComandosRemotos.processarComando(Linha 213) (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+[2026-07-08 13:04:33.255] [GATE_SUCCESS] Código do portão enviado com sucesso: 170651413
+[2026-07-08 13:11:24.838] [LIGHT] [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 9, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: SwingWorker-pool-4-thread-4)
+[2026-07-08 13:11:24.838] [LIGHT] Comando de luz enviado: LUZ-OFF-9
+[2026-07-08 13:11:30.537] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 9. Chamador: com.motelinteligente.dados.VerificaComandosRemotos.processarComando(Linha 213) (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+[2026-07-08 13:11:30.640] [GATE_SUCCESS] Código do portão enviado com sucesso: 176870421
+[2026-07-08 13:26:45.829] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton3ActionPerformed$20(Linha 3146) (Thread: AWT-EventQueue-0)
+[2026-07-08 13:26:45.931] [GATE_SUCCESS] Código do portão enviado com sucesso: 168095317
+[2026-07-08 13:31:49.297] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 2. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+[2026-07-08 13:31:49.401] [GATE_SUCCESS] Código do portão enviado com sucesso: 190245525
+[2026-07-08 13:31:52.073] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton3ActionPerformed$20(Linha 3146) (Thread: AWT-EventQueue-0)
+[2026-07-08 13:31:52.177] [GATE_SUCCESS] Código do portão enviado com sucesso: 168095317
+[2026-07-08 13:34:04.329] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.controller.EncerraQuartoController.salvarLocacao(Linha 429) (Thread: AWT-EventQueue-0)
+[2026-07-08 13:34:04.433] [GATE_SUCCESS] Código do portão enviado com sucesso: 168095317
+[2026-07-08 13:34:04.553] [LIGHT] [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 2, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: AWT-EventQueue-0)
+[2026-07-08 13:34:04.553] [LIGHT] Comando de luz enviado: LUZ-OFF-2
+[2026-07-08 13:35:13.583] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton3ActionPerformed$20(Linha 3146) (Thread: AWT-EventQueue-0)
+[2026-07-08 13:35:13.686] [GATE_SUCCESS] Código do portão enviado com sucesso: 168095317
+[2026-07-08 14:03:47.164] [LIGHT] [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 3, Ligar: true. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 62) (Thread: http-nio-0.0.0.0-1521-exec-10)
+[2026-07-08 14:03:47.165] [LIGHT] Comando de luz enviado: LUZ-ON-3
+[2026-07-08 14:03:47.673] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 3. Chamador: com.motelinteligente.dados.ReceberNumeroQuartoController.lambda$receberNumeroQuarto$0(Linha 177) (Thread: Thread-125)
+[2026-07-08 14:03:47.777] [GATE_SUCCESS] Código do portão enviado com sucesso: 190245557
+[2026-07-08 14:03:48.578] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.dados.ReceberNumeroQuartoController.lambda$receberNumeroQuarto$0(Linha 182) (Thread: Thread-125)
+[2026-07-08 14:03:49.288] [GATE_SUCCESS] Código do portão enviado com sucesso: 168753845
+[2026-07-08 14:37:36.084] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.controller.EncerraQuartoController.salvarLocacao(Linha 429) (Thread: AWT-EventQueue-0)
+[2026-07-08 14:37:36.189] [GATE_SUCCESS] Código do portão enviado com sucesso: 168095317
+[2026-07-08 14:37:36.203] [LIGHT] [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 3, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: AWT-EventQueue-0)
+[2026-07-08 14:37:36.203] [LIGHT] Comando de luz enviado: LUZ-OFF-3
+[2026-07-08 14:38:06.064] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton3ActionPerformed$20(Linha 3146) (Thread: AWT-EventQueue-0)
+[2026-07-08 14:38:06.167] [GATE_SUCCESS] Código do portão enviado com sucesso: 168095317
+[2026-07-08 14:44:20.211] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton1ActionPerformed$19(Linha 3140) (Thread: AWT-EventQueue-0)
+[2026-07-08 14:44:20.314] [GATE_SUCCESS] Código do portão enviado com sucesso: 168753845
+[2026-07-08 14:44:39.467] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton1ActionPerformed$19(Linha 3140) (Thread: AWT-EventQueue-0)
+[2026-07-08 14:44:39.571] [GATE_SUCCESS] Código do portão enviado com sucesso: 168753845
+[2026-07-08 14:44:40.971] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton3ActionPerformed$20(Linha 3146) (Thread: AWT-EventQueue-0)
+[2026-07-08 14:44:41.075] [GATE_SUCCESS] Código do portão enviado com sucesso: 168095317
+[2026-07-08 14:48:50.072] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton3ActionPerformed$20(Linha 3146) (Thread: AWT-EventQueue-0)
+[2026-07-08 14:48:50.176] [GATE_SUCCESS] Código do portão enviado com sucesso: 168095317
+[2026-07-08 14:57:08.663] [LIGHT] [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 4, Ligar: true. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 62) (Thread: http-nio-0.0.0.0-1521-exec-3)
+[2026-07-08 14:57:08.664] [LIGHT] Comando de luz enviado: LUZ-ON-4
+[2026-07-08 14:57:09.165] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 4. Chamador: com.motelinteligente.dados.ReceberNumeroQuartoController.lambda$receberNumeroQuarto$0(Linha 177) (Thread: Thread-140)
+[2026-07-08 14:57:09.270] [GATE_SUCCESS] Código do portão enviado com sucesso: 170651413
+[2026-07-08 14:57:10.071] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.dados.ReceberNumeroQuartoController.lambda$receberNumeroQuarto$0(Linha 182) (Thread: Thread-140)
+[2026-07-08 14:57:10.777] [GATE_SUCCESS] Código do portão enviado com sucesso: 168753845
+[2026-07-08 14:58:21.825] [LIGHT] [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 9, Ligar: true. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 62) (Thread: http-nio-0.0.0.0-1521-exec-5)
+[2026-07-08 14:58:21.826] [LIGHT] Comando de luz enviado: LUZ-ON-9
+[2026-07-08 14:58:22.328] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 9. Chamador: com.motelinteligente.dados.ReceberNumeroQuartoController.lambda$receberNumeroQuarto$0(Linha 177) (Thread: Thread-145)
+[2026-07-08 14:58:22.432] [GATE_SUCCESS] Código do portão enviado com sucesso: 176870421
+[2026-07-08 14:58:23.233] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.dados.ReceberNumeroQuartoController.lambda$receberNumeroQuarto$0(Linha 182) (Thread: Thread-145)
+[2026-07-08 14:58:23.942] [GATE_SUCCESS] Código do portão enviado com sucesso: 168753845
+[2026-07-08 14:58:49.316] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 4. Chamador: com.motelinteligente.dados.VerificaComandosRemotos.processarComando(Linha 213) (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+[2026-07-08 14:58:49.420] [GATE_SUCCESS] Código do portão enviado com sucesso: 170651413
+[2026-07-08 14:58:49.810] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.dados.VerificaComandosRemotos.processarComando(Linha 209) (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+[2026-07-08 14:58:51.621] [GATE_SUCCESS] Código do portão enviado com sucesso: 168753845
+[2026-07-08 14:59:00.392] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 4. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+[2026-07-08 14:59:00.497] [GATE_SUCCESS] Código do portão enviado com sucesso: 170651413
+[2026-07-08 14:59:02.464] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 4. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+[2026-07-08 14:59:02.568] [GATE_SUCCESS] Código do portão enviado com sucesso: 170651413
+[2026-07-08 14:59:04.840] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton1ActionPerformed$19(Linha 3140) (Thread: AWT-EventQueue-0)
+[2026-07-08 14:59:04.944] [GATE_SUCCESS] Código do portão enviado com sucesso: 168753845
+[2026-07-08 14:59:07.440] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 9. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+[2026-07-08 14:59:07.543] [GATE_SUCCESS] Código do portão enviado com sucesso: 176870421
+[2026-07-08 15:04:42.676] [LIGHT] [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 11, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: SwingWorker-pool-4-thread-5)
+[2026-07-08 15:04:42.677] [LIGHT] Comando de luz enviado: LUZ-OFF-11
+[2026-07-08 15:04:54.668] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton1ActionPerformed$19(Linha 3140) (Thread: AWT-EventQueue-0)
+[2026-07-08 15:04:54.772] [GATE_SUCCESS] Código do portão enviado com sucesso: 168753845
+[2026-07-08 15:05:23.535] [LIGHT] [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 11, Ligar: true. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 62) (Thread: AWT-EventQueue-0)
+[2026-07-08 15:05:23.536] [LIGHT] Comando de luz enviado: LUZ-ON-11
+[2026-07-08 15:05:23.839] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 11. Chamador: com.motelinteligente.telas.controller.TelaPrincipalController.lambda$executaIniciar$0(Linha 335) (Thread: Thread-154)
+[2026-07-08 15:05:23.943] [GATE_SUCCESS] Código do portão enviado com sucesso: 170090517
+[2026-07-08 15:05:24.743] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.telas.controller.TelaPrincipalController.lambda$executaIniciar$0(Linha 341) (Thread: Thread-154)
+[2026-07-08 15:05:25.450] [GATE_SUCCESS] Código do portão enviado com sucesso: 168753845
+[2026-07-08 15:12:46.711] [LIGHT] [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 10, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: SwingWorker-pool-4-thread-6)
+[2026-07-08 15:12:46.711] [LIGHT] Comando de luz enviado: LUZ-OFF-10
+[2026-07-08 15:12:47.430] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 10. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+[2026-07-08 15:12:47.533] [GATE_SUCCESS] Código do portão enviado com sucesso: 135674005
+[2026-07-08 15:20:14.769] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.dados.VerificaComandosRemotos.processarComando(Linha 209) (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+[2026-07-08 15:20:14.873] [GATE_SUCCESS] Código do portão enviado com sucesso: 168753845
+[2026-07-08 15:20:19.220] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.dados.VerificaComandosRemotos.processarComando(Linha 211) (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+[2026-07-08 15:20:19.324] [GATE_SUCCESS] Código do portão enviado com sucesso: 168095317
+[2026-07-08 15:20:36.388] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.dados.VerificaComandosRemotos.processarComando(Linha 209) (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+[2026-07-08 15:20:36.492] [GATE_SUCCESS] Código do portão enviado com sucesso: 168753845
+[2026-07-08 15:24:45.141] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton3ActionPerformed$20(Linha 3146) (Thread: AWT-EventQueue-0)
+[2026-07-08 15:24:45.244] [GATE_SUCCESS] Código do portão enviado com sucesso: 168095317
+[2026-07-08 15:25:06.381] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 11. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+[2026-07-08 15:25:06.485] [GATE_SUCCESS] Código do portão enviado com sucesso: 170090517
+[2026-07-08 15:26:17.077] [LIGHT] [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 10, Ligar: true. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 62) (Thread: http-nio-0.0.0.0-1521-exec-9)
+[2026-07-08 15:26:17.078] [LIGHT] Comando de luz enviado: LUZ-ON-10
+[2026-07-08 15:26:17.579] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 10. Chamador: com.motelinteligente.dados.ReceberNumeroQuartoController.lambda$receberNumeroQuarto$0(Linha 177) (Thread: Thread-164)
+[2026-07-08 15:26:17.683] [GATE_SUCCESS] Código do portão enviado com sucesso: 135674005
+[2026-07-08 15:26:18.484] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.dados.ReceberNumeroQuartoController.lambda$receberNumeroQuarto$0(Linha 182) (Thread: Thread-164)
+[2026-07-08 15:26:19.193] [GATE_SUCCESS] Código do portão enviado com sucesso: 168753845
+[2026-07-08 15:26:40.756] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton1ActionPerformed$19(Linha 3140) (Thread: AWT-EventQueue-0)
+[2026-07-08 15:26:40.858] [GATE_SUCCESS] Código do portão enviado com sucesso: 168753845
+[2026-07-08 15:26:49.059] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 10. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+[2026-07-08 15:26:49.162] [GATE_SUCCESS] Código do portão enviado com sucesso: 135674005
+[2026-07-08 15:29:15.859] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.controller.EncerraQuartoController.salvarLocacao(Linha 429) (Thread: AWT-EventQueue-0)
+[2026-07-08 15:29:15.966] [GATE_SUCCESS] Código do portão enviado com sucesso: 168095317
+[2026-07-08 15:29:15.976] [LIGHT] [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 11, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: AWT-EventQueue-0)
+[2026-07-08 15:29:15.977] [LIGHT] Comando de luz enviado: LUZ-OFF-11
+[2026-07-08 15:29:34.401] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 4. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+[2026-07-08 15:29:34.506] [GATE_SUCCESS] Código do portão enviado com sucesso: 170651413
+[2026-07-08 15:29:40.449] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton3ActionPerformed$20(Linha 3146) (Thread: AWT-EventQueue-0)
+[2026-07-08 15:29:40.553] [GATE_SUCCESS] Código do portão enviado com sucesso: 168095317
+[2026-07-08 15:31:34.235] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.controller.EncerraQuartoController.salvarLocacao(Linha 429) (Thread: AWT-EventQueue-0)
+[2026-07-08 15:31:34.339] [GATE_SUCCESS] Código do portão enviado com sucesso: 168095317
+[2026-07-08 15:31:34.349] [LIGHT] [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 4, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: AWT-EventQueue-0)
+[2026-07-08 15:31:34.350] [LIGHT] Comando de luz enviado: LUZ-OFF-4
+[2026-07-08 15:32:03.375] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton3ActionPerformed$20(Linha 3146) (Thread: AWT-EventQueue-0)
+[2026-07-08 15:32:03.479] [GATE_SUCCESS] Código do portão enviado com sucesso: 168095317
+[2026-07-08 15:32:07.477] [LIGHT] [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 6, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: SwingWorker-pool-4-thread-7)
+[2026-07-08 15:32:07.477] [LIGHT] Comando de luz enviado: LUZ-OFF-6
+[2026-07-08 15:32:08.000] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 6. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+[2026-07-08 15:32:08.103] [GATE_SUCCESS] Código do portão enviado com sucesso: 200267925
+[2026-07-08 15:34:43.535] [LIGHT] [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 6, Ligar: true. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 62) (Thread: AWT-EventQueue-0)
+[2026-07-08 15:34:43.535] [LIGHT] Comando de luz enviado: LUZ-ON-6
+[2026-07-08 15:34:43.836] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 6. Chamador: com.motelinteligente.telas.controller.TelaPrincipalController.lambda$executaIniciar$0(Linha 335) (Thread: Thread-197)
+[2026-07-08 15:34:43.941] [GATE_SUCCESS] Código do portão enviado com sucesso: 200267925
+[2026-07-08 15:34:44.742] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.telas.controller.TelaPrincipalController.lambda$executaIniciar$0(Linha 341) (Thread: Thread-197)
+[2026-07-08 15:34:45.449] [GATE_SUCCESS] Código do portão enviado com sucesso: 168753845
+[2026-07-08 15:35:12.885] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton1ActionPerformed$19(Linha 3140) (Thread: AWT-EventQueue-0)
+[2026-07-08 15:35:12.988] [GATE_SUCCESS] Código do portão enviado com sucesso: 168753845
+[2026-07-08 15:35:16.573] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 6. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+[2026-07-08 15:35:16.677] [GATE_SUCCESS] Código do portão enviado com sucesso: 200267925
+[2026-07-08 15:52:09.530] [LIGHT] [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 4, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: SwingWorker-pool-4-thread-8)
+[2026-07-08 15:52:09.531] [LIGHT] Comando de luz enviado: LUZ-OFF-4
+[2026-07-08 15:52:14.639] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 4. Chamador: com.motelinteligente.dados.VerificaComandosRemotos.processarComando(Linha 213) (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+[2026-07-08 15:52:14.743] [GATE_SUCCESS] Código do portão enviado com sucesso: 170651413
+[2026-07-08 15:54:04.742] [LIGHT] [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 4, Ligar: true. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 62) (Thread: http-nio-0.0.0.0-1521-exec-10)
+[2026-07-08 15:54:04.743] [LIGHT] Comando de luz enviado: LUZ-ON-4
+[2026-07-08 15:54:05.245] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 4. Chamador: com.motelinteligente.dados.ReceberNumeroQuartoController.lambda$receberNumeroQuarto$0(Linha 177) (Thread: Thread-207)
+[2026-07-08 15:54:05.349] [GATE_SUCCESS] Código do portão enviado com sucesso: 170651413
+[2026-07-08 15:54:06.150] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.dados.ReceberNumeroQuartoController.lambda$receberNumeroQuarto$0(Linha 182) (Thread: Thread-207)
+[2026-07-08 15:54:06.858] [GATE_SUCCESS] Código do portão enviado com sucesso: 168753845
+[2026-07-08 15:59:11.240] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 4. Chamador: com.motelinteligente.dados.VerificaComandosRemotos.processarComando(Linha 213) (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+[2026-07-08 15:59:11.344] [GATE_SUCCESS] Código do portão enviado com sucesso: 170651413
+[2026-07-08 15:59:11.584] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 4. Chamador: com.motelinteligente.dados.VerificaComandosRemotos.processarComando(Linha 213) (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+[2026-07-08 15:59:13.393] [GATE_SUCCESS] Código do portão enviado com sucesso: 170651413
+[2026-07-08 15:59:13.449] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.dados.VerificaComandosRemotos.processarComando(Linha 209) (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+[2026-07-08 15:59:15.263] [GATE_SUCCESS] Código do portão enviado com sucesso: 168753845
+[2026-07-08 15:59:15.979] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 6. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+[2026-07-08 15:59:16.786] [GATE_SUCCESS] Código do portão enviado com sucesso: 200267925
+[2026-07-08 15:59:45.507] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 8. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+[2026-07-08 15:59:45.610] [GATE_SUCCESS] Código do portão enviado com sucesso: 176870437
+[2026-07-08 15:59:50.931] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 7. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+[2026-07-08 15:59:51.034] [GATE_SUCCESS] Código do portão enviado com sucesso: 148154517
+[2026-07-08 16:00:17.076] [LIGHT] [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 7, Ligar: true. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 62) (Thread: AWT-EventQueue-0)
+[2026-07-08 16:00:17.077] [LIGHT] Comando de luz enviado: LUZ-ON-7
+[2026-07-08 16:00:17.378] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 7. Chamador: com.motelinteligente.telas.controller.TelaPrincipalController.lambda$executaIniciar$0(Linha 335) (Thread: Thread-212)
+[2026-07-08 16:00:17.481] [GATE_SUCCESS] Código do portão enviado com sucesso: 148154517
+[2026-07-08 16:00:18.283] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 888. Chamador: com.motelinteligente.telas.controller.TelaPrincipalController.lambda$executaIniciar$0(Linha 341) (Thread: Thread-212)
+[2026-07-08 16:00:18.990] [GATE_SUCCESS] Código do portão enviado com sucesso: 168753845
+[2026-07-08 16:00:24.666] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 4. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+[2026-07-08 16:00:24.769] [GATE_SUCCESS] Código do portão enviado com sucesso: 170651413
+[2026-07-08 16:00:28.978] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 6. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+[2026-07-08 16:00:29.081] [GATE_SUCCESS] Código do portão enviado com sucesso: 200267925
+[2026-07-08 16:08:38.572] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 6. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+[2026-07-08 16:08:38.675] [GATE_SUCCESS] Código do portão enviado com sucesso: 200267925
+[2026-07-08 16:11:28.454] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.controller.EncerraQuartoController.salvarLocacao(Linha 429) (Thread: AWT-EventQueue-0)
+[2026-07-08 16:11:28.559] [GATE_SUCCESS] Código do portão enviado com sucesso: 168095317
+[2026-07-08 16:11:28.573] [LIGHT] [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 6, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: AWT-EventQueue-0)
+[2026-07-08 16:11:28.573] [LIGHT] Comando de luz enviado: LUZ-OFF-6
+[2026-07-08 16:12:02.202] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton3ActionPerformed$20(Linha 3146) (Thread: AWT-EventQueue-0)
+[2026-07-08 16:12:02.304] [GATE_SUCCESS] Código do portão enviado com sucesso: 168095317
+[2026-07-08 16:12:45.537] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 4. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+[2026-07-08 16:12:45.640] [GATE_SUCCESS] Código do portão enviado com sucesso: 170651413
+[2026-07-08 16:14:49.292] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.controller.EncerraQuartoController.salvarLocacao(Linha 429) (Thread: AWT-EventQueue-0)
+[2026-07-08 16:14:49.395] [GATE_SUCCESS] Código do portão enviado com sucesso: 168095317
+[2026-07-08 16:14:49.406] [LIGHT] [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 4, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: AWT-EventQueue-0)
+[2026-07-08 16:14:49.407] [LIGHT] Comando de luz enviado: LUZ-OFF-4
+[2026-07-08 16:15:13.079] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton3ActionPerformed$20(Linha 3146) (Thread: AWT-EventQueue-0)
+[2026-07-08 16:15:13.183] [GATE_SUCCESS] Código do portão enviado com sucesso: 168095317
+[2026-07-08 16:15:53.263] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 9. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton4ActionPerformed$13(Linha 2755) (Thread: AWT-EventQueue-0)
+[2026-07-08 16:15:53.367] [GATE_SUCCESS] Código do portão enviado com sucesso: 176870421
+[2026-07-08 16:18:16.250] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.controller.EncerraQuartoController.salvarLocacao(Linha 429) (Thread: AWT-EventQueue-0)
+[2026-07-08 16:18:16.356] [GATE_SUCCESS] Código do portão enviado com sucesso: 168095317
+[2026-07-08 16:18:16.367] [LIGHT] [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 9, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: AWT-EventQueue-0)
+[2026-07-08 16:18:16.367] [LIGHT] Comando de luz enviado: LUZ-OFF-9
+[2026-07-08 16:18:34.604] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 999. Chamador: com.motelinteligente.telas.TelaPrincipal.lambda$jButton3ActionPerformed$20(Linha 3146) (Thread: AWT-EventQueue-0)
+[2026-07-08 16:18:34.709] [GATE_SUCCESS] Código do portão enviado com sucesso: 168095317
+[2026-07-08 16:18:53.073] [LIGHT] [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 3, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: SwingWorker-pool-4-thread-9)
+[2026-07-08 16:18:53.073] [LIGHT] Comando de luz enviado: LUZ-OFF-3
+[2026-07-08 16:32:12.272] [GATE_TRIGGER] [ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: 2. Chamador: com.motelinteligente.dados.VerificaComandosRemotos.processarComando(Linha 213) (Thread: MQTT Call: MotelClient_toledo_1783521932125)
+[2026-07-08 16:32:12.377] [GATE_SUCCESS] Código do portão enviado com sucesso: 190245525
+[2026-07-08 16:32:22.542] [LIGHT] [ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: 2, Ligar: false. Chamador: com.motelinteligente.dados.fquartos.setStatus(Linha 64) (Thread: SwingWorker-pool-4-thread-10)
+[2026-07-08 16:32:22.543] [LIGHT] Comando de luz enviado: LUZ-OFF-2
