@@ -312,6 +312,38 @@ public class fcaixa {
         return valor;
     }
 
+    public valores getAntecipadoOutrosDetalhado(int idCaixaAtual) {
+        valores v = new valores();
+        String sql = "SELECT a.valor, a.tipo FROM registralocado rl "
+                + "JOIN antecipado a ON rl.idlocacao = a.idlocacao "
+                + "WHERE rl.idcaixaatual = ? AND rl.horafim IS NOT NULL AND a.idcaixaatual != ?";
+        try (Connection link = new fazconexao().conectar(); PreparedStatement statement = link.prepareStatement(sql)) {
+            statement.setInt(1, idCaixaAtual);
+            statement.setInt(2, idCaixaAtual);
+            try (ResultSet resultado = statement.executeQuery()) {
+                while (resultado.next()) {
+                    String tipo = resultado.getString("tipo");
+                    if (!"desconto".equals(tipo)) {
+                        float val = resultado.getFloat("valor");
+                        if (tipo != null) {
+                            tipo = tipo.toLowerCase();
+                            if (tipo.contains("dinheiro")) {
+                                v.entradaD += val;
+                            } else if (tipo.contains("cartao") || tipo.contains("cartão") || tipo.contains("credito") || tipo.contains("debito")) {
+                                v.entradaC += val;
+                            } else if (tipo.contains("pix")) {
+                                v.entradaP += val;
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Erro ao buscar antecipado outros detalhado: ", e);
+        }
+        return v;
+    }
+
     public float getOutrosCaixas(int idCaixaAtual) {
         // Alias for getAntecipadoOutros to match internal method naming convention
         return getAntecipadoOutros(idCaixaAtual);

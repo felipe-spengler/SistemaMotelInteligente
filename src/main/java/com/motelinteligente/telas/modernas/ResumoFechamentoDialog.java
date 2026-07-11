@@ -148,9 +148,10 @@ public class ResumoFechamentoDialog extends JDialog {
         // antecipados em aberto)
         // antecipadoDetalhado é apenas um detalhamento informativo, não deve ser somado
         // novamente
-        float esperadoDinheiro = saldoInicial + vals.entradaD - (antecipadoOutro > 0 ? antecipadoOutro : 0);
-        float esperadoCartao = vals.entradaC;
-        float esperadoPix = vals.entradaP;
+        com.motelinteligente.dados.valores antecipadoOutrosDet = new com.motelinteligente.dados.fcaixa().getAntecipadoOutrosDetalhado(com.motelinteligente.dados.configGlobal.getInstance().getCaixa());
+        float esperadoDinheiro = saldoInicial + vals.entradaD - antecipadoOutrosDet.entradaD;
+        float esperadoCartao = vals.entradaC - antecipadoOutrosDet.entradaC;
+        float esperadoPix = vals.entradaP - antecipadoOutrosDet.entradaP;
 
         // Mostrando o DEVE TER
         addRow(pnlFisico, "(=) Deve ter em Dinheiro", esperadoDinheiro, true);
