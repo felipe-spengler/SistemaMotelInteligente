@@ -266,7 +266,7 @@ public class CheckSincronia extends TimerTask {
             case "alarmes":
                 return "id";
             case "reservas":
-                return "id";
+                return "id_reserva";
             case "portoes":
                 return "id";
             case "antecipado":
