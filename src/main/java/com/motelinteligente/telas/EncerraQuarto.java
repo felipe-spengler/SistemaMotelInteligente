@@ -2042,6 +2042,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 valP = recebidoPix[0];
                 valCredito = recebidoCredito[0];
                 valDebito = recebidoDebito[0];
+                valorRecebidoAgora = totalRecebido;
                 sucesso[0] = true; // Indica que o pagamento foi bem-sucedido
                 dialog.dispose(); // Fecha o JDialog
             } else {

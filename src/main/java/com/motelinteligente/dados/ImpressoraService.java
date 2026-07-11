@@ -458,8 +458,9 @@ public class ImpressoraService {
         if (valoreRecebido > 0) {
             sb.append(String.format("Pago Antecipado:           R$ %,.2f\n", valoreRecebido));
         }
-        if (valorRecebidoAgora > 0) {
-            sb.append(String.format("Pago no Fechamento:        R$ %,.2f\n", valorRecebidoAgora));
+        float totalPagamentoFechamento = (valD + valP + valC) > 0 ? (valD + valP + valC) : valorRecebidoAgora;
+        if (totalPagamentoFechamento > 0) {
+            sb.append(String.format("Pago no Fechamento:        R$ %,.2f\n", totalPagamentoFechamento));
             if (valD > 0) {
                 sb.append(String.format(" -> Em Dinheiro:           R$ %,.2f\n", valD));
             }
