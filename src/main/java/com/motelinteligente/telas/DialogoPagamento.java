@@ -43,6 +43,7 @@ public class DialogoPagamento extends JDialog {
     private final JLabel lblTotalDivida;
     private final JLabel lblTotalAntecipado;
     private final JLabel lblRestante;
+    private JLabel lblValRestante;
 
     private final JButton btnCredito;
     private final JButton btnDebito;
@@ -395,7 +396,9 @@ public class DialogoPagamento extends JDialog {
         float restante = valorDivida - totalGeral;
         if (restante < 0) restante = 0;
         
-        lblRestante.setText(String.format("R$ %,.2f", restante));
+        if (lblValRestante != null) {
+            lblValRestante.setText(String.format("R$ %,.2f", restante));
+        }
 
         txtAreaRecebidos.append("--- VALORES DIGITADOS / PAGOS ---\n");
         if (recebidoDin > 0) {
@@ -451,6 +454,10 @@ public class DialogoPagamento extends JDialog {
         JLabel lblValue = new JLabel(String.format("R$ %,.2f", valor));
         lblValue.setFont(new Font("Segoe UI", Font.BOLD, 22));
         lblValue.setForeground(corDestaque);
+
+        if ("SALDO A PAGAR".equals(titulo)) {
+            lblValRestante = lblValue;
+        }
 
         card.add(lblTitle, BorderLayout.NORTH);
         card.add(lblValue, BorderLayout.CENTER);
