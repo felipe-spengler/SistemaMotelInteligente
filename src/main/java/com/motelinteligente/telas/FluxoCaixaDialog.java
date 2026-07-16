@@ -1,5 +1,6 @@
 package com.motelinteligente.telas;
 
+import com.motelinteligente.dados.configGlobal;
 import com.motelinteligente.dados.fazconexao;
 import com.motelinteligente.dados.fcaixa;
 import java.awt.BorderLayout;
@@ -14,6 +15,7 @@ import java.awt.Insets;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -188,6 +190,15 @@ public class FluxoCaixaDialog extends JDialog {
         JPanel painelBotoesTab = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 5));
         painelBotoesTab.setBackground(Color.WHITE);
 
+        JButton btnLancar = new JButton("Lançar Despesa");
+        btnLancar.setBackground(new Color(76, 175, 80));
+        btnLancar.setForeground(Color.WHITE);
+        btnLancar.setFocusPainted(false);
+        btnLancar.addActionListener(e -> {
+            new DespesaDialog((JFrame) SwingUtilities.getWindowAncestor(this)).setVisible(true);
+            carregarFluxo();
+        });
+
         JButton btnEditar = new JButton("Editar Despesa");
         btnEditar.setBackground(new Color(255, 152, 0));
         btnEditar.setForeground(Color.WHITE);
@@ -200,6 +211,7 @@ public class FluxoCaixaDialog extends JDialog {
         btnExcluir.setFocusPainted(false);
         btnExcluir.addActionListener(e -> excluirLancamentoSelecionado());
 
+        painelBotoesTab.add(btnLancar);
         painelBotoesTab.add(btnEditar);
         painelBotoesTab.add(btnExcluir);
         painelDetalhesTab.add(painelBotoesTab, BorderLayout.SOUTH);
@@ -231,6 +243,82 @@ public class FluxoCaixaDialog extends JDialog {
         painelAdiantamentosTab.add(painelSummaryAdiantamentos, BorderLayout.SOUTH);
 
         abas.addTab("Adiantamentos de Funcionários", painelAdiantamentosTab);
+
+        // Aba 4: Taxas Administrativas
+        JPanel painelTaxasTab = new JPanel(new GridBagLayout());
+        painelTaxasTab.setBackground(Color.WHITE);
+        painelTaxasTab.setBorder(new EmptyBorder(20, 20, 20, 20));
+
+        GridBagConstraints gbcT = new GridBagConstraints();
+        gbcT.insets = new Insets(10, 10, 10, 10);
+        gbcT.anchor = GridBagConstraints.WEST;
+        gbcT.fill = GridBagConstraints.HORIZONTAL;
+
+        gbcT.gridx = 0; gbcT.gridy = 0;
+        JLabel lblInfoTaxas = new JLabel("Configuração de Taxas Administrativas (%)");
+        lblInfoTaxas.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        painelTaxasTab.add(lblInfoTaxas, gbcT);
+
+        gbcT.gridy++;
+        painelTaxasTab.add(new JLabel("Taxa Crédito (%):"), gbcT);
+        JTextField txtTaxaCredito = new JTextField(10);
+        gbcT.gridx = 1;
+        painelTaxasTab.add(txtTaxaCredito, gbcT);
+
+        gbcT.gridx = 0; gbcT.gridy++;
+        painelTaxasTab.add(new JLabel("Taxa Débito (%):"), gbcT);
+        JTextField txtTaxaDebito = new JTextField(10);
+        gbcT.gridx = 1;
+        painelTaxasTab.add(txtTaxaDebito, gbcT);
+
+        gbcT.gridx = 0; gbcT.gridy++;
+        painelTaxasTab.add(new JLabel("Taxa Pix (%):"), gbcT);
+        JTextField txtTaxaPix = new JTextField(10);
+        gbcT.gridx = 1;
+        painelTaxasTab.add(txtTaxaPix, gbcT);
+
+        // Load current rates
+        configGlobal currentCfg = configGlobal.getInstance();
+        txtTaxaCredito.setText(String.format("%.2f", currentCfg.getTaxaCredito()).replace(".", ","));
+        txtTaxaDebito.setText(String.format("%.2f", currentCfg.getTaxaDebito()).replace(".", ","));
+        txtTaxaPix.setText(String.format("%.2f", currentCfg.getTaxaPix()).replace(".", ","));
+
+        gbcT.gridx = 0; gbcT.gridy++;
+        gbcT.gridwidth = 2;
+        JButton btnSalvarTaxas = new JButton("Salvar Taxas");
+        btnSalvarTaxas.setBackground(new Color(76, 175, 80));
+        btnSalvarTaxas.setForeground(Color.WHITE);
+        btnSalvarTaxas.setFocusPainted(false);
+        btnSalvarTaxas.addActionListener(evtT -> {
+            try {
+                float valCred = Float.parseFloat(txtTaxaCredito.getText().replace(",", "."));
+                float valDeb = Float.parseFloat(txtTaxaDebito.getText().replace(",", "."));
+                float valPix = Float.parseFloat(txtTaxaPix.getText().replace(",", "."));
+
+                try (Connection link = new fazconexao().conectar();
+                     PreparedStatement stmt = link.prepareStatement(
+                         "UPDATE configuracoes SET taxa_credito = ?, taxa_debito = ?, taxa_pix = ?")) {
+                    stmt.setFloat(1, valCred);
+                    stmt.setFloat(2, valDeb);
+                    stmt.setFloat(3, valPix);
+                    stmt.executeUpdate();
+
+                    configGlobal.getInstance().setTaxaCredito(valCred);
+                    configGlobal.getInstance().setTaxaDebito(valDeb);
+                    configGlobal.getInstance().setTaxaPix(valPix);
+
+                    JOptionPane.showMessageDialog(this, "Taxas salvas com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                    carregarFluxo(); // Recarrega fluxo para recalcular com base nas novas taxas
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Digite valores numéricos válidos.", "Erro", JOptionPane.ERROR_MESSAGE);
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(this, "Erro ao salvar no banco: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        painelTaxasTab.add(btnSalvarTaxas, gbcT);
+
+        abas.addTab("Taxas Administrativas", painelTaxasTab);
 
         add(painelFiltros, BorderLayout.NORTH);
         add(abas, BorderLayout.CENTER);
@@ -287,17 +375,22 @@ public class FluxoCaixaDialog extends JDialog {
             float totalDespesasVal = 0f;
 
             // Mapas para agrupar Faturamento por forma de pagamento e Despesas por Categoria
-            Map<String, Float> faturamentoMeios = new HashMap<>();
+            Map<String, Float> faturamentoMeios = new java.util.LinkedHashMap<>();
             faturamentoMeios.put("Dinheiro", 0f);
             faturamentoMeios.put("Pix", 0f);
-            faturamentoMeios.put("Cartão", 0f);
+            faturamentoMeios.put("Cartão Crédito", 0f);
+            faturamentoMeios.put("Cartão Débito", 0f);
             faturamentoMeios.put("Outro", 0f);
 
             Map<String, Float> despesasCategorias = new HashMap<>();
 
             try (Connection link = new fazconexao().conectar()) {
                 // 1. Consultar Locações (Receita para soma total) - NO modeloDetalhes.addRow
-                String sqlLocacoes = "SELECT horafim, pagodinheiro, pagopix, pagocartao, numquarto FROM registralocado WHERE horafim >= ? AND horafim <= ? AND valorquarto IS NOT NULL ORDER BY horafim";
+                String sqlLocacoes = "SELECT r.horafim, r.pagodinheiro, r.pagopix, r.pagocartao, r.numquarto, " +
+                                     "COALESCE(vc.valorcredito, 0) as valorcredito, COALESCE(vc.valordebito, 0) as valordebito " +
+                                     "FROM registralocado r " +
+                                     "LEFT JOIN valorcartao vc ON r.idlocacao = vc.idlocacao " +
+                                     "WHERE r.horafim >= ? AND r.horafim <= ? AND r.valorquarto IS NOT NULL ORDER BY r.horafim";
                 try (PreparedStatement stmt = link.prepareStatement(sqlLocacoes)) {
                     stmt.setString(1, tInicio);
                     stmt.setString(2, tFim);
@@ -306,12 +399,20 @@ public class FluxoCaixaDialog extends JDialog {
                             float pgDinheiro = rs.getFloat("pagodinheiro");
                             float pgPix = rs.getFloat("pagopix");
                             float pgCartao = rs.getFloat("pagocartao");
+                            float valCred = rs.getFloat("valorcredito");
+                            float valDeb = rs.getFloat("valordebito");
+
+                            if (pgCartao > 0 && valCred == 0 && valDeb == 0) {
+                                valCred = pgCartao; // Fallback
+                            }
+
                             float total = pgDinheiro + pgPix + pgCartao;
 
                             faturamentoTotal += total;
                             faturamentoMeios.put("Dinheiro", faturamentoMeios.get("Dinheiro") + pgDinheiro);
                             faturamentoMeios.put("Pix", faturamentoMeios.get("Pix") + pgPix);
-                            faturamentoMeios.put("Cartão", faturamentoMeios.get("Cartão") + pgCartao);
+                            faturamentoMeios.put("Cartão Crédito", faturamentoMeios.get("Cartão Crédito") + valCred);
+                            faturamentoMeios.put("Cartão Débito", faturamentoMeios.get("Cartão Débito") + valDeb);
                         }
                     }
                 }
@@ -331,13 +432,33 @@ public class FluxoCaixaDialog extends JDialog {
                                 faturamentoMeios.put("Dinheiro", faturamentoMeios.get("Dinheiro") + total);
                             } else if ("pix".equalsIgnoreCase(pgto)) {
                                 faturamentoMeios.put("Pix", faturamentoMeios.get("Pix") + total);
-                            } else if ("credito".equalsIgnoreCase(pgto) || "debito".equalsIgnoreCase(pgto) || "cartao".equalsIgnoreCase(pgto)) {
-                                faturamentoMeios.put("Cartão", faturamentoMeios.get("Cartão") + total);
+                            } else if ("credito".equalsIgnoreCase(pgto)) {
+                                faturamentoMeios.put("Cartão Crédito", faturamentoMeios.get("Cartão Crédito") + total);
+                            } else if ("debito".equalsIgnoreCase(pgto)) {
+                                faturamentoMeios.put("Cartão Débito", faturamentoMeios.get("Cartão Débito") + total);
+                            } else if ("cartao".equalsIgnoreCase(pgto)) {
+                                faturamentoMeios.put("Cartão Crédito", faturamentoMeios.get("Cartão Crédito") + total);
                             } else {
                                 faturamentoMeios.put("Outro", faturamentoMeios.get("Outro") + total);
                             }
                         }
                     }
+                }
+
+                // Calcular Taxas de Cartão/Pix com base nas configuradas
+                configGlobal cfg = configGlobal.getInstance();
+                float taxaCred = cfg.getTaxaCredito();
+                float taxaDeb = cfg.getTaxaDebito();
+                float taxaPix = cfg.getTaxaPix();
+
+                float totCred = faturamentoMeios.get("Cartão Crédito");
+                float totDeb = faturamentoMeios.get("Cartão Débito");
+                float totPix = faturamentoMeios.get("Pix");
+
+                float valorTaxasCalculado = (totCred * taxaCred / 100f) + (totDeb * taxaDeb / 100f) + (totPix * taxaPix / 100f);
+                if (valorTaxasCalculado > 0) {
+                    totalDespesasVal += valorTaxasCalculado;
+                    despesasCategorias.put("Taxas Administrativas (Cartões/Pix)", valorTaxasCalculado);
                 }
 
                 // 3. Consultar Retiradas/Sangrias (Despesa) - WITH modeloDetalhes.addRow

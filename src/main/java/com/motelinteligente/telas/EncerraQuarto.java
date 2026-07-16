@@ -557,7 +557,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
         float descAntecipado = controller.getValorDesconto();
         if (descAntecipado > 0) {
             txtDesconto.setText(String.valueOf(descAntecipado));
-            txtJustifica.setText("Desconto aplicado via Autoatendimento");
+            txtJustifica.setText("desconto negociado antecipadamente!");
             // Força cálculo de porcentagem no UI
             verificaDesconto(2);
             lastDescontoVal = txtDesconto.getText().trim();

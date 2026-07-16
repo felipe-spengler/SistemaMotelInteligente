@@ -1863,6 +1863,11 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
             menuCadastraProduto.setEnabled(false);
         }
 
+        String cargoUser = config.getCargoUsuario();
+        if (!"admin".equals(cargoUser) && !"gerente".equals(cargoUser)) {
+            jMenu16.setEnabled(false);
+        }
+
         // carrega o numero de alarmes ativos ao iniciar o sistema
         try (Connection conn = new fazconexao().conectar();
                 Statement stmt = conn.createStatement();
@@ -2414,7 +2419,11 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     }
 
     private void menuFluxoCaixaActionPerformed(java.awt.event.ActionEvent evt) {
-        new FluxoCaixaDialog(this).setVisible(true);
+        if (cargo != null && (cargo.equals("admin") || cargo.equals("gerente"))) {
+            new FluxoCaixaDialog(this).setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(null, "Você não tem permissão! Somente gerência ou acima.");
+        }
     }
 
     private void menuCadastraProdutoActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuCadastraProdutoActionPerformed

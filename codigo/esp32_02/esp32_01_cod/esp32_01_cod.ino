@@ -5,9 +5,10 @@
 
 #include <Preferences.h> // Biblioteca nativa para salvar na memória flash
 
-// 🛰️ PINOS EXCLUSIVOS DE COMUNICAÇÃO DO MAX485
-#define MAX485_DE_RE 4   // Controle de direção (RE/DE) -> GPIO 4
-// Dados: RX2 na GPIO 16 e TX2 na GPIO 17 (Tratados nativamente pela Serial2)
+// 🛰️ PINOS EXCLUSIVOS DE COMUNICAÇÃO E SINALIZAÇÃO
+#define MAX485_DE_RE 5   // Controle de direção (RE/DE) -> GPIO 5 (D5)
+#define LED_STATUS 2     // LED interno do ESP32 para sinalização visual (GPIO 2)
+// Dados: RX2 na GPIO 15 (D15) e TX2 na GPIO 23 (D23) (Tratados nativamente pela Serial2)
 
 String rs485Buffer = "";
 Preferences listaLuzes; // Cria o objeto de memória
@@ -46,8 +47,16 @@ int obtenerPinoPortaoGeral(int codigoGeral) {
 }
 
 void setup() {
-  // Inicializa a Serial2 nativa nos pinos 16 (RX2) e 17 (TX2)
-  Serial2.begin(9600, SERIAL_8N1, 16, 17);
+  // Inicializa a Serial de depuração USB para monitoramento no PC
+  Serial.begin(9600);
+  Serial.println("--- ESP32 Inicializado e Pronto ---");
+
+  // Configura o LED de status
+  pinMode(LED_STATUS, OUTPUT);
+  digitalWrite(LED_STATUS, LOW);
+
+  // Inicializa a Serial2 nativa nos pinos 15 (RX2/D15) e 23 (TX2/D23)
+  Serial2.begin(9600, SERIAL_8N1, 15, 23);
   
   // Configura direção do MAX485
   pinMode(MAX485_DE_RE, OUTPUT);
@@ -92,8 +101,19 @@ void loop() {
   while (Serial2.available() > 0) {
     char c = (char)Serial2.read();
     if (c == '\n') {
+      // Sinalização visual: acende o LED indicando recepção de dados
+      digitalWrite(LED_STATUS, HIGH);
+      
+      // Limpa e exibe o comando recebido na Serial do USB (PC)
+      rs485Buffer.trim();
+      Serial.print("[RS485 Recebido]: ");
+      Serial.println(rs485Buffer);
+      
       processarComandoRS485(rs485Buffer);
       rs485Buffer = ""; 
+      
+      // Apaga o LED de status
+      digitalWrite(LED_STATUS, LOW);
     } else if (c != '\r') {
       rs485Buffer += c;
     }
@@ -114,6 +134,10 @@ void processarComandoRS485(String cmd) {
     if (quartoNum >= 106 && quartoNum <= 110) {
       int pinoLuz = obtenerPinoLuzQuarto(quartoNum);
       if (pinoLuz != -1) {
+        Serial.print("-> Executando LUZ do Quarto ");
+        Serial.print(quartoNum);
+        Serial.println(ligar ? ": LIGAR (LOW)" : ": DESLIGAR (HIGH)");
+
         // Aciona o relé físico
         digitalWrite(pinoLuz, ligar ? LOW : HIGH); 
         
@@ -121,6 +145,10 @@ void processarComandoRS485(String cmd) {
         String chaveMemory = "q" + String(quartoNum);
         listaLuzes.putBool(chaveMemory.c_str(), ligar);
       }
+    } else {
+      Serial.print("-> Comando LUZ ignorado (Quarto ");
+      Serial.print(quartoNum);
+      Serial.println(" fora do range 106-110)");
     }
   }
   // 2. COMANDO DE PORTÃO (Ex: 106, 107, 888, 999)
@@ -130,15 +158,27 @@ void processarComandoRS485(String cmd) {
     
     if (codigoCmd >= 106 && codigoCmd <= 110) {
       pinoBotoeira = obtenerPinoPortaoQuarto(codigoCmd);
+      if (pinoBotoeira != -1) {
+        Serial.print("-> Acionando portao individual do quarto: ");
+        Serial.println(codigoCmd);
+      }
     }
     else if (codigoCmd == 888 || codigoCmd == 999) {
       pinoBotoeira = obtenerPinoPortaoGeral(codigoCmd);
+      if (pinoBotoeira != -1) {
+        Serial.print("-> Acionando portao geral: ");
+        Serial.println(codigoCmd == 888 ? "ENTRADA (888)" : "SAIDA (999)");
+      }
     }
       
     if (pinoBotoeira != -1) {
       digitalWrite(pinoBotoeira, LOW);  // Dá o pulso
       delay(500);                       
       digitalWrite(pinoBotoeira, HIGH); // Abre o contato
+      Serial.println("-> Pulso de 500ms concluido.");
+    } else {
+      Serial.print("-> Codigo de portao/comando nao reconhecido: ");
+      Serial.println(cmd);
     }
   }
 }

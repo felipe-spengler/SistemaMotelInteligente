@@ -60,7 +60,7 @@ public class fquartos {
             if (ok) {
                 if (status.equalsIgnoreCase("manutencao") || status.toLowerCase().contains("ocupado")) {
                     com.motelinteligente.arduino.ConectaArduino.enviarComandoLuz(numero, true);
-                } else if (status.equalsIgnoreCase("livre") || status.equalsIgnoreCase("limpeza")) {
+                } else if (status.equalsIgnoreCase("livre") || status.equalsIgnoreCase("limpeza") || status.equalsIgnoreCase("reservado") || status.equalsIgnoreCase("reserva")) {
                     com.motelinteligente.arduino.ConectaArduino.enviarComandoLuz(numero, false);
                 }
             }
@@ -75,7 +75,7 @@ public class fquartos {
             if (ok) {
                 if (status.equalsIgnoreCase("manutencao") || status.toLowerCase().contains("ocupado")) {
                     com.motelinteligente.arduino.ConectaArduino.enviarComandoLuz(numero, true);
-                } else if (status.equalsIgnoreCase("livre") || status.equalsIgnoreCase("limpeza")) {
+                } else if (status.equalsIgnoreCase("livre") || status.equalsIgnoreCase("limpeza") || status.equalsIgnoreCase("reservado") || status.equalsIgnoreCase("reserva")) {
                     com.motelinteligente.arduino.ConectaArduino.enviarComandoLuz(numero, false);
                 }
             }

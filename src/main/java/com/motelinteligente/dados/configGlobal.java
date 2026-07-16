@@ -37,6 +37,9 @@ public class configGlobal {
     private boolean impressoraAtiva;
     private String impressoraNome;
     private boolean luzAtiva;
+    private float taxaCredito;
+    private float taxaDebito;
+    private float taxaPix;
 
     // Construtor privado para evitar a criação de múltiplas instâncias
     public configGlobal() {
@@ -52,7 +55,9 @@ public class configGlobal {
         impressoraAtiva = false;
         impressoraNome = null;
         luzAtiva = false;
-
+        taxaCredito = 0f;
+        taxaDebito = 0f;
+        taxaPix = 0f;
     }
 
     public int getAlarmesAtivos() {
@@ -160,12 +165,34 @@ public class configGlobal {
         }
     }
 
+    private void verificarColunasTaxas(Connection link) {
+        String[] colunas = {
+            "taxa_credito FLOAT DEFAULT 0",
+            "taxa_debito FLOAT DEFAULT 0",
+            "taxa_pix FLOAT DEFAULT 0"
+        };
+        for (String col : colunas) {
+            String nomeColuna = col.split(" ")[0];
+            try (PreparedStatement testStmt = link.prepareStatement("SELECT " + nomeColuna + " FROM configuracoes LIMIT 1")) {
+                testStmt.executeQuery();
+            } catch (SQLException ex) {
+                try (Statement alterStmt = link.createStatement()) {
+                    alterStmt.executeUpdate("ALTER TABLE configuracoes ADD COLUMN " + col);
+                    logger.info("Coluna " + nomeColuna + " adicionada com sucesso na tabela configuracoes.");
+                } catch (SQLException alterEx) {
+                    logger.error("Erro ao adicionar coluna " + nomeColuna + " em configuracoes: ", alterEx);
+                }
+            }
+        }
+    }
+
     public void carregarConfiguracoesAdicionais() {
         logger.info("[CONFIG] carregarConfiguracoesAdicionais iniciado");
         String consultaSQL = "SELECT * FROM configuracoes";
 
         try (Connection link = new fazconexao().conectar()) {
             verificarColunasImpressora(link);
+            verificarColunasTaxas(link);
 
             try (Statement statement = link.createStatement();
                     ResultSet resultado = statement.executeQuery(consultaSQL)) {
@@ -197,6 +224,13 @@ public class configGlobal {
                     } catch (Exception ex) {
                         // Coluna pode não existir ainda
                     }
+                    try {
+                        this.taxaCredito = resultado.getFloat("taxa_credito");
+                        this.taxaDebito = resultado.getFloat("taxa_debito");
+                        this.taxaPix = resultado.getFloat("taxa_pix");
+                    } catch (Exception ex) {
+                        // Colunas podem não existir ainda
+                    }
                 } else {
                     JOptionPane.showMessageDialog(null,
                             "Erro ao carregar Informações Adicionais. Nenhuma configuração encontrada.");
@@ -209,6 +243,30 @@ public class configGlobal {
             JOptionPane.showMessageDialog(null, "Erro ao conectar e carregar informações: " + e.toString(),
                     "Erro de Conexão", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    public float getTaxaCredito() {
+        return taxaCredito;
+    }
+
+    public void setTaxaCredito(float taxaCredito) {
+        this.taxaCredito = taxaCredito;
+    }
+
+    public float getTaxaDebito() {
+        return taxaDebito;
+    }
+
+    public void setTaxaDebito(float taxaDebito) {
+        this.taxaDebito = taxaDebito;
+    }
+
+    public float getTaxaPix() {
+        return taxaPix;
+    }
+
+    public void setTaxaPix(float taxaPix) {
+        this.taxaPix = taxaPix;
     }
 
     public String getUsuario() {
