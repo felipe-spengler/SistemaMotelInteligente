@@ -186,7 +186,7 @@ public class configGlobal {
         }
     }
 
-    private void verificarColunaPortoesRF(Connection link) {
+    public static void verificarColunaPortoesRF(Connection link) {
         try {
             boolean tipoIncorreto = false;
             String typeStr = "";
