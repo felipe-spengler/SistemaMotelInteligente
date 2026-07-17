@@ -28,9 +28,9 @@ public class ConectaArduino {
             valorPortao, chamador, Thread.currentThread().getName());
 
         configGlobal config = configGlobal.getInstance();
-        boolean portoesRF = config.getPortoesRF();
+        String tipoPortao = config.getPortoesRF();
 
-        if (portoesRF) {
+        if ("RF".equalsIgnoreCase(tipoPortao)) {
             if (CacheDados.getArduinoPort() == null) {
                 logger.error("Erro ao enviar Codigo Portão ao Arduino. Arduino Não Conectado");
                 return;
@@ -51,6 +51,8 @@ public class ConectaArduino {
             } else {
                 logger.warn("Portão " + valorPortao + " não encontrado no banco de dados.");
             }
+        } else if ("REDE_LOCAL".equalsIgnoreCase(tipoPortao)) {
+            enviarUDP("" + valorPortao);
         } else {
             enviaBotoeira(valorPortao);
         }
@@ -201,17 +203,36 @@ public class ConectaArduino {
             numeroQuarto, ligar, chamador, Thread.currentThread().getName());
 
         configGlobal config = configGlobal.getInstance();
-        if (config.isFlagArduino() && config.isLuzAtiva() && CacheDados.getArduinoPort() != null) {
-            synchronized (ConectaArduino.class) {
-                String cmd = "LUZ-" + (ligar ? "ON" : "OFF") + "-" + numeroQuarto + "\n";
-                try {
-                    byte[] msg = cmd.getBytes();
-                    CacheDados.getArduinoPort().writeBytes(msg, msg.length);
-                    logger.info("Comando de luz enviado: " + cmd.trim());
-                } catch (Exception e) {
-                    logger.error("Erro ao enviar comando de luz para o Arduino: ", e);
+        if (config.isLuzAtiva()) {
+            String cmd = "LUZ-" + (ligar ? "ON" : "OFF") + "-" + numeroQuarto + "\n";
+            String tipoPortao = config.getPortoesRF();
+            
+            if ("REDE_LOCAL".equalsIgnoreCase(tipoPortao)) {
+                enviarUDP(cmd);
+            } else if (config.isFlagArduino() && CacheDados.getArduinoPort() != null) {
+                synchronized (ConectaArduino.class) {
+                    try {
+                        byte[] msg = cmd.getBytes();
+                        CacheDados.getArduinoPort().writeBytes(msg, msg.length);
+                        logger.info("Comando de luz enviado para o Arduino: " + cmd.trim());
+                    } catch (Exception e) {
+                        logger.error("Erro ao enviar comando de luz para o Arduino: ", e);
+                    }
                 }
             }
+        }
+    }
+
+    public static void enviarUDP(String comando) {
+        try (java.net.DatagramSocket socket = new java.net.DatagramSocket()) {
+            socket.setBroadcast(true);
+            byte[] buffer = (comando.trim() + "\n").getBytes();
+            java.net.InetAddress address = java.net.InetAddress.getByName("255.255.255.255");
+            java.net.DatagramPacket packet = new java.net.DatagramPacket(buffer, buffer.length, address, 12345);
+            socket.send(packet);
+            logger.info("[UDP] Comando enviado com sucesso para a rede local: " + comando.trim());
+        } catch (Exception e) {
+            logger.error("[UDP] Erro ao enviar comando via rede local: ", e);
         }
     }
 }

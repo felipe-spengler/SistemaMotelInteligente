@@ -25,6 +25,7 @@ public class ConfiguracoesModerno extends JFrame {
     private JComboBox<String> jComboBoxTelas;
     private JRadioButton botaoRF;
     private JRadioButton botaoBotoeira;
+    private JRadioButton botaoRedeLocal;
     private JButton botaoCodigos;
     private ButtonGroup portoesGroup;
     private JCheckBox checkImpressora;
@@ -104,16 +105,21 @@ public class ConfiguracoesModerno extends JFrame {
 
         portoesGroup = new ButtonGroup();
         botaoRF = new JRadioButton("Portões RF");
-        botaoRF.addActionListener(e -> salvarPortoes(true));
+        botaoRF.addActionListener(e -> salvarPortoes("RF"));
 
         botaoBotoeira = new JRadioButton("Portões Botoeira");
-        botaoBotoeira.addActionListener(e -> salvarPortoes(false));
+        botaoBotoeira.addActionListener(e -> salvarPortoes("BOTOEIRA"));
+
+        botaoRedeLocal = new JRadioButton("Rede Local (Wi-Fi)");
+        botaoRedeLocal.addActionListener(e -> salvarPortoes("REDE_LOCAL"));
 
         portoesGroup.add(botaoRF);
         portoesGroup.add(botaoBotoeira);
+        portoesGroup.add(botaoRedeLocal);
 
         pnlPortoes.add(botaoRF);
-        pnlPortoes.add(botaoBotoeira, "wrap");
+        pnlPortoes.add(botaoBotoeira);
+        pnlPortoes.add(botaoRedeLocal, "wrap");
 
         botaoCodigos = new JButton("Códigos Portões");
         botaoCodigos.addActionListener(e -> new CodigosPortoes().setVisible(true));
@@ -201,9 +207,13 @@ public class ConfiguracoesModerno extends JFrame {
         txtLimiteDesconto.setText(String.valueOf(config.getLimiteDesconto()));
 
         // Gates
-        if (config.getPortoesRF()) {
+        String tipoPortao = config.getPortoesRF();
+        if ("RF".equalsIgnoreCase(tipoPortao)) {
             botaoRF.setSelected(true);
             botaoCodigos.setVisible(true);
+        } else if ("REDE_LOCAL".equalsIgnoreCase(tipoPortao)) {
+            botaoRedeLocal.setSelected(true);
+            botaoCodigos.setVisible(false);
         } else {
             botaoBotoeira.setSelected(true);
             botaoCodigos.setVisible(false);
@@ -290,12 +300,22 @@ public class ConfiguracoesModerno extends JFrame {
         setarTela(tela);
     }
 
-    private void salvarPortoes(boolean isRF) {
-        botaoCodigos.setVisible(isRF);
-        configGlobal.getInstance().setPortoesRF(isRF);
-        funcaoSet("portoesrf", isRF);
+    private void salvarPortoes(String tipo) {
+        botaoCodigos.setVisible("RF".equalsIgnoreCase(tipo));
+        configGlobal.getInstance().setPortoesRF(tipo);
+        funcaoSetString("portoesrf", tipo);
         // We don't need to manually verify botoes state as ButtonGroup handles visual
         // toggle, but we set DB.
+    }
+
+    private void funcaoSetString(String campo, String valor) {
+        try (Connection link = new fazconexao().conectar();
+                PreparedStatement stmt = link.prepareStatement("UPDATE configuracoes SET " + campo + " = ?")) {
+            stmt.setString(1, valor);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Erro ao salvar configuração: " + e.getMessage());
+        }
     }
 
     // Database Helper Methods

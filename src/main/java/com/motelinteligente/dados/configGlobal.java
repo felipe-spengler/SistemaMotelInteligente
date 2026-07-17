@@ -25,7 +25,7 @@ public class configGlobal {
     private boolean flagSistemaSpring;
     private boolean flagArduino;
     private boolean flagMesmoUserCaixa;
-    private boolean portoesRF;
+    private String portoesRF;
     private int limiteDesconto;
     private BackupQueueManager backupQueueManager;
     private static int contadorConexoes = 0;
@@ -46,7 +46,7 @@ public class configGlobal {
         usuario = null;
         cargoUsuario = "Visitante";
         caixaAberto = 0;
-        portoesRF = true;
+        portoesRF = "BOTOEIRA";
         mudanca = false;
         logoffecharcaixa = false;
         controlaEstoque = false;
@@ -107,11 +107,11 @@ public class configGlobal {
         return flagMesmoUserCaixa;
     }
 
-    public boolean getPortoesRF() {
+    public String getPortoesRF() {
         return portoesRF;
     }
 
-    public void setPortoesRF(boolean portoes) {
+    public void setPortoesRF(String portoes) {
         this.portoesRF = portoes;
     }
 
@@ -186,11 +186,56 @@ public class configGlobal {
         }
     }
 
+    private void verificarColunaPortoesRF(Connection link) {
+        try {
+            boolean tipoIncorreto = false;
+            String typeStr = "";
+            try (PreparedStatement stmt = link.prepareStatement("SHOW COLUMNS FROM configuracoes LIKE 'portoesrf'")) {
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        typeStr = rs.getString("Type").toLowerCase();
+                        if (typeStr.contains("tinyint") || typeStr.contains("bit") || typeStr.contains("bool")) {
+                            tipoIncorreto = true;
+                        }
+                    }
+                }
+            }
+            if (tipoIncorreto) {
+                logger.info("[CONFIG] Coluna portoesrf com tipo antigo ({}). Migrando para VARCHAR(50)...", typeStr);
+                
+                // 1. Obter o valor atual
+                boolean valorAtual = true;
+                try (Statement stmt = link.createStatement();
+                     ResultSet rs = stmt.executeQuery("SELECT portoesrf FROM configuracoes LIMIT 1")) {
+                    if (rs.next()) {
+                        valorAtual = rs.getBoolean("portoesrf");
+                    }
+                }
+                
+                // 2. Alterar o tipo da coluna
+                try (Statement stmt = link.createStatement()) {
+                    stmt.executeUpdate("ALTER TABLE configuracoes MODIFY COLUMN portoesrf VARCHAR(50) DEFAULT 'BOTOEIRA'");
+                }
+                
+                // 3. Atualizar com o valor mapeado
+                String novoValor = valorAtual ? "RF" : "BOTOEIRA";
+                try (PreparedStatement stmt = link.prepareStatement("UPDATE configuracoes SET portoesrf = ?")) {
+                    stmt.setString(1, novoValor);
+                    stmt.executeUpdate();
+                }
+                logger.info("[CONFIG] Migração da coluna portoesrf concluída. Novo valor: {}", novoValor);
+            }
+        } catch (SQLException e) {
+            logger.error("[CONFIG] Erro ao verificar/migrar coluna portoesrf: ", e);
+        }
+    }
+
     public void carregarConfiguracoesAdicionais() {
         logger.info("[CONFIG] carregarConfiguracoesAdicionais iniciado");
         String consultaSQL = "SELECT * FROM configuracoes";
 
         try (Connection link = new fazconexao().conectar()) {
+            verificarColunaPortoesRF(link);
             verificarColunasImpressora(link);
             verificarColunasTaxas(link);
 
@@ -204,7 +249,10 @@ public class configGlobal {
                     this.flagMesmoUserCaixa = resultado.getBoolean("flagMesmoUserCaixa");
                     this.limiteDesconto = resultado.getInt("limitadesconto");
                     this.telaMostrar = resultado.getString("telaMostrar");
-                    this.portoesRF = resultado.getBoolean("portoesrf");
+                    this.portoesRF = resultado.getString("portoesrf");
+                    if (this.portoesRF == null) {
+                        this.portoesRF = "BOTOEIRA";
+                    }
                     try {
                         this.caminhoAudio = resultado.getString("caminhoAudio");
                         this.clienteSeleciona = resultado.getBoolean("clienteSeleciona");
