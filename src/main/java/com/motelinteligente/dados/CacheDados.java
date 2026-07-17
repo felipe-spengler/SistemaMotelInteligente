@@ -107,9 +107,10 @@ public class CacheDados {
 
                 boolean isCh340 = descricao.contains("usb-serial ch340");
                 boolean isFt232 = descricao.contains("ft232r usb uart") || descricao.contains("usb serial port");
+                boolean isCp210x = descricao.contains("cp210x");
 
-                if (isCh340 || isFt232) {
-                    String tipo = isCh340 ? "CH340" : "FT232R/Genérico";
+                if (isCh340 || isFt232 || isCp210x) {
+                    String tipo = isCh340 ? "CH340" : (isCp210x ? "CP210x" : "FT232R/Genérico");
                     logger.info("[ARDUINO] Arduino ({}) encontrado na porta: {}", tipo, porta.getSystemPortName());
                     arduinoPort = porta; // Define a porta do Arduino
                     break; // Para o loop assim que encontrar o primeiro

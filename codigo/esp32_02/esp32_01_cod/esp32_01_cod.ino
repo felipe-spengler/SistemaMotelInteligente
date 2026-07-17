@@ -112,6 +112,9 @@ void loop() {
       processarComandoRS485(rs485Buffer);
       rs485Buffer = ""; 
       
+      // Dá um tempo de 100ms para o olho humano conseguir ver o LED aceso
+      delay(100); 
+      
       // Apaga o LED de status
       digitalWrite(LED_STATUS, LOW);
     } else if (c != '\r') {
