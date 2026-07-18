@@ -356,6 +356,18 @@ public class VerificaComandosRemotos extends Thread implements MqttCallback {
                         // Executar ações de hardware e som
                         new playSound().playSound("som/agradecemosPreferencia.wav");
                         new ConectaArduino(999);
+
+                        // Fecha/despeja a tela local se estiver aberta para esta locacao
+                        for (java.awt.Frame frame : java.awt.Frame.getFrames()) {
+                            if (frame instanceof com.motelinteligente.telas.EncerraQuarto && frame.isVisible()) {
+                                com.motelinteligente.telas.EncerraQuarto eq = (com.motelinteligente.telas.EncerraQuarto) frame;
+                                if (eq.getIdLocacao() == idLoc) {
+                                    eq.setSalvouLocacao(true);
+                                    SwingUtilities.invokeLater(() -> eq.dispose());
+                                    break;
+                                }
+                            }
+                        }
                         
                         // Trata impressao opcional
                         boolean imprimir = (partes.length > 2 && partes[2].equalsIgnoreCase("imprimir"));
@@ -373,7 +385,10 @@ public class VerificaComandosRemotos extends Thread implements MqttCallback {
                             com.motelinteligente.telas.EncerraQuarto eq =
                                 (com.motelinteligente.telas.EncerraQuarto) frame;
                             if (eq.getIdLocacao() == idLoc) {
-                                SwingUtilities.invokeLater(() -> eq.imprimirExtratoPelaTela());
+                                SwingUtilities.invokeLater(() -> {
+                                    eq.recarregarDadosDaLocacao();
+                                    eq.imprimirExtratoPelaTela();
+                                });
                                 impressoPelaTela = true;
                                 break;
                             }

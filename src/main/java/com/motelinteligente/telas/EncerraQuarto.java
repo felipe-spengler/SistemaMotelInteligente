@@ -167,12 +167,29 @@ public class EncerraQuarto extends javax.swing.JFrame {
             public void tableChanged(TableModelEvent e) {
                 if (e.getType() == TableModelEvent.UPDATE && e.getColumn() == 1) {
                     int row = e.getFirstRow();
-                    int novaQuantidade = (int) tabela.getValueAt(row, 1);
-                    float valorUnd = (float) tabela.getValueAt(row, 3);
+                    Object qtyVal = tabela.getValueAt(row, 1);
+                    int novaQuantidade = 0;
+                    if (qtyVal instanceof Number) {
+                        novaQuantidade = ((Number) qtyVal).intValue();
+                    } else if (qtyVal != null) {
+                        try {
+                            novaQuantidade = Integer.parseInt(String.valueOf(qtyVal).trim());
+                        } catch (Exception ex) {}
+                    }
+                    Object valUndObj = tabela.getValueAt(row, 3);
+                    float valorUnd = 0;
+                    if (valUndObj instanceof Number) {
+                        valorUnd = ((Number) valUndObj).floatValue();
+                    } else if (valUndObj != null) {
+                        try {
+                            valorUnd = Float.parseFloat(String.valueOf(valUndObj).trim());
+                        } catch (Exception ex) {}
+                    }
                     float novoTotal = novaQuantidade * valorUnd;
                     tabela.setValueAt(novoTotal, row, 4); // Atualize a coluna "Total"
 
                     atualizaConsumo();
+                    salvarPreVendidosSilenciosamente();
                 }
             }
 
@@ -245,14 +262,13 @@ public class EncerraQuarto extends javax.swing.JFrame {
                     return;
                 }
                 try (java.sql.Connection conn = new com.motelinteligente.dados.fazconexao().conectar()) {
-                    try (java.sql.PreparedStatement ps = conn.prepareStatement("SELECT ultima_atividade FROM checkout_session_ping WHERE numeroquarto = ?")) {
+                    try (java.sql.PreparedStatement ps = conn.prepareStatement("SELECT TIMESTAMPDIFF(SECOND, ultima_atividade, NOW()) AS diff_seconds FROM checkout_session_ping WHERE numeroquarto = ?")) {
                         ps.setInt(1, numeroDoQuarto);
                         try (java.sql.ResultSet rs = ps.executeQuery()) {
                             if (rs.next()) {
-                                java.sql.Timestamp ultimaAtividade = rs.getTimestamp("ultima_atividade");
-                                long diff = System.currentTimeMillis() - ultimaAtividade.getTime();
-                                if (diff > 90000) { // Se inativo há mais de 90s, fecha
-                                    logger.info("Checkout remoto inativo para o quarto {}. Fechando tela local.", numeroDoQuarto);
+                                int diffSeconds = rs.getInt("diff_seconds");
+                                if (diffSeconds > 90) { // Se inativo há mais de 90s, fecha
+                                    logger.info("Checkout remoto inativo para o quarto {} ({} segundos). Fechando tela local.", numeroDoQuarto, diffSeconds);
                                     timerAtividade.stop();
                                     dispose();
                                 }
@@ -543,6 +559,8 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 for (vendaProdutos vp : vendidos) {
                     adicionarProdutoPorId(vp.idProduto, vp.quantidade);
                 }
+                
+                recarregarDadosDaLocacao();
             } catch (Exception e) {
                 logger.error("Erro ao sincronizar produtos remotamente: ", e);
             }
@@ -1520,19 +1538,21 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 if (isInteger(quantidadeTexto)) {
 
                     int quantidade = Integer.parseInt(quantidadeTexto); // Usa a quantidade (1 ou a digitada)
+                    int idProdInt = Integer.parseInt(txtIdProduto.getText());
 
-                    float valor = produtodao.getValorProduto(Integer.parseInt(txtIdProduto.getText()));
+                    float valor = produtodao.getValorProduto(idProdInt);
                     float valorSoma = valor * quantidade; // Usa a variável 'quantidade'
 
                     modelo.addRow(new Object[] {
-                            txtIdProduto.getText(),
-                            quantidadeTexto, // Usa a quantidade (1 ou a digitada) como String
+                            idProdInt,
+                            quantidade, // Usa a quantidade como Integer
                             texto,
                             valor,
                             valorSoma
                     });
-                    outraTela.adicionaTabela(txtIdProduto.getText(), quantidadeTexto, texto, valor, valorSoma);
+                    outraTela.adicionaTabela(String.valueOf(idProdInt), String.valueOf(quantidade), texto, valor, valorSoma);
                     atualizaConsumo();
+                    salvarPreVendidosSilenciosamente();
 
                 } else {
                     // Isso só será executado se o texto digitado (e não vazio) não for um número
@@ -2129,6 +2149,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
             outraTela.removerRow(selectedRow);
             atualizaConsumo();
             setValorDivida();
+            salvarPreVendidosSilenciosamente();
             txtIdProduto.grabFocus();
         } else {
             JOptionPane.showMessageDialog(null, "Nenhum produto selecionado!");
@@ -2567,6 +2588,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
             int id = dialog.getIdProdutoSelecionado();
             int qtd = dialog.getQuantidadeSelecionada();
             adicionarProdutoPorId(id, qtd);
+            salvarPreVendidosSilenciosamente();
         }
     }
 
@@ -2591,6 +2613,73 @@ public class EncerraQuarto extends javax.swing.JFrame {
         } else {
             JOptionPane.showMessageDialog(this, "Produto não encontrado!");
         }
+    }
+
+    public void setSalvouLocacao(boolean salvouLocacao) {
+        this.salvouLocacao = salvouLocacao;
+    }
+
+    public void salvarPreVendidosSilenciosamente() {
+        DefaultTableModel modelo = (DefaultTableModel) tabela.getModel();
+        int qtdLinhas = modelo.getRowCount();
+        List<vendaProdutos> lista = new ArrayList<>();
+        for (int i = 0; i < qtdLinhas; i++) {
+            try {
+                int idProd = objectToInt(i, 0);
+                int quantidade = objectToInt(i, 1);
+                lista.add(new vendaProdutos(idProd, quantidade, 0, 0));
+            } catch (Exception e) {
+                // ignora
+            }
+        }
+        controller.salvarPreVendidos(lista);
+    }
+
+    public void recarregarDadosDaLocacao() {
+        controller.recarregarDados();
+
+        dataInicio = controller.getDataInicio();
+        lblInicioLocacao.setText(formatarDataHora(dataInicio));
+
+        dataFim = controller.getDataFim();
+        lblFimLocacao.setText(formatarDataHora(dataFim));
+
+        tempoTotalLocado = controller.getTempoTotalLocado();
+        lblTempoLocado.setText(tempoTotalLocado);
+
+        valorAdicionalPessoa = controller.getValorAdicionalPessoa();
+        valorQuarto = controller.getValorQuartoBase();
+        valorAdicionalPeriodo = controller.getValorAdicionalPeriodo();
+        lblHoraAdicional.setText("R$" + String.valueOf(valorAdicionalPeriodo));
+
+        if (CacheDados.getInstancia().getCacheOcupado().get(numeroDoQuarto) != null) {
+            txtPessoas.setText(String.valueOf(CacheDados.getInstancia().getCacheOcupado().get(numeroDoQuarto).getNumeroPessoas()));
+        }
+
+        // Justificativas do banco
+        float descJustificativa = controller.getValorDescontoJustificativa();
+        float acrescJustificativa = controller.getValorAcrescimoJustificativa();
+        String textoJust = controller.getTextoJustificativa();
+
+        if (descJustificativa > 0) {
+            txtDesconto.setText(String.valueOf(descJustificativa));
+            valorDesconto = descJustificativa;
+            if (textoJust != null && !textoJust.isEmpty()) {
+                txtJustifica.setText(textoJust);
+            }
+        }
+        if (acrescJustificativa > 0) {
+            txtAcrescimo.setText(String.valueOf(acrescJustificativa));
+            valorAcrescimo = acrescJustificativa;
+            if (textoJust != null && !textoJust.isEmpty()) {
+                txtJustifica.setText(textoJust);
+            }
+        }
+
+        antecipados = verAntecipado(idLocacao);
+        setValorDivida();
+
+        outraTela.setaDatas(dataInicio, dataFim, tempoTotalLocado);
     }
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {// GEN-FIRST:event_formWindowActivated

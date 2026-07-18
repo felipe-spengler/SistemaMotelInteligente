@@ -254,6 +254,58 @@ public class EncerraQuartoController {
         return lista;
     }
 
+    public void recarregarDados() {
+        inicializarDadosLocacao();
+    }
+
+    public float getValorDescontoJustificativa() {
+        float valor = 0;
+        try (Connection link = new fazconexao().conectar();
+             PreparedStatement ps = link.prepareStatement("SELECT SUM(valor) FROM justificativa WHERE idlocacao = ? AND tipo = 'desconto'")) {
+            ps.setInt(1, idLocacao);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    valor = rs.getFloat(1);
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Erro ao buscar desconto da justificativa: ", e);
+        }
+        return valor;
+    }
+
+    public float getValorAcrescimoJustificativa() {
+        float valor = 0;
+        try (Connection link = new fazconexao().conectar();
+             PreparedStatement ps = link.prepareStatement("SELECT SUM(valor) FROM justificativa WHERE idlocacao = ? AND tipo = 'acrescimo'")) {
+            ps.setInt(1, idLocacao);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    valor = rs.getFloat(1);
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Erro ao buscar acrescimo da justificativa: ", e);
+        }
+        return valor;
+    }
+
+    public String getTextoJustificativa() {
+        String texto = "";
+        try (Connection link = new fazconexao().conectar();
+             PreparedStatement ps = link.prepareStatement("SELECT justificativa FROM justificativa WHERE idlocacao = ? AND tipo IN ('desconto', 'acrescimo') ORDER BY id DESC LIMIT 1")) {
+            ps.setInt(1, idLocacao);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    texto = rs.getString("justificativa");
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Erro ao buscar texto da justificativa: ", e);
+        }
+        return texto;
+    }
+
     // Lógica Matemática
     public float calculaAdicionalPessoa(int numeroPessoas) {
         float valAdd = new fquartos().getAddPessoa(numeroDoQuarto);
