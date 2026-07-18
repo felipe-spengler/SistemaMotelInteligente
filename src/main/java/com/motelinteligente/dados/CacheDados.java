@@ -193,13 +193,13 @@ public class CacheDados {
 
     public CarregaQuarto carregarDadosQuarto() {
 
-        logger.debug("[CACHE] Iniciando carregarDadosQuarto");
+        //logger.debug("[CACHE] Iniciando carregarDadosQuarto");
     synchronized (cacheQuarto) { 
         try (Connection link = new fazconexao().conectar(); 
              PreparedStatement statement = link.prepareStatement("select * from status order by numeroquarto"); 
              ResultSet resultado = statement.executeQuery()) {
 
-            logger.debug("[CACHE] Query de status executada");
+            
             // Opcional, dependendo da sua lógica: Se o objetivo é recarregar a cache
             // cacheQuarto.clear(); 
             // cacheOcupado.clear(); 
@@ -224,7 +224,7 @@ public class CacheDados {
                     carregarOcupado(numeroQuarto);
                 }
             }
-            logger.debug("[CACHE] carregarDadosQuarto concluído com {} quartos", cacheQuarto.size());
+            //logger.debug("[CACHE] carregarDadosQuarto concluído com {} quartos", cacheQuarto.size());
         } catch (SQLException e) {
             logger.error("Erro ao carregar dados dos quartos", e);
         }

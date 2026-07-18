@@ -431,6 +431,19 @@ public class VerificaComandosRemotos extends Thread implements MqttCallback {
                     } catch (Exception ex) {
                         logger.error("Erro ao atualizar produtos remotamente: ", ex);
                     }
+                } else if (acao.equals("ping_checkout")) {
+                    try {
+                        int numQuarto = Integer.parseInt(numero);
+                        try (Connection conn = new fazconexao().conectar()) {
+                            try (PreparedStatement ps = conn.prepareStatement("INSERT INTO checkout_session_ping (numeroquarto, ultima_atividade) VALUES (?, NOW()) ON DUPLICATE KEY UPDATE ultima_atividade = NOW()")) {
+                                ps.setInt(1, numQuarto);
+                                ps.executeUpdate();
+                            }
+                        }
+                        logger.info("Ping remoto recebido via MQTT para o quarto {}. Tabela local atualizada.", numQuarto);
+                    } catch (Exception ex) {
+                        logger.error("Erro ao atualizar ping do checkout remoto no banco local: ", ex);
+                    }
                 } else if (acao.equals("reproduzir")) {
                     new playSound().playSound("som/mensagem conferencia.wav");
                 }

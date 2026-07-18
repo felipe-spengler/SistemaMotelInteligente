@@ -267,6 +267,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
                         try (java.sql.ResultSet rs = ps.executeQuery()) {
                             if (rs.next()) {
                                 int diffSeconds = rs.getInt("diff_seconds");
+                                logger.info("Checando atividade remota para o quarto {}. Segundos inativo: {}s", numeroDoQuarto, diffSeconds);
                                 if (diffSeconds > 90) { // Se inativo há mais de 90s, fecha
                                     logger.info("Checkout remoto inativo para o quarto {} ({} segundos). Fechando tela local.", numeroDoQuarto, diffSeconds);
                                     timerAtividade.stop();
