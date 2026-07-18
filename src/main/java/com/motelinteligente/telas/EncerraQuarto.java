@@ -495,6 +495,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
 
         idLocacao = controller.getIdLocacao();
 
+        controller.baixarPreVendidosDoBancoRemoto();
         adicionaPreVendidos(idLocacao);
         antecipados = verAntecipado(idLocacao);
         setValorDivida();
@@ -554,6 +555,9 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 
                 // 3. Reseta o valor de consumo na tela
                 valorConsumo = 0;
+                
+                // 3.5 Copia produtos do banco remoto para o local
+                controller.baixarPreVendidosDoBancoRemoto();
                 
                 // 4. Recarrega os pré-vendidos do banco usando o buscarPreVendidos original
                 List<vendaProdutos> vendidos = controller.buscarPreVendidos();

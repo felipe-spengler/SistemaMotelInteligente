@@ -258,6 +258,59 @@ public class EncerraQuartoController {
         inicializarDadosLocacao();
     }
 
+    public void baixarPreVendidosDoBancoRemoto() {
+        String querySelect = "SELECT idproduto, quantidade FROM prevendidos WHERE idlocacao = ?";
+        String queryDelete = "DELETE FROM prevendidos WHERE idlocacao = ?";
+        String queryInsert = "INSERT INTO prevendidos (idlocacao, idproduto, quantidade) VALUES (?, ?, ?)";
+
+        List<vendaProdutos> listaRemota = new ArrayList<>();
+
+        // 1. Ler do banco remoto
+        try (Connection remoteConn = com.motelinteligente.dados.ConexaoRemota.getConnection();
+             PreparedStatement psSel = remoteConn.prepareStatement(querySelect)) {
+            psSel.setInt(1, idLocacao);
+            try (ResultSet rs = psSel.executeQuery()) {
+                while (rs.next()) {
+                    listaRemota.add(new vendaProdutos(
+                        rs.getInt("idproduto"),
+                        rs.getInt("quantidade"),
+                        0, 0
+                    ));
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Erro ao ler prevendidos do banco remoto: ", e);
+            return; // Se falhar a leitura remota, não mexe no local por segurança
+        }
+
+        // 2. Gravar no banco local
+        try (Connection localConn = new fazconexao().conectar()) {
+            localConn.setAutoCommit(false);
+            try {
+                try (PreparedStatement psDel = localConn.prepareStatement(queryDelete)) {
+                    psDel.setInt(1, idLocacao);
+                    psDel.executeUpdate();
+                }
+                try (PreparedStatement psIns = localConn.prepareStatement(queryInsert)) {
+                    for (vendaProdutos vp : listaRemota) {
+                        psIns.setInt(1, idLocacao);
+                        psIns.setInt(2, vp.idProduto);
+                        psIns.setInt(3, vp.quantidade);
+                        psIns.addBatch();
+                    }
+                    psIns.executeBatch();
+                }
+                localConn.commit();
+                logger.info("Sincronizado prevendidos remotos com o banco local para locacao {}", idLocacao);
+            } catch (Exception ex) {
+                localConn.rollback();
+                logger.error("Erro ao gravar prevendidos remotos no banco local", ex);
+            }
+        } catch (Exception e) {
+            logger.error("Erro de conexao local ao sincronizar prevendidos", e);
+        }
+    }
+
     public float getValorDescontoJustificativa() {
         float valor = 0;
         try (Connection link = new fazconexao().conectar();
