@@ -224,15 +224,62 @@ public class ConectaArduino {
     }
 
     public static void enviarUDP(String comando) {
-        try (java.net.DatagramSocket socket = new java.net.DatagramSocket()) {
-            socket.setBroadcast(true);
-            byte[] buffer = (comando.trim() + "\n").getBytes();
-            java.net.InetAddress address = java.net.InetAddress.getByName("255.255.255.255");
-            java.net.DatagramPacket packet = new java.net.DatagramPacket(buffer, buffer.length, address, 12345);
-            socket.send(packet);
-            logger.info("[UDP] Comando enviado com sucesso para a rede local: " + comando.trim());
-        } catch (Exception e) {
-            logger.error("[UDP] Erro ao enviar comando via rede local: ", e);
-        }
+        Thread enviarThread = new Thread(() -> {
+            String expectedAck = comando.trim() + "-OK";
+            boolean sucesso = false;
+            
+            for (int i = 0; i < 3; i++) {
+                try (java.net.DatagramSocket socket = new java.net.DatagramSocket()) {
+                    socket.setBroadcast(true);
+                    socket.setSoTimeout(500); // 500ms timeout para aguardar a confirmação da placa
+                    
+                    byte[] buffer = (comando.trim() + "\n").getBytes();
+                    java.net.InetAddress address = java.net.InetAddress.getByName("255.255.255.255");
+                    java.net.DatagramPacket packet = new java.net.DatagramPacket(buffer, buffer.length, address, 12345);
+                    
+                    // Envia o comando
+                    socket.send(packet);
+                    logger.info("[UDP] Comando enviado (tentativa {}/3): {}", i + 1, comando.trim());
+                    
+                    // Aguarda a resposta (ACK)
+                    byte[] receiveBuffer = new byte[256];
+                    java.net.DatagramPacket receivePacket = new java.net.DatagramPacket(receiveBuffer, receiveBuffer.length);
+                    
+                    try {
+                        socket.receive(receivePacket);
+                        String resposta = new String(receivePacket.getData(), 0, receivePacket.getLength()).trim();
+                        logger.info("[UDP] Resposta recebida da placa ({}): {}", receivePacket.getAddress().getHostAddress(), resposta);
+                        
+                        if (expectedAck.equalsIgnoreCase(resposta)) {
+                            logger.info("[UDP] Confirmacao de entrega recebida com sucesso: {}", resposta);
+                            sucesso = true;
+                            break; // Sucesso! Sai do loop de tentativas
+                        }
+                    } catch (java.net.SocketTimeoutException e) {
+                        logger.warn("[UDP] Timeout aguardando confirmacao para o comando: {}", comando.trim());
+                    }
+                } catch (Exception e) {
+                    logger.error("[UDP] Erro ao enviar/receber via rede local: ", e);
+                }
+                
+                // Pequeno intervalo antes do reenvio
+                if (i < 2) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+            }
+            
+            if (!sucesso) {
+                logger.error("[UDP] FALHA CRITICA: O comando '{}' nao foi confirmado por nenhuma placa apos 3 tentativas!", comando.trim());
+                javax.swing.SwingUtilities.invokeLater(() -> {
+                    new com.motelinteligente.telas.NotificacaoAutomacao("O comando \"" + comando.trim() + "\" não foi<br>confirmado pelas placas do corredor.");
+                });
+            }
+        });
+        enviarThread.setName("UDP-Ack-Sender-" + System.currentTimeMillis());
+        enviarThread.start();
     }
 }

@@ -48,7 +48,30 @@ void setup() {
   udp.begin(udpPort);
 }
 
+void verificarConexaoWiFi() {
+  static unsigned long ultimoCheckWiFi = 0;
+  static bool estavaDesconectado = false;
+  unsigned long agora = millis();
+  
+  if (agora - ultimoCheckWiFi >= 5000) { // verifica a cada 5 segundos
+    ultimoCheckWiFi = agora;
+    if (WiFi.status() != WL_CONNECTED) {
+      estavaDesconectado = true;
+      Serial.println("[WIFI] Conexao perdida! Reconectando...");
+      WiFi.disconnect();
+      WiFi.begin(ssid, password);
+    } else if (estavaDesconectado) {
+      Serial.println("[WIFI] Reconectado com sucesso!");
+      udp.stop();
+      udp.begin(udpPort);
+      estavaDesconectado = false;
+    }
+  }
+}
+
 void loop() {
+  verificarConexaoWiFi();
+
   // Lê os comandos vindos do computador via USB (Serial)
   while (Serial.available()) {
     char inChar = (char)Serial.read();
@@ -78,9 +101,15 @@ void enviarViaWiFi(String comando) {
   // Pisca o LED rapidamente ao enviar dados
   digitalWrite(LED_STATUS, HIGH);
 
-  udp.beginPacket(broadcastIP, udpPort);
-  udp.print(comando + "\n");
-  udp.endPacket();
+  // Envia o comando 3 vezes com um pequeno intervalo para garantir a entrega via UDP Broadcast
+  for (int i = 0; i < 3; i++) {
+    udp.beginPacket(broadcastIP, udpPort);
+    udp.print(comando + "\n");
+    udp.endPacket();
+    if (i < 2) {
+      delay(80);
+    }
+  }
 
   delay(50);
   digitalWrite(LED_STATUS, LOW);

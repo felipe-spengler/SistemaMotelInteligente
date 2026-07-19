@@ -96,7 +96,30 @@ void setup() {
   pinMode(22, OUTPUT); digitalWrite(22, HIGH); // IN12
 }
 
+void verificarConexaoWiFi() {
+  static unsigned long ultimoCheckWiFi = 0;
+  static bool estavaDesconectado = false;
+  unsigned long agora = millis();
+  
+  if (agora - ultimoCheckWiFi >= 5000) { // verifica a cada 5 segundos
+    ultimoCheckWiFi = agora;
+    if (WiFi.status() != WL_CONNECTED) {
+      estavaDesconectado = true;
+      Serial.println("[WIFI] Conexao perdida! Reconectando...");
+      WiFi.disconnect();
+      WiFi.begin(ssid, password);
+    } else if (estavaDesconectado) {
+      Serial.println("[WIFI] Reconectado com sucesso!");
+      udp.stop();
+      udp.begin(udpPort);
+      estavaDesconectado = false;
+    }
+  }
+}
+
 void loop() {
+  verificarConexaoWiFi();
+  
   int packetSize = udp.parsePacket();
   if (packetSize) {
     // Pisca o LED de status ao receber comando
@@ -121,9 +144,44 @@ void loop() {
   }
 }
 
+void enviarConfirmacao(String resposta) {
+  udp.beginPacket(udp.remoteIP(), udp.remotePort());
+  udp.print(resposta + "\n");
+  udp.endPacket();
+  Serial.print("[UDP Resposta/ACK]: ");
+  Serial.println(resposta);
+}
+
+bool souResponsavel(String cmd) {
+  if (cmd.startsWith("LUZ-")) {
+    int idxQuarto = cmd.lastIndexOf("-") + 1;
+    int quartoNum = cmd.substring(idxQuarto).toInt();
+    return (quartoNum >= 101 && quartoNum <= 105);
+  } else {
+    int codigoCmd = cmd.toInt();
+    return (codigoCmd >= 101 && codigoCmd <= 105) || (codigoCmd == 888 || codigoCmd == 999);
+  }
+}
+
 void processarComandoWiFi(String cmd) {
   cmd.trim();
   if (cmd.length() == 0) return;
+  
+  if (!souResponsavel(cmd)) return; // Se não é responsável, ignora completamente
+  
+  static String ultimoComando = "";
+  static unsigned long tempoUltimoComando = 0;
+  
+  // Ignora comando idêntico recebido nos últimos 1.5 segundos, mas responde com ACK
+  if (cmd.equals(ultimoComando) && (millis() - tempoUltimoComando < 1500)) {
+    Serial.print("[UDP] Comando duplicado ignorado. Reenviando ACK: ");
+    Serial.println(cmd);
+    enviarConfirmacao(cmd + "-OK");
+    return;
+  }
+  
+  ultimoComando = cmd;
+  tempoUltimoComando = millis();
   
   // 1. COMANDO DE LUZ (Ex: LUZ-ON-101)
   if (cmd.startsWith("LUZ-")) {
@@ -131,15 +189,13 @@ void processarComandoWiFi(String cmd) {
     int idxQuarto = cmd.lastIndexOf("-") + 1;
     int quartoNum = cmd.substring(idxQuarto).toInt();
     
-    // O ESP1 só processa se for do bloco dele (101 a 105)
-    if (quartoNum >= 101 && quartoNum <= 105) {
-      int pinoLuz = obtenerPinoLuzQuarto(quartoNum);
-      if (pinoLuz != -1) {
-        digitalWrite(pinoLuz, ligar ? LOW : HIGH); // LOW ativa o relé módulo
-        Serial.print("-> LUZ Quarto ");
-        Serial.print(quartoNum);
-        Serial.println(ligar ? " LIGADA" : " DESLIGADA");
-      }
+    int pinoLuz = obtenerPinoLuzQuarto(quartoNum);
+    if (pinoLuz != -1) {
+      digitalWrite(pinoLuz, ligar ? LOW : HIGH); // LOW ativa o relé módulo
+      Serial.print("-> LUZ Quarto ");
+      Serial.print(quartoNum);
+      Serial.println(ligar ? " LIGADA" : " DESLIGADA");
+      enviarConfirmacao(cmd + "-OK");
     }
   }
   // 2. COMANDO DE PORTÃO (Ex: 101, 888, 999)
@@ -161,6 +217,7 @@ void processarComandoWiFi(String cmd) {
       Serial.print("-> Portao ");
       Serial.print(codigoCmd);
       Serial.println(" acionado.");
+      enviarConfirmacao(cmd + "-OK");
     }
   }
 }

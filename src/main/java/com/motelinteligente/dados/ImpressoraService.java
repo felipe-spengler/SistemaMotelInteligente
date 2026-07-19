@@ -207,11 +207,17 @@ public class ImpressoraService {
         if (antecipadoOutro > 0) {
             sb.append(String.format("Pago em Outro Caixa (Info):R$ %,.2f\n", antecipadoOutro));
         }
-        // Vendas Avulsas / Adiantamentos detalhados no relatório
+        // Apenas adiantamentos detalhados no relatório financeiro (vendas avulsas de produtos saem no relatório de produtos)
         List<Object[]> avulsas = dao.getListaVendasAvulsas(idCaixa);
-        if (!avulsas.isEmpty()) {
-            sb.append("\nVENDAS AVULSAS / ADIANTAMENTOS:\n");
-            for (Object[] row : avulsas) {
+        List<Object[]> adiantamentos = new ArrayList<>();
+        for (Object[] row : avulsas) {
+            if ("adiantamento".equalsIgnoreCase((String) row[5])) {
+                adiantamentos.add(row);
+            }
+        }
+        if (!adiantamentos.isEmpty()) {
+            sb.append("\nADIANTAMENTOS:\n");
+            for (Object[] row : adiantamentos) {
                 sb.append(String.format("%s - %s\n", row[0], row[1]));
                 sb.append(String.format("  Qtd: %d x R$ %.2f = R$ %.2f (%s, %s)\n",
                         row[2], row[3], row[4], row[5], row[6]));
