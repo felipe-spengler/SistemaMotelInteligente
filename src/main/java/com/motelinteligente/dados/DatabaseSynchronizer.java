@@ -77,7 +77,7 @@ public class DatabaseSynchronizer {
     private boolean sincronizarTabela(String tabela, Connection conexaoLocal, Connection conexaoRemoto) throws SQLException {
         System.out.printf("Iniciando sincronização para a tabela: %s%n", tabela);
         if (exibirLogs != null) {
-            exibirLogs.append(String.format("Iniciando sincronização para a tabela: %s%n", tabela));
+            //exibirLogs.append(String.format("Iniciando sincronização para a tabela: %s%n", tabela));
         }
 
         boolean localExists = tableExists(tabela, conexaoLocal);

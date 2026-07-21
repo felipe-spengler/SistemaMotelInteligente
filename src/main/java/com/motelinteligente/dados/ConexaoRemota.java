@@ -33,7 +33,7 @@ public class ConexaoRemota {
             remoteConfig.setConnectionTestQuery("SELECT 1");
 
             remoteDataSource = new HikariDataSource(remoteConfig);
-            log.info("Conexão remota inicializada com sucesso.");
+            //log.info("Conexão remota inicializada com sucesso.");
             inicializarBancoDeDadosRemoto();
 
         } catch (Exception e) {
@@ -104,7 +104,7 @@ public class ConexaoRemota {
             stmt.executeUpdate(sqlDespesas);
             stmt.executeUpdate(sqlRetiradas);
             stmt.executeUpdate(sqlAuditoria);
-            log.info("Tabelas no banco remoto inicializadas/verificadas com sucesso.");
+            //log.info("Tabelas no banco remoto inicializadas/verificadas com sucesso.");
         } catch (Exception e) {
             log.error("Erro ao inicializar tabelas no banco de dados remoto: " + e.getMessage(), e);
         }
@@ -123,7 +123,7 @@ public class ConexaoRemota {
 
     public static void fecharPool() {
         if (remoteDataSource != null) {
-            log.info("Fechando pool de conexões remotas...");
+            //log.info("Fechando pool de conexões remotas...");
             remoteDataSource.close();
             remoteDataSource = null;
         }

@@ -70,8 +70,13 @@ void setup() {
   delay(1000);
   digitalWrite(LED_STATUS, LOW);
 
+  Serial.print("[WIFI] Conectado com sucesso! IP local: ");
+  Serial.println(WiFi.localIP());
+
   // Inicia escuta UDP
   udp.begin(udpPort);
+  Serial.print("[UDP] Escuta iniciada na porta: ");
+  Serial.println(udpPort);
   
   // Configura e desliga as 5 Luzes (101 a 105)
   for (int q = 101; q <= 105; q++) {
@@ -97,22 +102,34 @@ void setup() {
 }
 
 void verificarConexaoWiFi() {
-  static unsigned long ultimoCheckWiFi = 0;
-  static bool estavaDesconectado = false;
-  unsigned long agora = millis();
+  static unsigned long tempoDesconectado = 0;
   
-  if (agora - ultimoCheckWiFi >= 5000) { // verifica a cada 5 segundos
-    ultimoCheckWiFi = agora;
-    if (WiFi.status() != WL_CONNECTED) {
-      estavaDesconectado = true;
-      Serial.println("[WIFI] Conexao perdida! Reconectando...");
+  if (WiFi.status() != WL_CONNECTED) {
+    digitalWrite(LED_STATUS, HIGH); // Acende o LED na hora para indicar sinal perdido
+    
+    // Se acabou de cair, registra o tempo inicial da queda
+    if (tempoDesconectado == 0) {
+      tempoDesconectado = millis();
+    }
+    
+    // Meio-termo: Se ficar mais de 45 segundos direto sem conseguir se reconectar sozinho,
+    // aí sim nós forçamos o WiFi.begin() manualmente para destravar a placa.
+    if (millis() - tempoDesconectado >= 45000) {
+      Serial.println("[WIFI] Sem conexao ha mais de 45s. Forcando reinicializacao...");
       WiFi.disconnect();
       WiFi.begin(ssid, password);
-    } else if (estavaDesconectado) {
+      tempoDesconectado = millis(); // Reseta o cronômetro para tentar de novo se necessário
+    }
+  } else {
+    // Se está conectado, apaga o LED
+    digitalWrite(LED_STATUS, LOW);
+    
+    // Se estava desconectado antes e agora voltou, reinicia a escuta UDP para garantir
+    if (tempoDesconectado != 0) {
       Serial.println("[WIFI] Reconectado com sucesso!");
       udp.stop();
       udp.begin(udpPort);
-      estavaDesconectado = false;
+      tempoDesconectado = 0; // Zera o cronômetro
     }
   }
 }
@@ -159,7 +176,7 @@ bool souResponsavel(String cmd) {
     return (quartoNum >= 101 && quartoNum <= 105);
   } else {
     int codigoCmd = cmd.toInt();
-    return (codigoCmd >= 101 && codigoCmd <= 105) || (codigoCmd == 888 || codigoCmd == 999);
+    return (codigoCmd >= 101 && codigoCmd <= 105); // Somente quartos 101 ao 105
   }
 }
 

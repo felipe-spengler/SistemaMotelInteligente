@@ -63,9 +63,9 @@ public class CheckSincronia extends TimerTask {
 
         try {
             if (temRegistrosParaSincronizar()) {
-                logger.info("Iniciando sincronização de registros...");
+                //logger.info("Iniciando sincronização de registros...");
                 checkDatabaseSync();
-                logger.info("Sincronização concluída.");
+                //logger.info("Sincronização concluída.");
             }
         } catch (Exception ex) {
             logger.error("Erro durante execução de CheckSincronia", ex);
