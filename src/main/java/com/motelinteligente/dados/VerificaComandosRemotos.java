@@ -268,9 +268,11 @@ public class VerificaComandosRemotos extends Thread implements MqttCallback {
                             logger.error("Erro ao tentar locar - comando remoto - return false ");
                             JOptionPane.showMessageDialog(null, "Falha ao iniciar locação!");
                         }
+                    } else if (statusAtual != null && statusAtual.startsWith("ocupado")) {
+                        logger.info("Comando de locação duplicado ou quarto já ocupado: {} (Status: {}). Ignorando.", quartoEmFoco, statusAtual);
                     } else {
-                        JOptionPane.showMessageDialog(null, "Tentando alugar quarto não disponível");
-                        logger.error("Tentando alugar quarto não disponível");
+                        //JOptionPane.showMessageDialog(null, "Tentando alugar quarto não disponível");
+                        logger.error("Tentando alugar quarto não disponível. Quarto: {}, Status atual: {}", quartoEmFoco, statusAtual);
                     }
                 } else if (acao.equals("reservar")) {
                     mudaStatusNaCache(quartoEmFoco, "reservado");

@@ -1,20 +1,18 @@
 /*
- * ESP32 Nº 1 - RECEPTOR WI-FI E CONTROLADOR (QUARTOS 101 AO 105 + GERAIS)
- * COM COMUNICAÇÃO VIA UDP BROADCAST (SEM CABO)
+ * ESP32 Nº 1 - RECEPTOR ESP-NOW E CONTROLADOR (QUARTOS 101 AO 105 + GERAIS)
+ * COM COMUNICAÇÃO VIA ESP-NOW DIRECT (SEM CABO)
  */
 
 #include <WiFi.h>
-#include <WiFiUdp.h>
+#include <esp_now.h>
 
-// 📶 CONFIGURAÇÕES DA REDE WI-FI LOCAL
+// 📶 CONFIGURAÇÕES DA REDE WI-FI LOCAL (Para sincronizar o canal com o receptor)
 const char* ssid = "VENUS CLIENTE";
 const char* password = "venus123";
 
-// 📡 CONFIGURAÇÕES DE UDP
-const int udpPort = 12345;
-WiFiUDP udp;
-
 #define LED_STATUS 2 // LED interno para sinalizar recebimento de dados
+
+uint8_t ultimoRemetenteMac[6];
 
 // 💡 LUZES (101 ao 105): Retorna o GPIO com base no quarto
 int obtenerPinoLuzQuarto(int numeroQuarto) {
@@ -49,14 +47,51 @@ int obtenerPinoPortaoGeral(int codigoGeral) {
   }
 }
 
+void processarComandoWiFi(String cmd);
+void enviarConfirmacao(String resposta);
+bool souResponsavel(String cmd);
+
+// Callback executado quando dados chegam via ESP-NOW
+void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
+  // Pisca o LED de status ao receber comando
+  digitalWrite(LED_STATUS, HIGH);
+  
+  // Registra o peer dinamicamente para poder responder o ACK
+  if (!esp_now_is_peer_exist(mac)) {
+    esp_now_peer_info_t peerInfo;
+    memset(&peerInfo, 0, sizeof(peerInfo));
+    memcpy(peerInfo.peer_addr, mac, 6);
+    peerInfo.channel = 0; 
+    peerInfo.encrypt = false;
+    esp_now_add_peer(&peerInfo);
+  }
+  
+  memcpy(ultimoRemetenteMac, mac, 6);
+  
+  char buffer[len + 1];
+  memcpy(buffer, incomingData, len);
+  buffer[len] = 0;
+  
+  String cmd = String(buffer);
+  cmd.trim();
+  
+  Serial.print("[ESP-NOW Recebido]: ");
+  Serial.println(cmd);
+  
+  processarComandoWiFi(cmd);
+  
+  delay(50);
+  digitalWrite(LED_STATUS, LOW);
+}
+
 void setup() {
   Serial.begin(9600);
-  Serial.println("--- ESP32 #1 Wi-Fi Inicializado e Pronto ---");
+  Serial.println("--- ESP32 #1 ESP-NOW Inicializado e Pronto ---");
 
   pinMode(LED_STATUS, OUTPUT);
   digitalWrite(LED_STATUS, LOW);
 
-  // Conecta ao Wi-Fi
+  // Conecta ao Wi-Fi para alinhar o canal de rádio com o receptor
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     digitalWrite(LED_STATUS, HIGH);
@@ -65,7 +100,6 @@ void setup() {
     delay(250);
   }
   
-  // LED aceso por 1s para indicar Wi-Fi conectado
   digitalWrite(LED_STATUS, HIGH);
   delay(1000);
   digitalWrite(LED_STATUS, LOW);
@@ -73,10 +107,13 @@ void setup() {
   Serial.print("[WIFI] Conectado com sucesso! IP local: ");
   Serial.println(WiFi.localIP());
 
-  // Inicia escuta UDP
-  udp.begin(udpPort);
-  Serial.print("[UDP] Escuta iniciada na porta: ");
-  Serial.println(udpPort);
+  // Inicializa o ESP-NOW
+  if (esp_now_init() == ESP_OK) {
+    Serial.println("[ESP-NOW] Inicializado com sucesso.");
+    esp_now_register_recv_cb(OnDataRecv);
+  } else {
+    Serial.println("[ESP-NOW] Erro ao inicializar.");
+  }
   
   // Configura e desliga as 5 Luzes (101 a 105)
   for (int q = 101; q <= 105; q++) {
@@ -105,68 +142,40 @@ void verificarConexaoWiFi() {
   static unsigned long tempoDesconectado = 0;
   
   if (WiFi.status() != WL_CONNECTED) {
-    digitalWrite(LED_STATUS, HIGH); // Acende o LED na hora para indicar sinal perdido
+    digitalWrite(LED_STATUS, HIGH);
     
-    // Se acabou de cair, registra o tempo inicial da queda
     if (tempoDesconectado == 0) {
       tempoDesconectado = millis();
     }
     
-    // Meio-termo: Se ficar mais de 45 segundos direto sem conseguir se reconectar sozinho,
-    // aí sim nós forçamos o WiFi.begin() manualmente para destravar a placa.
     if (millis() - tempoDesconectado >= 45000) {
       Serial.println("[WIFI] Sem conexao ha mais de 45s. Forcando reinicializacao...");
       WiFi.disconnect();
       WiFi.begin(ssid, password);
-      tempoDesconectado = millis(); // Reseta o cronômetro para tentar de novo se necessário
+      tempoDesconectado = millis();
     }
   } else {
-    // Se está conectado, apaga o LED
     digitalWrite(LED_STATUS, LOW);
-    
-    // Se estava desconectado antes e agora voltou, reinicia a escuta UDP para garantir
     if (tempoDesconectado != 0) {
       Serial.println("[WIFI] Reconectado com sucesso!");
-      udp.stop();
-      udp.begin(udpPort);
-      tempoDesconectado = 0; // Zera o cronômetro
+      tempoDesconectado = 0;
     }
   }
 }
 
 void loop() {
   verificarConexaoWiFi();
-  
-  int packetSize = udp.parsePacket();
-  if (packetSize) {
-    // Pisca o LED de status ao receber comando
-    digitalWrite(LED_STATUS, HIGH);
-    
-    char packetBuffer[255];
-    int len = udp.read(packetBuffer, 255);
-    if (len > 0) {
-      packetBuffer[len] = 0; // Termina a string
-    }
-    
-    String cmd = String(packetBuffer);
-    cmd.trim();
-    
-    Serial.print("[UDP Recebido]: ");
-    Serial.println(cmd);
-    
-    processarComandoWiFi(cmd);
-    
-    delay(100);
-    digitalWrite(LED_STATUS, LOW);
-  }
+  delay(100);
 }
 
 void enviarConfirmacao(String resposta) {
-  udp.beginPacket(udp.remoteIP(), udp.remotePort());
-  udp.print(resposta + "\n");
-  udp.endPacket();
-  Serial.print("[UDP Resposta/ACK]: ");
-  Serial.println(resposta);
+  esp_err_t result = esp_now_send(ultimoRemetenteMac, (uint8_t *)resposta.c_str(), resposta.length());
+  if (result == ESP_OK) {
+    Serial.print("[ESP-NOW Resposta/ACK]: ");
+    Serial.println(resposta);
+  } else {
+    Serial.println("[ESP-NOW] Erro ao enviar ACK.");
+  }
 }
 
 bool souResponsavel(String cmd) {
@@ -176,7 +185,7 @@ bool souResponsavel(String cmd) {
     return (quartoNum >= 101 && quartoNum <= 105);
   } else {
     int codigoCmd = cmd.toInt();
-    return (codigoCmd >= 101 && codigoCmd <= 105); // Somente quartos 101 ao 105
+    return (codigoCmd >= 101 && codigoCmd <= 105) || (codigoCmd == 888 || codigoCmd == 999);
   }
 }
 
@@ -191,7 +200,7 @@ void processarComandoWiFi(String cmd) {
   
   // Ignora comando idêntico recebido nos últimos 1.5 segundos, mas responde com ACK
   if (cmd.equals(ultimoComando) && (millis() - tempoUltimoComando < 1500)) {
-    Serial.print("[UDP] Comando duplicado ignorado. Reenviando ACK: ");
+    Serial.print("[ESP-NOW] Comando duplicado ignorado. Reenviando ACK: ");
     Serial.println(cmd);
     enviarConfirmacao(cmd + "-OK");
     return;
@@ -208,11 +217,11 @@ void processarComandoWiFi(String cmd) {
     
     int pinoLuz = obtenerPinoLuzQuarto(quartoNum);
     if (pinoLuz != -1) {
-      digitalWrite(pinoLuz, ligar ? LOW : HIGH); // LOW ativa o relé módulo
+      enviarConfirmacao(cmd + "-OK"); // Envia confirmação PRIMEIRO
+      digitalWrite(pinoLuz, ligar ? LOW : HIGH); // LOW ativa o relé
       Serial.print("-> LUZ Quarto ");
       Serial.print(quartoNum);
       Serial.println(ligar ? " LIGADA" : " DESLIGADA");
-      enviarConfirmacao(cmd + "-OK");
     }
   }
   // 2. COMANDO DE PORTÃO (Ex: 101, 888, 999)
@@ -228,13 +237,13 @@ void processarComandoWiFi(String cmd) {
     }
     
     if (pinoBotoeira != -1) {
+      enviarConfirmacao(cmd + "-OK"); // Envia confirmação PRIMEIRO para evitar timeout no Java
       digitalWrite(pinoBotoeira, LOW);  // Fecha o contato
       delay(500);                       // Pulso de 500ms
       digitalWrite(pinoBotoeira, HIGH); // Abre o contato
       Serial.print("-> Portao ");
       Serial.print(codigoCmd);
       Serial.println(" acionado.");
-      enviarConfirmacao(cmd + "-OK");
     }
   }
 }

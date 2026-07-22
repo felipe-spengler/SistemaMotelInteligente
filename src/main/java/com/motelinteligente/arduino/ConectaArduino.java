@@ -231,7 +231,7 @@ public class ConectaArduino {
             for (int i = 0; i < 3; i++) {
                 try (java.net.DatagramSocket socket = new java.net.DatagramSocket()) {
                     socket.setBroadcast(true);
-                    socket.setSoTimeout(1000); // 1000ms timeout para aguardar a confirmação da placa
+                    socket.setSoTimeout(500); // 500ms timeout para aguardar a confirmação da placa
                     
                     byte[] buffer = (comando.trim() + "\n").getBytes();
                     java.net.InetAddress address = java.net.InetAddress.getByName("255.255.255.255");

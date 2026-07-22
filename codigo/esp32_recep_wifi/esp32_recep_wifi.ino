@@ -1,24 +1,58 @@
 /*
  * ESP32 RECEPÇÃO - SUBSTITUTO DO ARDUINO RECEP
- * Recebe comandos da Serial USB (Java) e transmite via UDP Broadcast na Rede Sem Fio
+ * Recebe comandos da Serial USB ou UDP do Java e transmite via ESP-NOW Broadcast para as placas do corredor.
+ * Recebe ACKs via ESP-NOW das placas e repassa para o Java via UDP/Serial.
  */
 
 #include <WiFi.h>
 #include <WiFiUdp.h>
+#include <esp_now.h>
 
-// 📶 CONFIGURAÇÕES DA REDE WI-FI LOCAL
+// 📶 CONFIGURAÇÕES DA REDE WI-FI LOCAL (Para o Receptor ter o mesmo canal do roteador)
 const char* ssid = "VENUS CLIENTE";
 const char* password = "venus123";
 
 // 📡 CONFIGURAÇÕES DE UDP
 const int udpPort = 12345;
-const char* broadcastIP = "255.255.255.255"; // Envia para todas as placas da rede local
-
 WiFiUDP udp;
+
+IPAddress ultimoRemoteIP;
+int ultimoRemotePort = 0;
+
+// Endereço de Broadcast para ESP-NOW
+uint8_t broadcastAddress[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+
 String inputString = "";
 bool stringComplete = false;
 
 #define LED_STATUS 2 // LED interno do ESP32 para sinalização visual
+
+// Callback de recebimento do ESP-NOW (recebe o ACK da placa de destino)
+void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
+  char buffer[len + 1];
+  memcpy(buffer, incomingData, len);
+  buffer[len] = 0;
+  String resposta = String(buffer);
+  resposta.trim();
+  
+  Serial.print("[ESP-NOW Recebido]: ");
+  Serial.println(resposta);
+  
+  // Se for um ACK (ex: LUZ-ON-101-OK ou 101-OK)
+  if (resposta.endsWith("-OK")) {
+    // Responde pela Serial USB (caso Java tenha enviado por serial)
+    Serial.println(resposta);
+    
+    // Responde via UDP (caso Java tenha enviado via rede)
+    if (ultimoRemotePort != 0) {
+      udp.beginPacket(ultimoRemoteIP, ultimoRemotePort);
+      udp.print(resposta + "\n");
+      udp.endPacket();
+      Serial.print("[UDP Encaminhado para Java]: ");
+      Serial.println(resposta);
+    }
+  }
+}
 
 void setup() {
   Serial.begin(9600);
@@ -28,10 +62,9 @@ void setup() {
   
   inputString.reserve(100);
 
-  // Conecta ao Wi-Fi
+  // Conecta ao Wi-Fi (necessário para sincronizar canal de frequência do ESP-NOW com a rede)
   WiFi.begin(ssid, password);
   
-  // Pisca o LED enquanto tenta conectar
   while (WiFi.status() != WL_CONNECTED) {
     digitalWrite(LED_STATUS, HIGH);
     delay(250);
@@ -39,13 +72,30 @@ void setup() {
     delay(250);
   }
 
-  // LED aceso direto indica conectado com sucesso ao Wi-Fi
   digitalWrite(LED_STATUS, HIGH);
   delay(1000);
   digitalWrite(LED_STATUS, LOW);
   
   // Inicia o UDP
   udp.begin(udpPort);
+
+  // Inicializa o ESP-NOW
+  if (esp_now_init() == ESP_OK) {
+    Serial.println("[ESP-NOW] Inicializado com sucesso.");
+    esp_now_register_recv_cb(OnDataRecv);
+    
+    esp_now_peer_info_t peerInfo;
+    memset(&peerInfo, 0, sizeof(peerInfo));
+    memcpy(peerInfo.peer_addr, broadcastAddress, 6);
+    peerInfo.channel = 0;  // Usa o canal do Wi-Fi atual
+    peerInfo.encrypt = false;
+    
+    if (esp_now_add_peer(&peerInfo) != ESP_OK) {
+      Serial.println("[ESP-NOW] Falha ao adicionar peer broadcast.");
+    }
+  } else {
+    Serial.println("[ESP-NOW] Erro ao inicializar.");
+  }
 }
 
 void verificarConexaoWiFi() {
@@ -53,7 +103,7 @@ void verificarConexaoWiFi() {
   static bool estavaDesconectado = false;
   unsigned long agora = millis();
   
-  if (agora - ultimoCheckWiFi >= 5000) { // verifica a cada 5 segundos
+  if (agora - ultimoCheckWiFi >= 5000) {
     ultimoCheckWiFi = agora;
     if (WiFi.status() != WL_CONNECTED) {
       estavaDesconectado = true;
@@ -69,10 +119,26 @@ void verificarConexaoWiFi() {
   }
 }
 
+void enviarViaESPNow(String comando) {
+  digitalWrite(LED_STATUS, HIGH);
+  
+  // Transmite via ESP-NOW Broadcast
+  esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *)comando.c_str(), comando.length());
+  if (result == ESP_OK) {
+    Serial.print("[ESP-NOW Enviado]: ");
+    Serial.println(comando);
+  } else {
+    Serial.println("[ESP-NOW] Erro ao enviar.");
+  }
+  
+  delay(10);
+  digitalWrite(LED_STATUS, LOW);
+}
+
 void loop() {
   verificarConexaoWiFi();
 
-  // Lê os comandos vindos do computador via USB (Serial)
+  // 1. Lê os comandos vindos do computador via USB (Serial)
   while (Serial.available()) {
     char inChar = (char)Serial.read();
     inputString += inChar;
@@ -85,32 +151,32 @@ void loop() {
     inputString.trim();
     
     if (inputString.equalsIgnoreCase("OK")) {
-      // Handshake do Java para verificar se a placa está ativa
       Serial.print("OK\n");
     } else if (inputString.length() > 0) {
-      // Envia o comando via rede local sem fio (UDP Broadcast)
-      enviarViaWiFi(inputString);
+      enviarViaESPNow(inputString);
     }
     
     inputString = "";
     stringComplete = false;
   }
-}
 
-void enviarViaWiFi(String comando) {
-  // Pisca o LED rapidamente ao enviar dados
-  digitalWrite(LED_STATUS, HIGH);
-
-  // Envia o comando 3 vezes com um pequeno intervalo para garantir a entrega via UDP Broadcast
-  for (int i = 0; i < 3; i++) {
-    udp.beginPacket(broadcastIP, udpPort);
-    udp.print(comando + "\n");
-    udp.endPacket();
-    if (i < 2) {
-      delay(80);
+  // 2. Lê comandos vindos do Java via UDP (Rede)
+  int packetSize = udp.parsePacket();
+  if (packetSize) {
+    char packetBuffer[255];
+    int len = udp.read(packetBuffer, 255);
+    if (len > 0) {
+      packetBuffer[len] = 0;
     }
+    String cmd = String(packetBuffer);
+    cmd.trim();
+    
+    ultimoRemoteIP = udp.remoteIP();
+    ultimoRemotePort = udp.remotePort();
+    
+    Serial.print("[UDP Recebido de Java]: ");
+    Serial.println(cmd);
+    
+    enviarViaESPNow(cmd);
   }
-
-  delay(50);
-  digitalWrite(LED_STATUS, LOW);
 }
