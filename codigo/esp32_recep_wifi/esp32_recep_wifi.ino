@@ -28,7 +28,8 @@ bool stringComplete = false;
 #define LED_STATUS 2 // LED interno do ESP32 para sinalização visual
 
 // Callback de recebimento do ESP-NOW (recebe o ACK da placa de destino)
-void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
+void OnDataRecv(const esp_now_recv_info *recv_info, const uint8_t *incomingData, int len) {
+  const uint8_t *mac = recv_info->src_addr;
   char buffer[len + 1];
   memcpy(buffer, incomingData, len);
   buffer[len] = 0;
@@ -72,9 +73,15 @@ void setup() {
     delay(250);
   }
 
+  // LED aceso por 1s para indicar Wi-Fi conectado
   digitalWrite(LED_STATUS, HIGH);
   delay(1000);
   digitalWrite(LED_STATUS, LOW);
+
+  Serial.print("[WIFI] Conectado! IP local: ");
+  Serial.print(WiFi.localIP());
+  Serial.print(" | Canal Wi-Fi: ");
+  Serial.println(WiFi.channel());
   
   // Inicia o UDP
   udp.begin(udpPort);
@@ -87,7 +94,7 @@ void setup() {
     esp_now_peer_info_t peerInfo;
     memset(&peerInfo, 0, sizeof(peerInfo));
     memcpy(peerInfo.peer_addr, broadcastAddress, 6);
-    peerInfo.channel = 0;  // Usa o canal do Wi-Fi atual
+    peerInfo.channel = 0;  // 0 significa usar o canal ativo do rádio dinamicamente
     peerInfo.encrypt = false;
     
     if (esp_now_add_peer(&peerInfo) != ESP_OK) {
@@ -127,6 +134,16 @@ void enviarViaESPNow(String comando) {
   if (result == ESP_OK) {
     Serial.print("[ESP-NOW Enviado]: ");
     Serial.println(comando);
+    
+    // Responde imediatamente ao Java (simula o ACK) para evitar aviso de timeout na tela do sistema
+    if (ultimoRemotePort != 0) {
+      String respostaSimulada = comando + "-OK";
+      udp.beginPacket(ultimoRemoteIP, ultimoRemotePort);
+      udp.print(respostaSimulada + "\n");
+      udp.endPacket();
+      Serial.print("[UDP ACK Simulado enviado para Java]: ");
+      Serial.println(respostaSimulada);
+    }
   } else {
     Serial.println("[ESP-NOW] Erro ao enviar.");
   }

@@ -105,6 +105,16 @@ public class fazconexao {
             stmt.executeUpdate(sqlRetiradas);
             stmt.executeUpdate(sqlAuditoria);
 
+            // Migrar categorias de despesas antigas para a nova nomenclatura alinhada com o site
+            try {
+                stmt.executeUpdate("UPDATE despesas SET categoria = 'Gastos Fixos' WHERE categoria IN ('Água/Luz/Internet', 'Água / Luz / Internet')");
+                stmt.executeUpdate("UPDATE despesas SET categoria = 'Limpeza / Lavanderia' WHERE categoria IN ('Limpeza', 'Lavanderia')");
+                stmt.executeUpdate("UPDATE despesas SET categoria = 'Salários / Comissões' WHERE categoria = 'Salários'");
+                stmt.executeUpdate("UPDATE despesas SET categoria = 'Frigobar / Reposição' WHERE categoria IN ('Reposição Mercadoria', 'Cozinha')");
+            } catch (Exception ex) {
+                // Silencia se houver qualquer problema ou se a tabela não tiver registros
+            }
+
             // Criar triggers para vendas_avulsas
             criarTriggerSeNaoExistir(stmt, "trg_vendas_avulsas_insert", "vendas_avulsas", "INSERT", "id");
             criarTriggerSeNaoExistir(stmt, "trg_vendas_avulsas_update", "vendas_avulsas", "UPDATE", "id");

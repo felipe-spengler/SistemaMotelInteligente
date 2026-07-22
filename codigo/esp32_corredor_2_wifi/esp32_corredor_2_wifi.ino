@@ -1,15 +1,15 @@
 /*
  * ESP32 Nº 2 - RECEPTOR ESP-NOW E CONTROLADOR (QUARTOS 106 AO 110 + GERAIS)
- * COM COMUNICAÇÃO VIA ESP-NOW DIRECT (SEM CABO) E MEMÓRIA DE ESTADO (PREFERENCES)
+ * COM COMUNICAÇÃO VIA ESP-NOW DIRECT (100% INDEPENDENTE DE CONEXÃO COM ROTEADOR) E MEMÓRIA DE ESTADO (PREFERENCES)
  */
 
 #include <WiFi.h>
 #include <esp_now.h>
+#include <esp_wifi.h>
 #include <Preferences.h> // Salva estado das luzes na queda de energia
 
-// 📶 CONFIGURAÇÕES DA REDE WI-FI LOCAL (Para sincronizar o canal com o receptor)
-const char* ssid = "VENUS CLIENTE";
-const char* password = "venus123";
+// Canal de Wi-Fi fixado no roteador (deve ser o mesmo canal do roteador VENUS CLIENTE)
+#define WIFI_CHANNEL 11
 
 #define LED_STATUS 2 // LED interno para sinalizar recebimento de dados
 
@@ -54,8 +54,9 @@ void enviarConfirmacao(String resposta);
 bool souResponsavel(String cmd);
 
 // Callback executado quando dados chegam via ESP-NOW
-void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
-  // Pisca o LED de status ao receber comando
+void OnDataRecv(const esp_now_recv_info *recv_info, const uint8_t *incomingData, int len) {
+  const uint8_t *mac = recv_info->src_addr;
+  
   digitalWrite(LED_STATUS, HIGH);
   
   // Registra o peer dinamicamente para poder responder o ACK
@@ -63,7 +64,7 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
     esp_now_peer_info_t peerInfo;
     memset(&peerInfo, 0, sizeof(peerInfo));
     memcpy(peerInfo.peer_addr, mac, 6);
-    peerInfo.channel = 0; 
+    peerInfo.channel = 0; // Usa o canal de rádio ativo (11) para responder
     peerInfo.encrypt = false;
     esp_now_add_peer(&peerInfo);
   }
@@ -93,21 +94,16 @@ void setup() {
   pinMode(LED_STATUS, OUTPUT);
   digitalWrite(LED_STATUS, LOW);
 
-  // Conecta ao Wi-Fi para alinhar o canal de rádio com o receptor
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    digitalWrite(LED_STATUS, HIGH);
-    delay(250);
-    digitalWrite(LED_STATUS, LOW);
-    delay(250);
-  }
-  
-  digitalWrite(LED_STATUS, HIGH);
-  delay(1000);
-  digitalWrite(LED_STATUS, LOW);
+  // Inicializa o Wi-Fi em modo Station mas SEM conectar ao roteador
+  WiFi.mode(WIFI_STA);
+  WiFi.disconnect();
+  delay(100);
 
-  Serial.print("[WIFI] Conectado com sucesso! IP local: ");
-  Serial.println(WiFi.localIP());
+  // Configura o canal do rádio do ESP32 manualmente para o canal fixo do roteador (Canal 11)
+  int channel = WIFI_CHANNEL;
+  esp_wifi_set_channel(channel, WIFI_SECOND_CHAN_NONE);
+  Serial.print("[WIFI] Rádio sintonizado no canal fixo: ");
+  Serial.println(channel);
 
   // Inicializa o ESP-NOW
   if (esp_now_init() == ESP_OK) {
@@ -148,34 +144,9 @@ void setup() {
   pinMode(22, OUTPUT); digitalWrite(22, HIGH); // IN12
 }
 
-void verificarConexaoWiFi() {
-  static unsigned long tempoDesconectado = 0;
-  
-  if (WiFi.status() != WL_CONNECTED) {
-    digitalWrite(LED_STATUS, HIGH);
-    
-    if (tempoDesconectado == 0) {
-      tempoDesconectado = millis();
-    }
-    
-    if (millis() - tempoDesconectado >= 45000) {
-      Serial.println("[WIFI] Sem conexao ha mais de 45s. Forcando reinicializacao...");
-      WiFi.disconnect();
-      WiFi.begin(ssid, password);
-      tempoDesconectado = millis();
-    }
-  } else {
-    digitalWrite(LED_STATUS, LOW);
-    if (tempoDesconectado != 0) {
-      Serial.println("[WIFI] Reconectado com sucesso!");
-      tempoDesconectado = 0;
-    }
-  }
-}
-
 void loop() {
-  verificarConexaoWiFi();
-  delay(100);
+  // Não precisa de loop de reconexão de Wi-Fi, o ESP-NOW é direto via hardware!
+  delay(1000);
 }
 
 void enviarConfirmacao(String resposta) {

@@ -94,7 +94,8 @@ public class CheckSincronia extends TimerTask {
                 "alarmes", "antecipado", "caixa", "configuracoes", "desistencia", "funcionario", "imagens",
                 "justificativa", "prevendidos", "produtos", "quartos",
                 "registralimpeza", "registralocado", "registramanutencao", "registrareserva", "registravendido",
-                "status", "valorcartao", "portoes", "reservas"
+                "status", "valorcartao", "portoes", "reservas",
+                "despesas", "retiradas_caixa", "vendas_avulsas", "auditoria_locacoes"
         };
 
         try (
@@ -279,6 +280,10 @@ public class CheckSincronia extends TimerTask {
             case "desistencia":
             case "prevendidos":
             case "valorcartao":
+            case "despesas":
+            case "retiradas_caixa":
+            case "vendas_avulsas":
+            case "auditoria_locacoes":
                 return "id";
             case "justificativa":
                 return "id";

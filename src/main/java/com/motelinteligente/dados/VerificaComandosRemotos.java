@@ -194,9 +194,53 @@ public class VerificaComandosRemotos extends Thread implements MqttCallback {
 
     private void processarComando(String comando) {
         try {
+            comando = comando.trim();
+            if (comando.startsWith("lancar_despesa ")) {
+                String jsonStr = comando.substring("lancar_despesa ".length());
+                org.json.JSONObject json = new org.json.JSONObject(jsonStr);
+                int idCaixa = json.optInt("idcaixa", 0);
+                if (idCaixa == 0) {
+                    idCaixa = configGlobal.getInstance().getCaixa();
+                }
+                String descricao = json.getString("descricao");
+                String categoria = json.getString("categoria");
+                float valor = (float) json.getDouble("valor");
+                String formapagamento = json.getString("formapagamento");
+                String status = json.optString("status", "pago");
+                
+                new fcaixa().salvarDespesa(idCaixa, descricao, categoria, valor, formapagamento, status);
+                logger.info("Despesa lancada via MQTT: " + descricao + " | R$ " + valor);
+                return;
+            } else if (comando.startsWith("editar_despesa ")) {
+                String jsonStr = comando.substring("editar_despesa ".length());
+                org.json.JSONObject json = new org.json.JSONObject(jsonStr);
+                int id = json.getInt("id");
+                int idCaixa = json.optInt("idcaixa", 0);
+                if (idCaixa == 0) {
+                    idCaixa = configGlobal.getInstance().getCaixa();
+                }
+                String descricao = json.getString("descricao");
+                String categoria = json.getString("categoria");
+                float valor = (float) json.getDouble("valor");
+                String formapagamento = json.getString("formapagamento");
+                String status = json.optString("status", "pago");
+                
+                new fcaixa().editarDespesa(id, idCaixa, descricao, categoria, valor, formapagamento, status);
+                logger.info("Despesa editada via MQTT, ID: " + id);
+                return;
+            } else if (comando.startsWith("excluir_despesa ")) {
+                String jsonStr = comando.substring("excluir_despesa ".length());
+                org.json.JSONObject json = new org.json.JSONObject(jsonStr);
+                int id = json.getInt("id");
+                
+                new fcaixa().excluirDespesa(id);
+                logger.info("Despesa excluida via MQTT, ID: " + id);
+                return;
+            }
+
             String[] partes = comando.split(" ");
             if (partes.length < 2) {
-                logger.warn("Formato inválido do comando: " + comando);
+                logger.warn("Formato invalido do comando: " + comando);
                 return;
             }
 
