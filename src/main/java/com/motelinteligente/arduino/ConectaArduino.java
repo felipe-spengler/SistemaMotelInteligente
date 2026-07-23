@@ -181,7 +181,7 @@ public class ConectaArduino {
         }
     }
 
-    private void limparBufferArduino() {
+    private static void limparBufferArduino() {
         try {
             while (CacheDados.getArduinoPort().bytesAvailable() > 0) {
                 byte[] bufferLimpeza = new byte[CacheDados.getArduinoPort().bytesAvailable()];
@@ -190,6 +190,35 @@ public class ConectaArduino {
             System.out.println("Buffer do Arduino limpo.");
         } catch (Exception e) {
             System.out.println("Erro ao limpar buffer do Arduino: " + e.getMessage());
+        }
+    }
+
+    private static boolean aguardarRespostaEspecifica(String expectedText, int timeoutMs) {
+        try {
+            long tempoInicio = System.currentTimeMillis();
+            StringBuilder resposta = new StringBuilder();
+
+            while (System.currentTimeMillis() - tempoInicio < timeoutMs) {
+                if (CacheDados.getArduinoPort().bytesAvailable() > 0) {
+                    byte[] dadosRecebidos = new byte[CacheDados.getArduinoPort().bytesAvailable()];
+                    CacheDados.getArduinoPort().readBytes(dadosRecebidos, dadosRecebidos.length);
+                    resposta.append(new String(dadosRecebidos));
+                    String parcial = resposta.toString().trim();
+                    logger.info("Resposta parcial do Arduino (Luz): {}", parcial);
+
+                    if (parcial.toLowerCase().contains(expectedText.toLowerCase())) {
+                        return true;
+                    }
+                }
+                Thread.sleep(50);
+            }
+
+            logger.warn("Timeout aguardando resposta específica '{}'. Última resposta: {}", expectedText, resposta.toString().trim());
+            return false;
+
+        } catch (Exception e) {
+            logger.error("Erro ao aguardar resposta específica: {}", e.getMessage(), e);
+            return false;
         }
     }
 
@@ -212,9 +241,18 @@ public class ConectaArduino {
             } else if (config.isFlagArduino() && CacheDados.getArduinoPort() != null) {
                 synchronized (ConectaArduino.class) {
                     try {
+                        limparBufferArduino();
                         byte[] msg = cmd.getBytes();
                         CacheDados.getArduinoPort().writeBytes(msg, msg.length);
                         logger.info("Comando de luz enviado para o Arduino: " + cmd.trim());
+                        
+                        String expectedAck = cmd.trim() + "-OK";
+                        boolean sucesso = aguardarRespostaEspecifica(expectedAck, 1000);
+                        if (sucesso) {
+                            logger.info("Confirmação do comando de luz recebida: " + expectedAck);
+                        } else {
+                            logger.warn("Timeout aguardando confirmação do comando de luz: " + expectedAck);
+                        }
                     } catch (Exception e) {
                         logger.error("Erro ao enviar comando de luz para o Arduino: ", e);
                     }
