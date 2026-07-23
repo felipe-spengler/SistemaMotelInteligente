@@ -134,16 +134,6 @@ void enviarViaESPNow(String comando) {
   if (result == ESP_OK) {
     Serial.print("[ESP-NOW Enviado]: ");
     Serial.println(comando);
-    
-    // Responde imediatamente ao Java (simula o ACK) para evitar aviso de timeout na tela do sistema
-    if (ultimoRemotePort != 0) {
-      String respostaSimulada = comando + "-OK";
-      udp.beginPacket(ultimoRemoteIP, ultimoRemotePort);
-      udp.print(respostaSimulada + "\n");
-      udp.endPacket();
-      Serial.print("[UDP ACK Simulado enviado para Java]: ");
-      Serial.println(respostaSimulada);
-    }
   } else {
     Serial.println("[ESP-NOW] Erro ao enviar.");
   }
