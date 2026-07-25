@@ -204,7 +204,7 @@ public class VendaAvulsaDialog extends JDialog {
 
         gbc2.gridx = 0; gbc2.gridy++;
         formPanel.add(new JLabel("Forma de Pagamento:"), gbc2);
-        comboPagamento = new JComboBox<>(new String[] {"Dinheiro", "Crédito", "Débito", "Pix", "Outro"});
+        comboPagamento = new JComboBox<>(new String[] {"Dinheiro", "Crédito", "Débito", "Pix"});
         gbc2.gridx = 1;
         formPanel.add(comboPagamento, gbc2);
 
@@ -353,7 +353,6 @@ public class VendaAvulsaDialog extends JDialog {
                 }
             }
         }
-        comboPagamento.addItem("Outro");
     }
 
     private void salvarVendaAvulsa() {

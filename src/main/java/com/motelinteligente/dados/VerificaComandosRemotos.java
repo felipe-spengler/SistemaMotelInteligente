@@ -199,9 +199,6 @@ public class VerificaComandosRemotos extends Thread implements MqttCallback {
                 String jsonStr = comando.substring("lancar_despesa ".length());
                 org.json.JSONObject json = new org.json.JSONObject(jsonStr);
                 int idCaixa = json.optInt("idcaixa", 0);
-                if (idCaixa == 0) {
-                    idCaixa = configGlobal.getInstance().getCaixa();
-                }
                 String descricao = json.getString("descricao");
                 String categoria = json.getString("categoria");
                 float valor = (float) json.getDouble("valor");
@@ -216,9 +213,6 @@ public class VerificaComandosRemotos extends Thread implements MqttCallback {
                 org.json.JSONObject json = new org.json.JSONObject(jsonStr);
                 int id = json.getInt("id");
                 int idCaixa = json.optInt("idcaixa", 0);
-                if (idCaixa == 0) {
-                    idCaixa = configGlobal.getInstance().getCaixa();
-                }
                 String descricao = json.getString("descricao");
                 String categoria = json.getString("categoria");
                 float valor = (float) json.getDouble("valor");
