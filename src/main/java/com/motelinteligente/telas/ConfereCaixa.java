@@ -343,8 +343,30 @@ public class ConfereCaixa extends JFrame {
         }
         String[] colunasLoc = { "ID Locação", "Número Quarto", "Hora Início", "Hora Fim", "Valor Quarto",
                 "Valor Consumo", "Recebido Dinheiro", "Recebido Pix", "Recebido Cartão" };
-        JTable tabelaLoc = new JTable(dadosLoc.toArray(new Object[0][]), colunasLoc);
+        DefaultTableModel modelLoc = new DefaultTableModel(dadosLoc.toArray(new Object[0][]), colunasLoc) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        JTable tabelaLoc = new JTable(modelLoc);
         tabelaLoc.setRowHeight(25);
+        tabelaLoc.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                if (evt.getClickCount() == 2) {
+                    int row = tabelaLoc.getSelectedRow();
+                    if (row != -1) {
+                        try {
+                            int idLocacao = Integer.parseInt(tabelaLoc.getValueAt(row, 0).toString());
+                            new VerDadosLocacao(idLocacao).setVisible(true);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        });
         abas.addTab("Locações Concluídas", new JScrollPane(tabelaLoc));
 
         // 2. Aba Retiradas / Sangrias
@@ -366,7 +388,13 @@ public class ConfereCaixa extends JFrame {
             }
         }
         String[] colunasRet = { "Data/Hora", "Valor (R$)", "Quem Retirou", "Justificativa", "Operador" };
-        JTable tabelaRet = new JTable(dadosRet.toArray(new Object[0][]), colunasRet);
+        DefaultTableModel modelRet = new DefaultTableModel(dadosRet.toArray(new Object[0][]), colunasRet) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        JTable tabelaRet = new JTable(modelRet);
         tabelaRet.setRowHeight(25);
         abas.addTab("Retiradas / Sangrias", new JScrollPane(tabelaRet));
 
@@ -391,7 +419,13 @@ public class ConfereCaixa extends JFrame {
             }
         }
         String[] colunasDesp = { "Data/Hora", "Descrição", "Categoria", "Valor (R$)", "Forma Pgto", "Status", "Operador" };
-        JTable tabelaDesp = new JTable(dadosDesp.toArray(new Object[0][]), colunasDesp);
+        DefaultTableModel modelDesp = new DefaultTableModel(dadosDesp.toArray(new Object[0][]), colunasDesp) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        JTable tabelaDesp = new JTable(modelDesp);
         tabelaDesp.setRowHeight(25);
         abas.addTab("Despesas no Caixa", new JScrollPane(tabelaDesp));
 

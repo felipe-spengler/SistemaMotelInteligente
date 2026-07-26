@@ -314,50 +314,50 @@ public class ImpressoraService {
         sb.append(String.format("Caixa ID: %d\n", idCaixa));
         sb.append("------------------------------------------\n");
 
-        // Consulta agrupada por quarto + produto para facilitar reposição
+        // Consulta agrupada por quarto + produto incluindo vendas avulsas
         String sql =
-    "SELECT rl.numquarto, p.descricao, SUM(rv.quantidade) as qtd, rv.valorunidade, SUM(rv.valortotal) as total " +
-    "FROM registravendido rv " +
-    "INNER JOIN produtos p ON rv.idproduto = p.idproduto " +
-    "LEFT JOIN registralocado rl ON rv.idlocacao = rl.idlocacao " +
-    "WHERE rv.idcaixaatual = ? " +
-    "GROUP BY rl.numquarto, p.descricao, rv.valorunidade " + // <-- Adicionado isso aqui
-    "ORDER BY rl.numquarto, p.descricao";
+            "SELECT numquarto, descricao, SUM(qtd) as total_qtd FROM (" +
+            "  SELECT COALESCE(rl.numquarto, 0) as numquarto, p.descricao, rv.quantidade as qtd " +
+            "  FROM registravendido rv " +
+            "  INNER JOIN produtos p ON rv.idproduto = p.idproduto " +
+            "  LEFT JOIN registralocado rl ON rv.idlocacao = rl.idlocacao " +
+            "  WHERE rv.idcaixaatual = ? " +
+            "  UNION ALL " +
+            "  SELECT 0 as numquarto, p.descricao, va.quantidade as qtd " +
+            "  FROM vendas_avulsas va " +
+            "  INNER JOIN produtos p ON va.idproduto = p.idproduto " +
+            "  WHERE va.idcaixa = ? " +
+            ") as combined " +
+            "GROUP BY numquarto, descricao " +
+            "ORDER BY numquarto, descricao";
 
-        float totalGeral = 0;
         int quartoAtual = -1;
-        float totalQuarto = 0;
 
         try (Connection link = new fazconexao().conectar();
              PreparedStatement stmt = link.prepareStatement(sql)) {
             stmt.setInt(1, idCaixa);
+            stmt.setInt(2, idCaixa);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     int quarto = rs.getInt("numquarto");
                     String desc = rs.getString("descricao");
-                    if (desc != null && desc.length() > 18) desc = desc.substring(0, 16) + "..";
-                    int qtd = rs.getInt("qtd");
-                    float vUnit = rs.getFloat("valorunidade");
-                    float total = rs.getFloat("total");
+                    if (desc != null && desc.length() > 32) {
+                        desc = desc.substring(0, 30) + "..";
+                    }
+                    int qtd = rs.getInt("total_qtd");
 
                     // Cabeçalho do quarto quando muda
                     if (quarto != quartoAtual) {
-                        if (quartoAtual != -1) {
-                            sb.append(String.format("  Subtotal Qto %02d:       R$ %,.2f\n", quartoAtual, totalQuarto));
-                        }
                         quartoAtual = quarto;
-                        totalQuarto = 0;
-                        sb.append(String.format("--- Quarto %02d ---\n", quarto > 0 ? quarto : 0));
-                        sb.append(String.format("Qtd  Produto              V.Unit  V.Total\n"));
+                        if (quarto == 0) {
+                            sb.append("--- Vendas Avulsas ---\n");
+                        } else {
+                            sb.append(String.format("--- Quarto %02d ---\n", quarto));
+                        }
+                        sb.append("Qtd  Produto\n");
                     }
 
-                    totalQuarto += total;
-                    totalGeral += total;
-                    sb.append(String.format("%3d  %-18s %6.2f %8.2f\n", qtd, desc != null ? desc : "N/A", vUnit, total));
-                }
-                // Fecha último quarto
-                if (quartoAtual != -1) {
-                    sb.append(String.format("  Subtotal Qto %02d:       R$ %,.2f\n", quartoAtual, totalQuarto));
+                    sb.append(String.format("%3d  %s\n", qtd, desc != null ? desc : "N/A"));
                 }
             }
         } catch (SQLException e) {
@@ -366,7 +366,6 @@ public class ImpressoraService {
         }
 
         sb.append("------------------------------------------\n");
-        sb.append(String.format("TOTAL GERAL PRODUTOS:      R$ %,.2f\n", totalGeral));
         sb.append("==========================================\n\n\n\n\n");
 
         imprimirTexto(sb.toString());

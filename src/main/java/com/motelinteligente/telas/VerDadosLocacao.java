@@ -884,24 +884,25 @@ public class VerDadosLocacao extends javax.swing.JFrame {
             Object val = modelo.getValueAt(i, 3);
             Object valorSoma = modelo.getValueAt(i, 4);
 
-            if (valorSoma instanceof Number) {
-                soma += ((Number) valorSoma).floatValue();
-            } else {
-                try {
-                    float valorConvertido = Float.parseFloat(valorSoma.toString()); // Conversão segura
-                    soma += valorConvertido;
-
-                    vendaProdutos vendido = new vendaProdutos(
-                            Integer.parseInt(id.toString()),
-                            Integer.parseInt(qnt.toString()),
-                            Float.parseFloat(val.toString()),
-                            valorConvertido
-                    );
-                    produtos.add(vendido);
-                } catch (NumberFormatException e) {
-                    // Ignora valores inválidos
-                    e.printStackTrace(); // Opcional: pode ajudar a debugar erros de conversão
+            try {
+                float valorConvertido;
+                if (valorSoma instanceof Number) {
+                    valorConvertido = ((Number) valorSoma).floatValue();
+                } else {
+                    valorConvertido = Float.parseFloat(valorSoma.toString());
                 }
+                soma += valorConvertido;
+
+                vendaProdutos vendido = new vendaProdutos(
+                        Integer.parseInt(id.toString()),
+                        Integer.parseInt(qnt.toString()),
+                        Float.parseFloat(val.toString()),
+                        valorConvertido
+                );
+                produtos.add(vendido);
+            } catch (NumberFormatException | NullPointerException e) {
+                // Ignora valores inválidos
+                e.printStackTrace(); // Opcional: pode ajudar a debugar erros de conversão
             }
         }
         System.out.println("mudando consumo para " + soma);

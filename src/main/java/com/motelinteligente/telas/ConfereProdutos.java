@@ -59,6 +59,8 @@ public class ConfereProdutos extends JFrame {
 // Inicializa os JDateChoosers
         dateChooserInicio = new JDateChooser();
         dateChooserFim = new JDateChooser();
+        dateChooserInicio.setDate(new Date());
+        dateChooserFim.setDate(new Date());
         dateChooserInicio.setPreferredSize(new Dimension(200, 30));
         dateChooserFim.setPreferredSize(new Dimension(200, 30));
 
@@ -180,6 +182,22 @@ public class ConfereProdutos extends JFrame {
         ArrayList<Integer> idList = new ArrayList<>();
         Date dataInicio = dateChooserInicio.getDate();
         Date dataFim = dateChooserFim.getDate();
+
+        if (dataInicio == null) {
+            Calendar calStart = Calendar.getInstance();
+            calStart.set(Calendar.HOUR_OF_DAY, 0);
+            calStart.set(Calendar.MINUTE, 0);
+            calStart.set(Calendar.SECOND, 0);
+            calStart.set(Calendar.MILLISECOND, 0);
+            dataInicio = calStart.getTime();
+            dateChooserInicio.setDate(dataInicio);
+        }
+
+        if (dataFim == null) {
+            dataFim = new Date();
+            dateChooserFim.setDate(dataFim);
+        }
+
         Calendar cal = Calendar.getInstance();
         cal.setTime(dataFim);
         cal.set(Calendar.HOUR_OF_DAY, 23);

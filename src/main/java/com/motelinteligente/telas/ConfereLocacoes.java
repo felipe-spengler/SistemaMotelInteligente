@@ -427,11 +427,34 @@ public class ConfereLocacoes extends JFrame {
 
             Object[][] data = dados.toArray(new Object[0][]);
 
-            JTable tabelaDetalhes = new JTable(data, colunas);
+            DefaultTableModel modelDetalhes = new DefaultTableModel(data, colunas) {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+                }
+            };
+            JTable tabelaDetalhes = new JTable(modelDetalhes);
             // Define a altura das linhas
             tabelaDetalhes.setRowHeight(30);
 
-// Define a largura das colunas
+            tabelaDetalhes.addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
+                public void mouseClicked(java.awt.event.MouseEvent evt) {
+                    if (evt.getClickCount() == 2) {
+                        int row = tabelaDetalhes.getSelectedRow();
+                        if (row != -1) {
+                            try {
+                                int idLocacao = Integer.parseInt(tabelaDetalhes.getValueAt(row, 0).toString());
+                                new VerDadosLocacao(idLocacao).setVisible(true);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Define a largura das colunas
             tabelaDetalhes.getColumnModel().getColumn(0).setPreferredWidth(60);
             tabelaDetalhes.getColumnModel().getColumn(1).setPreferredWidth(60);
             tabelaDetalhes.getColumnModel().getColumn(2).setPreferredWidth(200);
