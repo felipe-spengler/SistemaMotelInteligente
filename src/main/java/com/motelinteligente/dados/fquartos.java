@@ -230,33 +230,60 @@ public class fquartos {
     public boolean registraLocacao(int num) { return registraLocacao(num, null); }
 
     public boolean registraLocacao(int num, String p) {
+        // Obter quem chamou o método para registrar a origem exata no log
+        String chamador = "Desconhecido";
+        StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+        for (StackTraceElement element : stack) {
+            String className = element.getClassName();
+            if (!className.equals("java.lang.Thread") && 
+                !className.equals("com.motelinteligente.dados.fquartos")) {
+                chamador = className.substring(className.lastIndexOf('.') + 1) + "." + element.getMethodName() + ":" + element.getLineNumber();
+                break;
+            }
+        }
+
+        // PREVENÇÃO DE LOCAÇÃO DUPLICADA / FANTASMA
+        int locacaoAtiva = getIdLocacao(num);
+        if (locacaoAtiva > 0) {
+            logger.warn("[LOCACAO] Tentativa de iniciar nova locação para o quarto {} ignorada. Já existe uma locação ativa (ID: {}). Origem da tentativa bloqueada: {}", num, locacaoAtiva, chamador);
+            return false;
+        }
+
         try (Connection link = conexao.conectar(); PreparedStatement stmt = link.prepareStatement("INSERT INTO registralocado (numquarto, horainicio, numpessoas, periodo_locado) VALUES (?, ?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS)) {
             Timestamp ts = new Timestamp(new Date().getTime());
             stmt.setInt(1, num); stmt.setTimestamp(2, ts); stmt.setInt(3, 2); stmt.setString(4, p);
             if (stmt.executeUpdate() > 0) {
+                int id = 0;
                 try (ResultSet rs = stmt.getGeneratedKeys()) {
                     if (rs.next()) {
-                        int id = rs.getInt(1);
+                        id = rs.getInt(1);
                         CacheDados.getInstancia().getCacheOcupado().put(num, new DadosOcupados(ts, id, getValorQuarto(num, "periodo"), getValorQuarto(num, "pernoite"), 2, getAdicional(num), getPeriodo(num)));
                     }
                 }
+                logger.info("[LOCACAO] Quarto {} iniciado com sucesso no banco. ID Locação: {}. Origem: {}", num, id, chamador);
                 return true;
             }
-        } catch (SQLException e) {}
+        } catch (SQLException e) {
+            logger.error("[LOCACAO] Erro ao registrar locação para o quarto {}. Origem: {}", num, chamador, e);
+        }
         return false;
     }
 
     public void atualizaPessoas(int num, int p) {
         try (Connection link = conexao.conectar(); PreparedStatement ps = link.prepareStatement("UPDATE registralocado SET numpessoas = ? WHERE numquarto = ? AND horafim IS NULL")) {
             ps.setInt(1, p); ps.setInt(2, num); ps.executeUpdate();
-        } catch (SQLException e) {}
+        } catch (SQLException e) {
+            logger.error("Erro ao atualizar número de pessoas no quarto {}", num, e);
+        }
     }
 
     public int getPessoas(int num) {
         try (Connection link = conexao.conectar(); PreparedStatement ps = link.prepareStatement("SELECT numpessoas FROM registralocado WHERE numquarto = ? AND horafim IS NULL")) {
             ps.setInt(1, num);
             try (ResultSet rs = ps.executeQuery()) { if (rs.next()) return rs.getInt(1); }
-        } catch (SQLException e) {}
+        } catch (SQLException e) {
+            logger.error("Erro ao obter quantidade de pessoas no quarto {}", num, e);
+        }
         return 2;
     }
 
@@ -266,15 +293,27 @@ public class fquartos {
             ps.setFloat(5, vD); ps.setFloat(6, vP); ps.setFloat(7, vCart);
             ps.setInt(8, configGlobal.getInstance().getCaixa()); ps.setString(9, p); ps.setInt(10, id);
             ps.executeUpdate();
-        } catch (SQLException e) {}
+            logger.info("[LOCACAO] Locação ID {} salva/encerrada com sucesso no banco local.", id);
+        } catch (SQLException e) {
+            logger.error("[LOCACAO] Erro crítico ao salvar/fechar locação ID {}", id, e);
+        }
     }
 
     public boolean salvaProduto(int idL, int idP, int q, float vU, float vT) {
+        String usuario = configGlobal.getInstance().getUsuario();
+        int caixa = configGlobal.getInstance().getCaixa();
         try (Connection link = conexao.conectar(); PreparedStatement ps = link.prepareStatement("INSERT INTO registravendido (idlocacao, idproduto, quantidade, valorunidade, valortotal, idcaixaatual) VALUES (?, ?, ?, ?, ?, ?)")) {
             ps.setInt(1, idL); ps.setInt(2, idP); ps.setInt(3, q); ps.setFloat(4, vU); ps.setFloat(5, vT);
-            ps.setInt(6, configGlobal.getInstance().getCaixa());
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) { return false; }
+            ps.setInt(6, caixa);
+            boolean result = ps.executeUpdate() > 0;
+            if (result) {
+                logger.info("[PRODUTO] Produto lançado com sucesso. Locação ID: {}, Produto ID: {}, Qtd: {}, Val. Unitário: {}, Val. Total: {}, Caixa: {}, Usuário: {}", idL, idP, q, vU, vT, caixa, usuario);
+            }
+            return result;
+        } catch (SQLException e) {
+            logger.error("Erro ao registrar produto vendido. Locação ID: {}, Produto ID: {}", idL, idP, e);
+            return false;
+        }
     }
 
     public List<Object[]> getRelatorioAutoAtendimentoTipos(String dI, String dF) {
@@ -318,10 +357,18 @@ public class fquartos {
     }
 
     public boolean salvaAntecipado(int id, String t, float v, int idC) {
+        String usuario = configGlobal.getInstance().getUsuario();
         try (Connection link = conexao.conectar(); PreparedStatement ps = link.prepareStatement("INSERT INTO antecipado (idlocacao, tipo, valor, hora, idcaixaatual) VALUES (?, ?, ?, NOW(), ?)")) {
             ps.setInt(1, id); ps.setString(2, t); ps.setFloat(3, v); ps.setInt(4, idC);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) { return false; }
+            boolean result = ps.executeUpdate() > 0;
+            if (result) {
+                logger.info("[ANTECIPADO] Salvo com sucesso via fquartos: locacao={}, tipo={}, valor={}, caixa={}, usuario={}", id, t, v, idC, usuario);
+            }
+            return result;
+        } catch (SQLException e) { 
+            logger.error("[ANTECIPADO] Erro ao salvar via fquartos: locacao={}, tipo={}, valor={}, caixa={}", id, t, v, idC, e);
+            return false; 
+        }
     }
 
     public List<PeriodoQuarto> getPeriodos(int num) {

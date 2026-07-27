@@ -4,6 +4,7 @@ package com.motelinteligente.arduino;
 import com.motelinteligente.dados.CacheDados;
 import com.motelinteligente.dados.configGlobal;
 import com.motelinteligente.dados.fazconexao;
+import com.motelinteligente.dados.CarregarVariaveis;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -43,7 +44,7 @@ public class ConectaArduino {
 
                 // Sincronizado para evitar colisão na porta Serial
                 if (enviarCodigoPortao(codigo, bitLength)) {
-                    logger.info("Código do portão enviado com sucesso: " + codigo);
+                    logger.debug("Código do portão enviado com sucesso: " + codigo);
                 } else {
                     logger.error("Falha ao enviar o código do portão: " + codigo);
                     // Não exibe JOptionPane para não travar a thread
@@ -90,7 +91,7 @@ public class ConectaArduino {
                     sucesso = aguardarResposta();
                     if (sucesso) {
                         sucesso = enviarParaArduino("" + cod);
-                        logger.info("Tentativa " + tentativa + " recebeu ok (Botoeira)");
+                        logger.debug("Tentativa " + tentativa + " recebeu ok (Botoeira)");
                         break;
                     }
                 } else {
@@ -118,7 +119,7 @@ public class ConectaArduino {
                     sucesso = aguardarResposta();
                     if (sucesso) {
                         sucesso = enviarParaArduino(codigo + "-" + bitLength);
-                        logger.info("Tentativa " + tentativa + " recebeu ok (RF)");
+                        logger.debug("Tentativa " + tentativa + " recebeu ok (RF)");
                         break;
                     }
                 } else {
@@ -161,7 +162,7 @@ public class ConectaArduino {
                     CacheDados.getArduinoPort().readBytes(dadosRecebidos, dadosRecebidos.length);
                     resposta += new String(dadosRecebidos);
                     String parcial = resposta.trim();
-                    logger.info("Resposta parcial do Arduino: {}", parcial);
+                    //logger.debug("Resposta parcial do Arduino: {}", parcial);
 
                     // Aceita tanto "OK" quanto respostas como "Arduino pronto." (case-insensitive)
                     String lower = parcial.toLowerCase();
@@ -228,8 +229,18 @@ public class ConectaArduino {
         if (stack.length > 2) {
             chamador = stack[2].getClassName() + "." + stack[2].getMethodName() + "(Linha " + stack[2].getLineNumber() + ")";
         }
-        logger.info("[ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: {}, Ligar: {}. Chamador: {} (Thread: {})", 
-            numeroQuarto, ligar, chamador, Thread.currentThread().getName());
+
+        String filial = CarregarVariaveis.getFilial();
+        boolean ocultarLogLuz = filial != null && (
+            filial.equalsIgnoreCase("xanxere") || 
+            filial.equalsIgnoreCase("toledo") || 
+            filial.equalsIgnoreCase("abelardo")
+        );
+
+        if (!ocultarLogLuz) {
+            logger.info("[ARDUINO] enviarComandoLuz chamado (Luz Quarto). Quarto: {}, Ligar: {}. Chamador: {} (Thread: {})", 
+                numeroQuarto, ligar, chamador, Thread.currentThread().getName());
+        }
 
         configGlobal config = configGlobal.getInstance();
         if (config.isLuzAtiva()) {
@@ -244,14 +255,20 @@ public class ConectaArduino {
                         limparBufferArduino();
                         byte[] msg = cmd.getBytes();
                         CacheDados.getArduinoPort().writeBytes(msg, msg.length);
-                        logger.info("Comando de luz enviado para o Arduino: " + cmd.trim());
+                        if (!ocultarLogLuz) {
+                            logger.info("Comando de luz enviado para o Arduino: " + cmd.trim());
+                        }
                         
                         String expectedAck = cmd.trim() + "-OK";
                         boolean sucesso = aguardarRespostaEspecifica(expectedAck, 1000);
                         if (sucesso) {
-                            logger.info("Confirmação do comando de luz recebida: " + expectedAck);
+                            if (!ocultarLogLuz) {
+                                logger.info("Confirmação do comando de luz recebida: " + expectedAck);
+                            }
                         } else {
-                            logger.warn("Timeout aguardando confirmação do comando de luz: " + expectedAck);
+                            if (!ocultarLogLuz) {
+                                logger.warn("Timeout aguardando confirmação do comando de luz: " + expectedAck);
+                            }
                         }
                     } catch (Exception e) {
                         logger.error("Erro ao enviar comando de luz para o Arduino: ", e);
@@ -266,6 +283,13 @@ public class ConectaArduino {
             String expectedAck = comando.trim() + "-OK";
             boolean sucesso = false;
             
+            String filial = CarregarVariaveis.getFilial();
+            boolean ocultarLogLuz = comando.trim().startsWith("LUZ-") && filial != null && (
+                filial.equalsIgnoreCase("xanxere") || 
+                filial.equalsIgnoreCase("toledo") || 
+                filial.equalsIgnoreCase("abelardo")
+            );
+
             for (int i = 0; i < 3; i++) {
                 try (java.net.DatagramSocket socket = new java.net.DatagramSocket()) {
                     socket.setBroadcast(true);
@@ -277,7 +301,9 @@ public class ConectaArduino {
                     
                     // Envia o comando
                     socket.send(packet);
-                    logger.info("[UDP] Comando enviado (tentativa {}/3): {}", i + 1, comando.trim());
+                    if (!ocultarLogLuz) {
+                        logger.info("[UDP] Comando enviado (tentativa {}/3): {}", i + 1, comando.trim());
+                    }
                     
                     // Aguarda a resposta (ACK)
                     byte[] receiveBuffer = new byte[256];
@@ -286,15 +312,21 @@ public class ConectaArduino {
                     try {
                         socket.receive(receivePacket);
                         String resposta = new String(receivePacket.getData(), 0, receivePacket.getLength()).trim();
-                        logger.info("[UDP] Resposta recebida da placa ({}): {}", receivePacket.getAddress().getHostAddress(), resposta);
+                        if (!ocultarLogLuz) {
+                            logger.info("[UDP] Resposta recebida da placa ({}): {}", receivePacket.getAddress().getHostAddress(), resposta);
+                        }
                         
                         if (expectedAck.equalsIgnoreCase(resposta)) {
-                            logger.info("[UDP] Confirmacao de entrega recebida com sucesso: {}", resposta);
+                            if (!ocultarLogLuz) {
+                                logger.info("[UDP] Confirmacao de entrega recebida com sucesso: {}", resposta);
+                            }
                             sucesso = true;
                             break; // Sucesso! Sai do loop de tentativas
                         }
                     } catch (java.net.SocketTimeoutException e) {
-                        logger.warn("[UDP] Timeout aguardando confirmacao para o comando: {}", comando.trim());
+                        if (!ocultarLogLuz) {
+                            logger.warn("[UDP] Timeout aguardando confirmacao para o comando: {}", comando.trim());
+                        }
                     }
                 } catch (Exception e) {
                     logger.error("[UDP] Erro ao enviar/receber via rede local: ", e);
@@ -311,7 +343,9 @@ public class ConectaArduino {
             }
             
             if (!sucesso) {
-                logger.error("[UDP] FALHA CRITICA: O comando '{}' nao foi confirmado por nenhuma placa apos 3 tentativas!", comando.trim());
+                if (!ocultarLogLuz) {
+                    logger.error("[UDP] FALHA CRITICA: O comando '{}' nao foi confirmado por nenhuma placa apos 3 tentativas!", comando.trim());
+                }
                 javax.swing.SwingUtilities.invokeLater(() -> {
                     new com.motelinteligente.telas.NotificacaoAutomacao("O comando \"" + comando.trim() + "\" não foi<br>confirmado pelas placas do corredor.");
                 });

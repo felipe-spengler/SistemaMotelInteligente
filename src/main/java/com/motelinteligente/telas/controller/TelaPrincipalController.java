@@ -405,6 +405,7 @@ public class TelaPrincipalController {
         };
         configGlobal config = configGlobal.getInstance();
         int idCaixaatual = config.getCaixa();
+        String usuario = config.getUsuario();
 
         try (Connection link = new fazconexao().conectar()) {
             String currentTime = new java.sql.Timestamp(System.currentTimeMillis()).toString();
@@ -426,7 +427,10 @@ public class TelaPrincipalController {
                         insertStatement.setString(4, currentTime);
                         insertStatement.setInt(5, idCaixaatual);
                         insertStatement.executeUpdate();
+                        logger.info("[ANTECIPADO] Novo recebimento antecipado inserido: locacao={}, tipo={}, valor={}, caixa={}, usuario={}", idLocacao, tipo, valor, idCaixaatual, usuario);
                     }
+                } else {
+                    logger.info("[ANTECIPADO] Recebimento antecipado atualizado: locacao={}, tipo={}, novo_valor={}, caixa={}, usuario={}", idLocacao, tipo, valor, idCaixaatual, usuario);
                 }
             }
         } catch (SQLException e) {
