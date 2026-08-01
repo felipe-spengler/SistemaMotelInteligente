@@ -204,9 +204,10 @@ public class VerificaComandosRemotos extends Thread implements MqttCallback {
                 float valor = (float) json.getDouble("valor");
                 String formapagamento = json.getString("formapagamento");
                 String status = json.optString("status", "pago");
+                String horario = json.optString("horario", null);
                 
-                new fcaixa().salvarDespesa(idCaixa, descricao, categoria, valor, formapagamento, status);
-                logger.info("Despesa lancada via MQTT: " + descricao + " | R$ " + valor);
+                new fcaixa().salvarDespesa(idCaixa, descricao, categoria, valor, formapagamento, status, horario);
+                logger.info("Despesa lancada via MQTT: " + descricao + " | R$ " + valor + " | Data: " + horario);
                 return;
             } else if (comando.startsWith("editar_despesa ")) {
                 String jsonStr = comando.substring("editar_despesa ".length());
@@ -218,9 +219,10 @@ public class VerificaComandosRemotos extends Thread implements MqttCallback {
                 float valor = (float) json.getDouble("valor");
                 String formapagamento = json.getString("formapagamento");
                 String status = json.optString("status", "pago");
+                String horario = json.optString("horario", null);
                 
-                new fcaixa().editarDespesa(id, idCaixa, descricao, categoria, valor, formapagamento, status);
-                logger.info("Despesa editada via MQTT, ID: " + id);
+                new fcaixa().editarDespesa(id, idCaixa, descricao, categoria, valor, formapagamento, status, horario);
+                logger.info("Despesa editada via MQTT, ID: " + id + " | Data: " + horario);
                 return;
             } else if (comando.startsWith("excluir_despesa ")) {
                 String jsonStr = comando.substring("excluir_despesa ".length());

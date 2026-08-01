@@ -2,6 +2,9 @@ package com.motelinteligente.telas;
 
 import com.motelinteligente.dados.configGlobal;
 import com.motelinteligente.dados.fcaixa;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -30,13 +33,14 @@ public class DespesaDialog extends JDialog {
     private final JComboBox<String> comboPagamento;
     private final JComboBox<String> comboStatus;
     private final JCheckBox chkCaixaAtual;
+    private final JTextField txtHorario;
     private Integer idEdicao = null;
 
     public DespesaDialog(JFrame parent) {
         super(parent, "Lançamento de Despesa", true);
 
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        setSize(460, 360);
+        setSize(460, 400);
         setLocationRelativeTo(parent);
         setLayout(new BorderLayout(10, 10));
 
@@ -94,6 +98,14 @@ public class DespesaDialog extends JDialog {
 
         gbc.gridx = 0;
         gbc.gridy++;
+        content.add(new JLabel("Data/Hora:"), gbc);
+        txtHorario = new JTextField(15);
+        txtHorario.setText(new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date()));
+        gbc.gridx = 1;
+        content.add(txtHorario, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
         content.add(new JLabel("Tirar do Caixa:"), gbc);
         chkCaixaAtual = new JCheckBox("Pagar com o Caixa do Dia");
         chkCaixaAtual.setSelected(true);
@@ -135,6 +147,22 @@ public class DespesaDialog extends JDialog {
         comboStatus.setSelectedItem(statusText);
         
         chkCaixaAtual.setSelected(doCaixa);
+
+        // Carregar data/hora da despesa
+        try (Connection link = new com.motelinteligente.dados.fazconexao().conectar();
+             PreparedStatement stmt = link.prepareStatement("SELECT horario FROM despesas WHERE id = ?")) {
+            stmt.setInt(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    java.sql.Timestamp ts = rs.getTimestamp("horario");
+                    if (ts != null) {
+                        txtHorario.setText(new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(ts));
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            org.slf4j.LoggerFactory.getLogger(DespesaDialog.class).error("Erro ao carregar data/hora da despesa: ", ex);
+        }
     }
 
     private void salvarDespesa() {
@@ -166,6 +194,18 @@ public class DespesaDialog extends JDialog {
         };
         String status = comboStatus.getSelectedItem().toString().toLowerCase();
 
+        String horarioText = txtHorario.getText().trim();
+        String horarioMysql = null;
+        if (!horarioText.isEmpty()) {
+            try {
+                java.util.Date parsedDate = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").parse(horarioText);
+                horarioMysql = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:00").format(parsedDate);
+            } catch (java.text.ParseException e) {
+                JOptionPane.showMessageDialog(this, "Digite a data/hora no formato correto: dd/MM/yyyy HH:mm", "Atenção", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+        }
+
         Integer idCaixa = null;
         if (chkCaixaAtual.isSelected()) {
             int caixa = configGlobal.getInstance().getCaixa();
@@ -178,9 +218,9 @@ public class DespesaDialog extends JDialog {
 
         boolean sucesso;
         if (idEdicao != null) {
-            sucesso = new fcaixa().editarDespesa(idEdicao, idCaixa, descricao, categoria, valor, formaPgto, status);
+            sucesso = new fcaixa().editarDespesa(idEdicao, idCaixa, descricao, categoria, valor, formaPgto, status, horarioMysql);
         } else {
-            sucesso = new fcaixa().salvarDespesa(idCaixa, descricao, categoria, valor, formaPgto, status);
+            sucesso = new fcaixa().salvarDespesa(idCaixa, descricao, categoria, valor, formaPgto, status, horarioMysql);
         }
         
         if (sucesso) {

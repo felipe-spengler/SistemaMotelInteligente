@@ -544,7 +544,15 @@ public class fcaixa {
     // ===== DESPESAS =====
 
     public boolean salvarDespesa(Integer idCaixa, String descricao, String categoria, float valor, String formaPgto, String status) {
-        String sql = "INSERT INTO despesas (idcaixa, descricao, categoria, valor, formapagamento, status, usuario) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        return salvarDespesa(idCaixa, descricao, categoria, valor, formaPgto, status, null);
+    }
+
+    public boolean salvarDespesa(Integer idCaixa, String descricao, String categoria, float valor, String formaPgto, String status, String horario) {
+        boolean usarHorario = (horario != null && !horario.trim().isEmpty());
+        String sql = usarHorario 
+            ? "INSERT INTO despesas (idcaixa, descricao, categoria, valor, formapagamento, status, usuario, horario) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+            : "INSERT INTO despesas (idcaixa, descricao, categoria, valor, formapagamento, status, usuario) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        
         try (Connection link = new fazconexao().conectar();
              PreparedStatement stmt = link.prepareStatement(sql)) {
             if (idCaixa != null && idCaixa > 0) {
@@ -558,6 +566,9 @@ public class fcaixa {
             stmt.setString(5, formaPgto);
             stmt.setString(6, status);
             stmt.setString(7, configGlobal.getInstance().getUsuario());
+            if (usarHorario) {
+                stmt.setString(8, horario);
+            }
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             logger.error("Erro ao salvar despesa: ", e);
@@ -566,7 +577,15 @@ public class fcaixa {
     }
 
     public boolean editarDespesa(int id, Integer idCaixa, String descricao, String categoria, float valor, String formaPgto, String status) {
-        String sql = "UPDATE despesas SET idcaixa = ?, descricao = ?, categoria = ?, valor = ?, formapagamento = ?, status = ? WHERE id = ?";
+        return editarDespesa(id, idCaixa, descricao, categoria, valor, formaPgto, status, null);
+    }
+
+    public boolean editarDespesa(int id, Integer idCaixa, String descricao, String categoria, float valor, String formaPgto, String status, String horario) {
+        boolean usarHorario = (horario != null && !horario.trim().isEmpty());
+        String sql = usarHorario
+            ? "UPDATE despesas SET idcaixa = ?, descricao = ?, categoria = ?, valor = ?, formapagamento = ?, status = ?, horario = ? WHERE id = ?"
+            : "UPDATE despesas SET idcaixa = ?, descricao = ?, categoria = ?, valor = ?, formapagamento = ?, status = ? WHERE id = ?";
+            
         try (Connection link = new fazconexao().conectar();
              PreparedStatement stmt = link.prepareStatement(sql)) {
             if (idCaixa != null && idCaixa > 0) {
@@ -579,7 +598,12 @@ public class fcaixa {
             stmt.setFloat(4, valor);
             stmt.setString(5, formaPgto);
             stmt.setString(6, status);
-            stmt.setInt(7, id);
+            if (usarHorario) {
+                stmt.setString(7, horario);
+                stmt.setInt(8, id);
+            } else {
+                stmt.setInt(7, id);
+            }
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             logger.error("Erro ao editar despesa: ", e);
