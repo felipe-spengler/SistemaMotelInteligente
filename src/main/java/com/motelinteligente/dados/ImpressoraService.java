@@ -174,9 +174,9 @@ public class ImpressoraService {
         float totalDespesasPix = dao.getTotalDespesasCaixa(idCaixa, "pix");
 
         valores antecipadoOutrosDet = dao.getAntecipadoOutrosDetalhado(idCaixa);
-        float esperadoDinheiro = saldoIni + v.entradaD - totalRetiradas - totalDespesasDinheiro - antecipadoOutrosDet.entradaD;
-        float esperadoCartao = v.entradaC - totalDespesasCartao - antecipadoOutrosDet.entradaC;
-        float esperadoPix = v.entradaP - totalDespesasPix - antecipadoOutrosDet.entradaP;
+        float esperadoDinheiro = saldoIni + v.entradaD + antecipadoDetalhado.entradaD - totalRetiradas - totalDespesasDinheiro - antecipadoOutrosDet.entradaD;
+        float esperadoCartao = v.entradaC + antecipadoDetalhado.entradaC - totalDespesasCartao - antecipadoOutrosDet.entradaC;
+        float esperadoPix = v.entradaP + antecipadoDetalhado.entradaP - totalDespesasPix - antecipadoOutrosDet.entradaP;
         float saldoFinal = esperadoDinheiro + esperadoCartao + esperadoPix;
 
         StringBuilder sb = new StringBuilder();
@@ -206,6 +206,13 @@ public class ImpressoraService {
         sb.append(String.format("Pix Recebidos:             R$ %,.2f\n", esperadoPix));
         if (antecipadoOutro > 0) {
             sb.append(String.format("Pago em Outro Caixa (Info):R$ %,.2f\n", antecipadoOutro));
+        }
+        float totalAntecipadoEste = antecipadoDetalhado.entradaD + antecipadoDetalhado.entradaC + antecipadoDetalhado.entradaP;
+        if (totalAntecipadoEste > 0) {
+            sb.append(String.format("Recebido Antecipado (Aberto):R$ %,.2f\n", totalAntecipadoEste));
+            sb.append(String.format("  - Dinheiro: R$ %,.2f\n", antecipadoDetalhado.entradaD));
+            sb.append(String.format("  - Cartao:   R$ %,.2f\n", antecipadoDetalhado.entradaC));
+            sb.append(String.format("  - Pix:      R$ %,.2f\n", antecipadoDetalhado.entradaP));
         }
         // Apenas adiantamentos detalhados no relatório financeiro (vendas avulsas de produtos saem no relatório de produtos)
         List<Object[]> avulsas = dao.getListaVendasAvulsas(idCaixa);

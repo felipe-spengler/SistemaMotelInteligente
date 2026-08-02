@@ -405,9 +405,15 @@ public class CaixaFrameModerno extends JFrame {
         txtValorInicial.setText(String.valueOf(saldoIni));
 
         valores v = dao.getValores(idCaixa);
-        valDinheiro.setText(df.format(v.entradaD));
-        valCartao.setText(df.format(v.entradaC));
-        valPix.setText(df.format(v.entradaP));
+        valores antecipadoDetalhado = dao.getAntecipadoDetalhado(idCaixa);
+
+        float totalDinheiro = v.entradaD + antecipadoDetalhado.entradaD;
+        float totalCartao = v.entradaC + antecipadoDetalhado.entradaC;
+        float totalPix = v.entradaP + antecipadoDetalhado.entradaP;
+
+        valDinheiro.setText(df.format(totalDinheiro));
+        valCartao.setText(df.format(totalCartao));
+        valPix.setText(df.format(totalPix));
         
         float totalRetiradas = dao.getTotalRetiradas(idCaixa);
         float totalDespesasDinheiro = dao.getTotalDespesasCaixa(idCaixa, "dinheiro");
@@ -427,15 +433,21 @@ public class CaixaFrameModerno extends JFrame {
         float antecipadoEste = dao.getCaixaAtual(idCaixa);
 
         lblAntecipadoOutro.setText("Recebido Antecipado (Outro Caixa): " + df.format(antecipadoOutro));
-        lblAntecipadoEste.setText("Neste Caixa (Antecipado): " + df.format(antecipadoEste));
+        lblAntecipadoEste.setText(String.format("Neste Caixa (Antecipado): %s (Dinheiro: %s, Cartão: %s, Pix: %s)",
+            df.format(antecipadoEste),
+            df.format(antecipadoDetalhado.entradaD),
+            df.format(antecipadoDetalhado.entradaC),
+            df.format(antecipadoDetalhado.entradaP)
+        ));
 
         // Totais
         float entradaTotal = v.entradaConsumo + v.entradaQuarto + justif[1] - justif[0];
 
         // Saldo esperado em caixa considerando dinheiro inicial, entradas dinheiro, menos retiradas e despesas em dinheiro.
-        float esperadoDinheiro = saldoIni + v.entradaD - totalRetiradas - totalDespesasDinheiro - (antecipadoOutro > 0 ? antecipadoOutro : 0);
-        float esperadoCartao = v.entradaC;
-        float esperadoPix = v.entradaP;
+        valores antecipadoOutrosDet = dao.getAntecipadoOutrosDetalhado(idCaixa);
+        float esperadoDinheiro = saldoIni + totalDinheiro - totalRetiradas - totalDespesasDinheiro - antecipadoOutrosDet.entradaD;
+        float esperadoCartao = totalCartao - antecipadoOutrosDet.entradaC;
+        float esperadoPix = totalPix - antecipadoOutrosDet.entradaP;
         float saldoEmCaixa = esperadoDinheiro + esperadoCartao + esperadoPix;
 
         lblEntradaTotal.setText(df.format(entradaTotal));

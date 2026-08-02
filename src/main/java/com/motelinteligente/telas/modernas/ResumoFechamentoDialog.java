@@ -148,10 +148,17 @@ public class ResumoFechamentoDialog extends JDialog {
         // antecipados em aberto)
         // antecipadoDetalhado é apenas um detalhamento informativo, não deve ser somado
         // novamente
-        com.motelinteligente.dados.valores antecipadoOutrosDet = new com.motelinteligente.dados.fcaixa().getAntecipadoOutrosDetalhado(com.motelinteligente.dados.configGlobal.getInstance().getCaixa());
-        float esperadoDinheiro = saldoInicial + vals.entradaD - antecipadoOutrosDet.entradaD;
-        float esperadoCartao = vals.entradaC - antecipadoOutrosDet.entradaC;
-        float esperadoPix = vals.entradaP - antecipadoOutrosDet.entradaP;
+        com.motelinteligente.dados.fcaixa dao = new com.motelinteligente.dados.fcaixa();
+        int idCaixa = com.motelinteligente.dados.configGlobal.getInstance().getCaixa();
+        float totalRetiradas = dao.getTotalRetiradas(idCaixa);
+        float totalDespesasDinheiro = dao.getTotalDespesasCaixa(idCaixa, "dinheiro");
+        float totalDespesasCartao = dao.getTotalDespesasCaixa(idCaixa, "credito") + dao.getTotalDespesasCaixa(idCaixa, "debito") + dao.getTotalDespesasCaixa(idCaixa, "outro");
+        float totalDespesasPix = dao.getTotalDespesasCaixa(idCaixa, "pix");
+
+        com.motelinteligente.dados.valores antecipadoOutrosDet = dao.getAntecipadoOutrosDetalhado(idCaixa);
+        float esperadoDinheiro = saldoInicial + vals.entradaD + antecipadoDetalhado.entradaD - totalRetiradas - totalDespesasDinheiro - antecipadoOutrosDet.entradaD;
+        float esperadoCartao = vals.entradaC + antecipadoDetalhado.entradaC - totalDespesasCartao - antecipadoOutrosDet.entradaC;
+        float esperadoPix = vals.entradaP + antecipadoDetalhado.entradaP - totalDespesasPix - antecipadoOutrosDet.entradaP;
 
         // Mostrando o DEVE TER
         addRow(pnlFisico, "(=) Deve ter em Dinheiro", esperadoDinheiro, true);
@@ -168,11 +175,15 @@ public class ResumoFechamentoDialog extends JDialog {
 
         addRow(pnlFisico, "Saldo Inicial (Fundo)", saldoInicial, false);
         addRow(pnlFisico, "Recebido (Fechados)", vals.entradaD + vals.entradaC + vals.entradaP, false);
-        // Mostra o valor de antecipados em aberto apenas como informação (já está
-        // incluído no "Recebido")
+        // Mostra o valor de antecipados em aberto com o detalhamento
         if (antecipadoEste > 0) {
             JLabel lblInfo = new JLabel(
-                    "    • Deste total, R$ " + df.format(antecipadoEste) + " são antecipados em aberto");
+                    String.format("    • Antecipados Abertos: R$ %s (Dinheiro: R$ %s, Cartão: R$ %s, Pix: %s)",
+                        df.format(antecipadoEste),
+                        df.format(antecipadoDetalhado.entradaD),
+                        df.format(antecipadoDetalhado.entradaC),
+                        df.format(antecipadoDetalhado.entradaP)
+                    ));
             lblInfo.setForeground(new Color(107, 114, 128)); // Cinza
             lblInfo.setFont(new Font("Segoe UI", Font.ITALIC, 12));
             pnlFisico.add(lblInfo, "span 2, left, wrap");
