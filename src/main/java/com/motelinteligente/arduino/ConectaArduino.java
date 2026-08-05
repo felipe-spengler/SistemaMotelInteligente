@@ -290,7 +290,7 @@ public class ConectaArduino {
                 filial.equalsIgnoreCase("abelardo")
             );
 
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < 2; i++) {
                 try (java.net.DatagramSocket socket = new java.net.DatagramSocket()) {
                     socket.setBroadcast(true);
                     socket.setSoTimeout(500); // 500ms timeout para aguardar a confirmação da placa
@@ -302,7 +302,7 @@ public class ConectaArduino {
                     // Envia o comando
                     socket.send(packet);
                     if (!ocultarLogLuz) {
-                        logger.info("[UDP] Comando enviado (tentativa {}/3): {}", i + 1, comando.trim());
+                        logger.info("[UDP] Comando enviado (tentativa {}/2): {}", i + 1, comando.trim());
                     }
                     
                     // Aguarda a resposta (ACK)
@@ -333,7 +333,7 @@ public class ConectaArduino {
                 }
                 
                 // Pequeno intervalo antes do reenvio
-                if (i < 2) {
+                if (i < 1) {
                     try {
                         Thread.sleep(100);
                     } catch (InterruptedException e) {
@@ -344,7 +344,7 @@ public class ConectaArduino {
             
             if (!sucesso) {
                 if (!ocultarLogLuz) {
-                    logger.error("[UDP] FALHA CRITICA: O comando '{}' nao foi confirmado por nenhuma placa apos 3 tentativas!", comando.trim());
+                    logger.error("[UDP] FALHA CRITICA: O comando '{}' nao foi confirmado por nenhuma placa apos 2 tentativas!", comando.trim());
                 }
                 javax.swing.SwingUtilities.invokeLater(() -> {
                     new com.motelinteligente.telas.NotificacaoAutomacao("O comando \"" + comando.trim() + "\" não foi<br>confirmado pelas placas do corredor.");

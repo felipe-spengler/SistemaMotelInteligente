@@ -110,6 +110,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private boolean isClickable = true;
     private Timer refreshTimer; // Timer para atualizar a tela
     private Timer pedidosTimer; // Timer para pedidos online
+    private Timer logoffTimer; // Timer para logoff após fechar caixa
     private long lastUpdate = 0;
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(TelaPrincipal.class);
     private com.motelinteligente.telas.EncerraQuarto encerraQuarto;
@@ -179,7 +180,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         }, 20000, 20000); // Já carregamos acima, então inicia após 20s
 
         // Timer dedicado para detectar logoff imediato após fechamento do caixa (a cada 2s)
-        Timer logoffTimer = new Timer(true);
+        logoffTimer = new Timer(true);
         logoffTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -2281,6 +2282,15 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     }// GEN-LAST:event_formWindowOpened
 
     public void fecharTela() throws IOException {
+        if (refreshTimer != null) {
+            try { refreshTimer.cancel(); } catch (Exception e) { logger.error("Erro ao cancelar refreshTimer", e); }
+        }
+        if (pedidosTimer != null) {
+            try { pedidosTimer.cancel(); } catch (Exception e) { logger.error("Erro ao cancelar pedidosTimer", e); }
+        }
+        if (logoffTimer != null) {
+            try { logoffTimer.cancel(); } catch (Exception e) { logger.error("Erro ao cancelar logoffTimer", e); }
+        }
         this.dispose();
         new TelaLogin().setVisible(true);
     }
