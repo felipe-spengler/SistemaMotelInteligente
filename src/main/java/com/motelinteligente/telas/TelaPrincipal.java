@@ -2899,28 +2899,38 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     }
 
     private void btNegociarActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btNegociarActionPerformed
-        // Exibe um JOptionPane para o cliente inserir o valor de desconto
-        String descontoInput = JOptionPane.showInputDialog(null, "Digite o valor do desconto:", "Desconto",
-                JOptionPane.PLAIN_MESSAGE);
+        String[] options = {"Desconto", "Acréscimo"};
+        int escolha = JOptionPane.showOptionDialog(null,
+                "Deseja aplicar Desconto ou Acréscimo?",
+                "Negociar Valor",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                options[0]);
 
-        // Verifica se o cliente inseriu algum valor
-        if (descontoInput != null && !descontoInput.isEmpty()) {
-            try {
-                // Converte o valor de desconto inserido para float
-                float valorDesconto = Float.parseFloat(descontoInput.replace(",", "."));
+        if (escolha == 0 || escolha == 1) {
+            String tipo = (escolha == 0) ? "desconto" : "acrescimo";
+            String labelTitulo = (escolha == 0) ? "Desconto" : "Acréscimo";
+            String input = JOptionPane.showInputDialog(null,
+                    "Digite o valor do " + labelTitulo.toLowerCase() + ":",
+                    labelTitulo,
+                    JOptionPane.PLAIN_MESSAGE);
 
-                // Agora você pode usar o valorDesconto no seu código
-                CacheDados cache = CacheDados.getInstancia();
-                int idLocacao = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
+            if (input != null && !input.isEmpty()) {
+                try {
+                    float valor = Float.parseFloat(input.replace(",", "."));
+                    CacheDados cache = CacheDados.getInstancia();
+                    int idLocacao = cache.getCacheOcupado().get(quartoEmFoco).getIdLoca();
 
-                // Chama a função salvaAntecipado ou outra lógica com o valor de desconto
-                salvaAntecipado(idLocacao, "desconto", valorDesconto);
-                JOptionPane.showMessageDialog(null, "Valor de desconto salvo");
-                txtDescontoNegociado.setText("R$" + valorDesconto);
-            } catch (NumberFormatException ex) {
-                logger.warn("Valor de desconto inválido informado: {}", descontoInput, ex);
-                JOptionPane.showMessageDialog(null, "Valor inválido! Insira um número válido.", "Erro",
-                        JOptionPane.ERROR_MESSAGE);
+                    salvaAntecipado(idLocacao, tipo, valor);
+                    JOptionPane.showMessageDialog(null, labelTitulo + " salvo com sucesso.");
+                    atualizaAntecipado(idLocacao);
+                } catch (NumberFormatException ex) {
+                    logger.warn("Valor inválido informado: {}", input, ex);
+                    JOptionPane.showMessageDialog(null, "Valor inválido! Insira um número válido.", "Erro",
+                            JOptionPane.ERROR_MESSAGE);
+                }
             }
         }
     }// GEN-LAST:event_btNegociarActionPerformed
@@ -2938,6 +2948,10 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
     public void atualizaAntecipado(int locacao) {
         controller.atualizaAntecipado(locacao, txtAntecipado, txtDescontoNegociado);
+    }
+
+    public void setLabelNegociadoText(String text) {
+        jLabel3.setText(text);
     }
 
     private void criarTelaSelecaoPagamento(int idLocacao) {

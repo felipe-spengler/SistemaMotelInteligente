@@ -390,6 +390,15 @@ public class VerificaComandosRemotos extends Thread implements MqttCallback {
                         logger.error("Erro ao buscar quarto para encerramento remoto", e);
                     }
 
+                    if (quarto == -1) {
+                        for (java.util.Map.Entry<Integer, com.motelinteligente.dados.DadosOcupados> entry : CacheDados.getInstancia().getCacheOcupado().entrySet()) {
+                            if (entry.getValue().getIdLoca() == idLoc) {
+                                quarto = entry.getKey();
+                                break;
+                            }
+                        }
+                    }
+
                     if (quarto != -1) {
                         mudaStatusNaCache(quarto, "limpeza");
                         CacheDados.getInstancia().getCacheOcupado().remove(quarto);

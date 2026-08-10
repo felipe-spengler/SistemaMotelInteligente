@@ -346,12 +346,35 @@ public class ConectaArduino {
                 if (!ocultarLogLuz) {
                     logger.error("[UDP] FALHA CRITICA: O comando '{}' nao foi confirmado por nenhuma placa apos 2 tentativas!", comando.trim());
                 }
+                final String msg = formatarComandoAmigavel(comando);
                 javax.swing.SwingUtilities.invokeLater(() -> {
-                    new com.motelinteligente.telas.NotificacaoAutomacao("O comando \"" + comando.trim() + "\" não foi<br>confirmado pelas placas do corredor.");
+                    new com.motelinteligente.telas.NotificacaoAutomacao(msg + " não foi<br>confirmado pelas placas do corredor.");
                 });
             }
         });
         enviarThread.setName("UDP-Ack-Sender-" + System.currentTimeMillis());
         enviarThread.start();
+    }
+
+    private static String formatarComandoAmigavel(String cmd) {
+        cmd = cmd.trim();
+        if (cmd.startsWith("LUZ-ON_")) {
+            return "O comando de ligar a LUZ do quarto " + cmd.replace("LUZ-ON_", "");
+        }
+        if (cmd.startsWith("LUZ-OFF_")) {
+            return "O comando de desligar a LUZ do quarto " + cmd.replace("LUZ-OFF_", "");
+        }
+        if (cmd.equals("888")) {
+            return "O comando do PORTÃO DE ENTRADA";
+        }
+        if (cmd.equals("999")) {
+            return "O comando do PORTÃO DE SAÍDA";
+        }
+        try {
+            int num = Integer.parseInt(cmd);
+            return "O comando do PORTÃO do quarto " + num;
+        } catch (NumberFormatException e) {
+            return "O comando \"" + cmd + "\"";
+        }
     }
 }

@@ -226,6 +226,7 @@ public class EncerraQuartoController {
         List<Antecipado> lista = new ArrayList<>();
         valorRecebidoAntecipado = 0; // Reset
         valorDesconto = 0; // Reset inicial, pode ser alterado se houver desconto antecipado
+        valorAcrescimo = 0; // Reset inicial
 
         try (Connection link = new fazconexao().conectar();
                 PreparedStatement ps = link
@@ -242,6 +243,9 @@ public class EncerraQuartoController {
                     if (tipo.equals("desconto")) {
                         this.valorDesconto = valor;
                         // O View deve checar se este valor > 0 para preencher o campo desconto
+                    } else if (tipo.equals("acrescimo")) {
+                        this.valorAcrescimo = valor;
+                        // O View deve checar se este valor > 0 para preencher o campo acrescimo
                     } else {
                         valorRecebidoAntecipado += valor;
                         lista.add(new Antecipado(tipo, valor, hora));

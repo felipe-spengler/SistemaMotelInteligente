@@ -587,6 +587,14 @@ public class EncerraQuarto extends javax.swing.JFrame {
             lastDescontoPorc = txtDescontoPorcento.getText().trim();
         }
 
+        // Verifica se houve acréscimo antecipado
+        float acrescAntecipado = controller.getValorAcrescimo();
+        if (acrescAntecipado > 0) {
+            txtAcrescimo.setText(String.valueOf(acrescAntecipado));
+            txtJustifica.setText("acréscimo negociado antecipadamente!");
+            this.valorAcrescimo = acrescAntecipado;
+        }
+
         return antecipados;
     }
 
@@ -611,42 +619,43 @@ public class EncerraQuarto extends javax.swing.JFrame {
             logger.error("Erro ao carregar prevendidos para comparacao: ", e);
         }
 
-        // 2. Mapeia os produtos atualmente exibidos na JTable
-        java.util.Map<Integer, Integer> tableMap = new java.util.HashMap<>();
-        for (int i = 0; i < qtdLinhas; i++) {
-            try {
-                int idProd = Integer.parseInt(modelo.getValueAt(i, 0).toString());
-                int quantidade = Integer.parseInt(modelo.getValueAt(i, 1).toString());
-                tableMap.put(idProd, quantidade);
-            } catch (Exception e) {
-                // ignora erros de conversão
+        if (qtdLinhas > 0) {
+            boolean manter = com.motelinteligente.telas.modernas.EstiloModerno.confirmarSimNao(
+                this,
+                "Manter Rascunho",
+                "Há itens no rascunho de consumo (Pré-venda). Deseja MANTER este rascunho salvo para este quarto?"
+            );
+            if (manter) {
+                List<vendaProdutos> lista = new ArrayList<>();
+                for (int i = 0; i < qtdLinhas; i++) {
+                    try {
+                        int idProd = Integer.parseInt(modelo.getValueAt(i, 0).toString());
+                        int quantidade = Integer.parseInt(modelo.getValueAt(i, 1).toString());
+                        lista.add(new vendaProdutos(idProd, quantidade, 0, 0));
+                    } catch (Exception e) {
+                        // ignora erros de conversão
+                    }
+                }
+                controller.salvarPreVendidos(lista);
+            } else {
+                // Descartar: limpa do banco
+                controller.salvarPreVendidos(new java.util.ArrayList<>());
             }
-        }
-
-        // 3. Se os itens do banco forem idênticos aos da tela, fecha direto
-        if (dbMap.equals(tableMap)) {
-            return;
-        }
-
-        // 4. Só pergunta se de fato houver diferença nos itens/quantidades
-        boolean salvar = com.motelinteligente.telas.modernas.EstiloModerno.confirmarSimNao(
-            this,
-            "Salvar Pré-venda",
-            "Há modificações pendentes no rascunho de consumo (Pré-venda). Deseja salvar as alterações antes de fechar a tela?"
-        );
-            
-        if (salvar) {
-            List<vendaProdutos> lista = new ArrayList<>();
-            for (int i = 0; i < qtdLinhas; i++) {
-                try {
-                    int idProd = Integer.parseInt(modelo.getValueAt(i, 0).toString());
-                    int quantidade = Integer.parseInt(modelo.getValueAt(i, 1).toString());
-                    lista.add(new vendaProdutos(idProd, quantidade, 0, 0));
-                } catch (Exception e) {
-                    // ignora erros de conversão
+        } else {
+            // Se a tabela está vazia, mas existiam itens no banco
+            if (!dbMap.isEmpty()) {
+                boolean salvarVazio = com.motelinteligente.telas.modernas.EstiloModerno.confirmarSimNao(
+                    this,
+                    "Descartar Rascunho",
+                    "Você removeu todos os itens do rascunho. Deseja salvar esta alteração (descartar o rascunho)?"
+                );
+                if (salvarVazio) {
+                    controller.salvarPreVendidos(new java.util.ArrayList<>());
                 }
             }
-            controller.salvarPreVendidos(lista);
+        }
+        if (principal != null) {
+            SwingUtilities.invokeLater(() -> principal.mostraQuartos());
         }
     }
 
@@ -2638,6 +2647,9 @@ public class EncerraQuarto extends javax.swing.JFrame {
             }
         }
         controller.salvarPreVendidos(lista);
+        if (principal != null) {
+            SwingUtilities.invokeLater(() -> principal.mostraQuartos());
+        }
     }
 
     public void recarregarDadosDaLocacao() {

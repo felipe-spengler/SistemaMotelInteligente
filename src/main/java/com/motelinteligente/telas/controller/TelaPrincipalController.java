@@ -395,14 +395,36 @@ public class TelaPrincipalController {
         view.mostraQuartos();
     }
 
+    private void zeraAntecipadoTipo(int idLocacao, String tipo) {
+        try (Connection link = new fazconexao().conectar()) {
+            String updateSQL = "UPDATE antecipado SET valor = 0 WHERE idlocacao = ? AND tipo = ?";
+            try (PreparedStatement updateStatement = link.prepareStatement(updateSQL)) {
+                updateStatement.setInt(1, idLocacao);
+                updateStatement.setString(2, tipo);
+                updateStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            logger.error("Erro ao zerar antecipado do tipo {} para locacao {}", tipo, idLocacao, e);
+        }
+    }
+
     public void salvaAntecipado(int idLocacao, String tipo, float valor) {
         tipo = switch (tipo) {
             case "C" -> "credito";
             case "D" -> "debito";
             case "O" -> "dinheiro";
             case "P" -> "pix";
+            case "desconto" -> "desconto";
+            case "acrescimo" -> "acrescimo";
             default -> "desconto";
         };
+
+        if (tipo.equals("desconto")) {
+            zeraAntecipadoTipo(idLocacao, "acrescimo");
+        } else if (tipo.equals("acrescimo")) {
+            zeraAntecipadoTipo(idLocacao, "desconto");
+        }
+
         configGlobal config = configGlobal.getInstance();
         int idCaixaatual = config.getCaixa();
         String usuario = config.getUsuario();
@@ -444,6 +466,7 @@ public class TelaPrincipalController {
             javax.swing.JTextField txtDescontoNegociado) {
         float jaRecebeu = 0;
         float valorDesconto = 0;
+        float valorAcrescimo = 0;
         try (Connection link = new fazconexao().conectar()) {
             String selectSQL = "SELECT tipo, valor FROM antecipado WHERE idlocacao = ?";
             try (PreparedStatement preparedStatement = link.prepareStatement(selectSQL)) {
@@ -452,15 +475,24 @@ public class TelaPrincipalController {
                     while (resultSet.next()) {
                         String tipo = resultSet.getString("tipo");
                         float valor = resultSet.getFloat("valor");
-                        if (tipo.equals("desconto"))
+                        if (tipo.equals("desconto")) {
                             valorDesconto += valor;
-                        else
+                        } else if (tipo.equals("acrescimo")) {
+                            valorAcrescimo += valor;
+                        } else {
                             jaRecebeu += valor;
+                        }
                     }
                 }
             }
+            if (valorAcrescimo > 0) {
+                view.setLabelNegociadoText("Acréscimo Negociado:");
+                txtDescontoNegociado.setText(String.format("R$ %.2f", valorAcrescimo));
+            } else {
+                view.setLabelNegociadoText("Desconto Negociado:");
+                txtDescontoNegociado.setText(String.format("R$ %.2f", valorDesconto));
+            }
             txtAntecipado.setText(String.format("R$ %.2f", jaRecebeu));
-            txtDescontoNegociado.setText(String.format("R$ %.2f", valorDesconto));
         } catch (SQLException e) {
             logger.error("Erro ao buscar dados antecipados para locacao {}", locacao, e);
             JOptionPane.showMessageDialog(null, "Erro ao buscar dados antecipados: " + e.getMessage(), "Erro",
