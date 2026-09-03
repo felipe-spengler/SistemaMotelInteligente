@@ -205,6 +205,7 @@ public class VerificaComandosRemotos extends Thread implements MqttCallback {
                 String formapagamento = json.getString("formapagamento");
                 String status = json.optString("status", "pago");
                 String horario = json.optString("horario", null);
+                if ("null".equals(horario)) horario = null;
                 
                 new fcaixa().salvarDespesa(idCaixa, descricao, categoria, valor, formapagamento, status, horario);
                 logger.info("Despesa lancada via MQTT: " + descricao + " | R$ " + valor + " | Data: " + horario);
@@ -214,12 +215,29 @@ public class VerificaComandosRemotos extends Thread implements MqttCallback {
                 org.json.JSONObject json = new org.json.JSONObject(jsonStr);
                 int id = json.getInt("id");
                 int idCaixa = json.optInt("idcaixa", 0);
+                if (idCaixa == 0) {
+                    try (java.sql.Connection link = new fazconexao().conectar();
+                         java.sql.PreparedStatement ps = link.prepareStatement("SELECT idcaixa FROM despesas WHERE id = ?")) {
+                        ps.setInt(1, id);
+                        try (java.sql.ResultSet rs = ps.executeQuery()) {
+                            if (rs.next()) {
+                                int val = rs.getInt("idcaixa");
+                                if (!rs.wasNull()) {
+                                    idCaixa = val;
+                                }
+                            }
+                        }
+                    } catch (Exception ex) {
+                        logger.error("Erro ao buscar idcaixa existente da despesa " + id, ex);
+                    }
+                }
                 String descricao = json.getString("descricao");
                 String categoria = json.getString("categoria");
                 float valor = (float) json.getDouble("valor");
                 String formapagamento = json.getString("formapagamento");
                 String status = json.optString("status", "pago");
                 String horario = json.optString("horario", null);
+                if ("null".equals(horario)) horario = null;
                 
                 new fcaixa().editarDespesa(id, idCaixa, descricao, categoria, valor, formapagamento, status, horario);
                 logger.info("Despesa editada via MQTT, ID: " + id + " | Data: " + horario);

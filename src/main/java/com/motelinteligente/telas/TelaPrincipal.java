@@ -694,7 +694,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         jTextField2.setText("jTextField1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Motel Intensy - Principal");
+        setTitle("Motel Inteligente - Principal");
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosed(java.awt.event.WindowEvent evt) {
                 formWindowClosed(evt);

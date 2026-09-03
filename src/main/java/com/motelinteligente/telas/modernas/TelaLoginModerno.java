@@ -74,7 +74,7 @@ public class TelaLoginModerno extends JFrame {
             JLabel lblLogo = new JLabel(new ImageIcon(scaledImage));
             cardLogin.add(lblLogo, "center, wrap");
         } catch (Exception e) {
-            JLabel lblTitulo = new JLabel("Motel Intensy");
+            JLabel lblTitulo = new JLabel("Motel Inteligente");
             lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 32));
             lblTitulo.setForeground(new Color(103, 58, 183));
             cardLogin.add(lblTitulo, "center, wrap");
@@ -176,7 +176,7 @@ public class TelaLoginModerno extends JFrame {
         mainPanel.add(cardLogin, "w 400!, wrap");
 
         // Rodapé com versão
-        JLabel lblVersao = new JLabel("v1.0.0 © 2025 Motel Intensy");
+        JLabel lblVersao = new JLabel("v1.0.0 © 2026 Motel Inteligente");
         lblVersao.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         lblVersao.setForeground(new Color(255, 255, 255, 180));
         mainPanel.add(lblVersao, "center");

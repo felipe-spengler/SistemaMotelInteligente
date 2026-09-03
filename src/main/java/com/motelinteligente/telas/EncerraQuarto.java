@@ -120,7 +120,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
 
     List<Antecipado> antecipados;
     private EncerraQuartoController controller;
-
+    private boolean isUpdatingDesconto = false;
     class numOnly extends PlainDocument {
 
         public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
@@ -215,6 +215,99 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 processaDescontoPorcento();
             }
         });
+
+        txtPessoas.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) { atualizarPessoas(); }
+            @Override
+            public void removeUpdate(DocumentEvent e) { atualizarPessoas(); }
+            @Override
+            public void changedUpdate(DocumentEvent e) { atualizarPessoas(); }
+
+            private void atualizarPessoas() {
+                String texto = txtPessoas.getText();
+                if (texto != null && !texto.trim().isEmpty()) {
+                    try {
+                        int qnt = Integer.parseInt(texto.trim());
+                        outraTela.setPessoas(qnt);
+                        if (qnt < 2) {
+                            qnt = 2;
+                        }
+                        float novoVal = calculaAdicionalPessoa(qnt);
+                        valorAdicionalPessoa = novoVal;
+                        setValorDivida();
+                    } catch (Exception ex) {
+                        // ignora erro de formatação temporário
+                    }
+                }
+            }
+        });
+        txtAcrescimo.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) { atualiza(); }
+            public void removeUpdate(DocumentEvent e) { atualiza(); }
+            public void changedUpdate(DocumentEvent e) { atualiza(); }
+            private void atualiza() {
+                try {
+                    String texto = txtAcrescimo.getText().replace(",", ".");
+                    valorAcrescimo = texto.isEmpty() ? 0 : Float.parseFloat(texto);
+                    setValorDivida();
+                } catch (Exception ex) {}
+            }
+        });
+
+        txtDesconto.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) { atualiza(); }
+            public void removeUpdate(DocumentEvent e) { atualiza(); }
+            public void changedUpdate(DocumentEvent e) { atualiza(); }
+            private void atualiza() {
+                if (isUpdatingDesconto) return;
+                try {
+                    String texto = txtDesconto.getText().replace(",", ".");
+                    float vDesconto = texto.isEmpty() ? 0 : Float.parseFloat(texto);
+                    
+                    float valorSomar = valorAcrescimo + valorQuarto + valorConsumo + valorAdicionalPeriodo + valorAdicionalPessoa;
+                    float baseCalculo = descontoNoTotal ? valorSomar : (valorQuarto + valorAdicionalPessoa + valorAdicionalPeriodo);
+                    if (baseCalculo <= 0) baseCalculo = 1;
+
+                    float vPorcento = (vDesconto / baseCalculo) * 100;
+                    
+                    valorDesconto = vDesconto;
+                    setValorDivida();
+
+                    isUpdatingDesconto = true;
+                    txtDescontoPorcento.setText(String.format(java.util.Locale.US, "%.2f", vPorcento));
+                    isUpdatingDesconto = false;
+                } catch (Exception ex) {}
+            }
+        });
+
+        txtDescontoPorcento.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) { atualiza(); }
+            public void removeUpdate(DocumentEvent e) { atualiza(); }
+            public void changedUpdate(DocumentEvent e) { atualiza(); }
+            private void atualiza() {
+                if (isUpdatingDesconto) return;
+                try {
+                    String texto = txtDescontoPorcento.getText().replace("%", "").replace(",", ".");
+                    float vPorcento = texto.isEmpty() ? 0 : Float.parseFloat(texto);
+                    
+                    float valorSomar = valorAcrescimo + valorQuarto + valorConsumo + valorAdicionalPeriodo + valorAdicionalPessoa;
+                    float baseCalculo = descontoNoTotal ? valorSomar : (valorQuarto + valorAdicionalPessoa + valorAdicionalPeriodo);
+                    if (baseCalculo <= 0) baseCalculo = 1;
+
+                    float vDesconto = (vPorcento / 100) * baseCalculo;
+                    
+                    valorDesconto = vDesconto;
+                    setValorDivida();
+
+                    isUpdatingDesconto = true;
+                    txtDesconto.setText(String.format(java.util.Locale.US, "%.2f", vDesconto));
+                    isUpdatingDesconto = false;
+                } catch (Exception ex) {}
+            }
+        });
+
+
 
         try {
             boolean found = new NativeDiscovery().discover();
@@ -612,38 +705,43 @@ public class EncerraQuarto extends javax.swing.JFrame {
             java.util.List<vendaProdutos> dbVendidos = controller.buscarPreVendidos();
             if (dbVendidos != null) {
                 for (vendaProdutos vp : dbVendidos) {
-                    dbMap.put(vp.idProduto, vp.quantidade);
+                    dbMap.put(vp.idProduto, dbMap.getOrDefault(vp.idProduto, 0) + vp.quantidade);
                 }
             }
         } catch (Exception e) {
             logger.error("Erro ao carregar prevendidos para comparacao: ", e);
         }
 
-        if (qtdLinhas > 0) {
-            boolean manter = com.motelinteligente.telas.modernas.EstiloModerno.confirmarSimNao(
-                this,
-                "Manter Rascunho",
-                "Há itens no rascunho de consumo (Pré-venda). Deseja MANTER este rascunho salvo para este quarto?"
-            );
-            if (manter) {
-                List<vendaProdutos> lista = new ArrayList<>();
-                for (int i = 0; i < qtdLinhas; i++) {
-                    try {
-                        int idProd = Integer.parseInt(modelo.getValueAt(i, 0).toString());
-                        int quantidade = Integer.parseInt(modelo.getValueAt(i, 1).toString());
-                        lista.add(new vendaProdutos(idProd, quantidade, 0, 0));
-                    } catch (Exception e) {
-                        // ignora erros de conversão
-                    }
-                }
-                controller.salvarPreVendidos(lista);
-            } else {
-                // Descartar: limpa do banco
-                controller.salvarPreVendidos(new java.util.ArrayList<>());
+        java.util.Map<Integer, Integer> tableMap = new java.util.HashMap<>();
+        List<vendaProdutos> lista = new ArrayList<>();
+        for (int i = 0; i < qtdLinhas; i++) {
+            try {
+                int idProd = Integer.parseInt(modelo.getValueAt(i, 0).toString());
+                int quantidade = Integer.parseInt(modelo.getValueAt(i, 1).toString());
+                tableMap.put(idProd, tableMap.getOrDefault(idProd, 0) + quantidade);
+                lista.add(new vendaProdutos(idProd, quantidade, 0, 0));
+            } catch (Exception e) {
+                // ignora erros de conversão
             }
-        } else {
-            // Se a tabela está vazia, mas existiam itens no banco
-            if (!dbMap.isEmpty()) {
+        }
+
+        boolean modificado = !dbMap.equals(tableMap);
+
+        if (modificado) {
+            if (qtdLinhas > 0) {
+                boolean manter = com.motelinteligente.telas.modernas.EstiloModerno.confirmarSimNao(
+                    this,
+                    "Manter Rascunho",
+                    "Você alterou os produtos. Deseja MANTER esses produtos salvos para este quarto?"
+                );
+                if (manter) {
+                    controller.salvarPreVendidos(lista);
+                } else {
+                    // Descartar: limpa do banco
+                    controller.salvarPreVendidos(new java.util.ArrayList<>());
+                }
+            } else {
+                // Se a tabela está vazia, mas existiam itens no banco
                 boolean salvarVazio = com.motelinteligente.telas.modernas.EstiloModerno.confirmarSimNao(
                     this,
                     "Descartar Rascunho",
@@ -654,6 +752,7 @@ public class EncerraQuarto extends javax.swing.JFrame {
                 }
             }
         }
+        
         if (principal != null) {
             SwingUtilities.invokeLater(() -> principal.mostraQuartos());
         }
