@@ -174,7 +174,7 @@ public class ReceberNumeroQuartoController {
                                     new Thread(() -> {
                                         try {
                                             Thread.sleep(500); 
-                                            new ConectaArduino(quartoEmFoco);
+                                            if (!CacheDados.getInstancia().isPortaoManual(quartoEmFoco)) { new ConectaArduino(quartoEmFoco); Thread.sleep(800); }
                                             Thread.sleep(800);
                                         } catch (InterruptedException ex) {
                                             Thread.currentThread().interrupt();

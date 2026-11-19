@@ -136,13 +136,15 @@ public class TelaPrincipalController {
                         corFundo = meuVermelho;
                 }
 
+                boolean portaoManual = cacheDados.isPortaoManual(num);
+
                 if (novo) {
-                    quadrado = new Quadrado(num, q.getTipoQuarto(), labelExtra, corBorda, auto);
+                    quadrado = new Quadrado(num, q.getTipoQuarto(), labelExtra, corBorda, auto, portaoManual);
                     quadrado.setQuartoClickListener(view);
                     mapaQuadrados.put(num, quadrado);
                     srPane.add(quadrado);
                 } else {
-                    quadrado.atualizar(labelExtra, corBorda, auto);
+                    quadrado.atualizar(labelExtra, corBorda, auto, portaoManual);
                 }
                 quadrado.setBackground(corFundo);
             }
@@ -332,8 +334,10 @@ public class TelaPrincipalController {
                     new Thread(() -> {
                         try {
                             Thread.sleep(300);
-                            new ConectaArduino(quartoEmFoco);
-                            Thread.sleep(800);
+                            if (!CacheDados.getInstancia().isPortaoManual(quartoEmFoco)) {
+                                new ConectaArduino(quartoEmFoco);
+                                Thread.sleep(800);
+                            }
                         } catch (InterruptedException ex) {
                             Thread.currentThread().interrupt();
                             logger.error("Thread interrompida ao acionar Arduino no início da locação", ex);

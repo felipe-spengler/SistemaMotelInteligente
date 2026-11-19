@@ -186,6 +186,20 @@ public class configGlobal {
         }
     }
 
+    public static void verificarColunaPortaoManual(Connection link) {
+        if (link == null) return;
+        try (PreparedStatement testStmt = link.prepareStatement("SELECT portao_manual FROM quartos LIMIT 1")) {
+            testStmt.executeQuery();
+        } catch (SQLException ex) {
+            try (Statement alterStmt = link.createStatement()) {
+                alterStmt.executeUpdate("ALTER TABLE quartos ADD COLUMN portao_manual TINYINT(1) NOT NULL DEFAULT 0");
+                logger.info("[CONFIG] Coluna portao_manual adicionada com sucesso na tabela quartos.");
+            } catch (SQLException alterEx) {
+                logger.error("[CONFIG] Erro ao adicionar coluna portao_manual na tabela quartos: ", alterEx);
+            }
+        }
+    }
+
     public static void verificarColunaPortoesRF(Connection link) {
         try {
             boolean tipoIncorreto = false;
@@ -236,6 +250,7 @@ public class configGlobal {
 
         try (Connection link = new fazconexao().conectar()) {
             verificarColunaPortoesRF(link);
+            verificarColunaPortaoManual(link);
             verificarColunasImpressora(link);
             verificarColunasTaxas(link);
 

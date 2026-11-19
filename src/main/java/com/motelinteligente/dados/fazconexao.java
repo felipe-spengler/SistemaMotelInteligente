@@ -104,6 +104,7 @@ public class fazconexao {
             stmt.executeUpdate(sqlDespesas);
             stmt.executeUpdate(sqlRetiradas);
             stmt.executeUpdate(sqlAuditoria);
+            configGlobal.verificarColunaPortaoManual(link);
 
             // Criar triggers para vendas_avulsas
             criarTriggerSeNaoExistir(stmt, "trg_vendas_avulsas_insert", "vendas_avulsas", "INSERT", "id");

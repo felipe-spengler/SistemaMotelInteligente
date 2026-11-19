@@ -28,6 +28,11 @@ public class ConectaArduino {
         logger.info("[ARDUINO] ConectaArduino instanciado (Abertura de Portão). Valor: {}. Chamador: {} (Thread: {})", 
             valorPortao, chamador, Thread.currentThread().getName());
 
+        if (CacheDados.getInstancia().isPortaoManual(valorPortao)) {
+            logger.info("[ARDUINO] Portão do quarto {} está definido como MANUAL. Sinal de abertura ignorado.", valorPortao);
+            return;
+        }
+
         configGlobal config = configGlobal.getInstance();
         String tipoPortao = config.getPortoesRF();
 

@@ -16,6 +16,15 @@ public class CarregaQuarto {
     String tipoQuarto;
     String statusQuarto;
     String horaStatus;
+    boolean portaoManual;
+
+    public boolean isPortaoManual() {
+        return portaoManual;
+    }
+
+    public void setPortaoManual(boolean portaoManual) {
+        this.portaoManual = portaoManual;
+    }
 
     public int getNumeroQuarto() {
         return numeroQuarto;

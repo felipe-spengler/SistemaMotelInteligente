@@ -20,17 +20,22 @@ public class Quadrado extends javax.swing.JPanel {
     }
 
     public Quadrado(int numero, String tipo, String data, Color minhacor, boolean autoAtend) {
+        this(numero, tipo, data, minhacor, autoAtend, false);
+    }
+
+    public Quadrado(int numero, String tipo, String data, Color minhacor, boolean autoAtend, boolean portaoManual) {
         initComponents();
         p2.setOpaque(false);
         p2.repaint();
         numeroQuarto.setText(String.valueOf(numero));
         tipoQuarto.setText(tipo);
-        manut.setText(data);
+        manut.setText(data != null ? data : "");
         painelTituloQuadrado.setBackground(minhacor);
         
         lblAuto.setVisible(autoAtend);
+        lblPortaoManual.setVisible(portaoManual);
         
-    addMouseListener(new MouseAdapter() {
+        addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (SwingUtilities.isRightMouseButton(e)) { // Verifica se foi um clique direito
@@ -47,6 +52,10 @@ public class Quadrado extends javax.swing.JPanel {
     }
 
     public void atualizar(String data, Color minhacor, boolean autoAtend) {
+        atualizar(data, minhacor, autoAtend, false);
+    }
+
+    public void atualizar(String data, Color minhacor, boolean autoAtend, boolean portaoManual) {
         if (data == null) {
             manut.setText("");
         } else {
@@ -54,6 +63,7 @@ public class Quadrado extends javax.swing.JPanel {
         }
         painelTituloQuadrado.setBackground(minhacor);
         lblAuto.setVisible(autoAtend);
+        lblPortaoManual.setVisible(portaoManual);
     }
 
     public void setQuartoClickListener(QuartoClickListener listener) {
@@ -75,6 +85,7 @@ public class Quadrado extends javax.swing.JPanel {
         numeroQuarto = new javax.swing.JLabel();
         manut = new javax.swing.JLabel();
         lblAuto = new javax.swing.JLabel();
+        lblPortaoManual = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(0, 0, 0));
         setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -127,6 +138,14 @@ public class Quadrado extends javax.swing.JPanel {
         lblAuto.setText("AUTOATENDIMENTO");
         lblAuto.setPreferredSize(new java.awt.Dimension(190, 20));
 
+        lblPortaoManual.setBackground(new java.awt.Color(33, 37, 41));
+        lblPortaoManual.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
+        lblPortaoManual.setForeground(new java.awt.Color(255, 215, 0));
+        lblPortaoManual.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblPortaoManual.setText("PORTÃO MANUAL");
+        lblPortaoManual.setOpaque(true);
+        lblPortaoManual.setPreferredSize(new java.awt.Dimension(190, 20));
+
         javax.swing.GroupLayout p2Layout = new javax.swing.GroupLayout(p2);
         p2.setLayout(p2Layout);
         p2Layout.setHorizontalGroup(
@@ -135,6 +154,7 @@ public class Quadrado extends javax.swing.JPanel {
             .addGroup(p2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblPortaoManual, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblAuto, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(manut, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -143,11 +163,13 @@ public class Quadrado extends javax.swing.JPanel {
             p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(p2Layout.createSequentialGroup()
                 .addComponent(painelTituloQuadrado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
-                .addComponent(lblAuto)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
+                .addComponent(lblPortaoManual, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblAuto, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(manut, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(28, 28, 28))
+                .addGap(14, 14, 14))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -165,6 +187,7 @@ public class Quadrado extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel lblAuto;
+    private javax.swing.JLabel lblPortaoManual;
     private javax.swing.JLabel manut;
     private javax.swing.JLabel numeroQuarto;
     private javax.swing.JPanel p2;

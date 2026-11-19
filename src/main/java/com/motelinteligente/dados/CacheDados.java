@@ -29,6 +29,9 @@ public class CacheDados {
     private static CacheDados instancia;
     private Map<Integer, CarregaQuarto> cacheQuarto = new java.util.concurrent.ConcurrentHashMap<>();
     private Map<Integer, DadosOcupados> cacheOcupado = new java.util.concurrent.ConcurrentHashMap<>();
+    private java.util.Set<Integer> portoesManuais = java.util.concurrent.ConcurrentHashMap.newKeySet();
+    private static final java.util.prefs.Preferences prefs = java.util.prefs.Preferences.userNodeForPackage(CacheDados.class);
+    private static final String PREF_PORTOES_MANUAIS = "portoes_manuais";
 
     public Map<Integer, Timestamp> despertador = new HashMap<>();
     public static SerialPort arduinoPort;
@@ -36,6 +39,63 @@ public class CacheDados {
 
     private CacheDados() {
         // Construtor privado para impedir instâncias diretas
+        carregarPortoesManuais();
+    }
+
+    private void carregarPortoesManuais() {
+        try {
+            String salvos = prefs.get(PREF_PORTOES_MANUAIS, "");
+            if (salvos != null && !salvos.trim().isEmpty()) {
+                for (String parte : salvos.split(",")) {
+                    String limpo = parte.trim();
+                    if (!limpo.isEmpty()) {
+                        portoesManuais.add(Integer.parseInt(limpo));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.warn("Erro ao carregar portões manuais salvos: {}", e.getMessage());
+        }
+    }
+
+    private void salvarPortoesManuais() {
+        try {
+            StringBuilder sb = new StringBuilder();
+            for (Integer q : portoesManuais) {
+                if (sb.length() > 0) sb.append(",");
+                sb.append(q);
+            }
+            prefs.put(PREF_PORTOES_MANUAIS, sb.toString());
+            prefs.flush();
+        } catch (Exception e) {
+            logger.warn("Erro ao salvar portões manuais: {}", e.getMessage());
+        }
+    }
+
+    public boolean isPortaoManual(int numeroQuarto) {
+        return portoesManuais.contains(numeroQuarto);
+    }
+
+    public void setPortaoManual(int numeroQuarto, boolean manual) {
+        if (manual) {
+            portoesManuais.add(numeroQuarto);
+        } else {
+            portoesManuais.remove(numeroQuarto);
+        }
+        CarregaQuarto q = cacheQuarto.get(numeroQuarto);
+        if (q != null) {
+            q.setPortaoManual(manual);
+        }
+        salvarPortoesManuais();
+        new Thread(() -> {
+            new fquartos().setPortaoManual(numeroQuarto, manual);
+        }).start();
+    }
+
+    public boolean alternarPortaoManual(int numeroQuarto) {
+        boolean novoEstado = !isPortaoManual(numeroQuarto);
+        setPortaoManual(numeroQuarto, novoEstado);
+        return novoEstado;
     }
 
     public static synchronized CacheDados getInstancia() {
@@ -196,7 +256,7 @@ public class CacheDados {
         //logger.debug("[CACHE] Iniciando carregarDadosQuarto");
     synchronized (cacheQuarto) { 
         try (Connection link = new fazconexao().conectar(); 
-             PreparedStatement statement = link.prepareStatement("select * from status order by numeroquarto"); 
+             PreparedStatement statement = link.prepareStatement("SELECT s.*, q.tipoquarto, COALESCE(q.portao_manual, 0) AS portao_manual FROM status s LEFT JOIN quartos q ON s.numeroquarto = q.numeroquarto ORDER BY s.numeroquarto"); 
              ResultSet resultado = statement.executeQuery()) {
 
             
@@ -208,13 +268,27 @@ public class CacheDados {
                 int numeroQuarto = resultado.getInt("numeroquarto");
                 String status = resultado.getString("atualquarto");
                 String data = String.valueOf(resultado.getTimestamp("horastatus"));
-                String tipo = new fquartos().getTipo(numeroQuarto);
+                String tipo = resultado.getString("tipoquarto");
+                if (tipo == null) {
+                    tipo = new fquartos().getTipo(numeroQuarto);
+                }
+                boolean isManual = false;
+                try {
+                    isManual = resultado.getInt("portao_manual") == 1;
+                } catch (SQLException ignored) {}
+
+                if (isManual) {
+                    portoesManuais.add(numeroQuarto);
+                } else {
+                    portoesManuais.remove(numeroQuarto);
+                }
 
                 CarregaQuarto quarto = new CarregaQuarto();
                 quarto.setNumeroQuarto(numeroQuarto);
                 quarto.setTipoQuarto(tipo);
                 quarto.setStatusQuarto(status);
                 quarto.setHoraStatus(data);
+                quarto.setPortaoManual(isManual);
 
                 // Adiciona o quarto ao mapa sincronizado
                 cacheQuarto.put(numeroQuarto, quarto);

@@ -49,6 +49,20 @@ public class fquartos {
         return list;
     }
 
+    public boolean setPortaoManual(int numero, boolean manual) {
+        try (Connection link = conexao.conectar()) {
+            configGlobal.verificarColunaPortaoManual(link);
+            try (PreparedStatement stmt = link.prepareStatement("UPDATE quartos SET portao_manual = ? WHERE numeroquarto = ?")) {
+                stmt.setInt(1, manual ? 1 : 0);
+                stmt.setInt(2, numero);
+                return stmt.executeUpdate() > 0;
+            }
+        } catch (SQLException e) {
+            logger.error("Erro setPortaoManual", e);
+            return false;
+        }
+    }
+
     public boolean setStatus(int numero, String status) {
         return setStatus(numero, status, new Timestamp(new Date().getTime()));
     }

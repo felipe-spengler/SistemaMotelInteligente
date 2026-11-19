@@ -109,6 +109,8 @@ public class CheckSincronia extends TimerTask {
             // Garante a migração de esquema (seja local ou remoto) antes de sincronizar
             configGlobal.verificarColunaPortoesRF(localConn);
             configGlobal.verificarColunaPortoesRF(remoteConn);
+            configGlobal.verificarColunaPortaoManual(localConn);
+            configGlobal.verificarColunaPortaoManual(remoteConn);
 
             boolean ok = true;
 

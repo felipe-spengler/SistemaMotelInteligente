@@ -107,6 +107,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     private String cargo = null;
     private int quartoEmFoco = 0;
     private JPopupMenu popupMenu;
+    private JMenuItem itemPortaoManualPopup;
     private boolean isClickable = true;
     private Timer refreshTimer; // Timer para atualizar a tela
     private Timer pedidosTimer; // Timer para pedidos online
@@ -2252,6 +2253,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         } else {
             popupMenu.getComponent(1).setEnabled(false); // Desativa a opção de editar se não for admin
         }
+        quartoEmFoco = numeroQuartoSelecionado;
+        atualizarTextoMenusPortaoManual(numeroQuartoSelecionado);
         popupMenu.show(this, MouseInfo.getPointerInfo().getLocation().x, MouseInfo.getPointerInfo().getLocation().y);
         quartoEmFoco = numeroQuartoSelecionado;
 
@@ -2278,6 +2281,29 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         verLocacaoItem.setFont(new Font("Arial", Font.PLAIN, 16));
         editarLocacaoItem.setFont(new Font("Arial", Font.PLAIN, 16));
         popupMenu.add(editarLocacaoItem);
+        popupMenu.addSeparator();
+        itemPortaoManualPopup = new JMenuItem("Definir Portão como Manual");
+        itemPortaoManualPopup.setFont(new Font("Arial", Font.PLAIN, 16));
+        try {
+            itemPortaoManualPopup.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/ferramentas.png")));
+        } catch (Exception ignored) {}
+        itemPortaoManualPopup.addActionListener((e) -> alternarPortaoManualQuarto(quartoEmFoco));
+        popupMenu.add(itemPortaoManualPopup);
+    }
+
+    private void atualizarTextoMenusPortaoManual(int numeroQuarto) {
+        if (numeroQuarto <= 0) return;
+        boolean isManual = CacheDados.getInstancia().isPortaoManual(numeroQuarto);
+        String texto = isManual ? "Voltar Portão p/ Automático" : "Definir Portão como Manual";
+        if (itemPortaoManualPopup != null) itemPortaoManualPopup.setText(texto);
+    }
+
+    private void alternarPortaoManualQuarto(int numeroQuarto) {
+        if (numeroQuarto <= 0) return;
+        CacheDados.getInstancia().alternarPortaoManual(numeroQuarto);
+        atualizarTextoMenusPortaoManual(numeroQuarto);
+        mostraQuartos();
+        focoQuarto();
 
     }// GEN-LAST:event_formWindowOpened
 
@@ -2767,6 +2793,10 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_jButton4ActionPerformed
         // abre o portão do quarto
+        if (quartoEmFoco > 0 && CacheDados.getInstancia().isPortaoManual(quartoEmFoco)) {
+            logger.info("[ARDUINO] Tentativa de abrir portão do quarto {} bloqueada na TelaPrincipal (Portão em modo MANUAL).", quartoEmFoco);
+            return;
+        }
         SwingUtilities.invokeLater(() -> {
             new ConectaArduino(quartoEmFoco);
         });
@@ -2853,6 +2883,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
         // TODO add your handling code here:
         if (quartoEmFoco != 0) {
             CacheDados cacheDados = CacheDados.getInstancia();
+            atualizarTextoMenusPortaoManual(quartoEmFoco);
             CarregaQuarto q = cacheDados.getCacheQuarto().get(quartoEmFoco);
             String status = q.getStatusQuarto();
             if (status.equals("limpeza") || status.equals("manutencao") || status.equals("reservado")) {
