@@ -715,6 +715,10 @@ public class ImpressoraService {
     }
 
     public static void imprimirMultiplasVendasAvulsas(List<Object[]> itens, String tipo, String formaPgto, String funcionario) {
+        imprimirMultiplasVendasAvulsas(itens, tipo, formaPgto, funcionario, 0f, -1f);
+    }
+
+    public static void imprimirMultiplasVendasAvulsas(List<Object[]> itens, String tipo, String formaPgto, String funcionario, float valorDesconto, float totalLiquido) {
         StringBuilder sb = new StringBuilder();
         sb.append("========================================\n");
         sb.append("             VENDA AVULSA               \n");
@@ -730,20 +734,25 @@ public class ImpressoraService {
         sb.append("Forma Pgto: ").append(formaPgto.toUpperCase()).append("\n");
         sb.append("----------------------------------------\n");
         
-        float totalGeral = 0f;
+        float subtotalItens = 0f;
         for (Object[] item : itens) {
             String produto = String.valueOf(item[0]);
             int quantidade = (Integer) item[1];
             float valorUnd = (Float) item[2];
             float total = (Float) item[3];
-            totalGeral += total;
+            subtotalItens += total;
             
             sb.append(produto).append("\n");
             sb.append("  ").append(quantidade).append(" x R$ ").append(String.format(java.util.Locale.US, "%.2f", valorUnd))
               .append(" = R$ ").append(String.format(java.util.Locale.US, "%.2f", total)).append("\n");
         }
         sb.append("----------------------------------------\n");
-        sb.append("TOTAL GERAL: R$ ").append(String.format(java.util.Locale.US, "%.2f", totalGeral)).append("\n");
+        float totalFinal = totalLiquido >= 0f ? totalLiquido : Math.max(0f, subtotalItens - valorDesconto);
+        if (valorDesconto > 0.009f) {
+            sb.append("SUBTOTAL:    R$ ").append(String.format(java.util.Locale.US, "%.2f", subtotalItens)).append("\n");
+            sb.append("DESCONTO:   -R$ ").append(String.format(java.util.Locale.US, "%.2f", valorDesconto)).append("\n");
+        }
+        sb.append("TOTAL GERAL: R$ ").append(String.format(java.util.Locale.US, "%.2f", totalFinal)).append("\n");
         sb.append("----------------------------------------\n");
         
         if ("adiantamento".equalsIgnoreCase(tipo)) {

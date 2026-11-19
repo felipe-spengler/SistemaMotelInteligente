@@ -616,13 +616,14 @@ public class CaixaFrameModerno extends JFrame {
                     com.motelinteligente.dados.ImpressoraService.imprimirProdutosVendidosPorQuarto(idCaixa);
                 }
 
-                JOptionPane.showMessageDialog(this,
-                        "Caixa fechado com sucesso!",
-                        "Sucesso",
-                        JOptionPane.INFORMATION_MESSAGE);
                 configGlobal.getInstance().setCaixa(0);
                 if (configGlobal.getInstance().getLogoffecharcaixa()) {
-                    configGlobal.getInstance().setFlagFechar(true); // Logoff solicitado pela config
+                    configGlobal.getInstance().setFlagFechar(true); // Logoff solicitado pela config (sem exibir popup antes)
+                } else {
+                    JOptionPane.showMessageDialog(this,
+                            "Caixa fechado com sucesso!",
+                            "Sucesso",
+                            JOptionPane.INFORMATION_MESSAGE);
                 }
                 dispose();
             }

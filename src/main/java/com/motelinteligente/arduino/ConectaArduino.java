@@ -363,21 +363,27 @@ public class ConectaArduino {
 
     private static String formatarComandoAmigavel(String cmd) {
         cmd = cmd.trim();
-        if (cmd.startsWith("LUZ-ON_")) {
-            return "O comando de ligar a LUZ do quarto " + cmd.replace("LUZ-ON_", "");
+        String upper = cmd.toUpperCase();
+        if (upper.startsWith("LUZ-ON-") || upper.startsWith("LUZ-ON_")) {
+            String quarto = cmd.substring(7).trim();
+            return "Ligar a energia/luz do Quarto " + quarto;
         }
-        if (cmd.startsWith("LUZ-OFF_")) {
-            return "O comando de desligar a LUZ do quarto " + cmd.replace("LUZ-OFF_", "");
+        if (upper.startsWith("LUZ-OFF-") || upper.startsWith("LUZ-OFF_")) {
+            String quarto = cmd.substring(8).trim();
+            return "Desligar a energia/luz do Quarto " + quarto;
         }
         if (cmd.equals("888")) {
-            return "O comando do PORTÃO DE ENTRADA";
+            return "Abrir o Portão de Entrada";
         }
         if (cmd.equals("999")) {
-            return "O comando do PORTÃO DE SAÍDA";
+            return "Abrir o Portão de Saída";
+        }
+        if (cmd.equals("777")) {
+            return "Comando Geral dos Portões";
         }
         try {
             int num = Integer.parseInt(cmd);
-            return "O comando do PORTÃO do quarto " + num;
+            return "Abrir o Portão do Quarto " + num;
         } catch (NumberFormatException e) {
             return "O comando \"" + cmd + "\"";
         }
