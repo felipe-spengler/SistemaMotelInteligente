@@ -243,6 +243,11 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
 
         adicionarMenuMensalidade();
         customizarAbas();
+
+        // Modal de aviso de reajuste de mensalidade (abre no centro da tela após login)
+        SwingUtilities.invokeLater(() -> {
+            ModalAvisoReajuste.exibir(this);
+        });
     }
 
     public void setLabel(String ini_user, String ini_cargo) {
