@@ -67,10 +67,10 @@ public class TelaLoginModerno extends JFrame {
                 BorderFactory.createLineBorder(new Color(0, 0, 0, 20), 1),
                 BorderFactory.createEmptyBorder(10, 10, 10, 10)));
 
-        // Logo
+        // Logo Oficial do Sistema (iconeMotel)
         try {
-            ImageIcon originalIcon = new ImageIcon(getClass().getResource("/imagens/logo.png"));
-            Image scaledImage = originalIcon.getImage().getScaledInstance(200, -1, Image.SCALE_SMOOTH);
+            ImageIcon originalIcon = new ImageIcon(getClass().getResource("/imagens/iconeMotel.png"));
+            Image scaledImage = originalIcon.getImage().getScaledInstance(120, 120, Image.SCALE_SMOOTH);
             JLabel lblLogo = new JLabel(new ImageIcon(scaledImage));
             cardLogin.add(lblLogo, "center, wrap");
         } catch (Exception e) {

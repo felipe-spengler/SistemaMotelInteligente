@@ -74,7 +74,14 @@ public class TelaLogin extends javax.swing.JFrame {
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/logo.png"))); // NOI18N
+        try {
+            javax.swing.ImageIcon iconOrig = new javax.swing.ImageIcon(getClass().getResource("/imagens/iconeMotel.png"));
+            java.awt.Image imgScale = iconOrig.getImage().getScaledInstance(130, 130, java.awt.Image.SCALE_SMOOTH);
+            jLabel1.setIcon(new javax.swing.ImageIcon(imgScale));
+            jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        } catch (Exception ex) {
+            jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagens/iconeMotel.png")));
+        }
 
         jLabel2.setText("Login:");
 

@@ -1964,89 +1964,11 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     }
 
     private String getSistemaProperty() {
-        Properties props = new Properties();
-
-        // CORREÇÃO CRÍTICA: Corrigido o erro de digitação de "Documetos" para
-        // "Documents"
-        String userHome = System.getProperty("user.home");
-        String path = userHome + File.separator + "Documents"
-                + File.separator + "logs" + File.separator + "application.properties";
-
-        try (FileInputStream fis = new FileInputStream(path)) {
-            props.load(fis);
-
-            // 1. Pega o valor da propriedade "SISTEMA"
-            String sistema = props.getProperty("SISTEMA", "SistemaDesconhecido");
-
-            // 2. Transforma para minúsculo (necessário para o switch/case no PHP)
-            String sistemaLower = sistema.toLowerCase();
-
-            // 3. (Sugestão de segurança) Codifica para URL, caso tenha caracteres especiais
-            return URLEncoder.encode(sistemaLower, StandardCharsets.UTF_8.toString());
-
-        } catch (Exception e) {
-            logger.error("Erro ao ler application.properties em {}", path, e);
-            return "SistemaDesconhecido";
-        }
+        return com.motelinteligente.service.MensalidadeService.getInstance().getSistemaProperty();
     }
 
     public void verificarMensalidade() {
-        LocalDate hoje = LocalDate.now();
-        int diaDoMes = hoje.getDayOfMonth();
-
-        // Só exibe avisos se o dia do mês for maior que 7
-        if (diaDoMes <= 7) {
-            return;
-        }
-
-        String sistemaNome = getSistemaProperty();
-
-        // Conexão com o banco de dados
-        try (Connection conn = ConexaoRemota.getConnection()) {
-            String sql = "SELECT referente FROM mensalidade WHERE status = 'approved' ORDER BY referente DESC LIMIT 1";
-            try (PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
-
-                LocalDate ultimoPagamento = null;
-                if (rs.next()) {
-                    // Pega a data de referência da última mensalidade paga
-                    ultimoPagamento = rs.getDate("referente").toLocalDate();
-                }
-
-                // --- Lógica de Verificação ---
-                // 1. Verifica se a última mensalidade paga é a deste mês (ou já paga)
-                if (ultimoPagamento != null && !ultimoPagamento.isBefore(hoje.withDayOfMonth(1))) {
-                    // A última mensalidade paga é a deste mês ou já está adiantada.
-                    return;
-                }
-
-                // --- Se chegou aqui, a mensalidade está em aberto ou atrasada ---
-                // URL de pagamento (O valor final será definido em mensalidade.php)
-                final String redirectUrl = "http://motelinteligente.com/api/mensalidade.php?sistema=" + sistemaNome;
-
-                String titulo = "Aviso de Mensalidade";
-                String mensagem;
-                int tipoMensagem; // Tipo de ícone: WARNING ou ERROR
-
-
-                if (diaDoMes <= 10) {
-                    // Até o dia 10: Vencimento próximo (Aviso Amarelo)
-                    mensagem = "O vencimento da Mensalidade está próximo (dia 10).\nDeseja pagar agora?";
-                    tipoMensagem = JOptionPane.WARNING_MESSAGE;
-                } else {
-                    // Após o dia 10: Mensalidade atrasada (Erro Vermelho)
-                    mensagem = "Sua mensalidade está em atraso.\nPor favor, regularize o pagamento para evitar interrupções.\nDeseja pagar agora?";
-                    tipoMensagem = JOptionPane.ERROR_MESSAGE;
-                }
-
-                // Exibe a notificação discreta no canto da tela
-                SwingUtilities.invokeLater(() -> {
-                    new NotificacaoMensalidade(mensagem, redirectUrl);
-                });
-
-            }
-        } catch (Exception e) {
-            logger.error("Erro ao verificar mensalidade: " + e);
-        }
+        com.motelinteligente.service.MensalidadeService.getInstance().verificarMensalidade();
     }
 
     private void verificarPopupFiscal() {
@@ -2145,78 +2067,12 @@ public class TelaPrincipal extends javax.swing.JFrame implements QuartoClickList
     }
 
     private void verificarReservasProximas() {
-
-        try (Connection conn = new fazconexao().conectar();
-                PreparedStatement stmt = conn.prepareStatement(
-                        "SELECT * FROM reservas "
-                                + "WHERE TIMESTAMP(data_entrada, horario_entrada) BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 12 HOUR)");
-                ResultSet rs = stmt.executeQuery()) {
-
-            CacheDados cache = CacheDados.getInstancia();
-            StringBuilder textoHTML = new StringBuilder("<html>");
-            boolean temReservas = false;
-
-            while (rs.next()) {
-                temReservas = true; // Indica que há pelo menos uma reserva
-
-                String numero = rs.getString("numero_quarto");
-                String hora = rs.getString("horario_entrada");
-                String data = rs.getString("data_entrada");
-                String valorPago = rs.getString("valor_pago");
-                String nome = rs.getString("observacao");
-
-                // verifica qual o status do quarto > se possível reserva ele
-                CarregaQuarto quarto = cache.getCacheQuarto().get(Integer.parseInt(numero));
-                System.out.println("quarto de num " + numero + " está reservado");
-                if (!quarto.getStatusQuarto().contains("ocupado") || quarto.getStatusQuarto().equals("limpeza")) {
-                    mudaStatusNaCache(Integer.parseInt(numero), "reservado", null);
-
-                    // a seguir acontece em background
-                    SwingWorker<Void, Void> worker;
-                    worker = new SwingWorker<Void, Void>() {
-                        @Override
-                        protected Void doInBackground() throws Exception {
-                            new fquartos().setStatus(Integer.parseInt(numero), "reservado");
-                            return null;
-                        }
-
-                    };
-                    worker.execute();
-
-                }
-
-                // Formatação da data e horário
-                String dataHora = hora + "/" + data;
-
-                // Adicionando a bolinha azul e o texto formatado
-                textoHTML.append("<div style='font-size: 14px;'>")
-                        .append("<span style='color: blue;'>&#9679;</span> Reserva: Nº <b style='color: red;'>")
-                        .append(numero)
-                        .append("</b> - <b style='color: red;'>")
-                        .append(dataHora)
-                        .append("</b> - pago <b style='color: red;'>")
-                        .append(valorPago)
-                        .append("</b> - <span style='color: black;'>")
-                        .append(nome)
-                        .append("</span></div><br>");
-
-            }
-
-            // Se não houver reservas, deve deixar o texto vazio
-            if (!temReservas) {
-                textoHTML.append("Nenhuma reserva nas proximas 24h.");
-            }
-
-            textoHTML.append("</html>");
-
-            SwingUtilities.invokeLater(() -> {
-                labelReservas.setText(textoHTML.toString());
-
-            });
-
-        } catch (Exception e) {
-            logger.error("Erro ao verificar reservas próximas", e);
-        }
+        String textoHTML = com.motelinteligente.service.ReservaService.getInstance().verificarReservasProximas(numQuarto -> {
+            mudaStatusNaCache(numQuarto, "reservado", null);
+        });
+        SwingUtilities.invokeLater(() -> {
+            labelReservas.setText(textoHTML);
+        });
     }
 
     public void mostraQuartos() {
