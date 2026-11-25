@@ -144,11 +144,13 @@ public class ConectaArduino {
     private boolean enviarParaArduino(String mensagem) {
         try {
             mensagem += "\n";
-            if (CacheDados.getArduinoPort() != null) {
-                CacheDados.getArduinoPort().writeBytes(mensagem.getBytes(), mensagem.length());
+            com.fazecast.jSerialComm.SerialPort port = CacheDados.getArduinoPort();
+            if (port != null && port.isOpen()) {
+                port.writeBytes(mensagem.getBytes(), mensagem.length());
                 // logger.debug("Enviado para Arduino: " + mensagem.trim());
                 return true;
             }
+            logger.warn("[ARDUINO] Porta serial não está aberta ou é nula.");
             return false;
         } catch (Exception e) {
             logger.error("Erro ao enviar dados para o Arduino: ", e);
@@ -162,9 +164,10 @@ public class ConectaArduino {
             String resposta = "";
 
             while (System.currentTimeMillis() - tempoInicio < TIMEOUT_RESPOSTA_MS) {
-                if (CacheDados.getArduinoPort().bytesAvailable() > 0) {
-                    byte[] dadosRecebidos = new byte[CacheDados.getArduinoPort().bytesAvailable()];
-                    CacheDados.getArduinoPort().readBytes(dadosRecebidos, dadosRecebidos.length);
+                com.fazecast.jSerialComm.SerialPort port = CacheDados.getArduinoPort();
+                if (port != null && port.isOpen() && port.bytesAvailable() > 0) {
+                    byte[] dadosRecebidos = new byte[port.bytesAvailable()];
+                    port.readBytes(dadosRecebidos, dadosRecebidos.length);
                     resposta += new String(dadosRecebidos);
                     String parcial = resposta.trim();
                     //logger.debug("Resposta parcial do Arduino: {}", parcial);
@@ -189,13 +192,14 @@ public class ConectaArduino {
 
     private static void limparBufferArduino() {
         try {
-            while (CacheDados.getArduinoPort().bytesAvailable() > 0) {
-                byte[] bufferLimpeza = new byte[CacheDados.getArduinoPort().bytesAvailable()];
-                CacheDados.getArduinoPort().readBytes(bufferLimpeza, bufferLimpeza.length);
+            com.fazecast.jSerialComm.SerialPort port = CacheDados.getArduinoPort();
+            while (port != null && port.isOpen() && port.bytesAvailable() > 0) {
+                byte[] bufferLimpeza = new byte[port.bytesAvailable()];
+                port.readBytes(bufferLimpeza, bufferLimpeza.length);
             }
-            System.out.println("Buffer do Arduino limpo.");
+            // System.out.println("Buffer do Arduino limpo.");
         } catch (Exception e) {
-            System.out.println("Erro ao limpar buffer do Arduino: " + e.getMessage());
+            logger.debug("Erro ao limpar buffer do Arduino: {}", e.getMessage());
         }
     }
 

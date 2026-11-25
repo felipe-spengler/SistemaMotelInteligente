@@ -241,11 +241,12 @@ public class TelaLogin extends javax.swing.JFrame {
             cache.carregarDadosQuarto();
             // logger.info("[LOGIN] Depois de carregarDadosQuarto");
 
-            // Carrega Arduino em todas as filiais. O filtro venus era incorreto.
+            // Carrega Arduino em todas as filiais com monitor de resiliência ativo
             if (!configuracoes.isFlagArduino()) {
                 new Thread(() -> {
                     try {
-                        cache.carregaArduino();
+                        CacheDados.carregaArduino();
+                        CacheDados.iniciarMonitorArduino();
                         configuracoes.setFlagArduino(true);
                     } catch (Exception ex) {
                         logger.error("[LOGIN] Erro ao carregar Arduino em background", ex);

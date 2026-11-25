@@ -35,7 +35,9 @@ public class CacheDados {
 
     public Map<Integer, Timestamp> despertador = new HashMap<>();
     public static SerialPort arduinoPort;
-    private static final Logger logger = LoggerFactory.getLogger(CacheDados.class); // Corrigido a classe de log
+    private static long ultimaTentativaReconexao = 0;
+    private static boolean monitorIniciado = false;
+    private static final Logger logger = LoggerFactory.getLogger(CacheDados.class);
 
     private CacheDados() {
         // Construtor privado para impedir instâncias diretas
@@ -211,12 +213,65 @@ public class CacheDados {
     }
 
     public static SerialPort getArduinoPort() {
-        return arduinoPort;
+        return obterOuReconectarArduino();
+    }
+
+    /**
+     * Retorna a porta serial aberta do Arduino.
+     * Caso esteja nula ou fechada (ex: cabo reconectado), tenta reconectar silenciosamente.
+     */
+    public static synchronized SerialPort obterOuReconectarArduino() {
+        if (arduinoPort != null && arduinoPort.isOpen()) {
+            return arduinoPort;
+        }
+
+        long agora = System.currentTimeMillis();
+        // Debounce de 4 segundos para evitar travamento em cascata se o dispositivo estiver desconectado
+        if (agora - ultimaTentativaReconexao > 4000) {
+            ultimaTentativaReconexao = agora;
+            logger.info("[ARDUINO] Porta serial desconectada ou fechada. Tentando reconexão silenciosa...");
+            carregaArduino();
+        }
+
+        return (arduinoPort != null && arduinoPort.isOpen()) ? arduinoPort : null;
+    }
+
+    /**
+     * Inicia um monitor daemon em segundo plano que verifica a cada 45 segundos
+     * se a comunicação serial com o Arduino está ativa, reconectando automaticamente se necessário.
+     */
+    public static synchronized void iniciarMonitorArduino() {
+        if (monitorIniciado) return;
+        monitorIniciado = true;
+
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
+            Thread t = new Thread(r, "ArduinoHeartbeatMonitor");
+            t.setDaemon(true);
+            return t;
+        });
+
+        scheduler.scheduleAtFixedRate(() -> {
+            try {
+                if (arduinoPort == null || !arduinoPort.isOpen()) {
+                    logger.debug("[ARDUINO] Heartbeat detectou Arduino desconectado. Tentando reconectar...");
+                    carregaArduino();
+                }
+            } catch (Exception e) {
+                logger.warn("[ARDUINO] Exceção no monitor de reconexão do Arduino: {}", e.getMessage());
+            }
+        }, 30, 45, TimeUnit.SECONDS);
+
+        logger.info("[ARDUINO] Monitor de resiliência e reconexão silenciosa do Arduino ativado.");
     }
 
     public static void fecharConexao() {
         if (arduinoPort != null && arduinoPort.isOpen()) {
-            arduinoPort.closePort();
+            try {
+                arduinoPort.closePort();
+            } catch (Exception ignored) {
+            } finally {
+                arduinoPort = null;
+            }
         }
     }
 
